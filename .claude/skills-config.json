@@ -41,7 +41,7 @@
    "path": ".claude/skills/papers-collect-from-web/SKILL.md"
   },
   "papers-download-from-list": {
-   "description": "Uses colocated paper download tools to download, verify, and repair local PDFs from curated candidate lists so that `obsidian-vault/paperPDFs/` stays complete and deduplicated. Use when you have a curated paper list and want all corresponding PDFs downloaded/checked before analysis or index rebuild.",
+   "description": "Uses colocated paper download tools to download, verify, and repair local PDFs from curated candidate lists so that `obsidian-vault/paperPDFs/` stays complete and deduplicated. Use when you have a curated paper list and want all corresponding PDFs downloaded and verified before analysis or index rebuild.",
    "path": ".claude/skills/papers-download-from-list/SKILL.md"
   },
   "papers-query-knowledge-base": {

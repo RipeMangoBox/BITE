@@ -19,7 +19,7 @@ python3 ".claude/skills/papers-collect-from-web/scripts/paper_collector_online/c
 
 Notes:
 - `state` defaults to `Wait`; later stages advance it to `Downloaded` and
-  `checked`.
+  `analysised`, then later promote reviewed assets to `checked`.
 - `importance`, `sort`, `pdf_path` are left blank for later manual fill.
 - Output is now unified with `papers-collect-from-github-repo`.
 

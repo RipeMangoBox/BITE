@@ -62,7 +62,7 @@ Typical execution order (from candidate list to clean PDF set):
    - Behavior:
      - verifies `pdf_path` references in `paper_list.csv`;
      - moves rows with missing PDFs back to `Wait`;
-     - promotes rows with found PDFs only to `Downloaded`, never to `checked`.
+     - promotes rows with found PDFs only to `Downloaded`, never to `analysised` or `checked`.
 
 4. **Deduplicate and clean up**
    - ```bash

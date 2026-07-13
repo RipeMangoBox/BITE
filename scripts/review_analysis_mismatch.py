@@ -219,7 +219,7 @@ def review_all_analysis_mismatch() -> None:
         reason = describe_mismatch(af)
 
         if af is not None and af.is_emergent_style_basic_ok:
-            new_status = "checked"
+            new_status = "analysised"
             row[0] = new_status
             rows[i] = row
         else:

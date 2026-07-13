@@ -19,6 +19,10 @@
 
 ## 当前正式链
 
+分析成功并通过 deterministic export validation 后，`paper_list.csv` 状态写为
+`analysised`；该状态表示分析资产已生成但尚未完成内容复查。后续质量复查通过后，
+再由 `analysised` 提升为 `checked`。
+
 正式 runner 支持 PDF、已有 MinerU 输出目录或 Markdown 源输入，默认链路是：
 
 ```text

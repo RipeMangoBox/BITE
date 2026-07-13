@@ -32,7 +32,7 @@ Defaults:
 - **sort**: leave blank if unknown; user can fill per item later
 - **pdf_path**: empty (filled later by `papers-download-from-list`)
 
-> State convention is defined in `STATE_CONVENTION.md`: main pipeline `Wait → Downloaded → checked`; out-of-band states `Skip` / `Missing`.
+> State convention is defined in `STATE_CONVENTION.md`: main pipeline `Wait → Downloaded → analysised → checked`; out-of-band states `Skip` / `Missing`.
 
 ## Workflow
 

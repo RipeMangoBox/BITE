@@ -29,6 +29,10 @@ collect candidate papers / import local PDFs
   -> query / ideate / focus / review / export
 ```
 
+Paper state advances as `Wait → Downloaded → analysised → checked`:
+`analysised` means that the structured note and deterministic export validation
+exist, while `checked` is reserved for a later content-quality review.
+
 ## Branch Sync Policy
 
 This branch is the canonical place for changes that should later appear in the

@@ -127,7 +127,7 @@ For each stage, return:
 `paper_list.csv` paper states follow a unified convention. See `STATE_CONVENTION.md`:
 
 ```
-Main pipeline: Wait → Downloaded → checked
+Main pipeline: Wait → Downloaded → analysised → checked
 Out-of-band states: Skip (manually skipped), Missing (download failed)
 Analyze exceptions: analysis_mismatch, too_large
 ```
