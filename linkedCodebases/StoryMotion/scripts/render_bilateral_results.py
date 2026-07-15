@@ -2,7 +2,7 @@
 """Render stage2 DDIM samples as static PNG and MP4 video."""
 from __future__ import annotations
 
-import argparse, ast, importlib.util, json, subprocess, sys, time
+import argparse, ast, hashlib, importlib.util, json, subprocess, sys, time
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +39,17 @@ def load_local_module(name, path):
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+run_layout = load_local_module('storymotion_run_layout_render', ROOT / 'scripts/storymotion_run_layout.py')
 
 try:
     import imageio_ffmpeg
@@ -137,9 +148,24 @@ def load_model(ckpt_path, device):
         return load_h2c_model(ckpt_path, ckpt, device)
     if is_model_switch_h2c_checkpoint(ckpt):
         return load_model_switch_h2c_model(ckpt_path, ckpt, device)
-    meta_args = ckpt.get('meta', {}).get('args', {})
-    v72_config = ckpt.get('meta', {}).get('v72_config', {})
-    p2b_meta = ckpt.get('meta', {}).get('p2b_reliability', {})
+    meta = ckpt.get('meta', {})
+    if parse_bool(meta.get('task_instruction', {}).get('enabled'), False):
+        bridge = load_local_module(
+            'storymotion_official_bridge_render_loader',
+            ROOT / 'scripts/storymotion_official_bridge_smoke.py',
+        )
+        model, diffusion, _ = bridge.load_stage2(
+            Path(ckpt_path).parent,
+            mod,
+            device,
+            checkpoint_path=Path(ckpt_path),
+        )
+        return model, diffusion, ckpt
+    meta_args = meta.get('args', {})
+    v72_config = meta.get('v72_config', {})
+    p2b_meta = meta.get('p2b_reliability', {})
+    task_names = meta.get('task_names', {})
+    num_task_embeddings = int(meta.get('num_task_embeddings', meta_args.get('num_task_embeddings', len(task_names) if task_names else 3)))
     width = int(meta_args.get('width', 384))
     dim_mults = tuple(int(v) for v in ast.literal_eval(meta_args.get('dim_mults', '[1,2,2]')))
     cond_mask_prob = float(meta_args.get('cond_mask_prob', 0.1))
@@ -167,6 +193,7 @@ def load_model(ckpt_path, device):
         v72_relation_surrogate=parse_bool(meta_args.get('v72_relation_surrogate'), parse_bool(v72_config.get('relation_surrogate'), False)),
         v72_gate_bias=float(meta_args.get('v72_gate_bias', v72_config.get('gate_bias', 2.0))),
         reliability_cond_dim=reliability_cond_dim,
+        num_task_embeddings=num_task_embeddings,
     ).to(device)
     model.load_state_dict(ckpt['model']); model.eval()
     if hasattr(mod, 'build_stage2_process'):
@@ -696,7 +723,9 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('--ckpt', type=Path, default=ROOT / 'runs/train/stage2/pulp_official_full_mixed_20260611/gpu3_branchmean_jointheavy6_ft_b512_102688_20260612_2151/last.pt')
     p.add_argument('--cache-dir', type=Path, default=ROOT / 'runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110')
-    p.add_argument('--out-dir', type=Path, default=ROOT / 'runs/eval/bilateral_cfg_renders_20260614')
+    p.add_argument('--runs-root', type=Path, default=ROOT / 'runs')
+    p.add_argument('--vis-id', help='Canonical Stage2 run id; derives the vis path under runs/stage2/<run-id>/vis.')
+    p.add_argument('--out-dir', type=Path, default=None)
     p.add_argument('--metrics-out-dir', type=Path, default=None)
     p.add_argument('--cfg-scale', type=float, default=2.0)
     p.add_argument('--cfg-human', type=float, default=None)
@@ -722,23 +751,50 @@ def main():
     p.add_argument('--joint-compose-h2c-source', choices=['replay', 'clean', 'noisy'], default='replay',
                    help='Source type passed to the H2C camera model during composed joint rendering.')
     args = p.parse_args()
+    if args.vis_id:
+        args.out_dir = run_layout.run_paths('stage2', args.vis_id, args.runs_root)['vis']
+    elif args.out_dir is None:
+        args.out_dir = ROOT / 'runs/eval/bilateral_cfg_renders_20260614'
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     torch.manual_seed(args.seed); np.random.seed(args.seed)
 
     print('Loading model...')
     model, diffusion, ckpt = load_model(args.ckpt, device)
+    checkpoint_meta = ckpt.get('meta', {})
+    task_routing = str(checkpoint_meta.get('task_routing', checkpoint_meta.get('args', {}).get('task_routing', 'symmetric')))
+    joint_coupling_scale = float(checkpoint_meta.get('joint_coupling_scale', checkpoint_meta.get('args', {}).get('joint_coupling_scale', 1.0)))
+    joint_coupling_mode = str(checkpoint_meta.get('joint_coupling_mode', checkpoint_meta.get('args', {}).get('joint_coupling_mode', 'symmetric')))
+    strict_run_sampler = task_routing == 'human_first'
     _, dataset, autoencoder = build_pulp(args, device)
-    cache = mod.PulpLatentCache(args.cache_dir / 'val.pt')
+    bridge = load_local_module('storymotion_official_bridge_render', ROOT / 'scripts/storymotion_official_bridge_smoke.py')
+    raw_cache = torch.load(args.cache_dir / 'val.pt', map_location='cpu')
+    cache_meta = raw_cache.get('meta', {}) if isinstance(raw_cache, dict) else {}
+    owning_decoder, owning_decoder_record = bridge.resolve_owning_decoder(
+        ROOT, cache_meta, autoencoder, device
+    )
+    znorm_record = ckpt.get('meta', {}).get('latent_znorm', {'enabled': False})
+    znorm_stats = None
+    if znorm_record.get('enabled', False):
+        stats_path = Path(znorm_record['stats_path'])
+        if not stats_path.exists():
+            stats_path = args.cache_dir / stats_path.name
+        znorm_stats = mod.load_latent_znorm_stats(stats_path)
+        mod.latent_znorm_meta(True, znorm_stats, stats_path, args.cache_dir / 'train.pt')
+    cache = mod.PulpLatentCache(args.cache_dir / 'val.pt', znorm_stats=znorm_stats)
     compose_joint = args.joint_compose_camera_run_dir is not None
     if compose_joint and 'joint' not in set(args.tasks):
         raise ValueError('--joint-compose-camera-run-dir is only useful when --tasks includes joint')
     full_eval = None
     h2c_model = None
     h2c_mod = None
-    if compose_joint:
+    h2c_diffusion = None
+    if compose_joint or strict_run_sampler:
         full_eval = load_local_module('storymotion_official_full_eval_render', ROOT / 'scripts/storymotion_official_full_eval.py')
-        h2c_model, h2c_mod, _ = full_eval.load_h2c_camera_model(ROOT, args.joint_compose_camera_run_dir.resolve(), device)
+    if compose_joint:
+        h2c_model, h2c_mod, _, h2c_diffusion = full_eval.load_h2c_camera_model(
+            ROOT, args.joint_compose_camera_run_dir.resolve(), device, mod
+        )
 
     if args.sample_ids:
         target_ids = [str(sample_id) for sample_id in args.sample_ids]
@@ -758,8 +814,18 @@ def main():
     results = {'samples': [], 'cfg_mode': 'bilateral' if is_bilateral else 'standard',
                'cfg_scale': args.cfg_scale, 'cfg_human': args.cfg_human, 'cfg_camera': args.cfg_camera,
                'cfg_channel_gated': bool(args.channel_gated_cfg), 'eta': args.eta, 'tasks': args.tasks,
+               'checkpoint': str(args.ckpt.resolve()),
+               'checkpoint_sha256': sha256_file(args.ckpt),
+               'checkpoint_step': int(ckpt.get('step', ckpt.get('meta', {}).get('step', -1))),
+               'task_routing': task_routing,
+               'joint_coupling_scale': joint_coupling_scale,
+               'joint_coupling_mode': joint_coupling_mode,
+               'strict_run_sampler': strict_run_sampler,
+               'human_task_camera_conditioning': task_routing != 'human_first',
+               'human_task_camera_display': 'dataset_gt_outside_model' if task_routing == 'human_first' else 'decoded_observed_branch',
                'joint_camera_latent_intervention': args.joint_camera_latent_intervention,
                'joint_human_camera_input_mode': args.joint_human_camera_input_mode,
+               'owning_decoder': owning_decoder_record,
                'joint_compose_camera_run_dir': str(args.joint_compose_camera_run_dir) if compose_joint else None,
                'joint_compose_human_task': args.joint_compose_human_task if compose_joint else None,
                'joint_compose_h2c_source': args.joint_compose_h2c_source if compose_joint else None}
@@ -783,7 +849,16 @@ def main():
         gt_joints_np = gt_joints[0, :valid_frames].cpu().numpy()
         gt_cam_xyz = gt_c2w_np[:, :3, 3]  # [T, 3]
 
-        sample_record = {'sample_id': sample_id, 'valid_frames': valid_frames, 'modes': {}}
+        caption_raw = sample.get('caption_raw', {})
+        if not isinstance(caption_raw, dict):
+            caption_raw = {}
+        sample_record = {
+            'sample_id': sample_id,
+            'valid_frames': valid_frames,
+            'human_text': str(caption_raw.get('human', '')),
+            'camera_text': str(caption_raw.get('camera', '')),
+            'modes': {},
+        }
         task_outputs = []
 
         for task_id, task_name in task_items:
@@ -791,12 +866,25 @@ def main():
             seed = args.seed + {'camera': 11, 'human': 23, 'joint': 37, 'human_text': 41}[task_name]
             if task_name == 'joint' and compose_joint:
                 completion = full_eval.sample_composed_human_first_joint(
-                    model, diffusion, h2c_model, h2c_mod, mod, z, text, valid, sample_indices, seed, args.num_steps,
+                    model, diffusion, h2c_model, h2c_mod, h2c_diffusion, mod,
+                    z, text, valid, sample_indices, seed, args.num_steps,
                     human_source='generated',
                     human_task_name=args.joint_compose_human_task,
                     h2c_source=args.joint_compose_h2c_source,
                     cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
                     channel_gated_cfg=args.channel_gated_cfg,
+                    human_task_routing=task_routing,
+                    h2c_task_routing=task_routing,
+                )
+            elif strict_run_sampler:
+                completion = full_eval.sample_start_x(
+                    model, diffusion, mod, z, text, valid, task_id, sample_indices, seed, args.num_steps,
+                    cfg_scale=args.cfg_scale, cfg_human=args.cfg_human, cfg_camera=args.cfg_camera, eta=args.eta,
+                    channel_gated_cfg=args.channel_gated_cfg, task_routing=task_routing,
+                    joint_camera_latent_intervention=args.joint_camera_latent_intervention if task_name == 'joint' else 'none',
+                    joint_human_camera_input_mode=args.joint_human_camera_input_mode if task_name == 'joint' else 'normal',
+                    joint_coupling_scale=joint_coupling_scale if task_name == 'joint' else 1.0,
+                    joint_coupling_mode=joint_coupling_mode if task_name == 'joint' else 'symmetric',
                 )
             else:
                 completion = ddim_sample_bilateral(
@@ -808,11 +896,25 @@ def main():
                 )
 
             # Decode predicted latent through autoencoder
-            raw_output = decode_raw(autoencoder, dataset, completion, gt_intrinsics)
+            completion_decode = mod.denormalize_latent(completion, valid, znorm_stats)
+            _, raw_output = bridge.decode_with_owning_decoder(
+                owning_decoder,
+                dataset,
+                mod,
+                completion_decode,
+                gt_intrinsics,
+                sample['padding_mask'].unsqueeze(0),
+            )
 
             # Extract predicted camera translation and human joints
-            pred_cam_xyz = raw_output['camera'][0, :valid_frames, :3, 3].cpu().numpy()  # [T, 3]
-            pred_joints_out = raw_output['human'].joints[0, :valid_frames].cpu().numpy()  # [T, 22, 3]
+            pred_c2w = raw_output['camera'][0, :valid_frames].detach().cpu().numpy()
+            pred_cam_xyz = pred_c2w[:, :3, 3]  # [T, 3]
+            pred_intrinsics = raw_output.get('intrinsics', gt_intrinsics)[0, :valid_frames].detach().cpu().numpy()
+            pred_joints_out = raw_output['human'].joints[0, :valid_frames].detach().cpu().numpy()  # [T, 22, 3]
+            if task_name == 'human' and task_routing == 'human_first':
+                pred_c2w = gt_c2w_np.copy()
+                pred_cam_xyz = pred_c2w[:, :3, 3]
+                pred_intrinsics = gt_intr_np.copy()
 
             # For rendering with correct joint positions:
             # Mode A (camera completion): GT human; camera path is shown in PNG.
@@ -825,6 +927,8 @@ def main():
             task_outputs.append({
                 'task_name': task_name,
                 'pred_cam_xyz': pred_cam_xyz,
+                'pred_c2w': pred_c2w,
+                'pred_intrinsics': pred_intrinsics,
                 'pred_joints_out': pred_joints_out,
                 'render_joints': render_joints,
             })
@@ -839,10 +943,20 @@ def main():
 
         gt_video = args.out_dir / sample_id / 'gt_skeleton.mp4'
         render_3d_video(gt_joints_np, render_context, gt_video, args.fps, f'{sample_id} [GT]')
+        gt_projection_path = args.out_dir / sample_id / 'gt_camera_projection.mp4'
+        render_video(
+            project_joints(gt_joints_np, gt_c2w_np, gt_intr_np),
+            gt_intr_np,
+            gt_projection_path,
+            args.fps,
+            f'{sample_id} [GT camera projection]',
+        )
 
         for output in task_outputs:
             task_name = output['task_name']
             pred_cam_xyz = output['pred_cam_xyz']
+            pred_c2w = output['pred_c2w']
+            pred_intrinsics = output['pred_intrinsics']
             pred_joints_out = output['pred_joints_out']
             render_joints = output['render_joints']
 
@@ -859,8 +973,25 @@ def main():
             concat_path = args.out_dir / sample_id / f'{task_name}_concat.mp4'
             concat_videos([gt_video, mp4_path], concat_path)
 
-            print(f'  {task_name}: done (PNG+MP4+Concat)')
-            sample_record['modes'][task_name] = {'png': str(png_path), 'mp4': str(mp4_path), 'concat': str(concat_path)}
+            projection_path = args.out_dir / sample_id / f'{task_name}_camera_projection.mp4'
+            render_video(
+                project_joints(render_joints, pred_c2w, pred_intrinsics),
+                pred_intrinsics,
+                projection_path,
+                args.fps,
+                f'{sample_id} [{task_name} camera projection]',
+            )
+            projection_concat_path = args.out_dir / sample_id / f'{task_name}_camera_projection_concat.mp4'
+            concat_videos([gt_projection_path, projection_path], projection_concat_path)
+
+            print(f'  {task_name}: done (trajectory PNG + world/projection MP4 + concat)')
+            sample_record['modes'][task_name] = {
+                'png': str(png_path),
+                'mp4': str(mp4_path),
+                'concat': str(concat_path),
+                'camera_projection': str(projection_path),
+                'camera_projection_concat': str(projection_concat_path),
+            }
 
         results['samples'].append(sample_record)
 
