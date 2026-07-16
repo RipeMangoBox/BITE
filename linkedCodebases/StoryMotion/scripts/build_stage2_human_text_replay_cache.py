@@ -57,6 +57,28 @@ def slice_sample_id(sample_id: Any, end: int) -> Any:
     return list(sample_id[:end])
 
 
+def masked_per_sample_std(residual: torch.Tensor, valid: torch.Tensor) -> torch.Tensor:
+    mask = valid[:, None, :].expand_as(residual)
+    count = mask.flatten(1).sum(dim=1).clamp_min(1).to(residual.dtype)
+    mean = residual.masked_fill(~mask, 0.0).flatten(1).sum(dim=1) / count
+    centered = (residual - mean[:, None, None]).masked_fill(~mask, 0.0)
+    return (centered.square().flatten(1).sum(dim=1) / count).sqrt()
+
+
+def scalar_summary(values: torch.Tensor) -> dict[str, float]:
+    if values.numel() == 0:
+        return {key: 0.0 for key in ("mean", "std", "p50", "p75", "p90", "max")}
+    values = values.float()
+    return {
+        "mean": float(values.mean().item()),
+        "std": float(values.std(unbiased=False).item()),
+        "p50": float(torch.quantile(values, 0.50).item()),
+        "p75": float(torch.quantile(values, 0.75).item()),
+        "p90": float(torch.quantile(values, 0.90).item()),
+        "max": float(values.max().item()),
+    }
+
+
 @torch.no_grad()
 def build_cache_file(
     input_path: Path,
@@ -66,6 +88,9 @@ def build_cache_file(
     device: torch.device,
     args: argparse.Namespace,
     file_index: int,
+    znorm_stats: dict[str, Any] | None,
+    znorm_record: dict[str, Any],
+    human_task_id: int,
 ) -> dict[str, Any]:
     data = torch.load(input_path, map_location="cpu")
     z = data["z"].float()
@@ -82,6 +107,7 @@ def build_cache_file(
     z_out = torch.empty((total, LATENT_DIM, LATENT_FRAMES), dtype=torch.float32)
     z_out[:, HUM_DIM:, :] = z[:total, HUM_DIM:, :]
     sigma = torch.empty((total,), dtype=torch.float32)
+    sigma_znorm = torch.empty((total,), dtype=torch.float32)
     source_type = torch.full((total,), SOURCE_REPLAY, dtype=torch.long)
     started = time.time()
 
@@ -89,17 +115,18 @@ def build_cache_file(
     for start in range(0, total, args.batch_size):
         end = min(total, start + args.batch_size)
         sample_indices = list(range(start, end))
-        z_batch = z[start:end].to(device)
+        z_batch_raw = z[start:end].to(device)
         text_batch = text[start:end].to(device)
         valid_batch = valid[start:end].to(device)
-        pred = eval_mod.sample_start_x(
+        z_batch = train_mod.normalize_latent(z_batch_raw, valid_batch, znorm_stats)
+        pred_znorm = eval_mod.sample_start_x(
             model,
             diffusion,
             train_mod,
             z_batch,
             text_batch,
             valid_batch,
-            train_mod.TASK_HUMAN_TEXT,
+            human_task_id,
             sample_indices,
             args.seed + file_index * 100_003,
             args.num_steps,
@@ -111,10 +138,20 @@ def build_cache_file(
             joint_camera_latent_intervention="none",
             joint_human_camera_input_mode="normal",
         )
-        human_syn = pred[:, :HUM_DIM, :].detach().cpu().float()
-        human_gt = z[start:end, :HUM_DIM, :]
-        z_out[start:end, :HUM_DIM, :] = human_syn
-        sigma[start:end] = (human_syn - human_gt).flatten(1).std(dim=1, unbiased=False)
+        pred_raw = train_mod.denormalize_latent(pred_znorm, valid_batch, znorm_stats)
+        human_syn_raw = pred_raw[:, :HUM_DIM, :].detach()
+        human_gt_raw = z_batch_raw[:, :HUM_DIM, :]
+        human_syn_znorm = pred_znorm[:, :HUM_DIM, :].detach()
+        human_gt_znorm = z_batch[:, :HUM_DIM, :]
+        z_out[start:end, :HUM_DIM, :] = human_syn_raw.cpu().float()
+        sigma[start:end] = masked_per_sample_std(
+            human_syn_raw - human_gt_raw,
+            valid_batch,
+        ).cpu()
+        sigma_znorm[start:end] = masked_per_sample_std(
+            human_syn_znorm - human_gt_znorm,
+            valid_batch,
+        ).cpu()
         if args.progress_every > 0 and (end == total or (end // args.batch_size) % args.progress_every == 0):
             elapsed = max(time.time() - started, 1e-6)
             print(
@@ -137,10 +174,16 @@ def build_cache_file(
         "sample_id": slice_sample_id(data.get("sample_id"), total),
         "source_type": source_type,
         "sigma": sigma,
+        "sigma_znorm": sigma_znorm,
         "meta": {
-            "kind": "stage2_human_text_replay_cache",
+            "kind": "stage2_human_replay_cache",
             "source_cache": str(input_path),
+            "source_cache_sha256": train_mod.sha256_file(input_path),
+            "sample_ids_sha256": train_mod.sha256_sample_ids(
+                [str(value) for value in slice_sample_id(data.get("sample_id"), total)]
+            ),
             "human_run_dir": str(args.human_run_dir),
+            "human_task": args.human_task,
             "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "num_samples": int(total),
             "num_steps": int(args.num_steps),
@@ -150,9 +193,10 @@ def build_cache_file(
             "human_slice": [0, HUM_DIM],
             "camera_slice": [HUM_DIM, LATENT_DIM],
             "camera_target": "ground_truth_from_source_cache",
-            "human_source": "human_text_generator",
-            "sigma_mean": float(sigma.mean().item()) if total else 0.0,
-            "sigma_std": float(sigma.std(unbiased=False).item()) if total else 0.0,
+            "human_source": f"{args.human_task}_generator",
+            "sigma_raw": scalar_summary(sigma),
+            "sigma_znorm": scalar_summary(sigma_znorm),
+            "latent_znorm": znorm_record,
             "upstream_meta": jsonable(data.get("meta", {})),
         },
     }
@@ -162,8 +206,9 @@ def build_cache_file(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Build H2C replay cache from a human_text generator and GT camera cache.")
+    p = argparse.ArgumentParser(description="Build H2C replay cache from a text-only human generator and GT camera cache.")
     p.add_argument("--human-run-dir", type=Path, required=True)
+    p.add_argument("--human-task", choices=["human", "human_text"], default="human")
     p.add_argument("--source-cache-dir", type=Path, required=True)
     p.add_argument("--output-cache-dir", type=Path, required=True)
     p.add_argument("--cache-files", nargs="+", default=["train.pt", "val.pt"])
@@ -188,13 +233,38 @@ def main() -> None:
         raise ValueError("--limit must be non-negative")
     device = torch.device(args.device)
     model, diffusion, run_info = bridge.load_stage2(args.human_run_dir, train_mod, device)
+    znorm_stats, znorm_record = eval_mod.resolve_run_znorm(
+        args.human_run_dir,
+        args.source_cache_dir,
+        train_mod,
+    )
+    human_task_id = {
+        "human": train_mod.TASK_HUMAN,
+        "human_text": train_mod.TASK_HUMAN_TEXT,
+    }[args.human_task]
+    if human_task_id >= int(run_info.get("num_task_embeddings", 3)):
+        raise ValueError(
+            f"run {args.human_run_dir} does not support task {args.human_task!r}; "
+            f"num_task_embeddings={run_info.get('num_task_embeddings', 3)}"
+        )
     metas = {}
     for file_index, name in enumerate(args.cache_files):
         input_path = args.source_cache_dir / name
         output_path = args.output_cache_dir / name
-        metas[name] = build_cache_file(input_path, output_path, model, diffusion, device, args, file_index)
+        metas[name] = build_cache_file(
+            input_path,
+            output_path,
+            model,
+            diffusion,
+            device,
+            args,
+            file_index,
+            znorm_stats,
+            znorm_record,
+            human_task_id,
+        )
     summary = {
-        "kind": "stage2_human_text_replay_cache_summary",
+        "kind": "stage2_human_replay_cache_summary",
         "human_run": run_info,
         "source_cache_dir": str(args.source_cache_dir),
         "output_cache_dir": str(args.output_cache_dir),

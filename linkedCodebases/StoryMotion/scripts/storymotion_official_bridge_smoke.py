@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import sys
@@ -115,7 +116,13 @@ def resolve_existing_path(path_value: str | None, run_dir: Path, train_mod: Any)
     return None
 
 
-def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
+def load_stage2(
+    run_dir: Path,
+    train_mod: Any,
+    device: torch.device,
+    checkpoint_path: Path | None = None,
+):
+    run_dir = run_dir.resolve()
     meta = json.loads((run_dir / "meta.json").read_text(encoding="utf-8"))
     args = meta.get("args", {})
     cond_mask_prob = float(args.get("cond_mask_prob", 0.1))
@@ -153,23 +160,31 @@ def load_stage2(run_dir: Path, train_mod: Any, device: torch.device):
         task_instruction_scale=float(args.get("task_instruction_scale", task_instruction_meta.get("scale", 1.0))),
         num_task_embeddings=infer_num_task_embeddings(meta, args),
     ).to(device)
-    ckpt_path = run_dir / "last.pt"
+    ckpt_path = (checkpoint_path or run_dir / "last.pt").resolve()
     ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt["model"])
     model.eval()
     process_meta = meta.get("stage2_process", {})
     process_name = args.get("generative_process", process_meta.get("generative_process", "diffusion"))
+    prediction_type = args.get("diffusion_prediction_type", process_meta.get("prediction_type", "START_X"))
     diffusion = train_mod.build_stage2_process(
         process_name,
         int(args.get("diffusion_steps", 1000)),
         str(args.get("noise_schedule", "cosine")),
         device,
+        prediction_type,
     )
     return model, diffusion, {
         "run_dir": str(run_dir),
         "checkpoint": str(ckpt_path),
+        "checkpoint_sha256": sha256_file(ckpt_path),
         "step": int(ckpt.get("step", -1)),
         "joint_loss_mode": args.get("joint_loss_mode") or meta.get("joint_loss_mode") or "element_mean",
+        "joint_loss_weight": float(args.get("joint_loss_weight", meta.get("joint_loss_weight", 1.0))),
+        "task_routing": str(args.get("task_routing", meta.get("task_routing", "symmetric"))),
+        "joint_human_camera_input_mode": str(
+            args.get("joint_human_camera_input_mode", meta.get("joint_human_camera_input_mode", "normal"))
+        ),
         "num_task_embeddings": infer_num_task_embeddings(meta, args),
         "cond_mask_prob": cond_mask_prob,
         "cond_mask_prob_cam": cond_mask_prob_cam,
@@ -211,6 +226,103 @@ def to_official_order(z_hum_cam: torch.Tensor, train_mod: Any) -> torch.Tensor:
     return torch.cat([z_hum_cam[:, train_mod.HUM_DIM :], z_hum_cam[:, : train_mod.HUM_DIM]], dim=1)
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def resolve_owning_decoder(
+    story_root: Path,
+    cache_meta: dict[str, Any],
+    official_autoencoder: torch.nn.Module,
+    device: torch.device,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    source = str(cache_meta.get("source") or "")
+    if source == "storymotion_joint_tokenizer":
+        checkpoint_value = cache_meta.get("tokenizer_checkpoint")
+        preset = cache_meta.get("tokenizer_preset")
+        if not checkpoint_value or not preset:
+            raise ValueError("local tokenizer cache is missing tokenizer_checkpoint/tokenizer_preset")
+        checkpoint = Path(str(checkpoint_value))
+        if not checkpoint.is_absolute():
+            checkpoint = story_root / checkpoint
+        if not checkpoint.exists():
+            raise FileNotFoundError(f"owning tokenizer checkpoint not found: {checkpoint}")
+        if "tokenizer_is_causal" not in cache_meta:
+            raise ValueError(
+                "local tokenizer cache is missing tokenizer_is_causal; rebuild it with the owning checkpoint contract"
+            )
+        render_mod = load_module(
+            "storymotion_owning_joint_tokenizer",
+            story_root / "scripts/render_stage1_joint_separate_3d_reconstructions.py",
+        )
+        spec = render_mod.ModelSpec(
+            name="owning_decoder",
+            preset=str(preset),
+            checkpoint=checkpoint,
+            drop_camera_z=bool(cache_meta.get("drop_camera_z", False)),
+        )
+        model = render_mod.build_model(spec, str(device))
+        model.eval()
+        cache_is_causal = bool(cache_meta["tokenizer_is_causal"])
+        if cache_is_causal:
+            raise ValueError("temporal causal tokenizers are forbidden for StoryMotion evaluation")
+        if bool(model.is_causal) != cache_is_causal:
+            raise ValueError(
+                f"cache/tokenizer is_causal mismatch: cache={cache_is_causal} checkpoint={bool(model.is_causal)}"
+            )
+        return {
+            "kind": "storymotion_joint_tokenizer",
+            "model": model,
+        }, {
+            "kind": "storymotion_joint_tokenizer",
+            "checkpoint": str(checkpoint),
+            "checkpoint_sha256": sha256_file(checkpoint),
+            "preset": str(preset),
+            "is_causal": cache_is_causal,
+            "cache_source": source,
+        }
+    if source:
+        raise ValueError(f"unsupported cache source for decoder resolution: {source!r}")
+    checkpoint = cache_meta.get("pulp_checkpoint")
+    return {
+        "kind": "pulp_official_autoencoder",
+        "model": official_autoencoder,
+    }, {
+        "kind": "pulp_official_autoencoder",
+        "checkpoint": str(checkpoint) if checkpoint else None,
+        "checkpoint_sha256": sha256_file(Path(checkpoint)) if checkpoint and Path(checkpoint).exists() else None,
+        "cache_source": "pulp_official_autoencoder",
+    }
+
+
+def decode_with_owning_decoder(
+    decoder: dict[str, Any],
+    dataset: Any,
+    train_mod: Any,
+    z_hum_cam: torch.Tensor,
+    intrinsics: torch.Tensor,
+    padding_mask: torch.Tensor,
+):
+    if decoder["kind"] == "pulp_official_autoencoder":
+        return decode_feature_and_raw(decoder["model"], dataset, train_mod, z_hum_cam, intrinsics)
+    if decoder["kind"] != "storymotion_joint_tokenizer":
+        raise ValueError(f"unknown decoder kind: {decoder['kind']!r}")
+    native = to_official_order(z_hum_cam, train_mod).transpose(1, 2).contiguous()
+    human, camera = decoder["model"].decode(native, target_len=int(padding_mask.shape[1]))
+    padding_mask = padding_mask.to(device=human.device, dtype=torch.bool)
+    x_output = {
+        "human": human.masked_fill(~padding_mask[..., None], 0.0),
+        "camera": camera.masked_fill(~padding_mask[..., None], 0.0),
+    }
+    feature_dataset = getattr(dataset, "joint_dataset", None) or dataset
+    raw_output = feature_dataset.get_raw(x_output, intrinsics)
+    return x_output, raw_output
+
+
 def decode_feature_and_raw(
     autoencoder: torch.nn.Module,
     dataset: Any,
@@ -238,9 +350,10 @@ def make_completion(
     valid: torch.Tensor,
     task_id: int,
     timestep: int,
+    task_routing: str = "symmetric",
 ) -> torch.Tensor:
     task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=z.device)
-    obs_mask, _ = train_mod.make_branch_masks(z, valid, task)
+    obs_mask, _ = train_mod.make_branch_masks(z, valid, task, task_routing=task_routing)
     if getattr(diffusion, "name", "diffusion") == "rectified_flow":
         t_value = float(timestep) / float(max(diffusion.num_timesteps - 1, 1))
         t = torch.full((z.shape[0],), t_value, dtype=torch.float32, device=z.device)
@@ -407,6 +520,8 @@ def main() -> None:
     model, diffusion, run_info = load_stage2(args.run_dir, train_mod, device)
     cfg, dataset, autoencoder = build_pulp(cache_mod, story_root, args, device)
     cache = train_mod.PulpLatentCache(args.cache_dir / "val.pt")
+    train_mod.assert_non_causal_cache_meta(cache.meta)
+    train_mod.assert_default_cache_meta(cache.meta)
     end = min(len(cache), args.start + args.samples)
     if args.start < 0 or args.start >= len(cache) or end <= args.start:
         raise ValueError(f"bad sample range start={args.start}, end={end}, cache_len={len(cache)}")
@@ -439,7 +554,17 @@ def main() -> None:
             intrinsics = pulp_batch["x_raw"]["intrinsics"]
             x_input, raw_input = reference_feature_and_raw(dataset, pulp_batch, intrinsics)
             for task_id, task_name in supported_task_items:
-                completion = make_completion(model, diffusion, train_mod, z, text, valid, task_id, args.timestep)
+                completion = make_completion(
+                    model,
+                    diffusion,
+                    train_mod,
+                    z,
+                    text,
+                    valid,
+                    task_id,
+                    args.timestep,
+                    task_routing=run_info["task_routing"],
+                )
                 x_output, raw_output = decode_feature_and_raw(autoencoder, dataset, train_mod, completion, intrinsics)
                 outputs = {"raw_input": raw_input, "raw_output": raw_output, "x_output": x_output}
                 check = validate_contract(outputs, pulp_batch)

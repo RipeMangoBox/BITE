@@ -79,11 +79,24 @@ def sha256_tensor(tensor: torch.Tensor) -> str:
     return hashlib.sha256(arr.tobytes()).hexdigest()
 
 
-def load_h2c_camera_model(story_root: Path, run_dir: Path, device: torch.device, train_mod: Any):
+def load_h2c_camera_model(
+    story_root: Path,
+    run_dir: Path,
+    device: torch.device,
+    train_mod: Any,
+    checkpoint_path: Path | None = None,
+):
     meta = json.loads((run_dir / "meta.json").read_text())
     if meta.get("pipeline") == "CondMDI-style obs_x0/obs_mask input replacement + process-specific target loss":
-        model, process, run_info = load_stage2(run_dir, train_mod, device)
+        model, process, run_info = load_stage2(
+            run_dir,
+            train_mod,
+            device,
+            checkpoint_path=checkpoint_path,
+        )
         return model, train_mod, run_info, process
+    if checkpoint_path is not None:
+        raise ValueError("an explicit composed-camera checkpoint is only supported for CondMDI runs")
     h2c_mod = load_module("train_stage2_model_switch_compose", story_root / "scripts/train_stage2_model_switch.py")
     model, run_info = h2c_mod.load_h2c(run_dir, device)
     model.eval()
@@ -940,6 +953,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="For task=joint, use explicit human-first composition: sample human with --run-dir, then sample camera with this H2C run.",
     )
     p.add_argument(
+        "--joint-compose-camera-checkpoint",
+        type=Path,
+        help="Explicit checkpoint for the composed camera pass. Same-run composition defaults to --checkpoint when supplied.",
+    )
+    p.add_argument(
         "--joint-compose-human-task",
         choices=["human_text", "human"],
         default="human_text",
@@ -1047,21 +1065,36 @@ def main() -> None:
     task_routing = str(run_info.get("task_routing", "symmetric"))
     metric_task_name = "human" if args.task == "human_text" else args.task
     compose_joint = args.task == "joint" and args.joint_compose_camera_run_dir is not None
+    compose_camera_checkpoint = args.joint_compose_camera_checkpoint
     h2c_model = h2c_mod = h2c_run_info = h2c_diffusion = None
     if args.joint_compose_camera_run_dir is not None and args.task != "joint":
         raise ValueError("--joint-compose-camera-run-dir is only valid with --task joint")
+    if args.joint_compose_camera_checkpoint is not None and not compose_joint:
+        raise ValueError("--joint-compose-camera-checkpoint requires composed joint evaluation")
     if compose_joint:
         if args.run_dir is None:
             raise ValueError("--joint-compose-camera-run-dir requires --run-dir")
+        if (
+            compose_camera_checkpoint is None
+            and args.checkpoint is not None
+            and args.run_dir.resolve() == args.joint_compose_camera_run_dir.resolve()
+        ):
+            compose_camera_checkpoint = args.checkpoint
         h2c_model, h2c_mod, h2c_run_info, h2c_diffusion = load_h2c_camera_model(
             story_root,
             args.joint_compose_camera_run_dir.resolve(),
             device,
             train_mod,
+            checkpoint_path=compose_camera_checkpoint,
         )
         _, h2c_znorm_record = resolve_run_znorm(args.joint_compose_camera_run_dir, args.cache_dir, train_mod)
         if h2c_znorm_record != znorm_record:
             raise RuntimeError("composed human and camera runs use different latent normalization contracts")
+        if (
+            args.run_dir.resolve() == args.joint_compose_camera_run_dir.resolve()
+            and h2c_run_info.get("checkpoint_sha256") != run_info.get("checkpoint_sha256")
+        ):
+            raise RuntimeError("same-run composed human and camera passes must use the exact same checkpoint hash")
     h2c_task_routing = str((h2c_run_info or {}).get("task_routing", "symmetric"))
     cfg, dataset, autoencoder = build_pulp(cache_mod, story_root, args, device)
     cache = train_mod.PulpLatentCache(args.cache_dir / args.cache_file, znorm_stats=znorm_stats)
@@ -1125,6 +1158,7 @@ def main() -> None:
         "joint_compose_human_task": args.joint_compose_human_task if compose_joint else None,
         "joint_compose_h2c_source": args.joint_compose_h2c_source if compose_joint else None,
         "joint_compose_camera_run_dir": str(args.joint_compose_camera_run_dir) if compose_joint else None,
+        "joint_compose_camera_checkpoint": str(compose_camera_checkpoint) if compose_camera_checkpoint else None,
     }
     if args.eval_source == "raw_gt":
         sampler.update(

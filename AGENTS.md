@@ -18,6 +18,46 @@ generation, and research decision support.
 - `obsidian-vault/index/` stores generated indexes and Obsidian navigation.
 - `obsidian-vault/ideas/` stores local idea, focus, and review notes.
 
+## StoryMotion Tasks
+
+These rules apply directly to any task involving StoryMotion code, experiments,
+metrics, runs, or research notes, even when the task starts outside the linked
+codebase:
+
+1. The mainline tokenizer is corrected v7.14 camera14 joint AE: normalized
+   human199 plus official camera14, non-causal, human128 plus camera64, and the
+   owning local decoder. camera9 separate is a control only; never merge
+   camera14 separate and camera14 joint evidence.
+   Temporal causal tokenizers are forbidden in every Stage1/Stage2 setting;
+   constructors, checkpoint/cache loading, training, and evaluation must assert
+   `is_causal is False`. Controls may change representation, not causality.
+2. Fixed representation settings live as code assertions in
+   `storymotion/experiment_invariants.py`. Do not repeat them as manually typed
+   per-run configuration.
+3. The run contract audits mutable boundaries: exact Stage1 checkpoint and
+   owning-decoder hashes, train/eval cache hashes and sample identities,
+   train-only z-normalization source, seed, train/eval batch sizes, split,
+   sample count, and sampler.
+4. A metric table mixing versions must include an explicit `version / run`
+   column with a non-empty value in every row. If a matched comparison is not
+   available, state the differing fields and restrict the conclusion.
+5. Human completion in the asymmetric Unified-3 model is human-text-only.
+   Camera completion consumes human latent plus camera text. Joint generation
+   must compare parallel and human-first cascade schedules from the same
+   unified implementation/checkpoint whenever attribution requires it.
+6. A specialist result is valid only as a task-sliced diagnostic of the same
+   branch implementation used by Unified-3, or when its weights are explicitly
+   transferred and verified. Do not train unrelated specialists as a gate for
+   a different three-mode model.
+
+Detailed commands and schemas are in:
+
+- `linkedCodebases/StoryMotion/AGENTS.md`
+- `linkedCodebases/StoryMotion/docs/experiment-contract.md`
+
+The scope includes `obsidian-vault/ideas/StoryMotion/`,
+`_private/*storymotion*`, and StoryMotion run directories on remote machines.
+
 ## Local Pipeline
 
 ```text

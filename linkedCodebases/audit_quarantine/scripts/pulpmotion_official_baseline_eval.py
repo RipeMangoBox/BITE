@@ -81,6 +81,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--set-name", default="mixed_")
     p.add_argument("--split", default="test")
     p.add_argument("--limit-samples", type=int)
+    p.add_argument(
+        "--sample-ids-jsonl",
+        type=Path,
+        help="Optional JSONL records containing sample_id; evaluates in that exact order.",
+    )
     p.add_argument("--device", default="cuda:0")
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--workers", type=int, default=8)
@@ -138,6 +143,21 @@ def main() -> None:
     dataset = instantiate(cfg.dataset)
     test_dataset = copy.deepcopy(dataset).set_split(args.split, mode="test")
     full_len = len(test_dataset)
+    if args.sample_ids_jsonl is not None:
+        requested_ids = [
+            str(json.loads(line)["sample_id"])
+            for line in args.sample_ids_jsonl.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        available_ids = set(test_dataset.sample_ids)
+        missing_ids = [sample_id for sample_id in requested_ids if sample_id not in available_ids]
+        if missing_ids:
+            raise ValueError(f"{len(missing_ids)} requested sample IDs are absent; first={missing_ids[0]}")
+        test_dataset.sample_ids = requested_ids
+        for attr in ("joint_dataset", "camera_dataset", "human_dataset", "caption_dataset"):
+            sub = getattr(test_dataset, attr, None)
+            if sub is not None:
+                sub.set_split(requested_ids, test_dataset.mode)
     test_dataset = truncate_dataset(test_dataset, args.limit_samples)
     dataloader = DataLoader(
         test_dataset,
@@ -158,6 +178,7 @@ def main() -> None:
         "full_split_samples": full_len,
         "evaluated_samples": len(test_dataset),
         "sample_ids": list(test_dataset.sample_ids),
+        "sample_ids_jsonl": str(args.sample_ids_jsonl) if args.sample_ids_jsonl is not None else None,
         "pulp_root": str(args.pulp_root),
         "data_root": str(args.data_root),
         "checkpoint_dir": str(args.checkpoint_dir),
