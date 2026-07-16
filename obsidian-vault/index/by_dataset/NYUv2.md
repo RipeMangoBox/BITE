@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: NYUv2
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Learning-based_Inverse_Rendering_of_Complex_Indoor_Scenes_with_Differentiable_Monte_Carlo_Raytracing.md|Learning-based Inverse Rendering of Complex Indoor Scenes with Differentiable Monte Carlo Raytracing (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Learning_based_Inverse_Rendering_of_Complex_Indoor_Scenes_with_Differentiable_Monte_Carlo_Raytracing.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Learning-based Inverse Rendering with Differentiable Monte Carlo Raytracing
+	- datasets: NYUv2, IIW
 - [[obsidian-vault/analysis/CVPR_2026/Differentiable_Laplacian_Matrix_Guided_Superpixel_Segmentation.md|Differentiable Laplacian Matrix Guided Superpixel Segmentation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Differentiable_Laplacian_Matrix_Guided_Superpixel_Segmentation.pdf|PDF]]
 	- topics: Other / Unclear

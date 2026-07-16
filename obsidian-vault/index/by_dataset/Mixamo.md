@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Mixamo
@@ -21,6 +21,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: OMG (Open-vocabulary Motion Generation)
 	- datasets: HumanML3D, Mixamo
+- [[obsidian-vault/analysis/SIGGRAPH_2025/One_Model_to_Rig_Them_All_Diverse_Skeleton_Rigging_with_UniRig.md|One Model to Rig Them All: Diverse Skeleton Rigging with UniRig (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/One_Model_to_Rig_Them_All_Diverse_Skeleton_Rigging_with_UniRig.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: UniRig
+	- datasets: Mixamo, VRoid, Model Resources-RigNet
 - [[obsidian-vault/analysis/CVPR_2026/Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_Open_Vocabulary_Motion_Generation.md|Open the Motion Door: Atomic Motion Decomposition and Recomposition for Open-Vocabulary Motion Generation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Motion Animation

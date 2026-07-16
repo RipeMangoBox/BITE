@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: MJHQ-30K
 
+- [[obsidian-vault/analysis/SIGGRAPH_2024/I2V-Adapter_A_General_Image-to-Video_Adapter_for_Diffusion_Models.md|I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/I2V_Adapter_A_General_Image_to_Video_Adapter_for_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: I2V-Adapter
+	- datasets: MJHQ-30K
 - [[obsidian-vault/analysis/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.md|LazyVAR: Accelerating Visual Autoregressive Models via Scale-wise Token Pruning and Parallel Group Decoding (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/LazyVAR_Accelerating_Visual_Autoregressive_Models_via_Scale_wise_Token_Pruning_and_Parallel_Group_Decoding.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ImageNet
@@ -33,6 +33,30 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory, Systems / Efficiency / Compression
 	- methods: Hardware-Aware Latency Pruning (HALP)
 	- datasets: ImageNet, PASCAL VOC
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Palette_Image-to-image_Diffusion_Models.md|Palette: Image-to-image Diffusion Models (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Palette_Image_to_image_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Palette
+	- datasets: ImageNet ctest10k, ImageNet 20-30% free-form mask, ImageNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Color-Perception-Guided_Display_Power_Reduction_for_Virtual_Reality.md|Color-Perception-Guided Display Power Reduction for Virtual Reality (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Color_Perception_Guided_Display_Power_Reduction_for_Virtual_Reality.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Gaze-Contingent Color-Perception-Guided Display Power Reduction (OUR)
+	- datasets: Panoramic video scenes, ImageNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Photo-Finishing.md|Neural Photo-Finishing (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Photo_Finishing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Neural Photo-Finishing
+	- datasets: ACR近似精度, Smartphone Image Denoising Dataset, ImageNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/UniColor_A_Unified_Framework_for_Multi-Modal_Colorization_with_Transformer.md|UniColor: A Unified Framework for Multi-Modal Colorization with Transformer (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/UniColor_A_Unified_Framework_for_Multi_Modal_Colorization_with_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: UniColor
+	- datasets: ImageNet, MSCOCO
 - [[obsidian-vault/analysis/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.md|Robustness-Guided Image Synthesis for Data-Free Quantization (AAAI 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.pdf|PDF]]
 	- topics: Motion Animation

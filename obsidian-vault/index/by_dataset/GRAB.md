@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: GRAB
@@ -33,6 +33,12 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: GeneOH Diffusion
 	- datasets: GRAB, HOI4D, ARCTIC
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/RoMo_A_Robust_Solver_for_Full-body_Unlabeled_Optical_Motion_Capture.md|RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/RoMo_A_Robust_Solver_for_Full_body_Unlabeled_Optical_Motion_Capture.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: RoMo
+	- datasets: Production, Front-waist, GRAB
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textual_Descriptions.md|DiffH2O Diffusion Based Synthesis of Hand Object Interactions from Textual Descriptions (SIGGRAPH_ASIA_2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textual_Descriptions.pdf|PDF]]
 	- topics: Generative Models / Diffusion

@@ -4,11 +4,23 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: N3DV
 
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Factorized_Motion_Fields_for_Fast_Sparse_Input_Dynamic_View_Synthesis.md|Factorized Motion Fields for Fast Sparse Input Dynamic View Synthesis (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Factorized_Motion_Fields_for_Fast_Sparse_Input_Dynamic_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RF-DeRF
+	- datasets: N3DV, InterDigital
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Anchored_4D_Gaussian_Splatting_for_Dynamic_Novel_View_Synthesis.md|Anchored 4D Gaussian Splatting for Dynamic Novel View Synthesis (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Anchored_4D_Gaussian_Splatting_for_Dynamic_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Anchored 4DGS
+	- datasets: N3DV, Technicolor
 - [[obsidian-vault/analysis/CVPR_2026/Dynamic_Static_Decomposition_for_Novel_View_Synthesis_of_Dynamic_Scenes_with_Spiking_Neurons.md|Dynamic-Static Decomposition for Novel View Synthesis of Dynamic Scenes with Spiking Neurons (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Dynamic_Static_Decomposition_for_Novel_View_Synthesis_of_Dynamic_Scenes_with_Spiking_Neurons.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

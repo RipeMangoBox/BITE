@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: CelebA-HQ
@@ -39,3 +39,9 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow
 	- methods: Antithetic Noise in Diffusion Models
 	- datasets: CIFAR-10, CelebA-HQ, DPS Inpainting
+- [[obsidian-vault/analysis/SIGGRAPH_2026/HairPort_In-context_3D-aware_Hair_Import_and_Transfer_for_Images.md|HairPort: In-context 3D-aware Hair Import and Transfer for Images (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/HairPort_In_context_3D_aware_Hair_Import_and_Transfer_for_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: HairPort
+	- datasets: CelebA-HQ

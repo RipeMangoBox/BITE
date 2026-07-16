@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Multiple
 
+- [[obsidian-vault/analysis/SIGGRAPH_2023/COFS_COntrolable_Furniture_Layout_Synthesis.md|COFS COntrolable Furniture Layout Synthesis (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/COFS_COntrolable_Furniture_Layout_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: COFS
+	- datasets: Multiple, LIVING, DINING
 - [[obsidian-vault/analysis/CVPR_2026/Stepwise_Credit_Assignment_for_GRPO_on_Flow_Matching_Models.md|Stepwise Credit Assignment for GRPO on Flow-Matching Models (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Stepwise_Credit_Assignment_for_GRPO_on_Flow_Matching_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

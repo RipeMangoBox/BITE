@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ShapeNet
@@ -27,12 +27,96 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: ImAM (Improved Auto-regressive Model)
 	- datasets: ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/A_Neural_Galerkin_Solver_for_Accurate_Surface_Reconstruction.md|A Neural Galerkin Solver for Accurate Surface Reconstruction (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/A_Neural_Galerkin_Solver_for_Accurate_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: NeuralGalerkin
+	- datasets: ShapeNet, D-FAUST, Matterport
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/DeepJoin_Learning_a_Joint_Occupancy_Signed_Distance_and_Normal_Field_Function_for_Shape_Repair.md|DeepJoin: Learning a Joint Occupancy, Signed Distance, and Normal Field Function for Shape Repair (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/DeepJoin_Learning_a_Joint_Occupancy_Signed_Distance_and_Normal_Field_Function_for_Shape_Repair.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DeepJoin
+	- datasets: ShapeNet, Google Scanned Objects, QP Cultural Heritage
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Metric-KNN_is_All_You_Need.md|Metric-KNN is All You Need (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Metric_KNN_is_All_You_Need.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: Metric-KNN (M-KNN)
+	- datasets: ShapeNet
+- [[obsidian-vault/analysis/arxiv_2023/Michelangelo_Conditional_3D_Shape_Generation_based_on_Shape-Image-Text_Aligned_Latent_Representation.md|Michelangelo: Conditional 3D Shape Generation based on Shape-Image-Text Aligned Latent Representation (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Michelangelo_Conditional_3D_Shape_Generation_based_on_Shape-Image-Text_Aligned_Latent_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Michelangelo (SITA-VAE + ASLDM)
+	- datasets: ShapeNet, Cartoon Monster
 - [[obsidian-vault/analysis/CVPR_2023/Neural_Kernel_Surface_Reconstruction.md|Neural Kernel Surface Reconstruction (CVPR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2023/Neural_Kernel_Surface_Reconstruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: Neural Kernel Surface Reconstruction (NKSR)
 	- datasets: ABC, ShapeNet, CARLA
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Adaptive_Local_Basis_Functions_for_Shape_Completion.md|Adaptive Local Basis Functions for Shape Completion (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Adaptive_Local_Basis_Functions_for_Shape_Completion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Local Basis Functions for Shape Completion
+	- datasets: ShapeNet, ShapeNet unseen classes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit-Implicit_Representation_for_Text-Guided_3D_Shape_Generation.md|EXIM: A Hybrid Explicit-Implicit Representation for Text-Guided 3D Shape Generation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit_Implicit_Representation_for_Text_Guided_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EXIM (混合显式-隐式表征)
+	- datasets: ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.md|Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: GeGnn
+	- datasets: ShapeNet, ShapeNet-A, ShapeNet-B
+- [[obsidian-vault/analysis/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.md|PivotMesh: Generic 3D Mesh Generation via Pivot Vertices Guidance (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PivotMesh
+	- datasets: ShapeNet, Objaverse, Objaverse-xl
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Unified_Differentiable_Boolean_Operator_With_Fuzzy_Logic.md|A Unified Differentiable Boolean Operator With Fuzzy Logic (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Unified_Differentiable_Boolean_Operator_With_Fuzzy_Logic.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Unified Differentiable Boolean Operator (统一可微布尔操作符)
+	- datasets: ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_2024/GEM3D_GEnerative_Medial_Abstractions_for_3D_Shape_Synthesis.md|GEM3D: GEnerative Medial Abstractions for 3D Shape Synthesis (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/GEM3D_GEnerative_Medial_Abstractions_for_3D_Shape_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GEM3D
+	- datasets: ShapeNet, ShapeNet reconstruction, Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_2025/NeurCross_A_Neural_Approach_to_Computing_Cross_Fields_for_Quad_Mesh_Generation.md|NeurCross: A Neural Approach to Computing Cross Fields for Quad Mesh Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/NeurCross_A_Neural_Approach_to_Computing_Cross_Fields_for_Quad_Mesh_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: NeurCross
+	- datasets: ShapeNet, Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/LLM-Primitives_Large_Language_Model_for_3D_Reconstruction_with_Primitives.md|LLM-Primitives: Large Language Model for 3D Reconstruction with Primitives (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/LLM_Primitives_Large_Language_Model_for_3D_Reconstruction_with_Primitives.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: LLM-Primitives
+	- datasets: ShapeNet, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Octahedral_Field_Octahedral_Prior_for_Simultaneous_Smoothing_and_Sharp_Edge_Regularization.md|Neural Octahedral Field: Octahedral Prior for Simultaneous Smoothing and Sharp Edge Regularization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Octahedral_Field_Octahedral_Prior_for_Simultaneous_Smoothing_and_Sharp_Edge_Regularization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Octahedral Field
+	- datasets: ABC / Thingi10k, SRB, ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Visibility_of_Point_Sets.md|Neural Visibility of Point Sets (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Visibility_of_Point_Sets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Neural Visibility Network (O-CNN U-Net + Shared MLP predictor)
+	- datasets: ShapeNet, Noisy ShapeNet, Cross-dataset
 - [[obsidian-vault/analysis/CVPR_2026/Learning_Hierarchical_Hyperbolic_Mixture_Model_for_Part_aware_3D_Generation.md|Learning Hierarchical Hyperbolic Mixture Model for Part-aware 3D Generation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Learning_Hierarchical_Hyperbolic_Mixture_Model_for_Part_aware_3D_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -69,3 +153,15 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: PointNSP
 	- datasets: ShapeNet, ShapeNet Completion
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.md|MeshFlow: Mesh Generation with Equivariant Flow Matching (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: MeshFlow
+	- datasets: ShapeNet, Inference Efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Strips_as_Tokens_Artist_Mesh_Generation_with_Native_UV_Segmentation.md|Strips as Tokens: Artist Mesh Generation with Native UV Segmentation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Strips_as_Tokens_Artist_Mesh_Generation_with_Native_UV_Segmentation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Strips as Tokens (SATO)
+	- datasets: ShapeNet, UV分割失真

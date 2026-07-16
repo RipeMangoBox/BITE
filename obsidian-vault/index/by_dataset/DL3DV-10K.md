@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: DL3DV-10K
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Quark_Real-time_High-resolution_and_General_Neural_View_Synthesis.md|Quark: Real-time, High-resolution, and General Neural View Synthesis (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Quark_Real_time_High_resolution_and_General_Neural_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Quark (and Quark+ for higher quality)
+	- datasets: Generalizable NVS Benchmark, Runtime on A100, DL3DV-10K
 - [[obsidian-vault/analysis/CVPR_2026/Gen3R_3D_Scene_Generation_Meets_Feed_Forward_Reconstruction.md|Gen3R: 3D Scene Generation Meets Feed-Forward Reconstruction (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Gen3R_3D_Scene_Generation_Meets_Feed_Forward_Reconstruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

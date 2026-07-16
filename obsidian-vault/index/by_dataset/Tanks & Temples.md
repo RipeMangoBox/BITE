@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Tanks & Temples
@@ -21,6 +21,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
 	- methods: BTimer (BulletTimer)
 	- datasets: DyCheck iPhone dataset, NVIDIA Dynamic Scene dataset, RE10K
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/SOF_Sorted_Opacity_Fields_for_Fast_Unbounded_Surface_Reconstruction.md|SOF: Sorted Opacity Fields for Fast Unbounded Surface Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/SOF_Sorted_Opacity_Fields_for_Fast_Unbounded_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Sorted Opacity Fields (SOF)
+	- datasets: Tanks & Temples, Barn scene Training, DTU
 - [[obsidian-vault/analysis/arxiv_2026/Neural_Harmonic_Textures_for_High_Quality_Primitive_Based_Neural_Reconstruction.md|Neural Harmonic Textures for High-Quality Primitive Based Neural Reconstruction (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/Neural_Harmonic_Textures_for_High_Quality_Primitive_Based_Neural_Reconstruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -57,3 +63,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Stylos
 	- datasets: Tanks & Temples
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Faster_3D_Gaussian_Splatting_Convergence_via_Structure-Aware_Densification.md|Faster 3D Gaussian Splatting Convergence via Structure-Aware Densification (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Faster_3D_Gaussian_Splatting_Convergence_via_Structure_Aware_Densification.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Structure-Aware Densification (SAD-GS)
+	- datasets: Mip-NeRF360, Deep Blending, Tanks & Temples

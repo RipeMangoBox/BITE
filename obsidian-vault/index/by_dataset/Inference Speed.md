@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Inference Speed
@@ -45,3 +45,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: ChronoEdit
 	- datasets: ImgEdit Basic-Edit Suite, PBench-Edit, Inference Speed
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Complex-Valued_Holographic_Radiance_Fields.md|Complex-Valued Holographic Radiance Fields (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Complex_Valued_Holographic_Radiance_Fields.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Complex-Valued Holographic Radiance Fields
+	- datasets: NeRF Synthetic, LLFF, Inference Speed

@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: BEAT
@@ -27,6 +27,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: DiffSHEG
 	- datasets: BEAT, SHOW
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SIGGesture_Generalized_Co-Speech_Gesture_Synthesis_via_Semantic_Injection_with_Large-Scale_Pre-Training_Diffusion_Models.md|SIGGesture: Generalized Co-Speech Gesture Synthesis via Semantic Injection with Large-Scale Pre-Training Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SIGGesture_Generalized_Co_Speech_Gesture_Synthesis_via_Semantic_Injection_with_Large_Scale_Pre_Training_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SIGGesture
+	- datasets: BEAT
 - [[obsidian-vault/analysis/TOG_2024/Semantic_Gesticulator_Semantics_Aware_Co_Speech_Gesture_Synthesis.md|Semantic Gesticulator: Semantics-Aware Co-Speech Gesture Synthesis (TOG 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/TOG_2024/Semantic_Gesticulator_Semantics_Aware_Co_Speech_Gesture_Synthesis.pdf|PDF]]
 	- topics: Generative Models / Diffusion

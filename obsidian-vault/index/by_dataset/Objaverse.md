@@ -4,11 +4,23 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Objaverse
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.md|SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: SeamlessNeRF
+	- datasets: Objaverse, Custom scenes
+- [[obsidian-vault/analysis/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.md|PivotMesh: Generic 3D Mesh Generation via Pivot Vertices Guidance (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PivotMesh
+	- datasets: ShapeNet, Objaverse, Objaverse-xl
 - [[obsidian-vault/analysis/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.md|Large-Scale 3D Generative Modeling using Sparse Voxel Hierarchies (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

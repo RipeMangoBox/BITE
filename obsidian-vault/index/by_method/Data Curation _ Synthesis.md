@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Data Curation / Synthesis
@@ -33,22 +33,34 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory, Data Curation / Synthesis
 	- methods: Wasserstein Core-set Selection via Generalized Benders Decomposition (Wass. + EOC + P)
 	- datasets: SVHN, CIFAR-10, Office-31
-- Immersive-Labeler: Immersive Annotation of Large-scale 3D Point Clouds in Virtual Reality (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Fine_Wrinkling_on_Coarsely_Meshed_Thin_Shells.md|Fine Wrinkling on Coarsely Meshed Thin Shells (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Fine_Wrinkling_on_Coarsely_Meshed_Thin_Shells.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: TFW (Tension Field Wrinkle augmentation)
+	- datasets: Highly stretched sheet, Sheared rectangle, Teddy bear inflatable
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Immersive-Labeler_Immersive_Annotation_of_Large-scale_3D_Point_Clouds_in_Virtual_Reality.md|Immersive-Labeler: Immersive Annotation of Large-scale 3D Point Clouds in Virtual Reality (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Immersive_Labeler_Immersive_Annotation_of_Large_scale_3D_Point_Clouds_in_Virtual_Reality.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
-- Learning to Relight Portrait Images via a Virtual Light Stage and Synthetic-to-Real Adaptation (SIGGRAPH ASIA 2022 2022)
-	- method groups: Data Curation / Synthesis
+	- methods: Immersive-Labeler
 - [[obsidian-vault/analysis/ICCV_2023/Towards_Viewpoint_Robustness_in_Birds_Eye_View_Segmentation.md|Towards Viewpoint Robustness in Bird's Eye View Segmentation (ICCV 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/ICCV_2023/Towards_Viewpoint_Robustness_in_Bird_s_Eye_View_Segmentation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
 	- methods: 基于新视角合成的视点增强框架 (NVS-based Viewpoint Augmentation Framework)
 	- datasets: NVIDIA DRIVE Sim 目标视点, CARLA synthetic views
-- CLIP-PAE: Projection-Augmentation Embedding to Extract Relevant Features for a Disentangled, Interpretable and Controllable Text-Guided Face Manipulation (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/CLIP-PAE_Projection-Augmentation_Embedding_to_Extract_Relevant_Features_for_a_Disentangled_Interpretable_and_Controllable_Text-Guided_Face_Manipulation.md|CLIP-PAE: Projection-Augmentation Embedding to Extract Relevant Features for a Disentangled, Interpretable and Controllable Text-Guided Face Manipulation (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CLIP_PAE_Projection_Augmentation_Embedding_to_Extract_Relevant_Features_for_a_Disentangled_Interpretable_and_Controllable_Text_Guided_Face_Manipulation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Data Curation / Synthesis
-- Neural Volumetric Reconstruction for Coherent Synthetic Aperture Sonar (SIGGRAPH 2023 2023)
+	- methods: CLIP Projection-Augmentation Embedding (PAE)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Neural_Volumetric_Reconstruction_for_Coherent_Synthetic_Aperture_Sonar.md|Neural Volumetric Reconstruction for Coherent Synthetic Aperture Sonar (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Volumetric_Reconstruction_for_Coherent_Synthetic_Aperture_Sonar.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: 神经反投影（Neural Backprojection）与脉冲解卷积
+	- datasets: SVSS 实测 cinder block 目标
 - [[obsidian-vault/analysis/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.md|Transferring Labels to Solve Annotation Mismatches Across Object Detection Datasets (ICLR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer
@@ -71,8 +83,16 @@ generated: 2026-06-24T20:47
 	- topics: Motion Animation
 	- method groups: Agent / RL / Planning, Data Curation / Synthesis
 	- methods: PARC
-- To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression, Data Curation / Synthesis
+- [[obsidian-vault/analysis/arxiv_2026/VLK_Learning_Humanoid_Loco-Manipulation_from_Synthetic_Interactions_in_Reconstructed_Scenes.md|VLK: Learning Humanoid Loco-Manipulation from Synthetic Interactions in Reconstructed Scenes (arxiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/2026_VLK_Learning_Humanoid_Loco_Manipulation_from_Synthetic_Interactions_in_Reconstructed_Scenes.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: VLK (Vision-Language-Kinematics)
+- [[obsidian-vault/analysis/CVPR_2026/Artiverse_A_Diverse_and_Physically_Grounded_Dataset_for_Articulated_Objects.md|Artiverse: A Diverse and Physically Grounded Dataset for Articulated Objects (CVPR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2026/Artiverse_A_Diverse_and_Physically_Grounded_Dataset_for_Articulated_Objects.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Data Curation / Synthesis
+	- methods: Artiverse dataset and semi-automated annotation pipeline
 - [[obsidian-vault/analysis/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.md|Active Learning for Decision Trees with Provable Guarantees (ICLR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2026/Active_Learning_for_Decision_Trees_with_Provable_Guarantees.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
@@ -101,3 +121,9 @@ generated: 2026-06-24T20:47
 	- topics: Other / Unclear
 	- method groups: Data Curation / Synthesis
 	- datasets: nuScenes, DriveObj3D
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MTPano_Multi-Task_Panoramic_Scene_Understanding_via_Label-Free_Integration_of_Dense_Prediction_Priors.md|MTPano: Multi-Task Panoramic Scene Understanding via Label-Free Integration of Dense Prediction Priors (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MTPano_Multi_Task_Panoramic_Scene_Understanding_via_Label_Free_Integration_of_Dense_Prediction_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: MTPano
+	- datasets: Matterport3D, Deep360

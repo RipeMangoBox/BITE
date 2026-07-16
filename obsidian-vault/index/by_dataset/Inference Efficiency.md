@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Inference Efficiency
@@ -21,3 +21,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
 	- methods: 统一隐空间校准框架（Unified Latent Calibration，含 Synergistic Visual Calibration (SVC) 与 Causal Representation Calibration (CRC) 模块）
 	- datasets: POPE, Inference Efficiency, CHAIR
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.md|MeshFlow: Mesh Generation with Equivariant Flow Matching (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: MeshFlow
+	- datasets: ShapeNet, Inference Efficiency

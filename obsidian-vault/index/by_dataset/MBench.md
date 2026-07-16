@@ -4,12 +4,12 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: MBench
 
-- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026)]]
+- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D

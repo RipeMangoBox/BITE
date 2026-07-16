@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: HumanML3D
@@ -291,6 +291,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: InterControl
 	- datasets: HumanML3D, Interaction Settings, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Flexible_Motion_In-betweening_With_Diffusion_Models.md|Flexible Motion In-betweening With Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Flexible_Motion_In_betweening_With_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Conditional Motion Diffusion In-betweening (CondMDI)
+	- datasets: HumanML3D test set, HumanML3D
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI.md|Flexible Motion In-betweening with Diffusion Models (CondMDI) (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -303,6 +309,12 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow
 	- methods: A-MDM (Auto-Regressive Motion Diffusion Model)
 	- datasets: HumanML3D, LaFAN1
+- [[obsidian-vault/analysis/SIGGRAPH_2024/LGTM_Local-to-Global_Text-driven_Human_Motion_Diffusion_Model.md|LGTM: Local-to-Global Text-driven Human Motion Diffusion Model (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/LGTM_Local_to_Global_Text_driven_Human_Motion_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LGTM
+	- datasets: HumanML3D
 - [[obsidian-vault/analysis/TPAMI_2024/GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generation.md|GUESS GradUally Enriching SyntheSis for Text Driven Human Motion Generation (TPAMI 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/TPAMI_2024/GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -609,12 +621,6 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: KV-Control
 	- datasets: HumanML3D
-- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026)]]
-	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
-	- topics: Motion Animation, Vision / Multimodal / Applications
-	- method groups: Vision / Multimodal / 3D
-	- methods: MotionVLA
-	- datasets: MBench, HumanML3D
 - [[obsidian-vault/analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.md|Beyond Global Alignment: Fine-Grained Motion-Language Retrieval via Pyramidal Shapley-Taylor Learning (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
@@ -663,6 +669,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MotionRFT
 	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MotionVLA
+	- datasets: MBench, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/NECromancer_Breathing_Life_into_Skeletons_via_BVH_Animation.md|NECromancer: Breathing Life into Skeletons via BVH Animation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/NECromancer_Breathing_Life_into_Skeletons_via_BVH_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: NECromancer (NEC)
+	- datasets: HumanML3D, Objaverse-XL, Truebones Zoo
 - [[obsidian-vault/analysis/arxiv_2026/OpenT2M_No_frill_Motion_Generation_with_Open_source_Large_scale_High_quality_Data.md|OpenT2M: No-frill Motion Generation with Open-source, Large-scale, High-quality Data (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/OpenT2M_No_frill_Motion_Generation_with_Open_source_Large_scale_High_quality_Data.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -705,12 +723,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Reconstruction-Anchored Diffusion Model (RAM)
 	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/ScaleMoGen_Autoregressive_Next-Scale_Prediction_for_Human_Motion_Generation.md|ScaleMoGen: Autoregressive Next-Scale Prediction for Human Motion Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/ScaleMoGen_Autoregressive_Next-Scale_Prediction_for_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ScaleMoGen
+	- datasets: HumanML3D, SnapMoGen
 - [[obsidian-vault/analysis/arxiv_2026/UniMo_Unified_Motion_Generation_and_Understanding_with_Chain_of_Thought.md|UniMo: Unified Motion Generation and Understanding with Chain of Thought (arXiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/UniMo:_Unified_Motion_Generation_and_Understanding_with_Chain_of_Thought.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: UniMo
 	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/VideoMDM_Towards_3D_Human_Motion_Generation_From_2D_Supervision.md|VideoMDM: Towards 3D Human Motion Generation From 2D Supervision (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/VideoMDM_Towards_3D_Human_Motion_Generation_From_2D_Supervision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoMDM
+	- datasets: HumanML3D, Fit3D, NBA
 - [[obsidian-vault/analysis/CVPR_2026/CMDM_HP.md|CMDM-HP: Causal Motion Diffusion Models for Autoregressive Motion Generation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/CMDM_HP.pdf|PDF]]
 	- topics: Motion Animation, Generative Models / Diffusion

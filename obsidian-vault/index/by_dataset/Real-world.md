@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Real-world
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
 	- methods: Moto
 	- datasets: SIMPLER, CALVIN, Real-world
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Diffusion-Guided_Relighting_for_Single-Image_SVBRDF_Estimation.md|Diffusion-Guided Relighting for Single-Image SVBRDF Estimation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Diffusion_Guided_Relighting_for_Single_Image_SVBRDF_Estimation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DGRSISE (Diffusion-Guided Relighting for Single-Image SVBRDF Estimation)
+	- datasets: INRIA, MatSynth, Real-world
 - [[obsidian-vault/analysis/CVPR_2026/MoEActok_A_MoE_based_Action_Tokenizer_for_Vision_Language_Action_Models.md|MoEActok: A MoE-based Action Tokenizer for Vision-Language-Action Models (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/MoEActok_A_MoE_based_Action_Tokenizer_for_Vision_Language_Action_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

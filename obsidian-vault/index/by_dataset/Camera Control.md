@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Camera Control
@@ -21,3 +21,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Diffusion as Shader (DaS)
 	- datasets: Camera Control, Motion Transfer, Mesh-to-Video Generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Virtually_Being_Customizing_Camera-Controllable_Video_Diffusion_Models_with_Volumetric_Performance_Captures.md|Virtually Being: Customizing Camera-Controllable Video Diffusion Models with Volumetric Performance Captures (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Virtually_Being_Customizing_Camera_Controllable_Video_Diffusion_Models_with_Volumetric_Performance_Captures.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Virtually Being
+	- datasets: Customization T2V, Camera Control

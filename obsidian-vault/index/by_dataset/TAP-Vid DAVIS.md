@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: TAP-Vid DAVIS
 
+- [[obsidian-vault/analysis/SIGGRAPH_2023/VideoDoodles_Hand-drawn_Animations_on_Videos_With_Scene-aware_Canvases.md|VideoDoodles: Hand-drawn Animations on Videos With Scene-aware Canvases (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/VideoDoodles_Hand_drawn_Animations_on_Videos_With_Scene_aware_Canvases.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoDoodles
+	- datasets: TAP-Vid DAVIS
 - [[obsidian-vault/analysis/CVPR_2026/Real_World_Point_Tracking_with_Verifier_Guided_Pseudo_Labeling.md|Real-World Point Tracking with Verifier-Guided Pseudo-Labeling (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Real_World_Point_Tracking_with_Verifier_Guided_Pseudo_Labeling.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

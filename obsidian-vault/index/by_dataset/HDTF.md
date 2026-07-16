@@ -4,11 +4,23 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: HDTF
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/VideoReTalking_Audio-based_Lip_Synchronization_for_Talking_Head_Video_Editing_In_the_Wild.md|VideoReTalking: Audio-based Lip Synchronization for Talking Head Video Editing In the Wild (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/VideoReTalking_Audio_based_Lip_Synchronization_for_Talking_Head_Video_Editing_In_the_Wild.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: VideoReTalking
+	- datasets: LRS2, HDTF, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/PersonaTalk_Bring_Attention_to_Your_Persona_in_Visual_Dubbing.md|PersonaTalk: Bring Attention to Your Persona in Visual Dubbing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PersonaTalk_Bring_Attention_to_Your_Persona_in_Visual_Dubbing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PersonaTalk
+	- datasets: HDTF, User Study
 - [[obsidian-vault/analysis/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditions.md|EchoMimic Lifelike Audio Driven Portrait Animations through Editable Landmark Conditioning (AAAI 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
@@ -27,6 +39,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Teller
 	- datasets: HDTF
+- [[obsidian-vault/analysis/SIGGRAPH_2025/LAM_Large_Avatar_Model_for_One-shot_Animatable_Gaussian_Head.md|LAM: Large Avatar Model for One-shot Animatable Gaussian Head (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LAM_Large_Avatar_Model_for_One_shot_Animatable_Gaussian_Head.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: LAM
+	- datasets: VFHQ, HDTF
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/High-Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.md|High-Fidelity Dynamic Portrait Animation via Direct Preference Optimization and Temporal Motion Modulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/High_Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: Hallo4 (DPO-enhanced portrait animation framework)
+	- datasets: Celeb-V, HDTF, EMTD
 - [[obsidian-vault/analysis/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.md|ActAvatar: Temporally-Aware Precise Action Control for Talking Avatars (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.pdf|PDF]]
 	- topics: Other / Unclear

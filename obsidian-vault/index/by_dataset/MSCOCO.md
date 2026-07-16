@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: MSCOCO
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/UniColor_A_Unified_Framework_for_Multi-Modal_Colorization_with_Transformer.md|UniColor: A Unified Framework for Multi-Modal Colorization with Transformer (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/UniColor_A_Unified_Framework_for_Multi_Modal_Colorization_with_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: UniColor
+	- datasets: ImageNet, MSCOCO
 - [[obsidian-vault/analysis/CVPR_2026/Towards_Highly_Transferable_Vision_Language_Attack_via_Semantic_Augmented_Dynamic_Contrastive_Interaction.md|Towards Highly Transferable Vision-Language Attack via Semantic-Augmented Dynamic Contrastive Interaction (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Towards_Highly_Transferable_Vision_Language_Attack_via_Semantic_Augmented_Dynamic_Contrastive_Interaction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer

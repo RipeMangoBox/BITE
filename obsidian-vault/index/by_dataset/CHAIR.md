@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: CHAIR
 
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Path-space_Differentiable_Rendering_of_Implicit_Surfaces.md|Path-space Differentiable Rendering of Implicit Surfaces (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Path_space_Differentiable_Rendering_of_Implicit_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Path-space Differentiable Rendering for Implicit Surfaces
+	- datasets: NEFERTITI / SUZANNE, CHAIR, BUNNY
 - [[obsidian-vault/analysis/CVPR_2026/CausalLens_Sensitivity_Guided_Multi_Head_Causal_Intervention_for_Hallucination_Mitigation_in_Large_Vision_Language_Models.md|CausalLens: Sensitivity-Guided Multi-Head Causal Intervention for Hallucination Mitigation in Large Vision-Language Models (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/CausalLens_Sensitivity_Guided_Multi_Head_Causal_Intervention_for_Hallucination_Mitigation_in_Large_Vision_Language_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

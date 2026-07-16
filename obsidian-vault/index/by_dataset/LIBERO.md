@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: LIBERO
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Unifying_Latent_Action_and_Latent_State_Pre-training_for_Policy_Learning_from_Videos.md|Unifying Latent Action and Latent State Pre-training for Policy Learning from Videos (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Unifying_Latent_Action_and_Latent_State_Pre_training_for_Policy_Learning_from_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: UniMimic
+	- datasets: LIBERO, CALVIN D→D, CALVIN ABC→D
 - [[obsidian-vault/analysis/CVPR_2026/ACoT_VLA_Action_Chain_of_Thought_for_Vision_Language_Action_Models.md|ACoT-VLA: Action Chain-of-Thought for Vision-Language-Action Models (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/ACoT_VLA_Action_Chain_of_Thought_for_Vision_Language_Action_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

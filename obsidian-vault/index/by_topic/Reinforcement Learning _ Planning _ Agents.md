@@ -4,7 +4,7 @@ type: paper-index
 dimension: topic
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Topic: Reinforcement Learning / Planning / Agents
@@ -39,12 +39,24 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: TRACE and PACER
 	- datasets: ORCA-Maps, nuScenes, Flat 地形
+- [[obsidian-vault/analysis/SIGGRAPH_2023/GREIL-Crowds_Crowd_Simulation_With_Deep_Reinforcement_Learning_and_Examples.md|GREIL-Crowds: Crowd Simulation With Deep Reinforcement Learning and Examples (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/GREIL_Crowds_Crowd_Simulation_With_Deep_Reinforcement_Learning_and_Examples.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: GREIL-Crowds
+	- datasets: Flock-2 / Pedestrian datasets, Long corridor scenario, Crossing scenario
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.md|Interactive Hair Simulation on the GPU using ADMM (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning
 	- methods: ADMM-based GPU Hair Simulation for Discrete Elastic Rods with Coulomb Friction
 	- datasets: Hairball 16k, Hairball 128k, Long 47k
+- [[obsidian-vault/analysis/SIGGRAPH_2023/PMP_Learning_to_Physically_Interact_With_Environments_Using_Part-wise_Motion_Priors.md|PMP: Learning to Physically Interact With Environments Using Part-wise Motion Priors (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PMP_Learning_to_Physically_Interact_With_Environments_Using_Part_wise_Motion_Priors.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: Part-wise Motion Priors (PMP)
+	- datasets: Cart Pulling, Barbell Lifting, Bar Hanging
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.md|Neural Collision Fields for Triangle Primitives (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents

@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: LaFAN1
@@ -33,3 +33,9 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow
 	- methods: A-MDM (Auto-Regressive Motion Diffusion Model)
 	- datasets: HumanML3D, LaFAN1
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Adaptive_Interpolation-Synthesis_for_Motion_In-Betweening_on_Keyframe-Based_Animation.md|Adaptive Interpolation-Synthesis for Motion In-Betweening on Keyframe-Based Animation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Adaptive_Interpolation_Synthesis_for_Motion_In_Betweening_on_Keyframe_Based_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AIS-BiLSTM
+	- datasets: Algorithmic Test Set, Production Test Set, Random Test Set

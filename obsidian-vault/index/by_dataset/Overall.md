@@ -4,11 +4,23 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Overall
 
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Real-time_Lens_Distortion_Algorithm_on_Embedded_GPU_Systems.md|Real-time Lens Distortion Algorithm on Embedded GPU Systems (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Real_time_Lens_Distortion_Algorithm_on_Embedded_GPU_Systems.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Compressed Lookup Table with Unified Memory
+	- datasets: Jetson Nano, Jetson NX, Overall
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/JoruriPuppet_Learning_Tempo-Changing_Mechanisms_Beyond_the_Beat_for_Music-to-Motion_Generation_with_Expressive_Metrics.md|JoruriPuppet: Learning Tempo-Changing Mechanisms Beyond the Beat for Music-to-Motion Generation with Expressive Metrics (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/JoruriPuppet_Learning_Tempo_Changing_Mechanisms_Beyond_the_Beat_for_Music_to_Motion_Generation_with_Expressive_Metrics.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Tempo-Changing Feature Enhancement for Music-to-Motion Generation
+	- datasets: EDGE on AIST++ dataset, LDA on Motorica dataset, Overall
 - [[obsidian-vault/analysis/CVPR_2026/AdaptVision_Efficient_Vision_Language_Models_via_Adaptive_Visual_Acquisition.md|AdaptVision: Efficient Vision-Language Models via Adaptive Visual Acquisition (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/AdaptVision_Efficient_Vision_Language_Models_via_Adaptive_Visual_Acquisition.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

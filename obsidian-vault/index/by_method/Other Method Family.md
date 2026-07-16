@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Other Method Family
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Neural State Machine (NSM)
 	- datasets: Sitting task - final pose precision, Carrying task - final pose precision, Responsiveness - idle to walk transition
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Comparison_of_Zoom-in_Transition_Methods_for_Multiscale_VR.md|A Comparison of Zoom-in Transition Methods for Multiscale VR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Comparison_of_Zoom_in_Transition_Methods_for_Multiscale_VR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OrbitThenZoom（先绕后缩过渡技术）
+	- datasets: 用户主观评估
 - [[obsidian-vault/analysis/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large-scale_Simulation_of_Incompressible_Flow.md|A Fast Unsmoothed Aggregation Algebraic Multigrid Framework for the Large-scale Simulation of Incompressible Flow (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Fast_Unsmoothed_Aggregation_Algebraic_Multigrid_Framework_for_the_Large_scale_Simulation_of_Incompressible_Flow.pdf|PDF]]
 	- topics: Other / Unclear
@@ -27,6 +33,12 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Two-Stage Initialization
 	- datasets: Mass-spring tetrahedral mesh, Cloth hat simulation, FEM plant
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_GPU-based_Multilevel_Additive_Schwarz_Preconditioner_for_Cloth_and_Deformable_Body_Simulation.md|A GPU-based Multilevel Additive Schwarz Preconditioner for Cloth and Deformable Body Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_GPU_based_Multilevel_Additive_Schwarz_Preconditioner_for_Cloth_and_Deformable_Body_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: GPU-based Multilevel Additive Schwarz (MAS) preconditioner
+	- datasets: PCG求解器加速比
 - [[obsidian-vault/analysis/SIGGRAPH_2022/A_Moving_Eulerian-Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.md|A Moving Eulerian-Lagrangian Particle Method for Thin Film and Foam Simulation (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Moving_Eulerian_Lagrangian_Particle_Method_for_Thin_Film_and_Foam_Simulation.pdf|PDF]]
 	- topics: Other / Unclear
@@ -39,6 +51,18 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: 基于力场的蝴蝶飞行仿真模型 (Force-based Butterfly Flight Simulation Model)
 	- datasets: 消融用户研究, 蝴蝶集群仿真, 蝴蝶集群旅行仿真
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_Unified_Newton_Barrier_Method_for_Multibody_Dynamics.md|A Unified Newton Barrier Method for Multibody Dynamics (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_Unified_Newton_Barrier_Method_for_Multibody_Dynamics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Unified Newton Barrier Method（统一牛顿障碍法）
+	- datasets: Windmill scene, Falling box energy conservation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Accurate_Diffuse_Lighting_From_Spherical_Gaussian_Lights.md|Accurate Diffuse Lighting From Spherical Gaussian Lights (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Accurate_Diffuse_Lighting_From_Spherical_Gaussian_Lights.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Our method (improved SG-based diffuse lighting)
+	- datasets: Exact clamped cosine, Normalized hemispherical integral, Dynamic indirect illumination
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.md|Adaptive Rigidification of Elastic Solids (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Adaptive_Rigidification_of_Elastic_Solids.pdf|PDF]]
 	- topics: Other / Unclear
@@ -51,6 +75,18 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Adjoint Nonlinear Ray Tracing
 	- datasets: GRIN透镜恢复
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Alpha_Wrapping_With_an_Offset.md|Alpha Wrapping With an Offset (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Alpha_Wrapping_With_an_Offset.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Alpha Wrapping with an Offset
+	- datasets: Thingi10k 全数据集, Loader 模型, Swept volume
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Artist_Controlled_Fracture_Design_Using_Impurity_Maps.md|Artist Controlled Fracture Design Using Impurity Maps (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Artist_Controlled_Fracture_Design_Using_Impurity_Maps.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Impurity Maps for Artist-Controlled Fracture
+	- datasets: Pizza model, Glass slab model
 - [[obsidian-vault/analysis/SIGGRAPH_2022/As-locally-uniform-as-possible_Reshaping_of_Vector_Clip_Art.md|As-locally-uniform-as-possible Reshaping of Vector Clip Art (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/As_locally_uniform_as_possible_Reshaping_of_Vector_Clip_Art.pdf|PDF]]
 	- topics: Other / Unclear
@@ -62,6 +98,12 @@ generated: 2026-06-24T20:47
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: CCP
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Centimeter-wave_Free-space_Neural_Time-of-flight_Imaging.md|Centimeter-wave Free-space Neural Time-of-flight Imaging (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Centimeter_wave_Free_space_Neural_Time_of_flight_Imaging.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: All-Optical Neural ToF成像系统（本方法）
+	- datasets: 合成测试场景, 镜面反射体 0.6 m 移动扫描
 - [[obsidian-vault/analysis/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.md|CLIP2StyleGAN: Unsupervised Extraction of StyleGAN Edit Directions (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/CLIP2StyleGAN_Unsupervised_Extraction_of_StyleGAN_Edit_Directions.pdf|PDF]]
 	- topics: Other / Unclear
@@ -74,12 +116,24 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Clustered Vector Textures
 	- datasets: 聚类对比基线
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Knit_Templates.md|Computational Design of Knit Templates (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_Knit_Templates.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Computational Design of Knit Templates (基于组合规则的四边网格重划分与可编织性约束)
+	- datasets: 设计变体生成
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.md|Computational Design of Passive Grippers (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Design_of_Passive_Grippers.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: Computational Design of Passive Grippers
 	- datasets: 物体特征覆盖
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Context-aware_Risk_Degree_Prediction_for_Smartphone_Zombies.md|Context-aware Risk Degree Prediction for Smartphone Zombies (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Context_aware_Risk_Degree_Prediction_for_Smartphone_Zombies.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Context-aware Risk Prediction System
+	- datasets: Custom-designed corridor obstacle avoidance task
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Covector_Fluids.md|Covector Fluids (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Covector_Fluids.pdf|PDF]]
 	- topics: Other / Unclear
@@ -98,6 +152,12 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: DCT-Net
 	- datasets: CelebA
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Deep_Compliant_Control.md|Deep Compliant Control (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Deep_Compliant_Control.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Deep Compliant Control (Two-level Hierarchical Control)
+	- datasets: Obstacle push, Trampoline, Door opening
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.md|Designing Perceptual Puzzles by Differentiating Probabilistic Programs (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Designing_Perceptual_Puzzles_by_Differentiating_Probabilistic_Programs.pdf|PDF]]
 	- topics: Other / Unclear
@@ -109,12 +169,47 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Dev2PQ
 	- datasets: Clothoid解析可展曲面
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Developability-driven_Piecewise_Approximations_for_Triangular_Meshes.md|Developability-driven Piecewise Approximations for Triangular Meshes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Developability_driven_Piecewise_Approximations_for_Triangular_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Developability-driven piecewise approximation
+	- datasets: Bunny model, Various models, Multiple models
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Development_of_Exergame_to_Resolve_Deconditioning_in_Children_With_Orthostatic_Dysregulation.md|Development of Exergame to Resolve Deconditioning in Children With Orthostatic Dysregulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Development_of_Exergame_to_Resolve_Deconditioning_in_Children_With_Orthostatic_Dysregulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OD Exergame (卧姿运动游戏)
+	- datasets: J-PANAS情绪评估
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DiffCloth_Differentiable_Cloth_Simulation_With_Dry_Frictional_Contact.md|DiffCloth: Differentiable Cloth Simulation With Dry Frictional Contact (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DiffCloth_Differentiable_Cloth_Simulation_With_Dry_Frictional_Contact.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: DiffCloth
+	- datasets: T-shirt 系统辨识, Flag 真实到仿真迁移, Hat 轨迹优化
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DiffPD_Differentiable_Projective_Dynamics.md|DiffPD: Differentiable Projective Dynamics (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DiffPD_Differentiable_Projective_Dynamics.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Differentiable Projective Dynamics (DiffPD)
+	- datasets: Plant, Bouncing ball, Starfish / Shark
+- [[obsidian-vault/analysis/SIGGRAPH_2022/DynaPix_Normal_Map_Pixelization_for_Dynamic_Lighting.md|DynaPix: Normal Map Pixelization for Dynamic Lighting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DynaPix_Normal_Map_Pixelization_for_Dynamic_Lighting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DynaPix (Krita extension)
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Ecoclimates_Climate-response_Modeling_of_Vegetation.md|Ecoclimates: Climate-response Modeling of Vegetation (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Ecoclimates_Climate_response_Modeling_of_Vegetation.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: Ecoclimates: Climate-response Modeling of Vegetation
 	- datasets: 不同气候条件下的森林消亡与恢复, 与 Makowski et al. 2019 的微气候比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Ensemble_Metropolis_Light_Transport.md|Ensemble Metropolis Light Transport (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Ensemble_Metropolis_Light_Transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Ensemble Metropolis Light Transport (EMLT)
+	- datasets: DOOR AJAR, BEDROOM, CORNELL BOX
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.md|Face Extrusion Quad Meshes (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Face_Extrusion_Quad_Meshes.pdf|PDF]]
 	- topics: Other / Unclear
@@ -127,6 +222,11 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Dynamic Facial Hair Capture Pipeline
 	- datasets: 面部表演序列
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Filament_Based_Plasma.md|Filament Based Plasma (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Filament_Based_Plasma.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Filament-Based Plasma (FFCS-Lagrangian)
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.md|Free2CAD: Parsing Freehand Drawings Into CAD Commands (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Free2CAD_Parsing_Freehand_Drawings_Into_CAD_Commands.pdf|PDF]]
 	- topics: Other / Unclear
@@ -138,12 +238,906 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: Generalized Resampled Importance Sampling (GRIS) and ReSTIR PT
 	- datasets: Carousel, Paris Opera House, Kitchen
+- [[obsidian-vault/analysis/SIGGRAPH_2022/geoTangle_Interactive_Design_of_Geodesic_Tangle_Patterns_on_Surfaces.md|geoTangle: Interactive Design of Geodesic Tangle Patterns on Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/geoTangle_Interactive_Design_of_Geodesic_Tangle_Patterns_on_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: geoTangle
+	- datasets: 交互式编辑性能, 测地线求解速度, 与热方法比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/GravityPack_Exploring_a_Wearable_Gravity_Display_for_Immersive_Interaction_Using_Liquid-based_System.md|GravityPack: Exploring a Wearable Gravity Display for Immersive Interaction Using Liquid-based System (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/GravityPack_Exploring_a_Wearable_Gravity_Display_for_Immersive_Interaction_Using_Liquid_based_System.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: GravityPack
+	- datasets: 定制VR喂兔子场景
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Guided_Bubbles_and_Wet_Foam_for_Realistic_Whitewater_Simulation.md|Guided Bubbles and Wet Foam for Realistic Whitewater Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Guided_Bubbles_and_Wet_Foam_for_Realistic_Whitewater_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Guided Bubbles and Wet Foam
+	- datasets: 气泡运动真实感对比
+- [[obsidian-vault/analysis/SIGGRAPH_2022/HDR_Lighting_Dilation_for_Dynamic_Range_Reduction_on_Virtual_Production_Stages.md|HDR Lighting Dilation for Dynamic Range Reduction on Virtual Production Stages (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/HDR_Lighting_Dilation_for_Dynamic_Range_Reduction_on_Virtual_Production_Stages.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: HDR Lighting Dilation
+	- datasets: CG场景在HDRI照明下的渲染效果
+- [[obsidian-vault/analysis/SIGGRAPH_2022/High-low_Tech_Ombro-Cinéma.md|High-low Tech Ombro-Cinéma (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/High_low_Tech_Ombro_Cin_ma.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: High-Low Tech Ombro-Cinéma
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Holographic_Glasses_for_Virtual_Reality.md|Holographic Glasses for Virtual Reality (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Holographic_Glasses_for_Virtual_Reality.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Holographic Glasses with Pupil-HOGD algorithm
+	- datasets: Wearable prototype, Dynamic eye box experiment, Simulation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Hybrid_Prediction_for_Games_Rollback_Netcode.md|Hybrid Prediction for Games’ Rollback Netcode (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Hybrid_Prediction_for_Games_Rollback_Netcode.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Hybrid Rollback Netcode
+- [[obsidian-vault/analysis/SIGGRAPH_2022/HYFAR_A_Textile_Soft_Actuator_for_Haptic_Clothing_Interfaces.md|HYFAR: A Textile Soft Actuator for Haptic Clothing Interfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/HYFAR_A_Textile_Soft_Actuator_for_Haptic_Clothing_Interfaces.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: HYFAR (HYperelastic FAbric-Reinforced actuator)
+	- datasets: Shoulder abduction-adduction joint blocked force test
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Interactive_Augmented_Reality_Storytelling_Guided_by_Scene_Semantics.md|Interactive Augmented Reality Storytelling Guided by Scene Semantics (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Interactive_Augmented_Reality_Storytelling_Guided_by_Scene_Semantics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 层次化故事采样与动态组装 (Hierarchical Story Sampling and Assembly)
+	- datasets: 用户研究
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_to_Brachiate_via_Simplified_Model_Imitation.md|Learning to Brachiate via Simplified Model Imitation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_to_Brachiate_via_Simplified_Model_Imitation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Two-stage Simplified Model Imitation Learning（简化模型模仿学习）
+	- datasets: 含3个不可达间隙的随机地形
+- [[obsidian-vault/analysis/SIGGRAPH_2022/LeviPrint_Contactless_Fabrication_Using_Full_Acoustic_Manipulation_of_Elongated_Parts.md|LeviPrint: Contactless Fabrication Using Full Acoustic Manipulation of Elongated Parts (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/LeviPrint_Contactless_Fabrication_Using_Full_Acoustic_Manipulation_of_Elongated_Parts.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: LeviPrint (核心捕获算法: TrapsAtSides 和 Minimum Potential)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Local_Anatomically_Constrained_Facial_Performance_Retargeting.md|Local Anatomically Constrained Facial Performance Retargeting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Local_Anatomically_Constrained_Facial_Performance_Retargeting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Local Anatomically Constrained Facial Performance Retargeting
+	- datasets: 留出验证形状, 与生产级大型混合形状视觉比较
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Local_Scale_Adaptation_for_Augmenting_Hand_Shape_Models.md|Local Scale Adaptation for Augmenting Hand Shape Models (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Local_Scale_Adaptation_for_Augmenting_Hand_Shape_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: aMANO (adaptive MANO)
+	- datasets: NYU, BigHand, GuessWho
+- [[obsidian-vault/analysis/SIGGRAPH_2022/MetaPo_A_Robotic_Meta_Portal_for_Interspace_Communication.md|MetaPo: A Robotic Meta Portal for Interspace Communication (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/MetaPo_A_Robotic_Meta_Portal_for_Interspace_Communication.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: MetaPo
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Mixed_Integer_Neural_Inverse_Design.md|Mixed Integer Neural Inverse Design (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Mixed_Integer_Neural_Inverse_Design.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: MILP-based Neural Inverse Design
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Moving_Level-of-detail_Surfaces.md|Moving Level-of-detail Surfaces (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Moving_Level_of_detail_Surfaces.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Moving Level-of-detail Surfaces (MLoD)
+	- datasets: CPU投影时间, 与全局APSS的逼近误差
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Neural_Dual_Contouring.md|Neural Dual Contouring (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Dual_Contouring.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Dual Contouring (NDC) / Unsigned Neural Dual Contouring (UNDC)
+	- datasets: ABC, Thingi10K, FAUST
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Neural_Layered_BRDFs.md|Neural Layered BRDFs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Layered_BRDFs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Layered BRDFs
+	- datasets: 分层BRDF渲染, 与近似方法比较, 单样本渲染
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Neural_Shadow_Mapping.md|Neural Shadow Mapping (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Shadow_Mapping.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Shadow Mapping
+	- datasets: Bistro interior + 未见过物体
+- [[obsidian-vault/analysis/SIGGRAPH_2022/NIMBLE_A_Non-rigid_Hand_Model_With_Bones_and_Muscles.md|NIMBLE: A Non-rigid Hand Model With Bones and Muscles (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/NIMBLE_A_Non_rigid_Hand_Model_With_Bones_and_Muscles.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: NIMBLE
+	- datasets: MRI + MANO 测试集, MRI 测试集 + 皮肤
+- [[obsidian-vault/analysis/SIGGRAPH_2022/OptiTrap_Optimal_Trap_Trajectories_for_Acoustic_Levitation_Displays.md|OptiTrap: Optimal Trap Trajectories for Acoustic Levitation Displays (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/OptiTrap_Optimal_Trap_Trajectories_for_Acoustic_Levitation_Displays.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OptiTrap
+	- datasets: Squircle, Fish, All shapes
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Penetration-free_Projective_Dynamics_on_the_GPU.md|Penetration-free Projective Dynamics on the GPU (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Penetration_free_Projective_Dynamics_on_the_GPU.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Projective IPC (GPU-accelerated Penetration-free Projective Dynamics)
+	- datasets: Halloween party, Falling dinosaur, Rubber helicopters
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Perception_of_Letter_Glyph_Parameters_for_InfoTypography.md|Perception of Letter Glyph Parameters for InfoTypography (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perception_of_Letter_Glyph_Parameters_for_InfoTypography.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于贝叶斯 MCMC 和自适应阶梯法的字体参数感知特性实验分析方法
+	- datasets: 实验1整体噪声, 实验2平均 JND, 实验2 可区分等级数
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Perceptual_Requirements_for_Eye-tracked_Distortion_Correction_in_VR.md|Perceptual Requirements for Eye-tracked Distortion Correction in VR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Requirements_for_Eye_tracked_Distortion_Correction_in_VR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive multidimensional psychophysics (基于AEPsych的EAVC方法)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Position-free_Multiple-bounce_Computations_for_Smith_Microfacet_BSDFs.md|Position-free Multiple-bounce Computations for Smith Microfacet BSDFs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Position_free_Multiple_bounce_Computations_for_Smith_Microfacet_BSDFs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Position-free Multiple-bounce Smith Microfacet BSDF
+	- datasets: Simulated data with Beckmann NDF, Single Slab scene
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Procedural_Texturing_of_Solid_Wood_With_Knots.md|Procedural Texturing of Solid Wood With Knots (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Procedural_Texturing_of_Solid_Wood_With_Knots.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Procedural Knot Texturing (基于时间场与平滑最小值的节疤木材纹理生成)
+	- datasets: 木材专家主观评估, 渲染效率
+- [[obsidian-vault/analysis/SIGGRAPH_2022/ProjecString_Turning_an_Everyday_String_Curtain_Into_an_Interactive_Projection_Display.md|ProjecString: Turning an Everyday String Curtain Into an Interactive Projection Display (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ProjecString_Turning_an_Everyday_String_Curtain_Into_an_Interactive_Projection_Display.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: ProjecString
+	- datasets: Media Art Exhibit
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Recording_and_Replaying_Psychomotor_User_Actions_in_VR.md|Recording and Replaying Psychomotor User Actions in VR (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Recording_and_Replaying_Psychomotor_User_Actions_in_VR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: VR Recording and Replaying System (VRRR)
+	- datasets: PC testbed
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Regression-based_Monte_Carlo_Integration.md|Regression-based Monte Carlo Integration (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Regression_based_Monte_Carlo_Integration.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Regression-based Monte Carlo Integration
+	- datasets: Dining Room scene, Killeroos scene, Bathroom scene
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Spatial_Augmented_Reality_Assistance_System_With_Accelerometer_and_Projection_Mapping_at_Cleaning_Activities.md|Spatial Augmented Reality Assistance System With Accelerometer and Projection Mapping at Cleaning Activities (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Spatial_Augmented_Reality_Assistance_System_With_Accelerometer_and_Projection_Mapping_at_Cleaning_Activities.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Spatial Augmented Reality Assistance System with Accelerometer and Projection Mapping
+	- datasets: Simulated living environment cleaning task, User motivation survey
+- [[obsidian-vault/analysis/SIGGRAPH_2022/SPCBPT_Subspace-based_Probabilistic_Connections_for_Bidirectional_Path_Tracing.md|SPCBPT: Subspace-based Probabilistic Connections for Bidirectional Path Tracing (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/SPCBPT_Subspace_based_Probabilistic_Connections_for_Bidirectional_Path_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SPCBPT
+	- datasets: Hallway, Bedroom
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Stability-aware_Simplification_of_Curve_Networks.md|Stability-aware Simplification of Curve Networks (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Stability_aware_Simplification_of_Curve_Networks.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Stability-aware Curve Network Simplification (Greedy Approximation Algorithm)
+	- datasets: Stadium, Tower
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Synthesis_of_Frame_Field-aligned_Multi-laminar_Structures.md|Synthesis of Frame Field-aligned Multi-laminar Structures (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Synthesis_of_Frame_Field_aligned_Multi_laminar_Structures.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Synthesis of Frame Field-aligned Multi-laminar Structures
+	- datasets: Cantilever
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Tailored_Reality_Perception-aware_Scene_Restructuring_for_Adaptive_VR_Navigation.md|Tailored Reality: Perception-aware Scene Restructuring for Adaptive VR Navigation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Tailored_Reality_Perception_aware_Scene_Restructuring_for_Adaptive_VR_Navigation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Perception-aware Scene Restructuring (OURS)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/The_Hierarchical_Subspace_Iteration_Method_for_Laplace-Beltrami_Eigenproblems.md|The Hierarchical Subspace Iteration Method for Laplace-Beltrami Eigenproblems (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/The_Hierarchical_Subspace_Iteration_Method_for_Laplace_Beltrami_Eigenproblems.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Hierarchical Subspace Iteration Method (HSIM)
+	- datasets: Sphere, Gargoyle
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Umbrella_Meshes_Elastic_Mechanisms_for_Freeform_Shape_Deployment.md|Umbrella Meshes: Elastic Mechanisms for Freeform Shape Deployment (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Umbrella_Meshes_Elastic_Mechanisms_for_Freeform_Shape_Deployment.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Umbrella Meshes inverse design framework
+	- datasets: Dome, Lilium Tower, Hive
+- [[obsidian-vault/analysis/SIGGRAPH_2022/VEMPIC_Particle-in-polyhedron_Fluid_Simulation_for_Intricate_Solid_Boundaries.md|VEMPIC: Particle-in-polyhedron Fluid Simulation for Intricate Solid Boundaries (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/VEMPIC_Particle_in_polyhedron_Fluid_Simulation_for_Intricate_Solid_Boundaries.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: VEMPIC
+	- datasets: Suzanne mesh with holes, Logs array, Open face mesh
+- [[obsidian-vault/analysis/SIGGRAPH_2022/WallPlan_Synthesizing_Floorplans_by_Learning_to_Generate_Wall_Graphs.md|WallPlan: Synthesizing Floorplans by Learning to Generate Wall Graphs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/WallPlan_Synthesizing_Floorplans_by_Learning_to_Generate_Wall_Graphs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: WallPlan
+	- datasets: RPLAN test set, Efficiency, Perceptual study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/A_Non-Associated_MSCC_Model_for_Simulating_Structured_and_Destructured_Clays.md|A Non-Associated MSCC Model for Simulating Structured and Destructured Clays (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/A_Non_Associated_MSCC_Model_for_Simulating_Structured_and_Destructured_Clays.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Non-Associated MSCC model (non-associated Modified Structured Cam Clay)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/A_Novel_Solution_to_Manufacturing_Multi-Color_Medical_Preoperative_Models_with_Transparent_Shells.md|A Novel Solution to Manufacturing Multi-Color Medical Preoperative Models with Transparent Shells (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/A_Novel_Solution_to_Manufacturing_Multi_Color_Medical_Preoperative_Models_with_Transparent_Shells.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Hybrid FDM-DLP casting method
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Artist-directed_Modeling_of_Competitively_Growing_Corals.md|Artist-directed Modeling of Competitively Growing Corals (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Artist_directed_Modeling_of_Competitively_Growing_Corals.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: 艺术家指导的竞争性珊瑚生长系统（Artist-directed Competitive Coral Growth System）
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Continuous_deformation_based_panelization_for_design_rationalization.md|Continuous deformation based panelization for design rationalization (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Continuous_deformation_based_panelization_for_design_rationalization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Continuous Deformation Panelization
+	- datasets: Bunny, Koala, Bear / Spot
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Declarative_Specification_for_Unstructured_Mesh_Editing_Algorithms.md|Declarative Specification for Unstructured Mesh Editing Algorithms (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Declarative_Specification_for_Unstructured_Mesh_Editing_Algorithms.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: IDAS (Invariant-Desiderata-Attributes-Schedule)
+	- datasets: Shortest Edge Collapse, QSlim, Isotropic Remeshing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/DeepJoin_Learning_a_Joint_Occupancy_Signed_Distance_and_Normal_Field_Function_for_Shape_Repair.md|DeepJoin: Learning a Joint Occupancy, Signed Distance, and Normal Field Function for Shape Repair (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/DeepJoin_Learning_a_Joint_Occupancy_Signed_Distance_and_Normal_Field_Function_for_Shape_Repair.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DeepJoin
+	- datasets: ShapeNet, Google Scanned Objects, QP Cultural Heritage
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Differentiable_Hybrid_Traffic_Simulation.md|Differentiable Hybrid Traffic Simulation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Differentiable_Hybrid_Traffic_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Differentiable Hybrid Traffic Simulator
+	- datasets: Runtime Performance, Parameter estimation, ITSCP - macroscopic simulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Differentiable_Simulation_of_Inertial_Musculotendons.md|Differentiable Simulation of Inertial Musculotendons (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Differentiable_Simulation_of_Inertial_Musculotendons.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Inertial Musculotendon Simulation
+	- datasets: 与Pai 2010分析结果验证
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Display_Size_and_Targeting_Performance_Small_Hurts_Large_May_Help.md|Display Size and Targeting Performance: Small Hurts, Large May Help (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Display_Size_and_Targeting_Performance_Small_Hurts_Large_May_Help.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Display Size Experiment with Constant FoV and Resolution
+	- datasets: Custom first-person targeting task
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Dressing_Avatars_Deep_Photorealistic_Appearance_for_Physically_Simulated_Clothing.md|Dressing Avatars: Deep Photorealistic Appearance for Physically Simulated Clothing (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Dressing_Avatars_Deep_Photorealistic_Appearance_for_Physically_Simulated_Clothing.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Dressing Avatars
+	- datasets: Tracked cloth
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Effects_of_Font_Type_and_Weight_on_Reading_in_VR.md|Effects of Font Type and Weight on Reading in VR (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Effects_of_Font_Type_and_Weight_on_Reading_in_VR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: VR长文本阅读的字体类型与粗细评估实验
+	- datasets: VR阅读实验
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Fast_Editing_of_Singularities_in_Field-Aligned_Stripe_Patterns.md|Fast Editing of Singularities in Field-Aligned Stripe Patterns (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Fast_Editing_of_Singularities_in_Field_Aligned_Stripe_Patterns.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于微分形式约束的场对齐参数化奇异点编辑算法
+	- datasets: Bimba
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Fast_Octree_Neighborhood_Search_for_SPH_Simulations.md|Fast Octree Neighborhood Search for SPH Simulations (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Fast_Octree_Neighborhood_Search_for_SPH_Simulations.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Octree-based Neighborhood Search
+	- datasets: Beach Scene, Fountain Scene, 密集/稀疏粒子分布
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Fused_BVH_to_Ray_Trace_Level_of_Detail_Meshes.md|Fused BVH to Ray Trace Level of Detail Meshes (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Fused_BVH_to_Ray_Trace_Level_of_Detail_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Fused BVH for LOD Meshes
+	- datasets: Buddha模型多LOD存储, Buddha场景100实例, LOD 0+1
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Globally_Injective_Flattening_via_a_Reduced_Harmonic_Subspace.md|Globally Injective Flattening via a Reduced Harmonic Subspace (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Globally_Injective_Flattening_via_a_Reduced_Harmonic_Subspace.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Globally Injective Flattening via a Reduced Harmonic Subspace
+	- datasets: Hilbert developable model, Bird model
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Hidden_Degrees_of_Freedom_in_Implicit_Vortex_Filaments.md|Hidden Degrees of Freedom in Implicit Vortex Filaments (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Hidden_Degrees_of_Freedom_in_Implicit_Vortex_Filaments.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Implicit vortex filament dynamics with untwisted Clebsch variables and non-swirling velocity extension
+	- datasets: Linked rings, Trefoil knot, Two linked rings
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Hierarchical_Layout_Blending_with_Recursive_Optimal_Correspondence.md|Hierarchical Layout Blending with Recursive Optimal Correspondence (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Hierarchical_Layout_Blending_with_Recursive_Optimal_Correspondence.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Recursive Optimal Correspondence Layout Blending (层次化递归最优对应布局混合)
+	- datasets: RICO 数据集上的布局混合定性对比
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/High-Order_Directional_Fields.md|High-Order Directional Fields (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/High_Order_Directional_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: High-Order Face-Based Directional Fields (高阶面基方向场框架)
+	- datasets: 向量 Dirichlet 能量插值, Thingi10K 向量泊松方程基准, 多网格收敛测试
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Impact_of_correct_and_simulated_focus_cues_on_perceived_realism.md|Impact of correct and simulated focus cues on perceived realism (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Impact_of_correct_and_simulated_focus_cues_on_perceived_realism.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: NearCorrect (correct focus cues via dual-focal-plane HDR stereo display)
+	- datasets: Realism pairwise comparison
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Investigating_the_Effects_of_Synchronized_Visuo-Tactile_Stimuli_for_Inducing_Kinesthetic_Illusion_in_Observational_Learning_of_Whole-Body_Movements.md|Investigating the Effects of Synchronized Visuo-Tactile Stimuli for Inducing Kinesthetic Illusion in Observational Learning of Whole-Body Movements (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Investigating_the_Effects_of_Synchronized_Visuo_Tactile_Stimuli_for_Inducing_Kinesthetic_Illusion_in_Observational_Learning_of_Whole_Body_Movements.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 同步视觉-触觉刺激诱导动觉错觉
+	- datasets: Whole-Body Observational Learning Experiment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Isotropic_ARAP_energy_using_Cauchy-Green_invariants.md|Isotropic ARAP energy using Cauchy-Green invariants (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Isotropic_ARAP_energy_using_Cauchy_Green_invariants.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于Cauchy-Green不变量的各向同性ARAP能量 (iARAP)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Lightweight_Neural_Basis_Functions_for_All-Frequency_Shading.md|Lightweight Neural Basis Functions for All-Frequency Shading (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Lightweight_Neural_Basis_Functions_for_All_Frequency_Shading.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Basis Functions (NBF)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Marginal_Multiple_Importance_Sampling.md|Marginal Multiple Importance Sampling (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Marginal_Multiple_Importance_Sampling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Marginal Multiple Importance Sampling (MMIS) / Marginal Path Sampling (MPS)
+	- datasets: Indoor room scene, Caustic-heavy scene, Canonical 1D function
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Mixed_Variational_Finite_Elements_for_Implicit_Simulation_of_Deformables.md|Mixed Variational Finite Elements for Implicit Simulation of Deformables (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Mixed_Variational_Finite_Elements_for_Implicit_Simulation_of_Deformables.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Mixed Finite Element Method (MFEM)
+	- datasets: Rubber toy boat 单时间步收敛, Swinging bunny 全模拟轨迹, Gecko 模拟
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Cloth_Simulation.md|Neural Cloth Simulation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Cloth_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural Cloth Simulation
+	- datasets: Mixamo 运动序列
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/NeuralMarker_A_Framework_for_Learning_General_Marker_Correspondence.md|NeuralMarker: A Framework for Learning General Marker Correspondence (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/NeuralMarker_A_Framework_for_Learning_General_Marker_Correspondence.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: NeuralMarker
+	- datasets: DVL-Markers, FlyingMarkers test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Physical_Interaction_Reconstructing_Hand-object_Interactions_with_Physics.md|Physical Interaction: Reconstructing Hand-object Interactions with Physics (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Physical_Interaction_Reconstructing_Hand_object_Interactions_with_Physics.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Physics-based Hand-object Interaction Refinement
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Position-Based_Surface_Tension_Flow.md|Position-Based Surface Tension Flow (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Position_Based_Surface_Tension_Flow.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Position-Based Surface Tension Flow
+	- datasets: Droplet hitting the ground, Film catenoid, Uniformly sampled sphere
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Progressive_Simulation_for_Cloth_Quasistatics.md|Progressive Simulation for Cloth Quasistatics (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Progressive_Simulation_for_Cloth_Quasistatics.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Progressive Cloth Simulation (PCS)
+	- datasets: Dragon drop test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Scalable_multi-class_sampling_via_filtered_sliced_optimal_transport.md|Scalable multi-class sampling via filtered sliced optimal transport (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Scalable_multi_class_sampling_via_filtered_sliced_optimal_transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Filtered Sliced Optimal Transport (FSOT)
+	- datasets: Progressive Monte Carlo integration, Perceptual error distribution
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Shape_Completion_with_Points_in_the_Shadow.md|Shape Completion with Points in the Shadow (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Shape_Completion_with_Points_in_the_Shadow.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Points in the Shadow
+	- datasets: MVP
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Simulation_of_Hand_Anatomy_Using_Medical_Imaging.md|Simulation of Hand Anatomy Using Medical Imaging (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Simulation_of_Hand_Anatomy_Using_Medical_Imaging.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 基于分层FEM和姿势空间塑性应变的手部肌肉骨骼模拟
+	- datasets: 示例姿态与未见姿态
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/SurfaceVoronoi_Efficiently_Computing_Voronoi_Diagrams_Over_Mesh_Surfaces_with_Arbitrary_Distance_Solvers.md|SurfaceVoronoi: Efficiently Computing Voronoi Diagrams Over Mesh Surfaces with Arbitrary Distance Solvers (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/SurfaceVoronoi_Efficiently_Computing_Voronoi_Diagrams_Over_Mesh_Surfaces_with_Arbitrary_Distance_Solvers.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: SurfaceVoronoi
+	- datasets: Horse, Dolphin, Bunny
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Temporal_and_Spatial_Distortion_for_VR_Rhythmic_Skill_Training.md|Temporal and Spatial Distortion for VR Rhythmic Skill Training (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Temporal_and_Spatial_Distortion_for_VR_Rhythmic_Skill_Training.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Temporal and Spatial Distortion for VR Rhythmic Skill Training
+	- datasets: 三球闪接测试
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Transcendental_Avatar_Experiencing_Bioresponsive_Avatar_of_the_Self_for_Improved_Cognition.md|Transcendental Avatar: Experiencing Bioresponsive Avatar of the Self for Improved Cognition (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Transcendental_Avatar_Experiencing_Bioresponsive_Avatar_of_the_Self_for_Improved_Cognition.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Transcendental Avatar
 - [[obsidian-vault/analysis/SIGGRAPH_2023/A_Practical_Walk-on-Boundary_Method_for_Boundary_Value_Problems.md|A Practical Walk-on-Boundary Method for Boundary Value Problems (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Practical_Walk_on_Boundary_Method_for_Boundary_Value_Problems.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: Walk-on-Boundary (WoB)
 	- datasets: 内部 Dirichlet 问题在凸/非凸二维域
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Adaptive_Local_Basis_Functions_for_Shape_Completion.md|Adaptive Local Basis Functions for Shape Completion (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Adaptive_Local_Basis_Functions_for_Shape_Completion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Local Basis Functions for Shape Completion
+	- datasets: ShapeNet, ShapeNet unseen classes
+- [[obsidian-vault/analysis/SIGGRAPH_2023/An_Elastic_Basis_for_Spectral_Shape_Correspondence.md|An Elastic Basis for Spectral Shape Correspondence (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/An_Elastic_Basis_for_Spectral_Shape_Correspondence.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Elastic Basis Functional Map (with non-orthogonal extension)
+	- datasets: Caricaturized meshes, FAUST, SHREC'20 low-res
+- [[obsidian-vault/analysis/SIGGRAPH_2023/An_Extensible_Data-oriented_Architecture_for_High-performance_Many-world_Simulation.md|An Extensible, Data-oriented Architecture for High-performance, Many-world Simulation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/An_Extensible_Data_oriented_Architecture_for_High_performance_Many_world_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Madrona
+	- datasets: HideSeek, Overcooked
+- [[obsidian-vault/analysis/SIGGRAPH_2023/B-rep_Matching_for_Collaborating_Across_CAD_Systems.md|B-rep Matching for Collaborating Across CAD Systems (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/B_rep_Matching_for_Collaborating_Across_CAD_Systems.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于学习的迭代B-rep实体匹配
+	- datasets: 合成B-rep匹配数据集, 专家收集的真实数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2023/BakedSDF_Meshing_Neural_SDFs_for_Real-time_View_Synthesis.md|BakedSDF: Meshing Neural SDFs for Real-time View Synthesis (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/BakedSDF_Meshing_Neural_SDFs_for_Real_time_View_Synthesis.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: BakedSDF
+	- datasets: mip-NeRF 360 outdoor scenes, mip-NeRF 360 indoor scenes, mip-NeRF 360 outdoor and indoor
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Beyond_Chainmail_Computational_Modeling_of_Discrete_Interlocking_Materials.md|Beyond Chainmail: Computational Modeling of Discrete Interlocking Materials (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Beyond_Chainmail_Computational_Modeling_of_Discrete_Interlocking_Materials.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于应变空间边界的DIM宏观‑微观仿真框架
+	- datasets: 物理原型
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Building_a_Virtual_Weakly-compressible_Wind_Tunnel_Testing_Facility.md|Building a Virtual Weakly-compressible Wind Tunnel Testing Facility (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Building_a_Virtual_Weakly_compressible_Wind_Tunnel_Testing_Facility.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 虚拟弱可压缩风洞测试设施 (Virtual Weakly-Compressible Wind Tunnel Testing Facility)
+	- datasets: DrivAer Fastback, DrivAer Notchback, DrivAer Estateback
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Complex_Wrinkle_Field_Evolution.md|Complex Wrinkle Field Evolution (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Complex_Wrinkle_Field_Evolution.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Complex Wrinkle Fields (CWF)
+	- datasets: Rotating plane wave, Rotating wrinkles on bunny, Upsampling comparison
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Data-free_Learning_of_Reduced-order_Kinematics.md|Data-free Learning of Reduced-order Kinematics (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Data_free_Learning_of_Reduced_order_Kinematics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Subspace Maps
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Deep_Appearance_Prefiltering.md|Deep Appearance Prefiltering (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Deep_Appearance_Prefiltering.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Deep Appearance Prefiltering (DAP)
+	- datasets: Cutlery, Oak, Mossy Rock
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Deployable_Strip_Structures.md|Deployable Strip Structures (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Deployable_Strip_Structures.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: C-mesh几何设计框架
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Differentiable_Heightfield_Path_Tracing_With_Accelerated_Discontinuities.md|Differentiable Heightfield Path Tracing With Accelerated Discontinuities (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Differentiable_Heightfield_Path_Tracing_With_Accelerated_Discontinuities.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differentiable Heightfield Path Tracing with Accelerated Discontinuities
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Differentiable_Stripe_Patterns_for_Inverse_Design_of_Structured_Surfaces.md|Differentiable Stripe Patterns for Inverse Design of Structured Surfaces (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Differentiable_Stripe_Patterns_for_Inverse_Design_of_Structured_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Differentiable Stripe Patterns
+	- datasets: Isotropic stiffness), Orthotropic stiffness), Tetragonal stiffness)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Differential_Frequency_Heterodyne_Time-of-flight_Imaging_for_Instantaneous_Depth_and_Velocity_Estimation.md|Differential Frequency Heterodyne Time-of-flight Imaging for Instantaneous Depth and Velocity Estimation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Differential_Frequency_Heterodyne_Time_of_flight_Imaging_for_Instantaneous_Depth_and_Velocity_Estimation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differential Frequency Heterodyne D-ToF (DFH D-ToF)
+	- datasets: Hardware platform, Rotating target platform
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Evolutionary_Piecewise_Developable_Approximations.md|Evolutionary Piecewise Developable Approximations (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Evolutionary_Piecewise_Developable_Approximations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Evolutionary Piecewise Developable Approximations
+	- datasets: CAD 与有机模型, 多种模型, Tortoise 模型
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Expansion_Cones_A_Progressive_Volumetric_Mapping_Framework.md|Expansion Cones: A Progressive Volumetric Mapping Framework (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Expansion_Cones_A_Progressive_Volumetric_Mapping_Framework.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Prioritizing Expansion (Shrink-and-Expand framework)
+	- datasets: TetWild meshes 映射到球、四面体、刚性四面体、随机星形四种星形域, 相同数据集按网格规模划分批次
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Fast_Complementary_Dynamics_via_Skinning_Eigenmodes.md|Fast Complementary Dynamics via Skinning Eigenmodes (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fast_Complementary_Dynamics_via_Skinning_Eigenmodes.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: 基于蒙皮特征模式的快速互补动力学 (Skining Eigenmodes)
+	- datasets: Elephant mesh, Bulldog mesh, XYZ Dragon mesh
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Fast_GPU-based_Two-way_Continuous_Collision_Handling.md|Fast GPU-based Two-way Continuous Collision Handling (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fast_GPU_based_Two_way_Continuous_Collision_Handling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Two-way continuous collision handling
+	- datasets: Bow Knot, Fig.1, Reef Knot
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Fluid_Cohomology.md|Fluid Cohomology (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fluid_Cohomology.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Fluid Cohomology method (流体上同调动力学方法)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Fluid-solid_Coupling_in_Kinetic_Two-phase_Flow_Simulation.md|Fluid-solid Coupling in Kinetic Two-phase Flow Simulation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Fluid_solid_Coupling_in_Kinetic_Two_phase_Flow_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 基于混合移动回弹与细化相场的动力学两相流求解器
+	- datasets: 螺旋桨入水对比, 钥匙落水, 硬币落水轨迹
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Forming_Terrains_by_Glacial_Erosion.md|Forming Terrains by Glacial Erosion (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Forming_Terrains_by_Glacial_Erosion.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: 无监督CNN Blatter冰流求解器与多尺度冰输送方案
+	- datasets: Figure 9 冰流稳态比较
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Generalizing_Shallow_Water_Simulations_With_Dispersive_Surface_Waves.md|Generalizing Shallow Water Simulations With Dispersive Surface Waves (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generalizing_Shallow_Water_Simulations_With_Dispersive_Surface_Waves.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Generalized Wave Model (统一波模型)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Guided_Linear_Upsampling.md|Guided Linear Upsampling (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Guided_Linear_Upsampling.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Guided Linear Upsampling (GLU)
+	- datasets: Alpha Matting on Rhemann et al. 2009 dataset, Alpha Matting, Colorization on DIV2K validation set
+- [[obsidian-vault/analysis/SIGGRAPH_2023/High-order_Incremental_Potential_Contact_for_Elastodynamic_Simulation_on_Curved_Meshes.md|High-order Incremental Potential Contact for Elastodynamic Simulation on Curved Meshes (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/High_order_Incremental_Potential_Contact_for_Elastodynamic_Simulation_on_Curved_Meshes.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: High-Order Incremental Potential Contact (HO-IPC)
+	- datasets: Armadillo-rollers, Bending beam, Bouncing ball
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Improved_Water_Sound_Synthesis_Using_Coupled_Bubbles.md|Improved Water Sound Synthesis Using Coupled Bubbles (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Improved_Water_Sound_Synthesis_Using_Coupled_Bubbles.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 正则化耦合气泡振荡器模型与高效音频合成框架（Coupled-Bubble Oscillator Model）
+	- datasets: Wave Crash 示例
+- [[obsidian-vault/analysis/SIGGRAPH_2023/In-Timestep_Remeshing_for_Contacting_Elastodynamics.md|In-Timestep Remeshing for Contacting Elastodynamics (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/In_Timestep_Remeshing_for_Contacting_Elastodynamics.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: In-Timestep Remeshing (ITR)
+	- datasets: Ball on spikes, Masticator
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Inkjet_4D_Print_Self-folding_Tessellated_Origami_Objects_by_Inkjet_UV_Printing.md|Inkjet 4D Print: Self-folding Tessellated Origami Objects by Inkjet UV Printing (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Inkjet_4D_Print_Self_folding_Tessellated_Origami_Objects_by_Inkjet_UV_Printing.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Inkjet 4D Print
+	- datasets: Ron Resch 最大图案, Stanford Bunny 面片比较
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Local_Deformation_for_Interactive_Shape_Editing.md|Local Deformation for Interactive Shape Editing (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Local_Deformation_for_Interactive_Shape_Editing.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Local Deformation with SC-L1 Regularization
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Locally_Meshable_Frame_Fields.md|Locally Meshable Frame Fields (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Locally_Meshable_Frame_Fields.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Local Meshability Algorithm
+	- datasets: HexMe dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Masonry_Shell_Structures_With_Discrete_Equivalence_Classes.md|Masonry Shell Structures With Discrete Equivalence Classes (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Masonry_Shell_Structures_With_Discrete_Equivalence_Classes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Hierarchical Cluster-and-Optimize
+	- datasets: Dome surface, Various surfaces
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Micro-Mesh_Construction.md|Micro-Mesh Construction (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Micro_Mesh_Construction.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Micro-Mesh Construction Pipeline
+	- datasets: Dark Fingered Reef Crab, Telegraph 模型, 与 Meshlab / Simplygon 的对比
+- [[obsidian-vault/analysis/SIGGRAPH_2023/MoiréTag_Angular_Measurement_and_Tracking_With_a_Passive_Marker.md|MoiréTag: Angular Measurement and Tracking With a Passive Marker (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Moir_Tag_Angular_Measurement_and_Tracking_With_a_Passive_Marker.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: MoiréTag
+	- datasets: Real experiment
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Multi-layer_Thick_Shells.md|Multi-layer Thick Shells (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Multi_layer_Thick_Shells.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Multi-Layer Thick Shells (Dual-Quadrature Prism Elements with Complementary Membrane Coupling)
+	- datasets: Wrinkle mat, Hand over pillow
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Neural_Progressive_Meshes.md|Neural Progressive Meshes (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Progressive_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Neural Progressive Meshes
+	- datasets: Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Nonlinear_Compliant_Modes_for_Large-deformation_Analysis_of_Flexible_Structures.md|Nonlinear Compliant Modes for Large-deformation Analysis of Flexible Structures (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Nonlinear_Compliant_Modes_for_Large_deformation_Analysis_of_Flexible_Structures.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Nonlinear Compliant Modes
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Orientable_Dense_Cyclic_Infill_for_Anisotropic_Appearance_Fabrication.md|Orientable Dense Cyclic Infill for Anisotropic Appearance Fabrication (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Orientable_Dense_Cyclic_Infill_for_Anisotropic_Appearance_Fabrication.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Orientable Dense Cyclic Infill via Aligned Sine Field
+	- datasets: BRAIN, VARY
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Perceptual_Visibility_Model_for_Temporal_Contrast_Changes_in_Periphery.md|Perceptual Visibility Model for Temporal Contrast Changes in Periphery (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Perceptual_Visibility_Model_for_Temporal_Contrast_Changes_in_Periphery.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于DCT的时空可见性模型 (Perceptual Visibility Model for Temporal Contrast Changes)
+	- datasets: 注视点渲染下的Bistro和Sponza场景, 图像转换可见性验证
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Perspective-correct_VR_Passthrough_Without_Reprojection.md|Perspective-correct VR Passthrough Without Reprojection (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Perspective_correct_VR_Passthrough_Without_Reprojection.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Light Field Passthrough
+	- datasets: Perspective accuracy, Real-time performance, Artifact removal
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Polynomial_2D_Green_Coordinates_for_Polygonal_Cages.md|Polynomial 2D Green Coordinates for Polygonal Cages (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Polynomial_2D_Green_Coordinates_for_Polygonal_Cages.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Polynomial 2D Green Coordinates
+	- datasets: Figure 3, Figure 4, Figure 5
+- [[obsidian-vault/analysis/SIGGRAPH_2023/PolyStokes_A_Polynomial_Model_Reduction_Method_for_Viscous_Fluid_Simulation.md|PolyStokes: A Polynomial Model Reduction Method for Viscous Fluid Simulation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PolyStokes_A_Polynomial_Model_Reduction_Method_for_Viscous_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: PolyStokes
+	- datasets: Piling Armadillos, Doughy Octopus
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Rhizomorph_The_Coordinated_Function_of_Shoots_and_Roots.md|Rhizomorph: The Coordinated Function of Shoots and Roots (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Rhizomorph_The_Coordinated_Function_of_Shoots_and_Roots.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Rhizomorph
+	- datasets: Root-to-shoot ratio comparison, Soil-type adaptation, Computation performance
+- [[obsidian-vault/analysis/SIGGRAPH_2023/RSMT_Real-time_Stylized_Motion_Transition_for_Characters.md|RSMT: Real-time Stylized Motion Transition for Characters (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/RSMT_Real_time_Stylized_Motion_Transition_for_Characters.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: RSMT (Real-time Stylized Motion Transition)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Sag-free_Initialization_for_Strand-based_Hybrid_Hair_Simulation.md|Sag-free Initialization for Strand-based Hybrid Hair Simulation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Sag_free_Initialization_for_Strand_based_Hybrid_Hair_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 四阶段无下垂初始化框架 (Four-stage Sag-free Initialization Framework)
+	- datasets: Long hairstyle, Drape, Curly wig
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Second-order_Stencil_Descent_for_Interior-point_Hyperelasticity.md|Second-order Stencil Descent for Interior-point Hyperelasticity (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Second_order_Stencil_Descent_for_Interior_point_Hyperelasticity.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Second-order Stencil Descent
+	- datasets: Falling barbarian ships, Dragon in U, Puffer ball in elastic chain net
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Semantics_and_Scheduling_for_Machine_Knitting_Compilers.md|Semantics and Scheduling for Machine Knitting Compilers (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Semantics_and_Scheduling_for_Machine_Knitting_Compilers.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: 基于 Fenced Tangle 的 Formal Knitout 语义与重写调度
+	- datasets: Linen stitch pattern pass optimization
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Shortest_Path_to_Boundary_for_Self-intersecting_Meshes.md|Shortest Path to Boundary for Self-intersecting Meshes (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Shortest_Path_to_Boundary_for_Self_intersecting_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Exact Shortest Path to Boundary via Topological Ray Traversal
+	- datasets: Dropping 8 octopi into a box, Twisting thin beam, Shortest path query
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Skin-Screen_A_Computational_Fabrication_Framework_for_Color_Tattoos.md|Skin-Screen: A Computational Fabrication Framework for Color Tattoos (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Skin_Screen_A_Computational_Fabrication_Framework_for_Color_Tattoos.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Skin-Screen
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Spectral_Coarsening_With_Hodge_Laplacians.md|Spectral Coarsening With Hodge Laplacians (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Spectral_Coarsening_With_Hodge_Laplacians.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Generalized Spectral Coarsening (广义谱粗化算法)
+	- datasets: Suzanne spectral distance lifting, Plate-hole mesh FEM under vertex noise
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Split-Lohmann_Multifocal_Displays.md|Split-Lohmann Multifocal Displays (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Split_Lohmann_Multifocal_Displays.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Split-Lohmann Multifocal Display
+- [[obsidian-vault/analysis/SIGGRAPH_2023/SpongeCake_A_Layered_Microflake_Surface_Appearance_Model.md|SpongeCake: A Layered Microflake Surface Appearance Model (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/SpongeCake_A_Layered_Microflake_Surface_Appearance_Model.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: SpongeCake
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Temporal_Set_Inversion_for_Animated_Implicits.md|Temporal Set Inversion for Animated Implicits (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Temporal_Set_Inversion_for_Animated_Implicits.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Temporal Set Inversion (Temporal SIVIA)
+	- datasets: Sponza scene, Piano scene, Cradle scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Hessian-Based_Field_Deformer_for_Real-Time_Topology-Aware_Shape_Editing.md|A Hessian-Based Field Deformer for Real-Time Topology-Aware Shape Editing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Hessian_Based_Field_Deformer_for_Real_Time_Topology_Aware_Shape_Editing.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Hessian-Based Field Deformer
+	- datasets: Target reproduction tasks, Interactive editing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Implicit_Physical_Face_Model_Driven_by_Expression_and_Style.md|An Implicit Physical Face Model Driven by Expression and Style (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicit_Physical_Face_Model_Driven_by_Expression_and_Style.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Implicit Physical Face Model Driven by Expression and Style
+	- datasets: Test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi-fluid_Simulations.md|An Implicitly Stable Mixture Model for Dynamic Multi-fluid Simulations (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi_fluid_Simulations.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Implicit Mixture Model (隐式稳定混合模型)
+	- datasets: Collide scene, Rotate scene, Two-phase separation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/C-shells_Deployable_Gridshells_with_Curved_Beams.md|C-shells: Deployable Gridshells with Curved Beams (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/C_shells_Deployable_Gridshells_with_Curved_Beams.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: C-shells
+	- datasets: Dome, Hexagon, Circular Boundary
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Collapsing_Embedded_Cell_Complexes_for_Safer_Hexahedral_Meshing.md|Collapsing Embedded Cell Complexes for Safer Hexahedral Meshing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Collapsing_Embedded_Cell_Complexes_for_Safer_Hexahedral_Meshing.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Collapsing Embedded Cell Complexes (嵌入胞腔复形坍缩与分块映射)
+	- datasets: 三个数据集共129个含零元素的模型, 第三数据集110个非平凡模型, 第三数据集非平凡实例
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Conditional_Resampled_Importance_Sampling_and_ReSTIR.md|Conditional Resampled Importance Sampling and ReSTIR (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Conditional_Resampled_Importance_Sampling_and_ReSTIR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Conditional Resampled Importance Sampling (CRIS) with Suffix ReSTIR
+	- datasets: Veach Ajar, Tower Bridge
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Decaf_Monocular_Deformation_Capture_for_Face_and_Hand_Interactions.md|Decaf: Monocular Deformation Capture for Face and Hand Interactions (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Decaf_Monocular_Deformation_Capture_for_Face_and_Hand_Interactions.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Decaf
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Developable_Quad_Meshes_and_Contact_Element_Nets.md|Developable Quad Meshes and Contact Element Nets (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Developable_Quad_Meshes_and_Contact_Element_Nets.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 基于接触元素网的可展四边形网格优化方法
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DiffFR_Differentiable_SPH-based_Fluid-Rigid_Coupling_for_Rigid_Body_Control.md|DiffFR: Differentiable SPH-based Fluid-Rigid Coupling for Rigid Body Control (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DiffFR_Differentiable_SPH-based_Fluid-Rigid_Coupling_for_Rigid_Body_Control.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: DiffFR (Differentiable SPH-based Two-way Fluid-Rigid Coupling Simulator)
+	- datasets: Water Bottle Flip, Stone Skipping, Water Rafting
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Discontinuity-Aware_2D_Neural_Fields.md|Discontinuity-Aware 2D Neural Fields (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Discontinuity_Aware_2D_Neural_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Discontinuity-Aware 2D Neural Fields
+	- datasets: 物理信息扩散曲线, Helmholtz 方程有限元解压缩
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Fast-MSX_Fast_Multiple_Scattering_Approximation.md|Fast-MSX: Fast Multiple Scattering Approximation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fast_MSX_Fast_Multiple_Scattering_Approximation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Fast-MSX
+	- datasets: Shaderball场景 + 环境贴图 在 Mitsuba 0.6 中渲染
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/High_Density_Ratio_Multi-fluid_Simulation_with_Peridynamics.md|High Density Ratio Multi-fluid Simulation with Peridynamics (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/High_Density_Ratio_Multi_fluid_Simulation_with_Peridynamics.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Peridynamic Mixture-model Fluid (PMF)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/K-surfaces_Bézier-Splines_Interpolating_at_Gaussian_Curvature_Extrema.md|K-surfaces: Bézier-Splines Interpolating at Gaussian Curvature Extrema (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/K_surfaces_B_zier_Splines_Interpolating_at_Gaussian_Curvature_Extrema.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: K-surface
+	- datasets: 随机生成的双二次Bézier patches测试集, 视觉对比:K-surfaces vs 固定参数Bézier样条, 全局优化性能:规则patch网格
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_based_2D_Irregular_Shape_Packing.md|Learning based 2D Irregular Shape Packing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_based_2D_Irregular_Shape_Packing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Learning-Assisted Hierarchical Super-Patch Packing (Ours)
+	- datasets: General test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/LiCROM_Linear-Subspace_Continuous_Reduced_Order_Modeling_with_Neural_Fields.md|LiCROM: Linear-Subspace Continuous Reduced Order Modeling with Neural Fields (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/LiCROM_Linear_Subspace_Continuous_Reduced_Order_Modeling_with_Neural_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: LiCROM
+	- datasets: 不同形状弹性体压缩, 渐进切割
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Locally-Adaptive_Level-of-Detail_for_Hardware-Accelerated_Ray_Tracing.md|Locally-Adaptive Level-of-Detail for Hardware-Accelerated Ray Tracing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Locally_Adaptive_Level_of_Detail_for_Hardware_Accelerated_Ray_Tracing.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Locally-Adaptive Level-of-Detail for Hardware-Accelerated Ray Tracing
+	- datasets: Terrain / Cloth / Teapot scenes, Cloth model primary rays, Cloth model secondary rays
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Manifold_Path_Guiding_for_Importance_Sampling_Specular_Chains.md|Manifold Path Guiding for Importance Sampling Specular Chains (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Manifold_Path_Guiding_for_Importance_Sampling_Specular_Chains.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Manifold Path Guiding
+	- datasets: Various scenes with long specular chains, Flower scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Multi-color_Holograms_Improve_Brightness_in_Holographic_Displays.md|Multi-color Holograms Improve Brightness in Holographic Displays (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multi_color_Holograms_Improve_Brightness_in_Holographic_Displays.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 多色全息图驱动方案 (Multi-color Hologram Driving Scheme)
+	- datasets: AR Glasses scene, Fruit lady scene, Dog scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Multisource_Holography.md|Multisource Holography (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multisource_Holography.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Multisource Holography
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Stress_Fields_for_Reduced-order_Elastoplasticity_and_Fracture.md|Neural Stress Fields for Reduced-order Elastoplasticity and Fracture (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Stress_Fields_for_Reduced_order_Elastoplasticity_and_Fracture.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural Stress Fields (NSF)
+	- datasets: Cake cutting, Bread tearing, Sand column collapse
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.md|Online Scene CAD Recomposition via Autonomous Scanning (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: RelCAD+RelNBV (关系引导在线CAD重组框架)
+	- datasets: ScanNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Real-time_Height-field_Simulation_of_Sand_and_Water_Mixtures.md|Real-time Height-field Simulation of Sand and Water Mixtures (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Real_time_Height_field_Simulation_of_Sand_and_Water_Mixtures.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Real-time Height-field Simulation of Sand and Water Mixtures
+	- datasets: Castle scene, Letters scene, Real-time GPU performance
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Shadow_Harmonization_for_Realistic_Compositing.md|Shadow Harmonization for Realistic Compositing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shadow_Harmonization_for_Realistic_Compositing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Shadow Harmonization for Realistic Compositing
+	- datasets: DESOBA, ISTD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SLANG.D_Fast_Modular_and_Differentiable_Shader_Programming.md|SLANG.D: Fast, Modular and Differentiable Shader Programming (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SLANG_D_Fast_Modular_and_Differentiable_Shader_Programming.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: SLANG.D
+	- datasets: Falcor 逆渲染, nvdiffmodeling 物理着色内核, nvdiffrec 变换内核
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Subspace-Preconditioned_GPU_Projective_Dynamics_with_Contact_for_Cloth_Simulation.md|Subspace-Preconditioned GPU Projective Dynamics with Contact for Cloth Simulation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Preconditioned_GPU_Projective_Dynamics_with_Contact_for_Cloth_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Subspace-Preconditioned Projective Dynamics (SP-PD)
+	- datasets: Kick, Ribbons, Cloth on sphere
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Text-Guided_Vector_Graphics_Customization.md|Text-Guided Vector Graphics Customization (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Text_Guided_Vector_Graphics_Customization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Text-Guided Vector Graphics Customization Pipeline
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Topology_Guaranteed_B-Spline_SurfaceSurface_Intersection.md|Topology Guaranteed B-Spline Surface/Surface Intersection (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Topology_Guaranteed_B_Spline_Surface_Surface_Intersection.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Topology guaranteed B-Spline surface intersection algorithm
+	- datasets: B-spline surface intersection, Torus-ellipsoid intersection
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Variational_Barycentric_Coordinates.md|Variational Barycentric Coordinates (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Variational_Barycentric_Coordinates.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Variational Barycentric Coordinates (VBC)
+	- datasets: 软体物理模拟网格, 人体网格
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co-Decomposition_for_Hybrid_Manufacturing.md|VASCO: Volume and Surface Co-Decomposition for Hybrid Manufacturing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co_Decomposition_for_Hybrid_Manufacturing.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: VASCO (Volume-And-Surface Co-decomposition) with beam-guided top-down block decomposition
+	- datasets: Kitten, Four-way pipe, Impeller
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Warped-Area_Reparameterization_of_Differential_Path_Integrals.md|Warped-Area Reparameterization of Differential Path Integrals (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Warped_Area_Reparameterization_of_Differential_Path_Integrals.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Warped-Area Reparameterization of Differential Path Integrals
+	- datasets: Star-shaped area light scene, Bunny in glass 逆渲染, Chess piece shadow 逆渲染
 - [[obsidian-vault/analysis/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.md|InstructAvatar: Text-Guided Emotion and Motion Control for Avatar Generation (AAAI 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.pdf|PDF]]
 	- topics: Motion Animation
@@ -162,18 +1156,404 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: GEARS
 	- datasets: GRAB, InterCap
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Dual-Particle_Approach_for_Incompressible_SPH_Fluids.md|A Dual-Particle Approach for Incompressible SPH Fluids (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Dual_Particle_Approach_for_Incompressible_SPH_Fluids.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Dual-Particle ISPH
+	- datasets: Rotating square fluid patch, Fluid stretching, Fountain with 1M particles
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Free-space_Diffraction_BSDF.md|A Free-space Diffraction BSDF (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Free_space_Diffraction_BSDF.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Free-space Diffraction BSDF
+	- datasets: Double-slit diffraction, Single-slit, ring
 - [[obsidian-vault/analysis/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.md|A Heat Method for Generalized Signed Distance (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Heat_Method_for_Generalized_Signed_Distance.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: Intrinsic Triangulation Framework (内蕴三角剖分框架)
 	- datasets: Thingi10k 数据集上的内蕴 Delaunay 翻转
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Realistic_Multi-scale_Surface-based_Cloth_Appearance_Model.md|A Realistic Multi-scale Surface-based Cloth Appearance Model (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Realistic_Multi_scale_Surface_based_Cloth_Appearance_Model.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: 多尺度表面布料外观模型（Multi-scale Cloth BSDF with CCV and C-PCA）
+	- datasets: Couch scene, Blouse scene, environment lighting
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Unified_Differentiable_Boolean_Operator_With_Fuzzy_Logic.md|A Unified Differentiable Boolean Operator With Fuzzy Logic (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Unified_Differentiable_Boolean_Operator_With_Fuzzy_Logic.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Unified Differentiable Boolean Operator (统一可微布尔操作符)
+	- datasets: ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Vortex_Particle-on-mesh_Method_for_Soap_Film_Simulation.md|A Vortex Particle-on-mesh Method for Soap Film Simulation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Vortex_Particle_on_mesh_Method_for_Soap_Film_Simulation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Vortex Particle-on-Mesh Method for Soap Film Simulation
+	- datasets: Taylor vortices separation, Leapfrog vortex preservation, Gravity Drainage thickness profile
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Area_ReSTIR_Resampling_for_Real-time_Defocus_and_Antialiasing.md|Area ReSTIR: Resampling for Real-time Defocus and Antialiasing (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Area_ReSTIR_Resampling_for_Real_time_Defocus_and_Antialiasing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Area ReSTIR
+	- datasets: Franck model, Contemporary Bathroom, Bistro
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Automatic_Digital_Garment_Initialization_From_Sewing_Patterns.md|Automatic Digital Garment Initialization From Sewing Patterns (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Automatic_Digital_Garment_Initialization_From_Sewing_Patterns.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Automatic Digital Garment Initialization System
+	- datasets: Complex quilted coat
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Compressed_Skinning_for_Facial_Blendshapes.md|Compressed Skinning for Facial Blendshapes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Compressed_Skinning_for_Facial_Blendshapes.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Compressed Skinning
+	- datasets: Aura at P=40, Aura - Memory, Aura - Speed
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Computational_Homogenization_for_Inverse_Design_of_Surface-based_Inflatables.md|Computational Homogenization for Inverse Design of Surface-based Inflatables (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Computational_Homogenization_for_Inverse_Design_of_Surface_based_Inflatables.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: 基于计算均匀化的表面充气结构逆向设计方法
+	- datasets: 物理负载测试, Zigzag模式属性分析
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Computational_Illusion_Knitting.md|Computational Illusion Knitting (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Computational_Illusion_Knitting.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: 基于图块的交互式错觉编织设计框架与混合调度编译器
+	- datasets: 单视图错觉
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Consistent_Point_Orientation_for_Manifold_Surfaces_via_Boundary_Integration.md|Consistent Point Orientation for Manifold Surfaces via Boundary Integration (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Consistent_Point_Orientation_for_Manifold_Surfaces_via_Boundary_Integration.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: BIM (Boundary Integration Method)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/ContourCraft_Learning_to_Resolve_Intersections_in_Neural_Multi-garment_Simulations.md|ContourCraft: Learning to Resolve Intersections in Neural Multi-garment Simulations (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/ContourCraft_Learning_to_Resolve_Intersections_in_Neural_Multi_garment_Simulations.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: ContourCraft
+	- datasets: 多服装动态模拟
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Cricket_A_Self-powered_Chirping_Pixel.md|Cricket: A Self-powered Chirping Pixel (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Cricket_A_Self_powered_Chirping_Pixel.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Cricket (自供电鸣叫像素传感器)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Curvature-driven_Conformal_Deformations.md|Curvature-driven Conformal Deformations (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Curvature_driven_Conformal_Deformations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Curvature-Driven Conformal Deformations (曲率驱动共形变形)
+	- datasets: Hand model, Double torus, Flat torus deformation
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Cyclogenesis_Simulating_Hurricanes_and_Tornadoes.md|Cyclogenesis: Simulating Hurricanes and Tornadoes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Cyclogenesis_Simulating_Hurricanes_and_Tornadoes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Cyclogenesis
+	- datasets: 飓风眼区角速度剖面, 龙卷风强度与热力学变量相关性, 飓风路径
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DeadWood_Including_disturbance_and_decay_in_the_depiction_of_digital_nature.md|DeadWood: Including disturbance and decay in the depiction of digital nature (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DeadWood_Including_disturbance_and_decay_in_the_depiction_of_digital_nature.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: DeadWood
+	- datasets: 生态系统仿真验证
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Differentiable_Geodesic_Distance_for_Intrinsic_Minimization_on_Triangle_Meshes.md|Differentiable Geodesic Distance for Intrinsic Minimization on Triangle Meshes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Differentiable_Geodesic_Distance_for_Intrinsic_Minimization_on_Triangle_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Differentiable Geodesic Distance (Intrinsic Minimization Framework)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Fluid_Control_With_Laplacian_Eigenfunctions.md|Fluid Control With Laplacian Eigenfunctions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Fluid_Control_With_Laplacian_Eigenfunctions.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Laplacian Eigenfluids control pipeline
+	- datasets: F/L/U/I/D letters transformation, Circle to bird
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Going_With_the_Flow.md|Going With the Flow (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Going_With_the_Flow.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 局部附加质量与升阻力近似结合SE(3)变分积分器
+	- datasets: Stanford Bunny 附加质量对角元, Propeller 附加质量对角元
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Implicit_Surface_Tension_for_SPH_Fluid_Simulation.md|Implicit Surface Tension for SPH Fluid Simulation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Implicit_Surface_Tension_for_SPH_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Implicit Surface Tension for SPH
+	- datasets: Sphere Stability, Double Droplet, Droplet Crown
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Lifting_Directional_Fields_to_Minimal_Sections.md|Lifting Directional Fields to Minimal Sections (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Lifting_Directional_Fields_to_Minimal_Sections.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Minimum Section Relaxation (generalized minimal section problem)
+	- datasets: small example, various models, flat domain
+- [[obsidian-vault/analysis/SIGGRAPH_2024/MERCI_Mixed_curvature-based_elements_for_computing_equilibria_of_thin_elastic_ribbons.md|MERCI: Mixed curvature-based elements for computing equilibria of thin elastic ribbons (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/MERCI_Mixed_curvature_based_elements_for_computing_equilibria_of_thin_elastic_ribbons.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Merci (Mixed curvature-based elements)
+	- datasets: Möbius 带
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Modeling_Hair_Strands_With_Roving_Capsules.md|Modeling Hair Strands With Roving Capsules (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Modeling_Hair_Strands_With_Roving_Capsules.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: rocaps (Roving Capsules)
+	- datasets: curly hair model, curly model
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Neural_Geometry_Fields_for_Meshes.md|Neural Geometry Fields for Meshes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Geometry_Fields_for_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Neural Geometry Fields (NGF)
+	- datasets: Dragon, Buddha, Armadillo
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Neural_Monte_Carlo_Fluid_Simulation.md|Neural Monte Carlo Fluid Simulation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Monte_Carlo_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Neural Monte Carlo (NMC)
+	- datasets: Taylor-Green vortex, von Kármán vortex street
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Neural-assisted_Homogenization_of_Yarn-level_Cloth.md|Neural-assisted Homogenization of Yarn-level Cloth (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_assisted_Homogenization_of_Yarn_level_Cloth.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural-Assisted Homogenization
+	- datasets: T-shirt simulation, Stretching stockinette fabric strip, Quadratic expansion error
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Online_Neural_Path_Guiding_with_Normalized_Anisotropic_Spherical_Gaussians.md|Online Neural Path Guiding with Normalized Anisotropic Spherical Gaussians (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Online_Neural_Path_Guiding_with_Normalized_Anisotropic_Spherical_Gaussians.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Normalized Anisotropic Spherical Gaussian Mixture (NASG) Online Path Guiding
+	- datasets: Ajar scene, Glossy Tube scene, Kitchen scene
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Position-based_Nonlinear_Gauss-Seidel_for_Quasistatic_Hyperelasticity.md|Position-based Nonlinear Gauss-Seidel for Quasistatic Hyperelasticity (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Position_based_Nonlinear_Gauss_Seidel_for_Quasistatic_Hyperelasticity.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Position-based Nonlinear Gauss-Seidel (PBNG) / Multiresolution PBNG (MPBNG)
+	- datasets: 肌肉模拟, 拉伸块
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Proxy_Tracing_Unbiased_Reciprocal_Estimation_for_Optimized_Sampling_in_BDPT.md|Proxy Tracing: Unbiased Reciprocal Estimation for Optimized Sampling in BDPT (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Proxy_Tracing_Unbiased_Reciprocal_Estimation_for_Optimized_Sampling_in_BDPT.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Proxy Tracing (代理追踪)
+	- datasets: Bedroom, Breakfast, Hallway
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Ray_Tracing_Harmonic_Functions.md|Ray Tracing Harmonic Functions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Ray_Tracing_Harmonic_Functions.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Harnack Tracing
+	- datasets: Various harmonic surfaces, Fig. 10 surface
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Reach_for_the_Arcs_Reconstructing_Surfaces_From_SDFs_via_Tangent_Points.md|Reach for the Arcs: Reconstructing Surfaces From SDFs via Tangent Points (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Reach_for_the_Arcs_Reconstructing_Surfaces_From_SDFs_via_Tangent_Points.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Reach for the Arcs (RFTA)
+	- datasets: Thingi10k
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Scale-invariant_Monocular_Depth_Estimation_via_SSI_Depth.md|Scale-invariant Monocular Depth Estimation via SSI Depth (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Scale_invariant_Monocular_Depth_Estimation_via_SSI_Depth.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Scale-invariant Monocular Depth Estimation via SSI Depth
+	- datasets: Middlebury, iBims-1
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Smooth_Bijective_Projection_in_a_High-order_Shell.md|Smooth Bijective Projection in a High-order Shell (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Smooth_Bijective_Projection_in_a_High_order_Shell.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Higher-order Shell
+	- datasets: Thingi10K 与 ABC 数据集, Fig. 3 与 Fig. 19 的定性比较, Fig. 2
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Solid_Knitting.md|Solid Knitting (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Solid_Knitting.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Solid Knitting (实体编织)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Split-and-Fit_Learning_B-Reps_via_Structure-aware_Voronoi_Partitioning.md|Split-and-Fit: Learning B-Reps via Structure-aware Voronoi Partitioning (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Split_and_Fit_Learning_B_Reps_via_Structure_aware_Voronoi_Partitioning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Split-and-Fit (NVD-Net)
+	- datasets: ABC
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Stochastic_Computation_of_Barycentric_Coordinates.md|Stochastic Computation of Barycentric Coordinates (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Stochastic_Computation_of_Barycentric_Coordinates.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于RKPM的随机重心坐标计算 (Stochastic Barycentric Coordinates via RKPM)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Surface-filling_Curve_Flows_via_Implicit_Medial_Axes.md|Surface-filling Curve Flows via Implicit Medial Axes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Surface_filling_Curve_Flows_via_Implicit_Medial_Axes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Implicit Medial Axis Flow
+	- datasets: 与Yu et al. 2021的质量与速度对比
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Temporal_Acoustic_Point_Holography.md|Temporal Acoustic Point Holography (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Temporal_Acoustic_Point_Holography.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Temporal Weighted Gerchberg-Saxton (TWGS)
+	- datasets: 形状动画, 人类动作动画
+- [[obsidian-vault/analysis/SIGGRAPH_2024/The_Method_of_Moving_Frames_for_Surface_Global_Parametrization.md|The Method of Moving Frames for Surface Global Parametrization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/The_Method_of_Moving_Frames_for_Surface_Global_Parametrization.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Cartan Moving Frames Parametrization
+	- datasets: Sculpt model
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Universal_Facial_Encoding_of_Codec_Avatars_From_VR_Headsets.md|Universal Facial Encoding of Codec Avatars From VR Headsets (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Universal_Facial_Encoding_of_Codec_Avatars_From_VR_Headsets.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Universal Facial Encoding Model
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Woven_Fabric_Capture_With_a_Reflection-transmission_Photo_Pair.md|Woven Fabric Capture With a Reflection-transmission Photo Pair (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Woven_Fabric_Capture_With_a_Reflection_transmission_Photo_Pair.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于反射-透射照片对的机织织物参数恢复
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Cubic_Barrier_with_Elasticity-Inclusive_Dynamic_Stiffness.md|A Cubic Barrier with Elasticity-Inclusive Dynamic Stiffness (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Cubic_Barrier_with_Elasticity_Inclusive_Dynamic_Stiffness.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Cubic Barrier with Elasticity-Inclusive Dynamic Stiffness
+	- datasets: Cloth draping strain-limiting stress test, Twisted cylinder contact, Scalability comparison
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave-Optical_Light_Transport.md|A Generalized Ray Formulation For Wave-Optical Light Transport (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Generalized_Ray_Formulation_For_Wave_Optical_Light_Transport.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Other Method Family
 	- methods: Generalized Ray Backward Light Transport (sample–solve)
 	- datasets: Snake enclosure, CD scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Alignable_Lamella_Gridshells.md|Alignable Lamella Gridshells (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Alignable_Lamella_Gridshells.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Computational Pipeline for Inverse Design of Alignable Lamella Gridshells
+	- datasets: Custom designed surfaces
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/All_you_need_is_rotation_Construction_of_developable_strips.md|All you need is rotation: Construction of developable strips (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/All_you_need_is_rotation_Construction_of_developable_strips.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Rotation-angle-driven developable strip construction
+	- datasets: 与 Raffaelli et al. 2018 的 ribbonization 比较, 与 Bo and Wang 2007 的整流可展面比较
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/An_Impulse_Ghost_Fluid_Method_for_Simulating_Two-Phase_Flows.md|An Impulse Ghost Fluid Method for Simulating Two-Phase Flows (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/An_Impulse_Ghost_Fluid_Method_for_Simulating_Two_Phase_Flows.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Impulse Ghost Fluid Method (IGFM)
+	- datasets: Vortex Ring Level Set Advection, Vortex Pair Crossing Interface
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Barrier-Augmented_Lagrangian_for_GPU-based_Elastodynamic_Contact.md|Barrier-Augmented Lagrangian for GPU-based Elastodynamic Contact (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Barrier_Augmented_Lagrangian_for_GPU_based_Elastodynamic_Contact.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Barrier-Augmented Lagrangian (BAL)
+	- datasets: Puffer Balls on Nets, Dragons-Pachinko, Staircase-Armadillos
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Coherent_Optical_Modems_for_Full-Wavefield_Lidar.md|Coherent Optical Modems for Full-Wavefield Lidar (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Coherent_Optical_Modems_for_Full_Wavefield_Lidar.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Full-Wavefield Lidar (FWL)
+	- datasets: 平面目标, 变曝光时间
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Controllable_Shape_Modeling_with_Neural_Generalized_Cylinder.md|Controllable Shape Modeling with Neural Generalized Cylinder (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Controllable_Shape_Modeling_with_Neural_Generalized_Cylinder.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Generalized Cylinder (NGC)
+	- datasets: Deformation, Deformation time
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Deformation_Recovery_Localized_Learning_for_Detail-Preserving_Deformations.md|Deformation Recovery: Localized Learning for Detail-Preserving Deformations (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Deformation_Recovery_Localized_Learning_for_Detail_Preserving_Deformations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Local Jacobian Network (LJN)
+	- datasets: FAUST, SCAPE, SMAL
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Differentiable_Owen_Scrambling.md|Differentiable Owen Scrambling (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Differentiable_Owen_Scrambling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differentiable Owen Scrambling
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Direct_Manipulation_of_Procedural_Implicit_Surfaces.md|Direct Manipulation of Procedural Implicit Surfaces (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Direct_Manipulation_of_Procedural_Implicit_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: 程序化隐式曲面直接操控方法
+	- datasets: libfive 对比
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/End-to-End_Hybrid_Refractive-Diffractive_Lens_Design_with_Differentiable_Ray-Wave_Model.md|End-to-End Hybrid Refractive-Diffractive Lens Design with Differentiable Ray-Wave Model (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/End_to_End_Hybrid_Refractive_Diffractive_Lens_Design_with_Differentiable_Ray_Wave_Model.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Differentiable Ray-Wave Model (可微分光线-波动模型)
+	- datasets: Simulated hybrid lens, Simulated prototype, Simulated EDoF imaging
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/GauWN_Gaussian-smoothed_Winding_Number_and_its_Derivatives.md|GauWN: Gaussian-smoothed Winding Number and its Derivatives (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/GauWN_Gaussian_smoothed_Winding_Number_and_its_Derivatives.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: GauWN (Gaussian-smoothed Winding Number)
+	- datasets: Curve with varying number of vertices, Various real-world polygon models, 曲线偏移
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MiNNIE_a_Mixed_Multigrid_Method_for_Real-time_Simulation_of_Nonlinear_Near-Incompressible_Elastics.md|MiNNIE: a Mixed Multigrid Method for Real-time Simulation of Nonlinear Near-Incompressible Elastics (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MiNNIE_a_Mixed_Multigrid_Method_for_Real_time_Simulation_of_Nonlinear_Near_Incompressible_Elastics.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: MiNNIE
+	- datasets: Bunny squeezed by torus, Cantilever test, Cube twist recovery
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/NASM_Neural_Anisotropic_Surface_Meshing.md|NASM: Neural Anisotropic Surface Meshing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/NASM_Neural_Anisotropic_Surface_Meshing.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: NASM (Neural Anisotropic Surface Meshing)
+	- datasets: Thingi10k
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Neural_Implicit_Reduced_Fluid_Simulation.md|Neural Implicit Reduced Fluid Simulation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Neural_Implicit_Reduced_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural Implicit Reduced Fluid Simulation (NIRFS)
+	- datasets: Binary Droplet Collision, Crown Splash
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Particle_Laden_Fluid_on_Flow_Maps.md|Particle Laden Fluid on Flow Maps (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Particle_Laden_Fluid_on_Flow_Maps.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Particle-Laden Flow on Flow Maps
+	- datasets: Ink Drops Oblique Collision, Ink Torus Breakup, Kármán Vortex Shedding
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Polar_Interpolants_for_Thin-Shell_Microstructure_Homogenization.md|Polar Interpolants for Thin-Shell Microstructure Homogenization (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Polar_Interpolants_for_Thin_Shell_Microstructure_Homogenization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Polar High-Order RBF Interpolants for Thin-Shell Homogenization
+	- datasets: 消融实验
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Polynomial_Cauchy_Coordinates_for_Curved_Cages.md|Polynomial Cauchy Coordinates for Curved Cages (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Polynomial_Cauchy_Coordinates_for_Curved_Cages.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Polynomial Cauchy Coordinates
+	- datasets: 多边形→弯曲笼变形, 逆映射, 弯曲笼→弯曲笼变形
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/ProcessPainter_Learning_to_draw_from_sequence_data.md|ProcessPainter: Learning to draw from sequence data (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/ProcessPainter_Learning_to_draw_from_sequence_data.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ProcessPainter
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Quad_mesh_mechanisms.md|Quad mesh mechanisms (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Quad_mesh_mechanisms.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: 基于代数度界与多初始化管线的四边形网格机构优化设计方法
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Stochastic_Normal_Orientation_for_Point_Clouds.md|Stochastic Normal Orientation for Point Clouds (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Stochastic_Normal_Orientation_for_Point_Clouds.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Stochastic Normal Orientation (SNO)
+	- datasets: Uniform Sampling, Nonuniform Sampling, Noise
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Time-Gated_Polarization_for_Active_Non-Line-Of-Sight_Imaging.md|Time-Gated Polarization for Active Non-Line-Of-Sight Imaging (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Time_Gated_Polarization_for_Active_Non_Line_Of_Sight_Imaging.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Time-Gated Polarization NLOS Imaging
+	- datasets: Bunny hidden scene, Lucy hidden scene, 旋转平面合成场景
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Trust-Region_Eigenvalue_Filtering_for_Projected_Newton.md|Trust-Region Eigenvalue Filtering for Projected Newton (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Trust_Region_Eigenvalue_Filtering_for_Projected_Newton.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Trust-Region Eigenvalue Filtering for Projected Newton
+	- datasets: Teaser example, large deformation, PR=0.495
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Volume_Scattering_Probability_Guiding.md|Volume Scattering Probability Guiding (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Volume_Scattering_Probability_Guiding.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Volume Scattering Probability Guiding (VSPG)
+	- datasets: Jungle, UnderWater, Lantern
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/XPBI_Position-Based_Dynamics_with_Smoothing_Kernels_Handles_Continuum_Inelasticity.md|XPBI: Position-Based Dynamics with Smoothing Kernels Handles Continuum Inelasticity (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/XPBI_Position_Based_Dynamics_with_Smoothing_Kernels_Handles_Continuum_Inelasticity.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: XPBI (eXtended Position-Based Inelasticity)
+	- datasets: Cantilever beam validation, Scalability test, Snow avalanche
 - [[obsidian-vault/analysis/arxiv_2025/Qwen3_VL_Technical_Report.md|Qwen3-VL Technical Report (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Qwen3_VL_Technical_Report.pdf|PDF]]
 	- topics: Other / Unclear
@@ -210,6 +1590,188 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: AC4AU
 	- datasets: CD6ME
+- [[obsidian-vault/analysis/SIGGRAPH_2025/60000nits_Full-color_Native_RGB_Single_Junction_3386PPI_Micro-OLED.md|60,000nits Full-color Native RGB Single Junction 3,386PPI Micro-OLED (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/60_000nits_Full_color_Native_RGB_Single_Junction_3_386PPI_Micro_OLED.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: uNEEDXR™ (Ultra-high pixel density for Near-EyE Display-XR)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/A_Versatile_Quaternion-Based_Constrained_Rigid_Body_Dynamics.md|A Versatile Quaternion-Based Constrained Rigid Body Dynamics (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Versatile_Quaternion_Based_Constrained_Rigid_Body_Dynamics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Quaternion-based Constrained Rigid Body Dynamics (加法四元数约束刚体动力学)
+	- datasets: Spinning Top, Pendulum, Gazelle overactuated mechanism
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Adaptive_Phase-Field-FLIP_for_Very_Large_Scale_Two-Phase_Fluid_Simulation.md|Adaptive Phase-Field-FLIP for Very Large Scale Two-Phase Fluid Simulation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Adaptive_Phase_Field_FLIP_for_Very_Large_Scale_Two_Phase_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Adaptive Phase-Field-FLIP (PF-FLIP)
+	- datasets: MSBG vs VDB 性能对比
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Adding_Regional_Control_for_Continuous_Remeshing_via_Attention_Flows.md|Adding Regional Control for Continuous Remeshing via Attention Flows (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Adding_Regional_Control_for_Continuous_Remeshing_via_Attention_Flows.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Attention Flow-enhanced Continuous Remeshing
+	- datasets: Armadillo, Bunny, Horse
+- [[obsidian-vault/analysis/SIGGRAPH_2025/An_Infinity_Mirror_Without_Apparent_Mirroring.md|An Infinity Mirror Without Apparent Mirroring (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/An_Infinity_Mirror_Without_Apparent_Mirroring.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Light Cell-based Non-Mirroring Infinity Mirror
+	- datasets: Light-chasing effect demonstration
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Anime_Colorization_Using_Segment_Matching_With_Candidate_Colors.md|Anime Colorization Using Segment Matching With Candidate Colors (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Anime_Colorization_Using_Segment_Matching_With_Candidate_Colors.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于候选颜色洗牌的分段匹配自动上色方法（Patch-based colorization + Shuffling + Inclusion matching）
+	- datasets: PBC test set, Hand-drawn test set
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Anywhere_Door_Experience_Projection_Mapping_for_Enhancing_Entertainment_and_Immersion.md|Anywhere Door Experience: Projection Mapping for Enhancing Entertainment and Immersion (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Anywhere_Door_Experience_Projection_Mapping_for_Enhancing_Entertainment_and_Immersion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于实体门的投影映射过渡方法 (Anywhere Door Experience)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Arenite_A_Physics-based_Sandstone_Simulator.md|Arenite: A Physics-based Sandstone Simulator (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Arenite_A_Physics_based_Sandstone_Simulator.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Arenite
+	- datasets: Arch and arcade formation, Arch similarity to lab experiment, Simulation performance
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Augmented_Vertex_Block_Descent.md|Augmented Vertex Block Descent (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Augmented_Vertex_Block_Descent.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: AVBD (Augmented Vertex Block Descent)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Clebsch_Gauge_Fluid_on_Particle_Flow_Maps.md|Clebsch Gauge Fluid on Particle Flow Maps (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Clebsch_Gauge_Fluid_on_Particle_Flow_Maps.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Clebsch Gauge Fluid on Particle Flow Maps (Clebsch PFM)
+	- datasets: Leapfrogging Vortices, Trefoil Knot, Hopf-Linked Vortex Rings
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Confidence_Estimation_of_Few-Shot_Patch-Based_Learning_for_Anime-Style_Colorization.md|Confidence Estimation of Few-Shot Patch-Based Learning for Anime-Style Colorization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Confidence_Estimation_of_Few_Shot_Patch_Based_Learning_for_Anime_Style_Colorization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Patch-Based Confidence Estimation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Conformal_First_Passage_for_Epsilon-free_Walk-on-Spheres.md|Conformal First Passage for Epsilon-free Walk-on-Spheres (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Conformal_First_Passage_for_Epsilon_free_Walk_on_Spheres.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Conformal First Passage (CFP)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Controllable_Complex_Freezing_Dynamics_Simulation_on_Thin_Films.md|Controllable Complex Freezing Dynamics Simulation on Thin Films (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Controllable_Complex_Freezing_Dynamics_Simulation_on_Thin_Films.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Phase Map method for freezing thin-film simulation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Correct_your_balance_heuristic_Optimizing_balance-style_multiple_importance_sampling_weights.md|Correct your balance heuristic: Optimizing balance-style multiple importance sampling weights (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Correct_your_balance_heuristic_Optimizing_balance_style_multiple_importance_sampling_weights.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 优化校正因子（γ-opt）
+	- datasets: 全局光照
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Discrete_Torsion_of_Connection_Forms_on_Simplicial_Meshes.md|Discrete Torsion of Connection Forms on Simplicial Meshes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Discrete_Torsion_of_Connection_Forms_on_Simplicial_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Torsion-Controlled Discrete Connection Framework
+	- datasets: convergence to smooth Levi-Civita connection on random quadratic surfaces, minimal-torsion trivial connections on the sphere, prescribed-torsion trivial connections on the sphere
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Dust_in_Time_Exploring_Embodied_Experience_of_Time_via_an_Interactive_Installation.md|Dust in Time: Exploring Embodied Experience of Time via an Interactive Installation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Dust_in_Time_Exploring_Embodied_Experience_of_Time_via_an_Interactive_Installation.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Dust in Time 装置 (Dust in Time installation)
+	- datasets: Dust in Time 展览现场
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Dynamic_Mesh_Processing_on_the_GPU.md|Dynamic Mesh Processing on the GPU (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Dynamic_Mesh_Processing_on_the_GPU.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: 基于腔体算子的GPU动态网格处理系统 (Cavity-based GPU Dynamic Mesh Processing System)
+	- datasets: Uniform Isotropic Remeshing, Delaunay Edge Flip, Surface Tracking
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Exploring_Distance_Management_in_Immersive_Combat_Sports_Training_With_Encountered-Type_Haptic_Feedback.md|Exploring Distance Management in Immersive Combat Sports Training With Encountered-Type Haptic Feedback (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Exploring_Distance_Management_in_Immersive_Combat_Sports_Training_With_Encountered_Type_Haptic_Feedback.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ETHF增强型VR格斗训练系统
+	- datasets: VR格斗训练任务
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Exploring_Real-Time_Water_Surface_Simulation_for_Immersive_Virtual_Reality_Using_Marker-Based_Tracking.md|Exploring Real-Time Water Surface Simulation for Immersive Virtual Reality Using Marker-Based Tracking (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Exploring_Real_Time_Water_Surface_Simulation_for_Immersive_Virtual_Reality_Using_Marker_Based_Tracking.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Marker-Based FlowMap VR Water Simulation System
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Fast_Determination_and_Computation_of_Self-intersections_for_NURBS_Surfaces.md|Fast Determination and Computation of Self-intersections for NURBS Surfaces (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_Determination_and_Computation_of_Self_intersections_for_NURBS_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Algebraic Signature Method for NURBS Self-intersections
+	- datasets: Ruled Surfaces, NURBS Surfaces, Park et al. 2021 surfaces
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Fast_Physics-Based_Modeling_of_Knots_and_Ties_using_Templates.md|Fast Physics-Based Modeling of Knots and Ties using Templates (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_Physics_Based_Modeling_of_Knots_and_Ties_using_Templates.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Template-based Physics-Based Knot Modeling System
+	- datasets: Trench Coat, Hoodie, Dress Shirt
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Field_Smoothness-Controlled_Partition_for_Quadrangulation.md|Field Smoothness-Controlled Partition for Quadrangulation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Field_Smoothness_Controlled_Partition_for_Quadrangulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Field Smoothness-Controlled Partition for Quadrangulation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Hand_Gesture-Driven_Vertical_Teleportation_Navigating_Complex_Height_Differences_in_VR.md|Hand Gesture-Driven Vertical Teleportation: Navigating Complex Height Differences in VR (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Hand_Gesture_Driven_Vertical_Teleportation_Navigating_Complex_Height_Differences_in_VR.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SphereBackcast and Penetration
+	- datasets: Stage 2, Stage 3, NASA-TLX
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Interactive_Trailers_and_Posters_That_Enhance_Viewing_Intentions_Through_Breaking_the_Fourth_Wall.md|Interactive Trailers and Posters That Enhance Viewing Intentions Through ‘Breaking the Fourth Wall’ (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Interactive_Trailers_and_Posters_That_Enhance_Viewing_Intentions_Through_Breaking_the_Fourth_Wall.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Interactive Trailers and Posters with 'Breaking the Fourth Wall
+- [[obsidian-vault/analysis/SIGGRAPH_2025/LAM_Large_Avatar_Model_for_One-shot_Animatable_Gaussian_Head.md|LAM: Large Avatar Model for One-shot Animatable Gaussian Head (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LAM_Large_Avatar_Model_for_One_shot_Animatable_Gaussian_Head.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: LAM
+	- datasets: VFHQ, HDTF
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Leapfrog_Flow_Maps_for_Real-Time_Fluid_Simulation.md|Leapfrog Flow Maps for Real-Time Fluid Simulation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Leapfrog_Flow_Maps_for_Real_Time_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Leapfrog Flow Maps (LFM)
+	- datasets: Leapfrog Vortex Rings, Poisson求解
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Manu-Grid_UI_for_Parameter_Estimation_of_Tilt_Angle_Extended_Generalized_Projection_Function_in_Illustrations.md|Manu-Grid: UI for Parameter Estimation of Tilt Angle Extended Generalized Projection Function in Illustrations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Manu_Grid_UI_for_Parameter_Estimation_of_Tilt_Angle_Extended_Generalized_Projection_Function_in_Illustrations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Manu-Grid UI with Modified Generalized Projection
+	- datasets: Tilted-angle background illustrations
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Multiple_Importance_Reweighting_for_Path_Guiding.md|Multiple Importance Reweighting for Path Guiding (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Multiple_Importance_Reweighting_for_Path_Guiding.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Multiple Importance Reweighting for Path Guiding
+	- datasets: Aquarium, Ajar, Kitchen
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PAAP_Performer-Aware_Automatic_Panning_System.md|PAAP: Performer-Aware Automatic Panning System (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PAAP_Performer_Aware_Automatic_Panning_System.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: PAAP (Performer-Aware Automatic Panning System)
+	- datasets: Unity 模拟测试场景, ABX 听觉辨别测试, MOS 视听一致性评分
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Painless_Differentiable_Rotation_Dynamics.md|Painless Differentiable Rotation Dynamics (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Painless_Differentiable_Rotation_Dynamics.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 基于李导数的可微旋转动力学 (Lie-derivative differentiable rotation dynamics)
+	- datasets: SIGGRAPH letter optimization, Rigid-body simulation, Frictional rigid-body contact
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Physically-Based_Compositing_of_2D_Graphics.md|Physically-Based Compositing of 2D Graphics (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Physically_Based_Compositing_of_2D_Graphics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Physically-Based 2D Graphic Compositing Pipeline
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Physics-inspired_Estimation_of_Optimal_Cloth_Mesh_Resolution.md|Physics-inspired Estimation of Optimal Cloth Mesh Resolution (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Physics_inspired_Estimation_of_Optimal_Cloth_Mesh_Resolution.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Physics-inspired Optimal Cloth Mesh Resolution Estimation
+	- datasets: Wine Style Dress, Mint Melody, 拉伸测试
 - [[obsidian-vault/analysis/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.md|PhysicsFC Learning User Controlled Skills for a Physics Based Football Player Controller (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_Player_Controller.pdf|PDF]]
 	- topics: Other / Unclear
@@ -222,6 +1784,266 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: PhysicsFC
 	- datasets: Dribble Skill, Trap Skill, Move Skill
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Polynomial_2D_Biharmonic_Coordinates_for_High-order_Cages.md|Polynomial 2D Biharmonic Coordinates for High-order Cages (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Polynomial_2D_Biharmonic_Coordinates_for_High_order_Cages.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Polynomial Biharmonic Coordinates (PolyBiHC)
+	- datasets: Pants 形状, 仙人掌状形状, 复杂形状
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Predicting_Colors_in_Unpainted_Gaps_for_Anime-Style_Illustration.md|Predicting Colors in Unpainted Gaps for Anime-Style Illustration (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Predicting_Colors_in_Unpainted_Gaps_for_Anime_Style_Illustration.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: U-Net-based Gap Color Prediction
+	- datasets: 未见过的完整动画剧集
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Putting_Rigid_Bodies_to_Rest.md|Putting Rigid Bodies to Rest (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Putting_Rigid_Bodies_to_Rest.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Morse-Smale Resting Probability Analysis
+	- datasets: Pass the Piggies 数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Real-Time_Multispectral_Lighting_Reproduction.md|Real-Time Multispectral Lighting Reproduction (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Real_Time_Multispectral_Lighting_Reproduction.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 基于二维查找表的多光谱光照实时映射
+	- datasets: 含1500个多光谱LED的光照球幕, ColorChecker色卡
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Segment-based_Light_Transport_Simulation.md|Segment-based Light Transport Simulation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Segment_based_Light_Transport_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Segment-based Bidirectional Path Filtering
+	- datasets: Warehouse scene, Bathroom, Saloon Bar
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Simulating_the_Mechanics_of_Ant_Swarm_Aggregations.md|Simulating the Mechanics of Ant Swarm Aggregations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Simulating_the_Mechanics_of_Ant_Swarm_Aggregations.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Constraint-based ant swarm simulation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Single_Edge_Collapse_Quad-Dominant_Mesh_Reduction.md|Single Edge Collapse Quad-Dominant Mesh Reduction (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Single_Edge_Collapse_Quad_Dominant_Mesh_Reduction.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Single Edge Collapse Quad-Dominant Mesh Reduction (our approach)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Skylight_Real-Time_Projection_Mapping_for_Surgical_Navigation_Leveraging_Skin-Adhered_Fiducials.md|Skylight: Real-Time Projection Mapping for Surgical Navigation Leveraging Skin-Adhered Fiducials (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Skylight_Real_Time_Projection_Mapping_for_Surgical_Navigation_Leveraging_Skin_Adhered_Fiducials.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Skylight system (SkinMatch registration + projection mapping)
+	- datasets: 台架/体模模型
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SOAP_Style-Omniscient_Animatable_Portraits.md|SOAP: Style-Omniscient Animatable Portraits (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SOAP_Style_Omniscient_Animatable_Portraits.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: SOAP
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Sobol_Sequences_with_Guaranteed-Quality_2D_Projections.md|Sobol' Sequences with Guaranteed-Quality 2D Projections (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Sobol_Sequences_with_Guaranteed_Quality_2D_Projections.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: OneTwoSobolSequences
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Spatial_Adaptivity_for_Solving_PDEs_on_Manifolds_With_the_Closest_Point_Method.md|Spatial Adaptivity for Solving PDEs on Manifolds With the Closest Point Method (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Spatial_Adaptivity_for_Solving_PDEs_on_Manifolds_With_the_Closest_Point_Method.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Spatially Adaptive Closest Point Method (Adaptive CPM)
+	- datasets: Poisson equation on unit circle arc, Screened-Poisson on spiral sheet
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Stable_Cosserat_Rods.md|Stable Cosserat Rods (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Stable_Cosserat_Rods.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Stable Cosserat Rods
+	- datasets: Slinky, Bridge, Yarn Letters
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Sticking_Information_in_Plain_Sight_Encoding_and_Detecting_Hidden_Stickers_in_the_Real_World.md|Sticking Information in Plain Sight: Encoding and Detecting Hidden Stickers in the Real World (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Sticking_Information_in_Plain_Sight_Encoding_and_Detecting_Hidden_Stickers_in_the_Real_World.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Hidden Sticker Pipeline
+	- datasets: Simulation test set, Simulation cover/container subsections, Real-world test set
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Stroke_Imprint_Knitting_Reassurance_Into_Anxious_Moments.md|Stroke Imprint: Knitting Reassurance Into Anxious Moments (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Stroke_Imprint_Knitting_Reassurance_Into_Anxious_Moments.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Stroke Imprint
+	- datasets: 用户感知测试
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Synchronized_tracing_of_primitive-based_implicit_volumes.md|Synchronized tracing of primitive-based implicit volumes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Synchronized_tracing_of_primitive_based_implicit_volumes.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Synchronized tracing of primitive-based implicit volumes
+	- datasets: Figure 22, Figure 16, Preprocessing time
+- [[obsidian-vault/analysis/SIGGRAPH_2025/The_Gesture_Lives_On_A_VR-Driven_Puppet_Performance_in_Immersive_Space.md|The Gesture Lives On: A VR-Driven Puppet Performance in Immersive Space (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/The_Gesture_Lives_On_A_VR_Driven_Puppet_Performance_in_Immersive_Space.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: The Gesture Lives On
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Topological_Offsets.md|Topological Offsets (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Topological_Offsets.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Topological Offsets
+	- datasets: Thingi10k
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Towards_Accelerating_Polarization_Path_tracing_of_Multi-Bounce_Smith_Microfacet_BSDFs.md|Towards Accelerating Polarization Path tracing of Multi-Bounce Smith Microfacet BSDFs (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Towards_Accelerating_Polarization_Path_tracing_of_Multi_Bounce_Smith_Microfacet_BSDFs.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 忽略坐标架旋转的加速偏振路径追踪（Rotation-Neglected Mueller Matrix for MB-BSDFs）
+	- datasets: 自定义场景:金属镀层物体
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Transforming_Unstructured_Hair_Strands_into_Procedural_Hair_Grooms.md|Transforming Unstructured Hair Strands into Procedural Hair Grooms (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Transforming_Unstructured_Hair_Strands_into_Procedural_Hair_Grooms.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Inverse Procedural Hair Grooming
+	- datasets: Synthetic Grooms, Real Grooms, Guide strand accuracy
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Variational_Green_and_Biharmonic_Coordinates_for_2D_Polynomial_Cages.md|Variational Green and Biharmonic Coordinates for 2D Polynomial Cages (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Variational_Green_and_Biharmonic_Coordinates_for_2D_Polynomial_Cages.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Variational Green and Biharmonic Coordinates for Polynomial Cages
+	- datasets: numerical integration comparison, cage compactness
+- [[obsidian-vault/analysis/SIGGRAPH_2025/ViSA_Physics-based_Virtual_Stunt_Actors_for_Ballistic_Stunts.md|ViSA: Physics-based Virtual Stunt Actors for Ballistic Stunts (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/ViSA_Physics_based_Virtual_Stunt_Actors_for_Ballistic_Stunts.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ViSA
+	- datasets: S形楼梯环境, Traffic Accident场景, Stair environment
+- [[obsidian-vault/analysis/SIGGRAPH_2025/When_Mud_Toys_Meet_Digital_MBuddies_How_Play_With_Earth_Bridges_Traditional_Craftsmanship_and_AI-Assisted_Creation.md|When Mud Toys Meet Digital M(B)uddies: How "Play With Earth" Bridges Traditional Craftsmanship and AI-Assisted Creation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/When_Mud_Toys_Meet_Digital_M_B_uddies_How_Play_With_Earth_Bridges_Traditional_Craftsmanship_and_AI_Assisted_Creation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Play with Earth
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/A_Nonconforming_Formulation_of_Cloth.md|A Nonconforming Formulation of Cloth (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/A_Nonconforming_Formulation_of_Cloth.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Continuous/Discontinuous Galerkin (CDG) cloth formulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/A_Stack-Free_Parallel_h-Adaptation_Algorithm_for_Dynamically_Balanced_Trees_on_GPUs.md|A Stack-Free Parallel h-Adaptation Algorithm for Dynamically Balanced Trees on GPUs (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/A_Stack_Free_Parallel_h_Adaptation_Algorithm_for_Dynamically_Balanced_Trees_on_GPUs.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Stack-Free Parallel h-Adaptation Algorithm (N-balanced MST merging framework)
+	- datasets: Non-balanced octree, Balanced and non-balanced octrees
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/DiffTex_Differentiable_Texturing_for_Architectural_Proxy_Models.md|DiffTex: Differentiable Texturing for Architectural Proxy Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/DiffTex_Differentiable_Texturing_for_Architectural_Proxy_Models.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: DiffTex
+	- datasets: Hyundai, Resident, PolyTech
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Fast_Galerkin_Multigrid_Method_for_Unstructured_Meshes.md|Fast Galerkin Multigrid Method for Unstructured Meshes (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Fast_Galerkin_Multigrid_Method_for_Unstructured_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: 无矩阵FAS Galerkin多重网格方法 (Matrix-free FAS Galerkin Multigrid)
+	- datasets: Bunny Drape, 与SGM的多帧比较, Dragon Drop
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Force-Dual_Modes_Subspace_Design_from_Stochastic_Forces.md|Force-Dual Modes: Subspace Design from Stochastic Forces (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Force_Dual_Modes_Subspace_Design_from_Stochastic_Forces.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Force-Dual Modes (FDM)
+	- datasets: Dragon model, Teddy bear 与 Pegasus 场景, Contact/localized force scenarios
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Implicit_Position-Based_Fluids.md|Implicit Position-Based Fluids (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Implicit_Position_Based_Fluids.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Implicit Position-Based Fluids (IPBF)
+	- datasets: Double Dam Break, Block Flop, Stability Stress Test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Inverse_Radiative_Transport_for_Infrared_Scenes_with_Gaussian_Primitives.md|Inverse Radiative Transport for Infrared Scenes with Gaussian Primitives (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Inverse_Radiative_Transport_for_Infrared_Scenes_with_Gaussian_Primitives.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: HiGS
+	- datasets: Teapot, Average over all scenes, Radiator
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Inverse_Tiling_of_2D_Finite_Domains.md|Inverse Tiling of 2D Finite Domains (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Inverse_Tiling_of_2D_Finite_Domains.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Inverse Tiling Approach
+	- datasets: Bunny, 三种 prototile 尺寸约束, Coin
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Local_Surface_Parameterizations_via_Smoothed_Geodesic_Splines.md|Local Surface Parameterizations via Smoothed Geodesic Splines (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Local_Surface_Parameterizations_via_Smoothed_Geodesic_Splines.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Local Surface Parameterizations via Smoothed Geodesic Splines
+	- datasets: Myles et al. 2014 曲面数据集, 多种几何表面
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Low-Rank_Adaptation_of_Neural_Fields.md|Low-Rank Adaptation of Neural Fields (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Low_Rank_Adaptation_of_Neural_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Low-Rank Adaptation for Neural Fields (LoRA-NF)
+	- datasets: 图像编辑 vs SVD基线, 图像编辑 vs 等参数量小MLP
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Medial_Sphere_Preconditioning_for_Knot_Untangling_and_Volume-Filling_Curves.md|Medial Sphere Preconditioning for Knot Untangling and Volume-Filling Curves (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Medial_Sphere_Preconditioning_for_Knot_Untangling_and_Volume_Filling_Curves.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Medial Sphere Preconditioning
+	- datasets: KNOT128, TREFOIL100, Freedman-He-Wang knot
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Multiphase_Particle-Based_Simulation_of_Poro-Elasto-Capillary_Effects.md|Multiphase Particle-Based Simulation of Poro-Elasto-Capillary Effects (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Multiphase_Particle_Based_Simulation_of_Poro_Elasto_Capillary_Effects.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Multiphase REV-based PEC Particle Framework
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neighbor-Aware_Data-Driven_Relaxation_of_Stitch_Mesh_Models_for_Knits.md|Neighbor-Aware Data-Driven Relaxation of Stitch Mesh Models for Knits (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neighbor_Aware_Data_Driven_Relaxation_of_Stitch_Mesh_Models_for_Knits.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Fabrication Design
+	- method groups: Other Method Family
+	- methods: Neighbor-Aware Stitch Mesh Relaxation
+	- datasets: Validation swatches, Heterogeneous patterns
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Kinematic_Bases_for_Fluids.md|Neural Kinematic Bases for Fluids (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Kinematic_Bases_for_Fluids.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural Kinematic Bases
+	- datasets: Simulation Speed, Generalization, Divergence Average
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Octahedral_Field_Octahedral_Prior_for_Simultaneous_Smoothing_and_Sharp_Edge_Regularization.md|Neural Octahedral Field: Octahedral Prior for Simultaneous Smoothing and Sharp Edge Regularization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Octahedral_Field_Octahedral_Prior_for_Simultaneous_Smoothing_and_Sharp_Edge_Regularization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Neural Octahedral Field
+	- datasets: ABC / Thingi10k, SRB, ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/NeuVAS_Neural_Implicit_Surfaces_for_Variational_Shape_Modeling.md|NeuVAS: Neural Implicit Surfaces for Variational Shape Modeling (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/NeuVAS_Neural_Implicit_Surfaces_for_Variational_Shape_Modeling.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: NeuVAS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Off-Centered_WoS-Type_Solvers_with_Statistical_Weighting.md|Off-Centered WoS-Type Solvers with Statistical Weighting (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Off_Centered_WoS_Type_Solvers_with_Statistical_Weighting.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Statistically Weighted Off-Centered WoS Estimator
+	- datasets: Model 1, Dirichlet, ω=π
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Practical_Gaussian_process_implicit_surfaces_with_sparse_convolutions.md|Practical Gaussian process implicit surfaces with sparse convolutions (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Practical_Gaussian_process_implicit_surfaces_with_sparse_convolutions.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Sparse Convolution Gaussian Process Implicit Surfaces (SC-GPIS)
+	- datasets: Equal-time ensemble light transport comparison, Non-stationary GPIS scenes with specular micro-surfaces, Veach MIS scene with GPIS planes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Reconfigurable_Hinged_Kirigami_Tessellations.md|Reconfigurable Hinged Kirigami Tessellations (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Reconfigurable_Hinged_Kirigami_Tessellations.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Reconfigurable Hinged Kirigami Tessellation Inverse Design
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/ReSTIR_PG_Path_Guiding_with_Spatiotemporally_Resampled_Paths.md|ReSTIR PG: Path Guiding with Spatiotemporally Resampled Paths (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/ReSTIR_PG_Path_Guiding_with_Spatiotemporally_Resampled_Paths.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: ReSTIR Path Guiding (ReSTIR PG)
+	- datasets: 所有测试场景, 初始候选质量对比
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Sample_Space_Partitioning_and_Spatiotemporal_Resampling_for_Specular_Manifold_Sampling.md|Sample Space Partitioning and Spatiotemporal Resampling for Specular Manifold Sampling (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Sample_Space_Partitioning_and_Spatiotemporal_Resampling_for_Specular_Manifold_Sampling.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Sample Space Partitioning and Spatiotemporal Resampling for Specular Manifold Sampling
+	- datasets: Double-Refractive Slab, Reflective Plane, Plane and Slab
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Single-Shot_Facial_Capture_using_Polarized_RGB_Sinusoidal_Illumination.md|Single-Shot Facial Capture using Polarized RGB Sinusoidal Illumination (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Single_Shot_Facial_Capture_using_Polarized_RGB_Sinusoidal_Illumination.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Polarized RGB Sinusoidal Illumination with Phase-based Decomposition
+	- datasets: Digital Emily
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Viscous_Vortex_Dynamics_on_Surfaces.md|Viscous Vortex Dynamics on Surfaces (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Viscous_Vortex_Dynamics_on_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Curvature-Aware Vorticity Method
+	- datasets: Rigid body rotation preservation on sphere, Rigid body rotation on non-uniform curvature surface, Killing field preservation on torus
 - [[obsidian-vault/analysis/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.md|ActAvatar: Temporally-Aware Precise Action Control for Talking Avatars (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/ActAvatar_Temporally_Aware_Precise_Action_Control_for_Talking_Avatars.pdf|PDF]]
 	- topics: Other / Unclear
@@ -371,3 +2193,51 @@ generated: 2026-06-24T20:47
 	- method groups: Other Method Family
 	- methods: TSLM (Tree-Structured Language Modeling)
 	- datasets: Game of 24, Gridworld, ProntoQA
+- [[obsidian-vault/analysis/SIGGRAPH_2026/8DNA_8D_Neural_Asset_Light_Transport_by_Distribution_Learning.md|8DNA: 8D Neural Asset Light Transport by Distribution Learning (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/8DNA_8D_Neural_Asset_Light_Transport_by_Distribution_Learning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 8DNA (8D Neural Asset)
+	- datasets: Candle, Milk, Cat
+- [[obsidian-vault/analysis/SIGGRAPH_2026/ADS_Random_Sampling_of_Occupancy_Functions_using_Adaptive_Delaunay_Scaffolding.md|ADS: Random Sampling of Occupancy Functions using Adaptive Delaunay Scaffolding (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ADS_Random_Sampling_of_Occupancy_Functions_using_Adaptive_Delaunay_Scaffolding.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Adaptive Delaunay Sampling (ADS)
+	- datasets: winding numbers, NESI
+- [[obsidian-vault/analysis/SIGGRAPH_2026/BrepForge_Factorized_B-rep_Synthesis_via_Wireframe_Composition_and_Boundary-Conditioned_Surface_Instantiation.md|BrepForge: Factorized B-rep Synthesis via Wireframe Composition and Boundary-Conditioned Surface Instantiation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/BrepForge_Factorized_B_rep_Synthesis_via_Wireframe_Composition_and_Boundary_Conditioned_Surface_Instantiation.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: BrepForge
+	- datasets: ABC
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Distributed_Affine_Body_Dynamics_with_Adaptive_Consensus.md|Distributed Affine Body Dynamics with Adaptive Consensus (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Distributed_Affine_Body_Dynamics_with_Adaptive_Consensus.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Distributed Affine Body Dynamics with Consensus ADMM and Adaptive Penalty (DA-ABD)
+	- datasets: 可扩展性测试
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Iskra_A_System_for_Inverse_Geometry_Processing.md|Iskra: A System for Inverse Geometry Processing (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Iskra_A_System_for_Inverse_Geometry_Processing.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: iskra
+	- datasets: ARAP inverse deformation, Terrain design via regularized geodesic distances, Terrain design memory
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Locality-Aware_Automatic_Differentiation_on_the_GPU_for_Mesh-Based_Computations.md|Locality-Aware Automatic Differentiation on the GPU for Mesh-Based Computations (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Locality_Aware_Automatic_Differentiation_on_the_GPU_for_Mesh_Based_Computations.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Locality-Aware GPU AD System for Mesh Computations
+	- datasets: Mass-Spring Cloth Simulation, Mesh Parameterization, ARAP Deformation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Rao-Blackwellized_Markov_chain_Monte_Carlo_Light_Transport.md|Rao-Blackwellized Markov chain Monte Carlo Light Transport (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Rao_Blackwellized_Markov_chain_Monte_Carlo_Light_Transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Vanilla Rao-Blackwellization (RB) for MCMC Light Transport
+	- datasets: SWIMMING POOL scene, TORUS scene, Gaussian target with Gaussian proposal
+- [[obsidian-vault/analysis/SIGGRAPH_2026/SymX_Energy-based_Simulation_from_Symbolic_Expressions.md|SymX: Energy-based Simulation from Symbolic Expressions (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/SymX_Energy_based_Simulation_from_Symbolic_Expressions.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: SymX
+	- datasets: 单元素评估, 动态立方体Hessian计算与装配

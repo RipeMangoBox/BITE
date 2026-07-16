@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: HOI4D
 
+- [[obsidian-vault/analysis/arxiv_2022/Point_Primitive_Transformer_for_Long-Term_4D_Point_Cloud_Video_Understanding.md|Point Primitive Transformer for Long-Term 4D Point Cloud Video Understanding (arXiv 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2022/Point_Primitive_Transformer_for_Long-Term_4D_Point_Cloud_Video_Understanding.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Point Primitive Transformer (PPTr)
+	- datasets: Synthia4D, HOI4D, MSR-Action3D
 - [[obsidian-vault/analysis/CVPR_2024/G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Grasp_Synthesis.md|G HOP Generative Hand Object Prior for Interaction Reconstruction and Grasp Synthesis (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Grasp_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

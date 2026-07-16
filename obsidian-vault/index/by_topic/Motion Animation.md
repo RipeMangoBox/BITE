@@ -4,7 +4,7 @@ type: paper-index
 dimension: topic
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Topic: Motion Animation
@@ -312,12 +312,6 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: AnyTop
 	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
-- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop: Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
-	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
-	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-	- methods: AnyTop
-	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
 - [[obsidian-vault/analysis/SIGGRAPH_2025/MAMM_Motion_Control_via_Metric_Aligning_Motion_Matching.md|MAMM: Motion Control via Metric-Aligning Motion Matching (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MAMM.pdf|PDF]]
 	- topics: Motion Animation
@@ -359,12 +353,6 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: CMC (Coordinating Multiple Conditions)
 	- datasets: HumanML3D, KIT-ML
-- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026)]]
-	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
-	- topics: Motion Animation, Vision / Multimodal / Applications
-	- method groups: Vision / Multimodal / 3D
-	- methods: MotionVLA
-	- datasets: MBench, HumanML3D
 - [[obsidian-vault/analysis/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.md|AnyAct: Towards Human Reenactment of Character Motion From Video (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
@@ -383,6 +371,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
 	- methods: Motion-Adapter
 	- datasets: 用户研究, 复合动作数据集
+- [[obsidian-vault/analysis/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.md|MotionVLA: Vision-Language-Action Model for Humanoid Motion (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/MotionVLA_Vision-Language-Action_Model_for_Humanoid_Motion.pdf|PDF]]
+	- topics: Motion Animation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: MotionVLA
+	- datasets: MBench, HumanML3D
 - [[obsidian-vault/analysis/arxiv_2026/Reconstruction-Anchored_Diffusion_Model_for_Text-to-Motion_Generation.md|Reconstruction-Anchored Diffusion Model for Text-to-Motion Generation (arXiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/Reconstruction-Anchored_Diffusion_Model_for_Text-to-Motion_Generation.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion

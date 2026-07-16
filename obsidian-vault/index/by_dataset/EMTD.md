@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: EMTD
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: EchoMimicV2
 	- datasets: EMTD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/High-Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.md|High-Fidelity Dynamic Portrait Animation via Direct Preference Optimization and Temporal Motion Modulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/High_Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: Hallo4 (DPO-enhanced portrait animation framework)
+	- datasets: Celeb-V, HDTF, EMTD
 - [[obsidian-vault/analysis/CVPR_2026/InfinityHuman_Towards_Long_Term_Audio_Driven_Human_Animation.md|InfinityHuman: Towards Long-Term Audio-Driven Human Animation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/InfinityHuman_Towards_Long_Term_Audio_Driven_Human_Animation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

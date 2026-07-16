@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ShapeNet Chair
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: GET3D
 	- datasets: ShapeNet Car, ShapeNet Chair, ShapeNet Motorbike
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Wavelet-domain_Diffusion_for_3D_Shape_Generation.md|Neural Wavelet-domain Diffusion for 3D Shape Generation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Wavelet_domain_Diffusion_for_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Wavelet-domain Diffusion
+	- datasets: ShapeNet Chair, ShapeNet Airplane
 - [[obsidian-vault/analysis/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.md|Large-Scale 3D Generative Modeling using Sparse Voxel Hierarchies (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/Large_Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

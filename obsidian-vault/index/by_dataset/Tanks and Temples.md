@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Tanks and Temples
@@ -21,6 +21,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D
 	- methods: ADOP
 	- datasets: Tanks and Temples
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GANeRF_Leveraging_Discriminators_to_Optimize_Neural_Radiance_Fields.md|GANeRF: Leveraging Discriminators to Optimize Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GANeRF_Leveraging_Discriminators_to_Optimize_Neural_Radiance_Fields.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GANeRF
+	- datasets: ScanNet++, Tanks and Temples
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.md|Gaussian Opacity Fields: Efficient Adaptive Surface Reconstruction in Unbounded Scenes (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Gaussian Opacity Fields (GOF)
+	- datasets: Tanks and Temples, DTU, Mip-NeRF 360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Quark_Real-time_High-resolution_and_General_Neural_View_Synthesis.md|Quark: Real-time, High-resolution, and General Neural View Synthesis (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Quark_Real_time_High_resolution_and_General_Neural_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Quark (and Quark+ for higher quality)
+	- datasets: Generalizable NVS Benchmark, Runtime on A100, DL3DV-10K
 - [[obsidian-vault/analysis/arxiv_2026/PPISP_Physically_Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_Field_Reconstruction.md|PPISP: Physically-Plausible Compensation and Control of Photometric Variations in Radiance Field Reconstruction (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/PPISP_Physically_Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_Field_Reconstruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation

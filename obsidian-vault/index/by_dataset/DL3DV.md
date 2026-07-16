@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: DL3DV
@@ -63,6 +63,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
 	- methods: SpatialVID
 	- datasets: RE10K, Sekai, SpatialVID
+- [[obsidian-vault/analysis/ECCV_2026/QWERTY_Training-Free_Motion_Control_via_Query-Warped_Video_Diffusion_Transformers.md|QWERTY: Training-Free Motion Control via Query-Warped Video Diffusion Transformers (ECCV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2026/QWERTY_Training-Free_Motion_Control_via_Query-Warped_Video_Diffusion_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: QWERTY
+	- datasets: VIPSeg, DL3DV
 - [[obsidian-vault/analysis/ICLR_2026/Lyra_Generative_3D_Scene_Reconstruction_via_Video_Diffusion_Model_Self_Distillation.md|Lyra: Generative 3D Scene Reconstruction via Video Diffusion Model Self-Distillation (ICLR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2026/Lyra_Generative_3D_Scene_Reconstruction_via_Video_Diffusion_Model_Self_Distillation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -93,6 +99,12 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: YoNoSplat
 	- datasets: RealEstate10K, ScanNet++, DL3DV
+- [[obsidian-vault/analysis/SIGGRAPH_2026/ReRoPE_Repurposing_RoPE_for_Relative_Camera_Control.md|ReRoPE: Repurposing RoPE for Relative Camera Control (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ReRoPE_Repurposing_RoPE_for_Relative_Camera_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ReRoPE
+	- datasets: DL3DV, SDG-1.5M
 - [[obsidian-vault/analysis/SIGGRAPH_2026/ArtiFixer_Enhancing_and_Extending_3D_Reconstruction_with_Auto_Regressive_Diffusion_Models.md|ArtiFixer: Enhancing and Extending 3D Reconstruction with Auto-Regressive Diffusion Models (SIGGRAPH 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ArtiFixer_Enhancing_and_Extending_3D_Reconstruction_with_Auto_Regressive_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Human3.6M
@@ -15,6 +15,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Physics-based pose refinement and motion synthesis framework
 	- datasets: Human3.6M, HumanEva
+- [[obsidian-vault/analysis/3DV_2022/Dual-Space_NeRF_Learning_Animatable_Avatars_and_Scene_Lighting_in_Separate_Spaces.md|Dual-Space NeRF: Learning Animatable Avatars and Scene Lighting in Separate Spaces (3DV 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/3DV_2022/Dual-Space_NeRF_Learning_Animatable_Avatars_and_Scene_Lighting_in_Separate_Spaces.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Dual-Space NeRF
+	- datasets: ZJU-MoCap, Human3.6M
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Evaluating_the_Quality_of_a_Synthesized_Motion_With_the_Fréchet_Motion_Distance.md|Evaluating the Quality of a Synthesized Motion With the Fréchet Motion Distance (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Evaluating_the_Quality_of_a_Synthesized_Motion_With_the_Fr_chet_Motion_Distance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Fréchet Motion Distance (FMD)
+	- datasets: Human3.6M
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Real-time_Controllable_Motion_Transition_for_Characters.md|Real-time Controllable Motion Transition for Characters (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Real_time_Controllable_Motion_Transition_for_Characters.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Real-time Controllable Motion Transition (Ours)
+	- datasets: Human3.6M, Lafan1
 - [[obsidian-vault/analysis/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.md|Motion-Conditioned Diffusion Model for Controllable Video Synthesis (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

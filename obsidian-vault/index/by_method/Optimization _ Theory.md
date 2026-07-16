@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Optimization / Theory
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory, LLM / Reasoning / Alignment
 	- methods: STEAL (Semantically Thinned Edge Alignment Learning)
 	- datasets: SBD re-annotated test set, SBD original test set, Cityscapes val
+- [[obsidian-vault/analysis/arxiv_2020/Adversarial_Texture_Optimization_from_RGB-D_Scans.md|Adversarial Texture Optimization from RGB-D Scans (arXiv 2020 2020)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2020/Adversarial_Texture_Optimization_from_RGB-D_Scans.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Adversarial Texture Optimization from RGB-D Scans
+	- datasets: ShapeNet 合成3D数据集, ScanNet 场景扫描, 真实物体扫描对齐的CAD模型
 - [[obsidian-vault/analysis/CVPR_2021/See_through_Gradients_Image_Batch_Recovery_via_GradInversion.md|See through Gradients: Image Batch Recovery via GradInversion (CVPR 2021 2021)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2021/See_through_Gradients_Image_Batch_Recovery_via_GradInversion.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
@@ -63,128 +69,284 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory
 	- methods: Free-Surface Clebsch Solver
 	- datasets: Bubble ring evolution, Paddling propulsion with waves, Single hole sink vortex
-- A GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/A_GPU-accelerated_Hydrodynamics_Solver_for_Atmosphere-fire_Interactions.md|A GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/A_GPU_accelerated_Hydrodynamics_Solver_for_Atmosphere_fire_Interactions.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction
 	- method groups: Optimization / Theory
+	- methods: GPU-accelerated Hydrodynamics Solver for Atmosphere-fire Interactions
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Accommodative_Holography_Improving_Accommodation_Response_for_Perceptually_Realistic_Holographic_Displays.md|Accommodative Holography: Improving Accommodation Response for Perceptually Realistic Holographic Displays (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Accommodative_Holography_Improving_Accommodation_Response_for_Perceptually_Realistic_Holographic_Displays.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Accommodative Holography (DOF-opt B-SGD & Temporal Multiplexing)
+	- datasets: DIV2K images
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Co-optimization_of_Design_and_Fabrication_Plans_for_Carpentry.md|Co-optimization of Design and Fabrication Plans for Carpentry (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Co_optimization_of_Design_and_Fabrication_Plans_for_Carpentry.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
 	- methods: ICEE (Iterative Contraction and Expansion on E-graphs) with Bag-of-Parts (BOP) E-graph
 	- datasets: 多个木质家具模型, 五个代表性模型
-- Energetically Consistent Inelasticity for Optimization Time Integration (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory
-- Node Graph Optimization Using Differentiable Proxies (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
-- Perceptual Error Optimization for Monte Carlo Rendering (SIGGRAPH 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Error_Optimization_for_Monte_Carlo_Rendering.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Computational_Object-wrapping_Rope_Nets.md|Computational Object-wrapping Rope Nets (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Computational_Object_wrapping_Rope_Nets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Scattering From Elliptical Hair Fibers Based on Microfacet Theory (SIGGRAPH 2022 2022)
+	- methods: Computational Object-Wrapping Rope Net (SDF-guided curve network optimization)
+	- datasets: Various 3D shapes, Physical assembly on 12 3D-printed models
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Energetically_Consistent_Inelasticity_for_Optimization_Time_Integration.md|Energetically Consistent Inelasticity for Optimization Time Integration (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Energetically_Consistent_Inelasticity_for_Optimization_Time_Integration.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- Simulation and Optimization of Magnetoelastic Thin Shells (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory
-- Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory, Systems / Efficiency / Compression
-- A Neural Galerkin Solver for Accurate Surface Reconstruction (SIGGRAPH ASIA 2022 2022)
+	- methods: Energetically Consistent Inelasticity (ECI)
+	- datasets: Sand Column Collapse, Spring system, Snow Castle collapse
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Neural_Rendering_in_a_Room_Amodal_3D_Understanding_and_Free-viewpoint_Rendering_for_the_Closed_Scene_Composed_of_Pre-Captured_Objects.md|Neural Rendering in a Room: Amodal 3D Understanding and Free-viewpoint Rendering for the Closed Scene Composed of Pre-Captured Objects (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Neural_Rendering_in_a_Room_Amodal_3D_Understanding_and_Free_viewpoint_Rendering_for_the_Closed_Scene_Composed_of_Pre_Captured_Objects.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Computer Generated Hologram Optimization for Lens Aberration (SIGGRAPH ASIA 2022 2022)
+	- methods: Holistic Neural Rendering Optimization
+	- datasets: iG-Synthetic, iG-Synthetic / Real-Room
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Node_Graph_Optimization_Using_Differentiable_Proxies.md|Node Graph Optimization Using Differentiable Proxies (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Node_Graph_Optimization_Using_Differentiable_Proxies.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Differentiable Proxy
+	- datasets: MATch framework, Average across all optimized materials, Hu et al. 2022 framework
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Physics-based_Combustion_Simulation.md|Physics-based Combustion Simulation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Physics_based_Combustion_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- ElastoMonolith: A Monolithic Optimization-based Liquid Solver for Contact-Aware Elastic-Solid Coupling (SIGGRAPH ASIA 2022 2022)
+	- methods: Physics-based Combustion Solver
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Scattering_From_Elliptical_Hair_Fibers_Based_on_Microfacet_Theory.md|Scattering From Elliptical Hair Fibers Based on Microfacet Theory (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Scattering_From_Elliptical_Hair_Fibers_Based_on_Microfacet_Theory.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Simulation_and_Optimization_of_Magnetoelastic_Thin_Shells.md|Simulation and Optimization of Magnetoelastic Thin Shells (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Simulation_and_Optimization_of_Magnetoelastic_Thin_Shells.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Differentiable Simulator for Magnetoelastic Thin Shells with Adjoint Optimization
+	- datasets: Plate bending/twisting, Track fitting, Letter embossing
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Sparsity-specific_Code_Optimization_Using_Expression_Trees.md|Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Sparsity_specific_Code_Optimization_Using_Expression_Trees.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Sparsity-specific Code Generation using Expression Trees
+	- datasets: Sparse algebraic expressions, Cotan Laplacian construction, Dual volumetric Laplacian and mass matrix construction
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Unsupervised_Shape_Completion_via_Deep_Prior_in_the_Neural_Tangent_Kernel_Perspective.md|Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Unsupervised_Shape_Completion_via_Deep_Prior_in_the_Neural_Tangent_Kernel_Perspective.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Unsupervised Deep Prior Shape Completion (基于 NTK 指导的稀疏 3D CNN 补全)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/A_Monte_Carlo_Method_for_Fluid_Simulation.md|A Monte Carlo Method for Fluid Simulation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/A_Monte_Carlo_Method_for_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Optimization / Theory
+	- methods: Monte Carlo Fluid Solver
+	- datasets: Analytical test case ω=sincos
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/A_Neural_Galerkin_Solver_for_Accurate_Surface_Reconstruction.md|A Neural Galerkin Solver for Accurate Surface Reconstruction (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/A_Neural_Galerkin_Solver_for_Accurate_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: NeuralGalerkin
+	- datasets: ShapeNet, D-FAUST, Matterport
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Computer_Generated_Hologram_Optimization_for_Lens_Aberration.md|Computer Generated Hologram Optimization for Lens Aberration (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Computer_Generated_Hologram_Optimization_for_Lens_Aberration.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: 基于可微光传播和像差建模的全息图优化方法
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Efficient_Light_Probes_for_Real-time_Global_Illumination.md|Efficient Light Probes for Real-time Global Illumination (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Light_Probes_for_Real_time_Global_Illumination.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Proposed method (gradient-based reflection search + neural reconstruction)
+	- datasets: FATPHOOM, IAY
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/ElastoMonolith_A_Monolithic_Optimization-based_Liquid_Solver_for_Contact-Aware_Elastic-Solid_Coupling.md|ElastoMonolith: A Monolithic Optimization-based Liquid Solver for Contact-Aware Elastic-Solid Coupling (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/ElastoMonolith_A_Monolithic_Optimization_based_Liquid_Solver_for_Contact_Aware_Elastic_Solid_Coupling.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- Fluidic Topology Optimization with an Anisotropic Mixture Model (SIGGRAPH ASIA 2022 2022)
+	- methods: ElastoMonolith
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Fluidic_Topology_Optimization_with_an_Anisotropic_Mixture_Model.md|Fluidic Topology Optimization with an Anisotropic Mixture Model (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Fluidic_Topology_Optimization_with_an_Anisotropic_Mixture_Model.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- Robust Vectorized Surface Reconstruction with 2D-3D Joint Optimization (SIGGRAPH ASIA 2022 2022)
+	- methods: 各向异性Stokes流拓扑优化（Anisotropic Stokes Topology Optimization）
+	- datasets: Fluidic Twister 设计
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Robust_Vectorized_Surface_Reconstruction_with_2D-3D_Joint_Optimization.md|Robust Vectorized Surface Reconstruction with 2D-3D Joint Optimization (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Robust_Vectorized_Surface_Reconstruction_with_2D_3D_Joint_Optimization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: 2D-3D Joint Optimization Pipeline
+	- datasets: MiMAP_02
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Woven_Fabric_Capture_from_a_Single_Photo.md|Woven Fabric Capture from a Single Photo (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Woven_Fabric_Capture_from_a_Single_Photo.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: FabricNet + Differentiable Optimization
+	- datasets: Synthetic Fabric Patterns, Real Fabric Samples, Comparison to MATch on real fabric
 - [[obsidian-vault/analysis/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.md|A Convex Optimization Framework for Regularized Geodesic Distances (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Convex_Optimization_Framework_for_Regularized_Geodesic_Distances.pdf|PDF]]
 	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation, Optimization / Theory
 	- methods: Convex Optimization Framework for Regularized Geodesic Distances
 	- datasets: Single-source distance, Pipe mesh, Dragon mesh
-- A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Temporal_Coherent_Topology_Optimization_Approach_for_Assembly_Planning_of_Bespoke_Frame_Structures.md|A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Temporal_Coherent_Topology_Optimization_Approach_for_Assembly_Planning_of_Bespoke_Frame_Structures.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: Temporal Coherent Topology Optimization
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.md|Boundary Value Caching for Walk on Spheres (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Boundary Value Caching (BVC)
 	- datasets: 多个视觉/几何计算测试问题, 纯Dirichlet问题, Dirichlet主导的高频边界条件问题
-- ColorfulCurves: Palette-aware Lightness Control and Color Editing via Sparse Optimization (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ColorfulCurves_Palette-aware_Lightness_Control_and_Color_Editing_via_Sparse_Optimization.md|ColorfulCurves: Palette-aware Lightness Control and Color Editing via Sparse Optimization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ColorfulCurves_Palette_aware_Lightness_Control_and_Color_Editing_via_Sparse_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- End-to-end Procedural Material Capture With Proxy-free Mixed-integer Optimization (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory
+	- methods: ColorfulCurves
+	- datasets: Expert study, Runtime on test cases, Runtime on sample case
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Constructing_Printable_Surfaces_With_View-dependent_Appearance.md|Constructing Printable Surfaces With View-dependent Appearance (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Constructing_Printable_Surfaces_With_View_dependent_Appearance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Differentiable Self-Occluding Heightfield Optimization
+	- datasets: View-dependent surface detail, Viewing angle compatibility, Printed multi-view surface
+- [[obsidian-vault/analysis/SIGGRAPH_2023/End-to-end_Procedural_Material_Capture_With_Proxy-free_Mixed-integer_Optimization.md|End-to-end Procedural Material Capture With Proxy-free Mixed-integer Optimization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/End_to_end_Procedural_Material_Capture_With_Proxy_free_Mixed_integer_Optimization.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Diffmat v2 + 混合整数优化的端到端程序化材质捕捉流水线
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.md|Flexible Isosurface Extraction for Gradient-Based Mesh Optimization (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
 	- methods: FlexiCubes
 	- datasets: Mesh Reconstruction
-- Geometric Optimisation via Spectral Shifting (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
-- Image Vectorization and Editing via Linear Gradient Layer Decomposition (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Generating_Activity_Snippets_by_Learning_Human-scene_Interactions.md|Generating Activity Snippets by Learning Human-scene Interactions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generating_Activity_Snippets_by_Learning_Human_scene_Interactions.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Microfacet Theory for Non-uniform Heightfields (SIGGRAPH 2023 2023)
+	- methods: Activity Snippet Generation via Sequential Graph Generation and Two-stage Optimization
+	- datasets: Activity Snippet Generation, Perceptual Study, Synthetic Overcooked dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Helix-free_Stripes_for_Knit_Graph_Design.md|Helix-free Stripes for Knit Graph Design (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Helix_free_Stripes_for_Knit_Graph_Design.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+	- methods: Helix-free Stripe Optimization Framework (S1 & S2)
+	- datasets: 多种三维网格模型
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Image_Vectorization_and_Editing_via_Linear_Gradient_Layer_Decomposition.md|Image Vectorization and Editing via Linear Gradient Layer Decomposition (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Image_Vectorization_and_Editing_via_Linear_Gradient_Layer_Decomposition.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Automatic Linear Gradient Layer Decomposition via Region Supporting Tree
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Microfacet_Theory_for_Non-uniform_Heightfields.md|Microfacet Theory for Non-uniform Heightfields (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Microfacet_Theory_for_Non_uniform_Heightfields.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Layered-Smith Microfacet Model (Asymmetric NDF Blending)
+	- datasets: Beckmann rough conductor, General rough conductor/diffuse, Two-layer roughening
+- [[obsidian-vault/analysis/SIGGRAPH_2023/P2M_A_Fast_Solver_for_Querying_Distance_From_Point_to_Mesh_Surface.md|P2M: A Fast Solver for Querying Distance From Point to Mesh Surface (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/P2M_A_Fast_Solver_for_Querying_Distance_From_Point_to_Mesh_Surface.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Optimization / Theory
-- P2M: A Fast Solver for Querying Distance From Point to Mesh Surface (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory
+	- methods: P2M
+	- datasets: Dragon模型, Thingi10K完整数据集
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.md|Simulation-aided face strain extraction for ML animation systems (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Simulation-aided muscle strain extraction
 	- datasets: 面部表演捕捉序列 / face-slab tetrahedral simulation examples
-- Stealth Shaper: Reflectivity Optimization as Surface Stylization (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Stealth_Shaper_Reflectivity_Optimization_as_Surface_Stylization.md|Stealth Shaper: Reflectivity Optimization as Surface Stylization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Stealth_Shaper_Reflectivity_Optimization_as_Surface_Stylization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Stealth Shaper
+	- datasets: 自定义3D模型, 真实世界 3D 打印隐身测试
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Synthesizing_Dexterous_Nonprehensile_Pregrasp_for_Ungraspable_Objects.md|Synthesizing Dexterous Nonprehensile Pregrasp for Ungraspable Objects (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Synthesizing_Dexterous_Nonprehensile_Pregrasp_for_Ungraspable_Objects.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Nonprehensile Pregrasp Synthesis via Contact Graph and Score-guided Optimization
+	- datasets: Bookshelf, Plate, Marker
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.md|Walk on Stars: Grid-Free Monte Carlo for Neumann Boundary Conditions (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Walk on Stars (WoSt)
 	- datasets: 已知参考函数, 混合边值问题效率对比
-- ∇-Prox: Differentiable Proximal Algorithm Modeling for Large-scale Optimization (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory
-- A Locality-based Neural Solver for Optical Motion Capture (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Locality_based_Neural_Solver_for_Optical_Motion_Capture.pdf|PDF]]
-	- method groups: Optimization / Theory
-- A Parametric Kinetic Solver for Simulating Boundary-Dominated Turbulent Flow Phenomena (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/-Prox_Differentiable_Proximal_Algorithm_Modeling_for_Large-scale_Optimization.md|∇-Prox: Differentiable Proximal Algorithm Modeling for Large-scale Optimization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Prox_Differentiable_Proximal_Algorithm_Modeling_for_Large_scale_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: ∇-Prox
+	- datasets: Computational thin-lens imaging, Energy system planning, Image deraining
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary-Dominated_Turbulent_Flow_Phenomena.md|A Parametric Kinetic Solver for Simulating Boundary-Dominated Turbulent Flow Phenomena (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary_Dominated_Turbulent_Flow_Phenomena.pdf|PDF]]
-	- method groups: Optimization / Theory
-- GARM-LS: A Gradient-Augmented Reference-Map Method for Level-Set Fluid Simulation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GARM_LS_A_Gradient_Augmented_Reference_Map_Method_for_Level_Set_Fluid_Simulation.pdf|PDF]]
-	- method groups: Optimization / Theory
-- Joint Sampling and Optimisation for Inverse Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Learning Gradient Fields for Scalable and Generalizable Irregular Packing (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.pdf|PDF]]
-	- method groups: Optimization / Theory
-- Metric Optimization in Penner Coordinates (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation, Optimization / Theory
-- Neural Cache for Monte Carlo Partial Differential Equation Solver (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Cache_for_Monte_Carlo_Partial_Differential_Equation_Solver.pdf|PDF]]
+	- methods: Parametric Kinetic Boundary Treatment Model
+	- datasets: 球体绕流, Notchback车背压力分布, 球体绕流阻力危机预测
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GARM-LS_A_Gradient-Augmented_Reference-Map_Method_for_Level-Set_Fluid_Simulation.md|GARM-LS: A Gradient-Augmented Reference-Map Method for Level-Set Fluid Simulation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GARM_LS_A_Gradient_Augmented_Reference_Map_Method_for_Level_Set_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- Neural Gradient Learning and Optimization for Oriented Point Normal Estimation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.pdf|PDF]]
-	- method groups: Optimization / Theory
-- Perceptual error optimization for Monte Carlo animation rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.pdf|PDF]]
+	- methods: GARM-LS
+	- datasets: Zalesak’s disk, Distorted circle, LeVeque’s sphere
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.md|Joint Sampling and Optimisation for Inverse Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Power Plastics: A Hybrid Lagrangian/Eulerian Solver for Mesoscale Inelastic Flows (SIGGRAPH ASIA 2023 2023)
+	- methods: Gradient Meta-estimation（梯度元估计）
+	- datasets: Spiral material optimisation, Exponential distribution rate parameter, Texture optimisation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.md|Metric Optimization in Penner Coordinates (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Penner Coordinate Metric Optimization
+	- datasets: Myles et al. 2014 完整数据集及其变体
+- Neural Cache for Monte Carlo Partial Differential Equation Solver (SIGGRAPH ASIA 2023 2023)
+	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.md|Neural Gradient Learning and Optimization for Oriented Point Normal Estimation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory
+	- methods: NGLO (Neural Gradient Learning and Optimization)
+	- datasets: PCPNet, FamousShape, Sparse point clouds
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Non-Newtonian_ViRheometry_via_Similarity_Analysis.md|Non-Newtonian ViRheometry via Similarity Analysis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Non_Newtonian_ViRheometry_via_Similarity_Analysis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Video-based Herschel-Bulkley parameter estimation with similarity-aware multi-setup optimization (ViRheometry)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Power_Plastics_A_Hybrid_LagrangianEulerian_Solver_for_Mesoscale_Inelastic_Flows.md|Power Plastics: A Hybrid Lagrangian/Eulerian Solver for Mesoscale Inelastic Flows (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Power_Plastics_A_Hybrid_Lagrangian_Eulerian_Solver_for_Mesoscale_Inelastic_Flows.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)
+	- methods: Power Plastics
+	- datasets: 冲洗气泡, 沙子柱坍塌, 瑞利-泰勒不稳定性
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Rectifying_Strip_Patterns.md|Rectifying Strip Patterns (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Rectifying_Strip_Patterns.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Discrete level-set optimization for rectifying strip patterns
+	- datasets: Fig. 12, Fig. 1
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.md|SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.pdf|PDF]]
-	- method groups: Optimization / Theory
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: SeamlessNeRF
+	- datasets: Objaverse, Custom scenes
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.md|Subspace Mixed Finite Elements for Real-Time Heterogeneous Elastodynamics (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Subspace Mixed Finite Element Method (MFEM)
 	- datasets: Mammoth, Crab, Sword
-- ToRoS: A Topology Optimization Approach for Designing Robotic Skins (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ToRoS_A_Topology_Optimization_Approach_for_Designing_Robotic_Skins.md|ToRoS: A Topology Optimization Approach for Designing Robotic Skins (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ToRoS_A_Topology_Optimization_Approach_for_Designing_Robotic_Skins.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: ToRoS
 - [[obsidian-vault/analysis/ECCV_2024/Improving_Hyperparameter_Optimization_with_Checkpointed_Model_Weights.md|Improving Hyperparameter Optimization with Checkpointed Model Weights (ECCV 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/ECCV_2024/Improving_Hyperparameter_Optimization_with_Checkpointed_Model_Weights.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
@@ -203,71 +365,214 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
 	- methods: Differentiable Walk-on-Spheres (可微WoS)
 	- datasets: Wrench, Teapot, Globe
-- An Induce-on-Boundary Magnetostatic Solver for Grid-based Ferrofluids (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Framework_for_Solving_Parabolic_Partial_Differential_Equations_on_Discrete_Domains.md|A Framework for Solving Parabolic Partial Differential Equations on Discrete Domains (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Framework_for_Solving_Parabolic_Partial_Differential_Equations_on_Discrete_Domains.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: Strang-Splitting Convex Optimization Framework
+	- datasets: 一维Wasserstein重心计算, 三角网格上三维分布Wasserstein重心, G-方程前端传播
+- [[obsidian-vault/analysis/SIGGRAPH_2024/An_Induce-on-Boundary_Magnetostatic_Solver_for_Grid-based_Ferrofluids.md|An Induce-on-Boundary Magnetostatic Solver for Grid-based Ferrofluids (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/An_Induce_on_Boundary_Magnetostatic_Solver_for_Grid_based_Ferrofluids.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Induce-on-Boundary (IoB) Solver
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Aperture-aware_Lens_Design.md|Aperture-aware Lens Design (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Aperture_aware_Lens_Design.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Warp-field Aperture-aware Optimization
+	- datasets: Low-light imaging, Motion blur, Vignetting
 - [[obsidian-vault/analysis/SIGGRAPH_2024/CNS-Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.md|CNS-Edit: 3D Shape Editing via Coupled Neural Shape Optimization (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CNS_Edit_3D_Shape_Editing_via_Coupled_Neural_Shape_Optimization.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
 	- methods: CNS-Edit
 	- datasets: ShapeNet Chair, ShapeNet Airplane
-- Differentiable solver for time-dependent deformation problems with contact (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Differentiable_solver_for_time-dependent_deformation_problems_with_contact.md|Differentiable solver for time-dependent deformation problems with contact (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Differentiable_solver_for_time_dependent_deformation_problems_with_contact.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Ours (differentiable IPC-FEM solver)
+	- datasets: Sliding Ball, Bouncing Ball / Bridge
+- [[obsidian-vault/analysis/SIGGRAPH_2024/From_Microfacets_to_Participating_Media_A_Unified_Theory_of_Light_Transport_With_Stochastic_Geometry.md|From Microfacets to Participating Media: A Unified Theory of Light Transport With Stochastic Geometry (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/From_Microfacets_to_Participating_Media_A_Unified_Theory_of_Light_Transport_With_Stochastic_Geometry.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Gaussian Process Implicit Surface (GPIS) Light Transport
+	- datasets: Microfacet matching scene, Homogeneous wedge scene, Downsampled implicit surface rendering
+- [[obsidian-vault/analysis/SIGGRAPH_2024/GIPC_Fast_and_stable_Gauss-Newton_optimization_of_IPC_barrier_energy.md|GIPC: Fast and stable Gauss-Newton optimization of IPC barrier energy (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/GIPC_Fast_and_stable_Gauss_Newton_optimization_of_IPC_barrier_energy.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: GIPC (Gauss-Newton optimization of IPC barrier energy)
+	- datasets: Bunny drop, Funnel test, Multi-layer cloth
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Implicit_Swept_Volume_SDF_Enabling_Continuous_Collision-free_Trajectory_Generation_for_Arbitrary_Shapes.md|Implicit Swept Volume SDF: Enabling Continuous Collision-free Trajectory Generation for Arbitrary Shapes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Implicit_Swept_Volume_SDF_Enabling_Continuous_Collision_free_Trajectory_Generation_for_Arbitrary_Shapes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Implicit Swept Volume SDF with Hierarchical Optimization (Implicit-SVSDF-Planner)
+	- datasets: SVSDF 内部点计算
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Kinetic_Simulation_of_Turbulent_Multifluid_Flows.md|Kinetic Simulation of Turbulent Multifluid Flows (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Kinetic_Simulation_of_Turbulent_Multifluid_Flows.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- From Microfacets to Participating Media: A Unified Theory of Light Transport With Stochastic Geometry (SIGGRAPH 2024 2024)
+	- methods: HOME-LBM Based Multifluid Solver with Unified Phase-Field Model
+	- datasets: 两相溃坝, Rayleigh-Taylor不稳定性, 大密度比三相溃坝
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Lagrangian_Covector_Fluid_With_Free_Surface.md|Lagrangian Covector Fluid With Free Surface (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Lagrangian_Covector_Fluid_With_Free_Surface.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Lagrangian Covector Solver (LMCP scheme)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/N-Dimensional_Gaussians_for_Fitting_of_High_Dimensional_Functions.md|N-Dimensional Gaussians for Fitting of High Dimensional Functions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/N_Dimensional_Gaussians_for_Fitting_of_High_Dimensional_Functions.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- GIPC: Fast and stable Gauss-Newton optimization of IPC barrier energy (SIGGRAPH 2024 2024)
-	- method groups: Optimization / Theory
-- HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning (SIGGRAPH 2024 2024)
-	- method groups: Agent / RL / Planning, Optimization / Theory
-- PEA-PODs: Perceptual Evaluation of Algorithms for Power Optimization in XR Displays (SIGGRAPH 2024 2024)
+	- methods: N-Dimensional Gaussian Mixture with LSH Culling and Optimization-Controlled Refinement
+	- datasets: Synthetic Scenes, Real Specular Scenes, CD Scene
+- [[obsidian-vault/analysis/SIGGRAPH_2024/PEA-PODs_Perceptual_Evaluation_of_Algorithms_for_Power_Optimization_in_XR_Displays.md|PEA-PODs: Perceptual Evaluation of Algorithms for Power Optimization in XR Displays (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/PEA_PODs_Perceptual_Evaluation_of_Algorithms_for_Power_Optimization_in_XR_Displays.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation, Optimization / Theory
-- Preconditioned Nonlinear Conjugate Gradient Method for Real-time Interior-point Hyperelasticity (SIGGRAPH 2024 2024)
+	- methods: PEA-PODs 统一感知评估框架
+	- datasets: OLED display with eye tracking, target -1 JOD, OLED display without eye tracking
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Preconditioned_Nonlinear_Conjugate_Gradient_Method_for_Real-time_Interior-point_Hyperelasticity.md|Preconditioned Nonlinear Conjugate Gradient Method for Real-time Interior-point Hyperelasticity (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Preconditioned_Nonlinear_Conjugate_Gradient_Method_for_Real_time_Interior_point_Hyperelasticity.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- Spin-It Faster: Quadrics Solve All Topology Optimization Problems That Depend Only on Mass Moments (SIGGRAPH 2024 2024)
+	- methods: Preconditioned Nonlinear Conjugate Gradient (PNCG) with Dai-Kou algorithm
+	- datasets: Drag armadillo, Four long noodles
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Proxy_Asset_Generation_for_Cloth_Simulation_in_Games.md|Proxy Asset Generation for Cloth Simulation in Games (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Proxy_Asset_Generation_for_Cloth_Simulation_in_Games.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Automatic Proxy Mesh Generation and Skinning Weight Optimization Pipeline
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Soft_Pneumatic_Actuator_Design_Using_Differentiable_Simulation.md|Soft Pneumatic Actuator Design Using Differentiable Simulation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Soft_Pneumatic_Actuator_Design_Using_Differentiable_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Optimization / Theory
+	- methods: Cascaded Shape Optimization with Contact Force Proxy for Pneumatic Actuators
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Spin-It_Faster_Quadrics_Solve_All_Topology_Optimization_Problems_That_Depend_Only_on_Mass_Moments.md|Spin-It Faster: Quadrics Solve All Topology Optimization Problems That Depend Only on Mass Moments (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Spin_It_Faster_Quadrics_Solve_All_Topology_Optimization_Problems_That_Depend_Only_on_Mass_Moments.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- Theory of Human Tetrachromatic Color Experience and Printing (SIGGRAPH 2024 2024)
+	- methods: 基于二次曲面的质量矩优化方法 (Spin-It Faster)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Theory_of_Human_Tetrachromatic_Color_Experience_and_Printing.md|Theory of Human Tetrachromatic Color Experience and Printing (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Theory_of_Human_Tetrachromatic_Color_Experience_and_Printing.pdf|PDF]]
-	- method groups: Optimization / Theory
-- View-Independent Adjoint Light Tracing for Lighting Design Optimization (SIGGRAPH 2024 2024)
-	- method groups: Optimization / Theory
+	- topics: Graphics Fabrication Design, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Ideal Tetrachromatic Inkset (CVPY) and Prototype Printer
+	- datasets: Ideal Tetrachromatic Gamut, Tetrachromatic Hue Sphere Sampling, Q-axis Gamut Width
+- [[obsidian-vault/analysis/SIGGRAPH_2024/View-Independent_Adjoint_Light_Tracing_for_Lighting_Design_Optimization.md|View-Independent Adjoint Light Tracing for Lighting Design Optimization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/View_Independent_Adjoint_Light_Tracing_for_Lighting_Design_Optimization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: View-Independent Adjoint Light Tracing
+	- datasets: Large Office, Small Office, Labyrinth
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.md|Walkin' Robin: Walk on Stars with Robin Boundary Conditions (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Walkin' Robin (WoSt with Robin boundary conditions)
 	- datasets: 多种几何, 常函数解问题
-- X-SLAM: Scalable Dense SLAM for Task-aware Optimization Using CSFD (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/X-SLAM_Scalable_Dense_SLAM_for_Task-aware_Optimization_Using_CSFD.md|X-SLAM: Scalable Dense SLAM for Task-aware Optimization Using CSFD (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/X_SLAM_Scalable_Dense_SLAM_for_Task_aware_Optimization_Using_CSFD.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: X-SLAM (X-KF / X-EF)
+	- datasets: TUM RGBD fr1_desk, Large-scale Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Flexible_Mold_for_Facade_Panel_Fabrication.md|A Flexible Mold for Facade Panel Fabrication (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Flexible_Mold_for_Facade_Panel_Fabrication.pdf|PDF]]
+	- topics: Graphics Fabrication Design
 	- method groups: Optimization / Theory
-- Accelerate Neural Subspace-Based Reduced-Order Solver of Deformable Simulation by Lipschitz Optimization (SIGGRAPH ASIA 2024 2024)
+	- methods: Flexible Mold with Deflatable Membrane and Inverse Design Optimization
+	- datasets: TP3, All four test panels TP1-4, TP1
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Accelerate_Neural_Subspace-Based_Reduced-Order_Solver_of_Deformable_Simulation_by_Lipschitz_Optimization.md|Accelerate Neural Subspace-Based Reduced-Order Solver of Deformable Simulation by Lipschitz Optimization (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Accelerate_Neural_Subspace_Based_Reduced_Order_Solver_of_Deformable_Simulation_by_Lipschitz_Optimization.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- CPoser: An Optimization-after-Parsing Approach for Text-to-Pose Generation Using Large Language Models. (SIGGRAPH ASIA 2024 2024)
+	- methods: Lipschitz Optimization of Neural Subspace Mapping
+	- datasets: Twist Bar, Dinosaur, Bunny
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Approximation_by_Meshes_with_Spherical_Faces.md|Approximation by Meshes with Spherical Faces (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Approximation_by_Meshes_with_Spherical_Faces.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Optimization / Theory
+	- methods: Sphere Congruence Optimization for Spherical Mesh Approximation
+	- datasets: Botanic garden surface, Lilium tower surface, SQ mesh optimization
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Chebyshev_Parameterization_for_Woven_Fabric_Modeling.md|Chebyshev Parameterization for Woven Fabric Modeling (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Chebyshev_Parameterization_for_Woven_Fabric_Modeling.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory
+	- methods: Chebyshev Parameterization (Chebyshev energy and local-global optimization)
+	- datasets: hemisphere, cloth, vase
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Computational_Design_of_a_Kit_of_Parts_for_Bending_Active_Structures.md|Computational Design of a Kit of Parts for Bending Active Structures (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Computational_Design_of_a_Kit_of_Parts_for_Bending_Active_Structures.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory
+	- methods: Relaxed Kit-of-Parts Optimization
+	- datasets: Umbrella Mesh Designs, Orthogonal Grids and C-shells
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Differential_Walk_on_Spheres.md|Differential Walk on Spheres (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Differential_Walk_on_Spheres.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
-- End-to-end Optimization of Fluidic Lenses (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/End-to-end_Optimization_of_Fluidic_Lenses.md|End-to-end Optimization of Fluidic Lenses (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/End_to_end_Optimization_of_Fluidic_Lenses.pdf|PDF]]
-	- method groups: Optimization / Theory
-- Filtering-Based Reconstruction for Gradient-Domain Rendering (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Physical Simulation, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: End-to-End Optimization of Fluidic Lenses
+	- datasets: DIV2K dataset, Real prototype imaging
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Filtering-Based_Reconstruction_for_Gradient-Domain_Rendering.md|Filtering-Based Reconstruction for Gradient-Domain Rendering (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Filtering_Based_Reconstruction_for_Gradient_Domain_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Physical Simulation, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- From Sim-to-Real: Toward General Event-based Low-light Frame Interpolation with Per-scene Optimization (SIGGRAPH ASIA 2024 2024)
+	- methods: Filtering-Based Reconstruction for Gradient-Domain Rendering (FRGR)
+	- datasets: 多个测试场景
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/From_Sim-to-Real_Toward_General_Event-based_Low-light_Frame_Interpolation_with_Per-scene_Optimization.md|From Sim-to-Real: Toward General Event-based Low-light Frame Interpolation with Per-scene Optimization (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/From_Sim_to_Real_Toward_General_Event_based_Low_light_Frame_Interpolation_with_Per_scene_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture (SIGGRAPH ASIA 2024 2024)
-	- method groups: Optimization / Theory, Safety / Privacy / Robustness
-- Spatiotemporal Bilateral Gradient Filtering for Inverse Rendering (SIGGRAPH ASIA 2024 2024)
+	- methods: Per-scene Optimization for Event-based VFI
+	- datasets: EVFI-LL, EVFI-LL-C
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Optimized_shock-protecting_microstructures.md|Optimized shock-protecting microstructures (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Optimized_shock_protecting_microstructures.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Optimization / Theory
+	- methods: Nonlinear Homogenization-based Shape Optimization with Contact
+	- datasets: Flat response max compression, Flat response vs. Huang et al. 2024, Drop test max Von Mises stress
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/RoMo_A_Robust_Solver_for_Full-body_Unlabeled_Optical_Motion_Capture.md|RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/RoMo_A_Robust_Solver_for_Full_body_Unlabeled_Optical_Motion_Capture.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: RoMo
+	- datasets: Production, Front-waist, GRAB
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Solving_Inverse_PDE_Problems_using_Grid-Free_Monte_Carlo_Estimators.md|Solving Inverse PDE Problems using Grid-Free Monte Carlo Estimators (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Solving_Inverse_PDE_Problems_using_Grid_Free_Monte_Carlo_Estimators.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Extended Delta Tracking Solver with Directional Neumann Sampling
+	- datasets: 二维椭圆 PDE 系数梯度估计
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Spatiotemporal_Bilateral_Gradient_Filtering_for_Inverse_Rendering.md|Spatiotemporal Bilateral Gradient Filtering for Inverse Rendering (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Spatiotemporal_Bilateral_Gradient_Filtering_for_Inverse_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Spatiotemporal Bilateral Gradient Filtering Optimizer
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Tencers_Tension-Constrained_Elastic_Rods.md|Tencers: Tension-Constrained Elastic Rods (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Tencers_Tension_Constrained_Elastic_Rods.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Tencers Inverse Design Optimization
+	- datasets: 表1中的多种设计模型
 - [[obsidian-vault/analysis/TOG_2024/Trading_Spaces_Adaptive_Subspace_Time_Integration_for_Contacting_Elastodynamics.md|Trading Spaces: Adaptive Subspace Time Integration for Contacting Elastodynamics (TOG 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/TOG_2024/Trading_Spaces_Adaptive_Subspace_Time_Integration_for_Contacting_Elastodynamics.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Adaptive Subspace Time Integration
 	- datasets: Multiple scenes, Linear solver comparison, Rubber hand on spikes
+- [[obsidian-vault/analysis/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.md|Auto-Connect: Connectivity-Preserving RigFormer with Direct Preference Optimization (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Auto-Connect (RigFormer + DPO post-training + Geodesic-aware module)
+	- datasets: Art-XL2.0 & ModelsResource, Art-XL2.0
 - [[obsidian-vault/analysis/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.md|ZTRS: Zero-Imitation End-to-end Autonomous Driving with Trajectory Scoring (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.pdf|PDF]]
 	- topics: Other / Unclear
@@ -289,29 +594,81 @@ generated: 2026-06-24T20:47
 - A Divide-and-Conquer Approach for Global Orientation of Non-Watertight Scene-Level Point Clouds with 0-1 Integer Optimization (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Divide-and-Conquer_Approach_for_Global_Orientation_of_Non-Watertight_Scene-Level_Point_Clouds_with_0-1_Integer_Optimization.pdf|PDF]]
 	- method groups: Optimization / Theory
-- C-Tubes: Design and Optimization of Tubular Structures Composed of Developable Strips (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/A_Hybrid_Near-wall_Model_for_Kinetic_Simulation_of_Turbulent_Boundary_Layer_Flows.md|A Hybrid Near-wall Model for Kinetic Simulation of Turbulent Boundary Layer Flows (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/A_Hybrid_Near_wall_Model_for_Kinetic_Simulation_of_Turbulent_Boundary_Layer_Flows.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
+	- methods: Hybrid Near-Wall Model for Lattice Boltzmann Solver
+	- datasets: NACA 0012 airfoil at Re=2×10^6, DJI M300 rotor thrust and torque, NACA 4412 airfoil
+- [[obsidian-vault/analysis/SIGGRAPH_2025/C-Tubes_Design_and_Optimization_of_Tubular_Structures_Composed_of_Developable_Strips.md|C-Tubes: Design and Optimization of Tubular Structures Composed of Developable Strips (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/C_Tubes_Design_and_Optimization_of_Tubular_Structures_Composed_of_Developable_Strips.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: C-tubes
+	- datasets: 三叶结管闭合, 环绕环面的可展开条带闭合
 - DAMO: A Deep Solver for Arbitrary Marker Configuration in Optical Motion Capture (SIGGRAPH 2025 2025)
 	- method groups: Optimization / Theory
-- Designing Balancing Toys Through Mass and Shape Optimization (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Data-Efficient_Discovery_of_Hyperelastic_TPMS_Metamaterials_with_Extreme_Energy_Dissipation.md|Data-Efficient Discovery of Hyperelastic TPMS Metamaterials with Extreme Energy Dissipation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Data_Efficient_Discovery_of_Hyperelastic_TPMS_Metamaterials_with_Extreme_Energy_Dissipation.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Optimization / Theory, Vision / Multimodal / 3D
+	- methods: Uncertainty-Aware Deep Ensemble Bayesian Optimization
+	- datasets: Micoscale TPMS Metamaterial Energy Dissipation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Designing_Balancing_Toys_Through_Mass_and_Shape_Optimization.md|Designing Balancing Toys Through Mass and Shape Optimization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Designing_Balancing_Toys_Through_Mass_and_Shape_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: Mass and Shape Optimization for Balancing Toys
+	- datasets: Stanford bunny 模型
 - DualMS: Implicit Dual-Channel Minimal Surface Optimization for Heat Exchanger Design (SIGGRAPH 2025 2025)
 	- method groups: Optimization / Theory
-- EDGE: Epsilon-Difference Gradient Evolution for Buffer-Free Flow Maps (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/EDGE_Epsilon-Difference_Gradient_Evolution_for_Buffer-Free_Flow_Maps.md|EDGE: Epsilon-Difference Gradient Evolution for Buffer-Free Flow Maps (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/EDGE_Epsilon_Difference_Gradient_Evolution_for_Buffer_Free_Flow_Maps.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- End-to-end Surface Optimization for Light Control (SIGGRAPH 2025 2025)
+	- methods: EDGE (Epsilon-Difference Gradient Evolution), 变体 ED4 (Four-Point Epsilon Difference)
+	- datasets: Dye Drift, Leapfrogging Vortices
+- [[obsidian-vault/analysis/SIGGRAPH_2025/End-to-end_Surface_Optimization_for_Light_Control.md|End-to-end Surface Optimization for Light Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/End_to_end_Surface_Optimization_for_Light_Control.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Optimization / Theory
-- Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation (SIGGRAPH 2025 2025)
+	- methods: End-to-end Surface Optimization for Light Control
+	- datasets: SIGGRAPH logo, Einstein portrait, Train
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Gaussian_Fluids_A_Grid-Free_Fluid_Solver_based_on_Gaussian_Spatial_Representation.md|Gaussian Fluids: A Grid-Free Fluid Solver based on Gaussian Spatial Representation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Gaussian_Fluids_A_Grid_Free_Fluid_Solver_based_on_Gaussian_Spatial_Representation.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Optimization / Theory
-- Interactive Optimization of Scaffolded Procedural Patterns (SIGGRAPH 2025 2025)
+	- methods: Gaussian Fluids (GSR-based optimization solver)
+	- datasets: Taylor-Green vortex, Kármán vortex street
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Interactive_Optimization_of_Scaffolded_Procedural_Patterns.md|Interactive Optimization of Scaffolded Procedural Patterns (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Interactive_Optimization_of_Scaffolded_Procedural_Patterns.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Graphics Animation Interaction
 	- method groups: Optimization / Theory
+	- methods: Interactive Optimization of Scaffolded Procedural Patterns
+	- datasets: 蜂窝图案, 用户编辑的6种图案, 四种基本图案
 - James-Stein Gradient Combiner for Inverse Monte Carlo Rendering (SIGGRAPH 2025 2025)
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
 - MGPBD: A Multigrid Accelerated Global XPBD Solver (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MGPBD_A_Multigrid_Accelerated_Global_XPBD_Solver.pdf|PDF]]
 	- method groups: Optimization / Theory
-- Neural Co-Optimization of Structural Topology, Manufacturable Layers, and Path Orientations for Fiber-Reinforced Composites (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Neural_Co-Optimization_of_Structural_Topology_Manufacturable_Layers_and_Path_Orientations_for_Fiber-Reinforced_Composites.md|Neural Co-Optimization of Structural Topology, Manufacturable Layers, and Path Orientations for Fiber-Reinforced Composites (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Neural_Co_Optimization_of_Structural_Topology_Manufacturable_Layers_and_Path_Orientations_for_Fiber_Reinforced_Composites.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: Neural Co-Optimization Framework for Fiber-Reinforced Composites
+	- datasets: GE-Bracket, L-Bracket
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Piecewise_Ruled_Approximation_for_Freeform_Mesh_Surfaces.md|Piecewise Ruled Approximation for Freeform Mesh Surfaces (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Piecewise_Ruled_Approximation_for_Freeform_Mesh_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Piecewise Ruled Approximation via Group-Sparsity Optimization
+	- datasets: Various freeform models in Fig. 13 and Fig. 14, Models in Fig. 15, Models in Table 1
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Shape_Space_Spectra.md|Shape Space Spectra (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Shape_Space_Spectra.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Shape Space Eigenanalysis with Causal Sorting
+	- datasets: DiffSound 声音优化形状
 - [[obsidian-vault/analysis/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.md|Solving partial differential equations in participating media (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Solving_partial_differential_equations_in_participating_media.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
@@ -324,18 +681,92 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory
 	- methods: Stochastic Barnes-Hut Approximation
 	- datasets: Power station Coulomb potential, Coulomb potential, grid 1003
-- Stochastic Preconditioning for Neural Field Optimization (SIGGRAPH 2025 2025)
-	- method groups: Optimization / Theory
-- TetWeave: Isosurface Extraction using On-The-Fly Delaunay Tetrahedral Grids for Gradient-Based Mesh Optimization (SIGGRAPH 2025 2025)
-	- method groups: Optimization / Theory
-- Transformer IMU Calibrator: Dynamic On-body IMU Calibration for Inertial Motion Capture (SIGGRAPH 2025 2025)
-	- method groups: Optimization / Theory
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Stochastic_Preconditioning_for_Neural_Field_Optimization.md|Stochastic Preconditioning for Neural Field Optimization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Stochastic_Preconditioning_for_Neural_Field_Optimization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Stochastic Preconditioning (SP)
+	- datasets: Surface reconstruction from oriented point clouds, DTU dataset - surface reconstruction from images, Synthetic NeRF scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2025/TetWeave_Isosurface_Extraction_using_On-The-Fly_Delaunay_Tetrahedral_Grids_for_Gradient-Based_Mesh_Optimization.md|TetWeave: Isosurface Extraction using On-The-Fly Delaunay Tetrahedral Grids for Gradient-Based Mesh Optimization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/TetWeave_Isosurface_Extraction_using_On_The_Fly_Delaunay_Tetrahedral_Grids_for_Gradient_Based_Mesh_Optimization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: TetWeave
+	- datasets: 多视图3D重建, 多视图渲染指标, Stanford ORB 摄影测量
 - [[obsidian-vault/analysis/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.md|Unbiased Differential Visibility Using Fixed-Step Walk-on-Spherical-Caps And Closest Silhouettes (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Fixed-Step Walk-on-Spherical-Caps (WoSC) for Warped-Area Reparameterization
 	- datasets: Voronoi-bunny shadows gradient, Center box gradient, Mirror shadows gradient
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Unified_Pressure_Surface_Tension_and_Friction_for_SPH_Fluids.md|Unified Pressure, Surface Tension and Friction for SPH Fluids (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Unified_Pressure_Surface_Tension_and_Friction_for_SPH_Fluids.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Optimization / Theory
+	- methods: Unified Implicit SPH Solver for Pressure, Surface Tension, and Friction
+	- datasets: Spherical droplet internal pressure validation, Droplet merging dynamics, Sessile droplet on flat surface
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/An_Adjoint_Method_for_Differentiable_Fluid_Simulation_on_Flow_Maps.md|An Adjoint Method for Differentiable Fluid Simulation on Flow Maps (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/An_Adjoint_Method_for_Differentiable_Fluid_Simulation_on_Flow_Maps.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Long-Short Time-Sparse EFM Adjoint Solver
+	- datasets: Vortex Dynamics Inference, Vortex Control
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Automated_design_of_compound_lenses_with_discrete-continuous_optimization.md|Automated design of compound lenses with discrete-continuous optimization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Automated_design_of_compound_lenses_with_discrete_continuous_optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: RESTORE-based joint discrete-continuous lens optimization
+	- datasets: Lens design task, various lenses
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Computational_Design_of_Shape-Aware_Sieves.md|Computational Design of Shape-Aware Sieves (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Computational_Design_of_Shape_Aware_Sieves.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Shape-Aware Sieve Design via Sieve Game Optimization
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Implicit_Bonded_Discrete_Element_Method_with_Manifold_Optimization.md|Implicit Bonded Discrete Element Method with Manifold Optimization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Implicit_Bonded_Discrete_Element_Method_with_Manifold_Optimization.pdf|PDF]]
+	- topics: Graphics Fabrication Design
+	- method groups: Optimization / Theory
+	- methods: 隐式BDEM（基于优化基积分器与流形优化）
+	- datasets: Beam Stretch, Beam Twist, Ceramic Plate Drop
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MATStruct_High-quality_Medial_Mesh_Computation_via_Structure-aware_Variational_Optimization.md|MATStruct: High-quality Medial Mesh Computation via Structure-aware Variational Optimization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MATStruct_High_quality_Medial_Mesh_Computation_via_Structure_aware_Variational_Optimization.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory
+	- methods: MATStruct
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MiGumi_Making_Tightly_Coupled_Integral_Joints_Millable.md|MiGumi: Making Tightly Coupled Integral Joints Millable (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MiGumi_Making_Tightly_Coupled_Integral_Joints_Millable.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: MiGumi (Millable Extrusion Geometry with Tight Coupling Optimization)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/PowerGS_Display-Rendering_Power_Co-Optimization_for_Neural_Rendering_in_Power-Constrained_XR_Systems.md|PowerGS: Display-Rendering Power Co-Optimization for Neural Rendering in Power-Constrained XR Systems (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/PowerGS_Display_Rendering_Power_Co_Optimization_for_Neural_Rendering_in_Power_Constrained_XR_Systems.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: PowerGS
+	- datasets: Mip-NeRF360, Synthetic NeRF, Foveated Rendering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Precise_Gradient_Discontinuities_in_Neural_Fields_for_Subspace_Physics.md|Precise Gradient Discontinuities in Neural Fields for Subspace Physics (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Precise_Gradient_Discontinuities_in_Neural_Fields_for_Subspace_Physics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Optimization / Theory
+	- methods: Gradient-Discontinuity-Aware Neural Field via Input Lifting
+	- datasets: 异构U形和蜗牛形状
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Scattering-Aware_Color_Calibration_for_3D_Printers_Using_a_Simple_Calibration_Target.md|Scattering-Aware Color Calibration for 3D Printers Using a Simple Calibration Target (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Scattering_Aware_Color_Calibration_for_3D_Printers_Using_a_Simple_Calibration_Target.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Scattering-Aware Color Calibration
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Solid-Shell_Labeling_for_Discrete_Surfaces.md|Solid-Shell Labeling for Discrete Surfaces (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Solid_Shell_Labeling_for_Discrete_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: Solid-Shell Labeling via GWN Optimization
+	- datasets: 罐子压缩仿真
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/SRBTrack_Terrain-Adaptive_Tracking_of_a_Single-Rigid-Body_Character_Using_Momentum-Mapped_Space-Time_Optimization.md|SRBTrack: Terrain-Adaptive Tracking of a Single-Rigid-Body Character Using Momentum-Mapped Space-Time Optimization (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/SRBTrack_Terrain_Adaptive_Tracking_of_a_Single_Rigid_Body_Character_Using_Momentum_Mapped_Space_Time_Optimization.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: SRBTrack
+	- datasets: Terrain adaptation, External pushes, Computation time
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.md|Harmonic caching for walk on spheres (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
@@ -1074,3 +1505,9 @@ generated: 2026-06-24T20:47
 	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
 	- methods: Uni-DPO
 	- datasets: AlpacaEval 2.0, Arena-Hard, Math Reasoning
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Forget_Superresolution_Sample_Adaptively_when_Path_Tracing.md|Forget Superresolution, Sample Adaptively (when Path Tracing) (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Forget_Superresolution_Sample_Adaptively_when_Path_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Ours (Stochastic Adaptive Sampling and Denoising Pipeline)
+	- datasets: Production scenes

@@ -4,7 +4,7 @@ type: paper-index
 dimension: venue_year
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Venue_Year: arxiv_2025
@@ -72,6 +72,30 @@ generated: 2026-06-24T20:47
 	- [[obsidian-vault/paperPDFs/arxiv_2025/A_Survey_on_Camera_Trajectory_Generation_in_AIGC.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/arxiv_2025/Articulated_Kinematics_Distillation_from_Video_Diffusion_Models.md|Articulated Kinematics Distillation from Video Diffusion Models (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Articulated_Kinematics_Distillation_from_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Articulated Kinematics Distillation (AKD)
+	- datasets: Text-to-4D Generation
+- [[obsidian-vault/analysis/arxiv_2025/ArtUV_Artist-style_UV_Unwrapping.md|ArtUV: Artist-style UV Unwrapping (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/ArtUV_Artist-style_UV_Unwrapping.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: ArtUV
+	- datasets: ArtUV-200K, FAM benchmark
+- [[obsidian-vault/analysis/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.md|Auto-Connect: Connectivity-Preserving RigFormer with Direct Preference Optimization (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Auto-Connect (RigFormer + DPO post-training + Geodesic-aware module)
+	- datasets: Art-XL2.0 & ModelsResource, Art-XL2.0
+- [[obsidian-vault/analysis/arxiv_2025/Auto-Regressive_Surface_Cutting.md|Auto-Regressive Surface Cutting (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Auto-Regressive_Surface_Cutting.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SeamGPT
+	- datasets: Flatten Anything benchmark
 - [[obsidian-vault/analysis/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.md|BAGEL: Emerging Properties in Unified Multimodal Pretraining (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.pdf|PDF]]
 	- topics: Other / Unclear
@@ -208,6 +232,11 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: FunPhase
 	- datasets: DOG
+- [[obsidian-vault/analysis/arxiv_2025/GaussGym_An_Open-Source_Real-to-Sim_Framework_for_Learning_Locomotion_from_Pixels.md|GaussGym: An Open-Source Real-to-Sim Framework for Learning Locomotion from Pixels (arxiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/2025_GaussGym_An_Open_Source_Real_to_Sim_Framework_for_Learning_Locomotion_from_Pixels.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GaussGym
 - [[obsidian-vault/analysis/arxiv_2025/Generating_Attribute-Aware_Human_Motions_from_Textual_Prompt.md|Generating Attribute-Aware Human Motions from Textual Prompt (arXiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Generating_Attribute-Aware_Human_Motions_from_Textual_Prompt.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -283,6 +312,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Hunyuan3D 2.5
 	- datasets: Shape generation, Texture generation
+- [[obsidian-vault/analysis/arxiv_2025/Hunyuan3D_Studio_End-to-End_AI_Pipeline_for_Game-Ready_3D_Asset_Generation.md|Hunyuan3D Studio: End-to-End AI Pipeline for Game-Ready 3D Asset Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Hunyuan3D_Studio_End_to_End_AI_Pipeline_for_Game_Ready_3D_Asset_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hunyuan3D Studio
+	- datasets: FAM Benchmark, Toys4K Benchmark, User Study
+- [[obsidian-vault/analysis/arxiv_2025/Hunyuan3D-Omni_A_Unified_Framework_for_Controllable_Generation_of_3D_Assets.md|Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Hunyuan3D_Omni_A_Unified_Framework_for_Controllable_Generation_of_3D_Assets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hunyuan3D-Omni
+	- datasets: Custom dataset
 - [[obsidian-vault/analysis/arxiv_2025/HunyuanWorld_1_0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds.md|HunyuanWorld 1.0: Generating Immersive, Explorable, and Interactive 3D Worlds from Words or Pixels (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/HunyuanWorld_1_0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -384,6 +425,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MARRS
 	- datasets: NTU120-AS, Chi3D-AS
+- [[obsidian-vault/analysis/arxiv_2025/MatPedia_A_Universal_Generative_Foundation_for_High-Fidelity_Material_Synthesis.md|MatPedia: A Universal Generative Foundation for High-Fidelity Material Synthesis (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/MatPedia_A_Universal_Generative_Foundation_for_High-Fidelity_Material_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MatPedia
+	- datasets: 文本到材质生成, 图像到材质生成, 材质分解
 - [[obsidian-vault/analysis/arxiv_2025/Matrix-Game_2.0_An_Open-Source_Real-Time_and_Streaming_Interactive_World_Model.md|Matrix-Game 2.0: An Open-Source, Real-Time, and Streaming Interactive World Model (arXiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Matrix-Game_2.0:_An_Open-Source,_Real-Time,_and_Streaming_Interactive_World_Model.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -486,6 +533,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: OneCAT
 	- datasets: TextVQA, ChartQA, GQA
+- [[obsidian-vault/analysis/arxiv_2025/P3-SAM_Native_3D_Part_Segmentation.md|P3-SAM: Native 3D Part Segmentation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/P3-SAM_Native_3D_Part_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: P3-SAM
+	- datasets: PartObj-Tiny, PartObj-Tiny-WT, PartNetE
 - [[obsidian-vault/analysis/arxiv_2025/PartMotionEdit_Fine_Grained_Text_Driven_3D_Human_Motion_Editing_via_Part_Level_Modulation.md|PartMotionEdit: Fine-Grained Text-Driven 3D Human Motion Editing via Part-Level Modulation (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/PartMotionEdit_Fine_Grained_Text_Driven_3D_Human_Motion_Editing_via_Part_Level_Modulation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -587,7 +640,7 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: SemanticGen
 	- datasets: VBench-Long, VBench short
-- [[obsidian-vault/analysis/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.md|Separate Motion from Appearance Customizing Motion via Customizing Text to Video Diffusion Models (arxiv 2025 2025)]]
+- [[obsidian-vault/analysis/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.md|Separate Motion from Appearance Customizing Motion via Customizing Text to Video Diffusion Models (arXiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
@@ -692,6 +745,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: UniHM
 	- datasets: OMOMO, Lingo, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2025/Unleashing_Vecset_Diffusion_Model_for_Fast_Shape_Generation.md|Unleashing Vecset Diffusion Model for Fast Shape Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Unleashing_Vecset_Diffusion_Model_for_Fast_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlashVDM
+	- datasets: Shape Reconstruction, Image-to-3D Generation
 - [[obsidian-vault/analysis/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.md|VideoJAM Joint Appearance Motion Representations for Enhanced Motion Generation in Video Models (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
@@ -716,6 +775,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
 	- methods: WorldPlay
 	- datasets: Our long-term test set, custom cycle trajectories, Our short-term test set
+- [[obsidian-vault/analysis/arxiv_2025/X-Part_high_fidelity_and_structure_coherent_shape_decomposition.md|X-Part: high fidelity and structure coherent shape decomposition (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/X-Part_high_fidelity_and_structure_coherent_shape_decomposition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: X-Part
+	- datasets: Image-to-3D Part Generation
 - [[obsidian-vault/analysis/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.md|ZTRS: Zero-Imitation End-to-end Autonomous Driving with Trajectory Scoring (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.pdf|PDF]]
 	- topics: Other / Unclear

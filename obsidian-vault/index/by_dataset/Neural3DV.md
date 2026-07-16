@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Neural3DV
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/4DSloMo_4D_Reconstruction_for_High_Speed_Scene_with_Asynchronous_Capture.md|4DSloMo: 4D Reconstruction for High Speed Scene with Asynchronous Capture (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/4DSloMo_4D_Reconstruction_for_High_Speed_Scene_with_Asynchronous_Capture.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 4DSloMo
+	- datasets: Neural3DV, DNA-Rendering
 - [[obsidian-vault/analysis/CVPR_2026/4C4D_4_Camera_4D_Gaussian_Splatting.md|4C4D: 4 Camera 4D Gaussian Splatting (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/4C4D_4_Camera_4D_Gaussian_Splatting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

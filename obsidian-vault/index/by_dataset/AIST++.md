@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: AIST++
@@ -15,12 +15,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D
 	- methods: Cross-View Fusion (CVF) method with Reversible Kinematic Topology Decoder (RKTD)
 	- datasets: AIST++, Human3.6M
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Fusing_Monocular_Images_and_Sparse_IMU_Signals_for_Real-time_Human_Motion_Capture.md|Fusing Monocular Images and Sparse IMU Signals for Real-time Human Motion Capture (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fusing_Monocular_Images_and_Sparse_IMU_Signals_for_Real_time_Human_Motion_Capture.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RobustCap
+	- datasets: TotalCapture, AIST++
 - [[obsidian-vault/analysis/AAAI_2024/MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation.md|MotionMix Weakly Supervised Diffusion for Controllable Motion Generation (AAAI 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2024/MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MotionMix
 	- datasets: HumanML3D, KIT-ML, AIST++
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Dance-to-Music_Generation_with_Encoder-based_Textual_Inversion.md|Dance-to-Music Generation with Encoder-based Textual Inversion (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Dance_to_Music_Generation_with_Encoder_based_Textual_Inversion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Dual-path Rhythm-Genre Inversion (Encoder-based Textual Inversion)
+	- datasets: AIST++, InDV
 - [[obsidian-vault/analysis/AAAI_2025/Unified_Text_Music_and_Motion_Generation.md|Unified Text Music and Motion Generation (AAAI 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2025/Unified_Text_Music_and_Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
@@ -63,6 +75,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MEGADance
 	- datasets: FineDance, AIST++, Codebook Utilization
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/PhysHMR_Learning_Humanoid_Control_Policies_from_Vision_for_Physically_Plausible_Human_Motion_Reconstruction.md|PhysHMR: Learning Humanoid Control Policies from Vision for Physically Plausible Human Motion Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/PhysHMR_Learning_Humanoid_Control_Policies_from_Vision_for_Physically_Plausible_Human_Motion_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PhysHMR
+	- datasets: EMDB2, AIST++, User Study
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba.md|TCM Learning Human Motion with Temporally Conditional Mamba (SIGGRAPH_ASIA_2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

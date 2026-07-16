@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: GIMO
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Scene_Synthesis_from_Human_Motion.md|Scene Synthesis from Human Motion (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Scene_Synthesis_from_Human_Motion.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: SUMMON
+	- datasets: PROXD validation, GIMO, PROXD
 - [[obsidian-vault/analysis/CVPR_2024/A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_from_Sparse_Signals.md|A Unified Diffusion Framework for Scene aware Human Motion Estimation from Sparse Signals (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_from_Sparse_Signals.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

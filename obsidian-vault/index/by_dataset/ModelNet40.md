@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ModelNet40
@@ -21,6 +21,12 @@ generated: 2026-06-24T20:47
 	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
 	- methods: DeltaConv
 	- datasets: ModelNet40, ScanObjectNN, ShapeNet
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.md|Random Walks for Adversarial Meshes (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: Imitating Network Attack via Random Walks
+	- datasets: SHREC11, ModelNet40
 - [[obsidian-vault/analysis/WACV_2023/Overlap_guided_gaussian_mixture_models_for_point_cloud_registration.md|Overlap-guided gaussian mixture models for point cloud registration (WACV 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/WACV_2023/Overlap_guided_gaussian_mixture_models_for_point_cloud_registration.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

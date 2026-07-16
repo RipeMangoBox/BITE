@@ -4,23 +4,53 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: GSO
 
+- [[obsidian-vault/analysis/arxiv_2023/Consistent123_Improve_Consistency_for_One_Image_to_3D_Object_Synthesis.md|Consistent123: Improve Consistency for One Image to 3D Object Synthesis (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Consistent123_Improve_Consistency_for_One_Image_to_3D_Object_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Consistent123
+	- datasets: Objaverse Testset, GSO, RTMV
+- [[obsidian-vault/analysis/CVPR_2024/ViewFusion_Towards_Multi-View_Consistency_via_Interpolated_Denoising.md|ViewFusion: Towards Multi-View Consistency via Interpolated Denoising (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/ViewFusion_Towards_Multi-View_Consistency_via_Interpolated_Denoising.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: ViewFusion
+	- datasets: ABO, GSO
 - [[obsidian-vault/analysis/NEURIPS_2024/Zero_to_Hero_Enhancing_Zero_Shot_Novel_View_Synthesis_via_Attention_Map_Filtering.md|Zero-to-Hero: Enhancing Zero-Shot Novel View Synthesis via Attention Map Filtering (NEURIPS 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2024/Zero_to_Hero_Enhancing_Zero_Shot_Novel_View_Synthesis_via_Attention_Map_Filtering.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: Zero-to-Hero
 	- datasets: GSO, RTMV
+- [[obsidian-vault/analysis/SIGGRAPH_2024/ReFiNe_Recursive_Field_Networks_for_Cross-modal_Multi-scene_Representation.md|ReFiNe: Recursive Field Networks for Cross-modal Multi-scene Representation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/ReFiNe_Recursive_Field_Networks_for_Cross_modal_Multi_scene_Representation.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: ReFiNe (Recursive Field Networks)
+	- datasets: Thingi32, ShapeNet150, SRN Cars
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DreamUDF_Generating_Unsigned_Distance_Fields_from_A_Single_Image.md|DreamUDF: Generating Unsigned Distance Fields from A Single Image (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DreamUDF_Generating_Unsigned_Distance_Fields_from_A_Single_Image.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: DreamUDF
+	- datasets: DeepFashion3D, GSO
 - [[obsidian-vault/analysis/arxiv_2025/Hunyuan3D_1_0_A_Unified_Framework_for_Text_to_3D_and_Image_to_3D_Generation.md|Hunyuan3D 1.0: A Unified Framework for Text-to-3D and Image-to-3D Generation (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Hunyuan3D_1_0_A_Unified_Framework_for_Text_to_3D_and_Image_to_3D_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Hunyuan3D 1.0
 	- datasets: GSO, OmniObject3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/SPGen_Spherical_Projection_as_Consistent_and_Flexible_Representation_for_Single_Image_3D_Shape_Generation.md|SPGen: Spherical Projection as Consistent and Flexible Representation for Single Image 3D Shape Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/SPGen_Spherical_Projection_as_Consistent_and_Flexible_Representation_for_Single_Image_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: SPGen
+	- datasets: GSO, DeepFashion3D
 - [[obsidian-vault/analysis/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.md|Appreciate the View: A Task-Aware Evaluation Framework for Novel View Synthesis (3DV 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.pdf|PDF]]
 	- topics: Benchmarks / Datasets / Evaluation

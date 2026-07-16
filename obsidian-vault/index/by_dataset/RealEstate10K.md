@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: RealEstate10K
 
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Single-view_View_Synthesis_in_the_Wild_With_Learned_Adaptive_Multiplane_Images.md|Single-view View Synthesis in the Wild With Learned Adaptive Multiplane Images (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Single_view_View_Synthesis_in_the_Wild_With_Learned_Adaptive_Multiplane_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: AdaMPI
+	- datasets: Ken Burns, TartanAir, RealEstate10K
 - [[obsidian-vault/analysis/arxiv_2024/CamCo_Camera_Controllable_3D_Consistent_Image_to_Video_Generation.md|CamCo: Camera-Controllable 3D-Consistent Image-to-Video Generation (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/CamCo_Camera_Controllable_3D_Consistent_Image_to_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

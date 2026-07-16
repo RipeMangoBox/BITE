@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ScanNet
@@ -15,18 +15,48 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
 	- methods: Mix3D
 	- datasets: ScanNet, S3DIS, SemanticKITTI
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/NeuralRoom_Geometry-Constrained_Neural_Implicit_Surfaces_for_Indoor_Scene_Reconstruction.md|NeuralRoom: Geometry-Constrained Neural Implicit Surfaces for Indoor Scene Reconstruction (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/NeuralRoom_Geometry_Constrained_Neural_Implicit_Surfaces_for_Indoor_Scene_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: NeuralRoom
+	- datasets: ScanNet
 - [[obsidian-vault/analysis/CVPR_2023/Fast_Monocular_Scene_Reconstruction_with_Global_Sparse_Local_Dense_Grids.md|Fast Monocular Scene Reconstruction with Global-Sparse Local-Dense Grids (CVPR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2023/Fast_Monocular_Scene_Reconstruction_with_Global_Sparse_Local_Dense_Grids.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: Global-Sparse Local-Dense Grids (GS-LD Grids)
 	- datasets: ScanNet scene 0084, ScanNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MIPS-Fusion_Multi-Implicit-Submaps_for_Scalable_and_Robust_Online_Neural_RGB-D_Reconstruction.md|MIPS-Fusion: Multi-Implicit-Submaps for Scalable and Robust Online Neural RGB-D Reconstruction (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MIPS_Fusion_Multi_Implicit_Submaps_for_Scalable_and_Robust_Online_Neural_RGB_D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: MIPS-Fusion
+	- datasets: ScanNet, Replica, FastCaMo-Synth
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.md|Online Scene CAD Recomposition via Autonomous Scanning (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: RelCAD+RelNBV (关系引导在线CAD重组框架)
+	- datasets: ScanNet
 - [[obsidian-vault/analysis/CVPR_2024/UnScene3D_Unsupervised_3D_Instance_Segmentation_for_Indoor_Scenes.md|UnScene3D: Unsupervised 3D Instance Segmentation for Indoor Scenes (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/UnScene3D_Unsupervised_3D_Instance_Segmentation_for_Indoor_Scenes.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: UnScene3D
 	- datasets: ScanNet, S3DIS Area 5
+- [[obsidian-vault/analysis/SIGGRAPH_2024/BoostMVSNeRFs_Boosting_MVS-based_NeRFs_to_Generalizable_View_Synthesis_in_Large-scale_Scenes.md|BoostMVSNeRFs: Boosting MVS-based NeRFs to Generalizable View Synthesis in Large-scale Scenes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/BoostMVSNeRFs_Boosting_MVS_based_NeRFs_to_Generalizable_View_Synthesis_in_Large_scale_Scenes.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: BoostMVSNeRFs
+	- datasets: Free, ScanNet
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DiffCAD_Weakly-supervised_Probabilistic_CAD_Model_Retrieval_and_Alignment_From_an_RGB_Image.md|DiffCAD: Weakly-supervised Probabilistic CAD Model Retrieval and Alignment From an RGB Image (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiffCAD_Weakly_supervised_Probabilistic_CAD_Model_Retrieval_and_Alignment_From_an_RGB_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: DiffCAD
+	- datasets: Scan2CAD, ScanNet
 - [[obsidian-vault/analysis/arxiv_2025/WorldMirror_Universal_3D_World_Reconstruction_with_Any_Prior_Prompting.md|WorldMirror: Universal 3D World Reconstruction with Any-Prior Prompting (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/WorldMirror_Universal_3D_World_Reconstruction_with_Any_Prior_Prompting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -39,6 +69,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D
 	- methods: MonST3R (Motion DUSt3R)
 	- datasets: Sintel, ScanNet, Bonn
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Gradient-Weighted_Feature_Back-Projection_A_Fast_Alternative_to_Feature_Distillation_in_3D_Gaussian_Splatting.md|Gradient-Weighted Feature Back-Projection: A Fast Alternative to Feature Distillation in 3D Gaussian Splatting (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Gradient_Weighted_Feature_Back_Projection_A_Fast_Alternative_to_Feature_Distillation_in_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Gradient-Weighted Feature Back-Projection
+	- datasets: ScanNet, LERF-Mask, Latency
 - [[obsidian-vault/analysis/arxiv_2026/Depth_Completion_as_Parameter_Efficient_Test_Time_Adaptation.md|Depth Completion as Parameter-Efficient Test-Time Adaptation (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/Depth_Completion_as_Parameter_Efficient_Test_Time_Adaptation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

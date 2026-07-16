@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: LLM / Reasoning / Alignment
@@ -27,27 +27,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: DirectTracker
 	- datasets: KITTI Tracking benchmark
-- Automatic Alignment and Completion of Point Cloud Environments Using XR Data (SIGGRAPH 2022 2022)
-	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
-- Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy-_and_Computation-efficient_Holography_on_the_Edge.md|Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy_and_Computation_efficient_Holography_on_the_Edge.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
-- Rapid Face Asset Acquisition with Recurrent Feature Alignment (SIGGRAPH ASIA 2022 2022)
-	- method groups: LLM / Reasoning / Alignment
+	- methods: DPRC (Joint Neural Phase Retrieval and Compression)
+	- datasets: DIV2K-like 测试集
 - [[obsidian-vault/analysis/ICCV_2023/TMR_Text_to_Motion_Retrieval_Using_Contrastive_3D_Human_Motion_Synthesis.md|TMR: Text-to-Motion Retrieval Using Contrastive 3D Human Motion Synthesis (ICCV 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/ICCV_2023/TMR_Text_to_Motion_Retrieval_Using_Contrastive_3D_Human_Motion_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: TMR
 	- datasets: HumanML3D, KIT-ML
-- Eventfulness for Interactive Video Alignment (SIGGRAPH 2023 2023)
-	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
-- Commonsense Knowledge-Driven Joint Reasoning Approach for Object Retrieval in Virtual Reality (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Commonsense_Knowledge-Driven_Joint_Reasoning_Approach_for_Object_Retrieval_in_Virtual_Reality.md|Commonsense Knowledge-Driven Joint Reasoning Approach for Object Retrieval in Virtual Reality (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Commonsense_Knowledge_Driven_Joint_Reasoning_Approach_for_Object_Retrieval_in_Virtual_Reality.pdf|PDF]]
-	- method groups: LLM / Reasoning / Alignment
-- ProSpect: Prompt Spectrum for Attribute-Aware Personalization of Diffusion Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute_Aware_Personalization_of_Diffusion_Models.pdf|PDF]]
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: LLM / Reasoning / Alignment, Benchmark / Evaluation
+	- methods: Commonsense Knowledge-Driven Joint Reasoning Approach (IntelligentGrasp)
+	- datasets: Evaluation 1 user study
 - [[obsidian-vault/analysis/TMLR_2023/Bridging_the_Sim2Real_gap_with_CARE_Supervised_Detection_Adaptation_with_Conditional_Alignment_and_Reweighting.md|Bridging the Sim2Real gap with CARE: Supervised Detection Adaptation with Conditional Alignment and Reweighting (TMLR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/TMLR_2023/Bridging_the_Sim2Real_gap_with_CARE_Supervised_Detection_Adaptation_with_Conditional_Alignment_and_Reweighting.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer
@@ -107,36 +104,46 @@ generated: 2026-06-24T20:47
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: UniMTS
-- Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells (SIGGRAPH 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
-- DiffCAD: Weakly-supervised Probabilistic CAD Model Retrieval and Alignment From an RGB Image (SIGGRAPH 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Alignment_Conditions_for_NURBS-based_Design_of_Mixed_Tension-compression_Grid_Shells.md|Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Alignment_Conditions_for_NURBS_based_Design_of_Mixed_Tension_compression_Grid_Shells.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: NURBS-based form-finding with alignment conditions
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.md|Iterative Motion Editing with Natural Language (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.pdf|PDF]]
 	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
 	- methods: MEO-based Iterative Motion Editing System
 	- datasets: User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Modelling_a_Feather_as_a_Strongly_Anisotropic_Elastic_Shell.md|Modelling a Feather as a Strongly Anisotropic Elastic Shell (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Modelling_a_Feather_as_a_Strongly_Anisotropic_Elastic_Shell.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, LLM / Reasoning / Alignment
+	- methods: Strongly Anisotropic Elastic Shell Model with Mesh Alignment and Inextensibility Constraint
 - [[obsidian-vault/analysis/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.md|WalkTheDog: Cross-Morphology Motion Alignment via Phase Manifolds (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.pdf|PDF]]
 	- topics: Motion Alignment, Phase Manifold, Vector Quantization, Character Animation
 	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
 	- methods: VQ-PAE, shared amplitude codebook, phase manifold
 	- datasets: Dog, Human-Locomotion, MOCHA-Clown
-- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.md|Autonomous Character-Scene Interaction Synthesis from Text Instruction (SIGGRAPH ASIA 2024 2024)]]
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf|PDF]]
-	- topics: Vision / Multimodal / Applications
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LLM-enhanced_Scene_Graph_Learning_for_Household_Rearrangement.md|LLM-enhanced Scene Graph Learning for Household Rearrangement (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LLM_enhanced_Scene_Graph_Learning_for_Household_Rearrangement.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: LLM增强的场景图学习（Affordance-Enhanced Graph, AEG）
+	- datasets: TidyBot benchmark, 上下文导向数据集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/ParSEL_Parameterized_Shape_Editing_with_Language.md|ParSEL: Parameterized Shape Editing with Language (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/ParSEL_Parameterized_Shape_Editing_with_Language.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
-	- methods: Proposed autonomous HSI synthesis method
-	- datasets: Interactive motion synthesis, Locomotion in cluttered scenes, Object reaching
-- LLM-enhanced Scene Graph Learning for Household Rearrangement (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Graph / Geometric / Structured Data
-- PALP: Prompt Aligned Personalization of Text-to-Image Models (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- SGEdit: Bridging LLM with Text2Image Generative Model for Scene Graph-based Image Editing (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- UFO Instruction Graphs Are Machine Knittable (SIGGRAPH ASIA 2024 2024)
+	- methods: ParSEL
+	- datasets: CoMPaT3D++ 知觉研究, PartNet 专家注释
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/UFO_Instruction_Graphs_Are_Machine_Knittable.md|UFO Instruction Graphs Are Machine Knittable (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/UFO_Instruction_Graphs_Are_Machine_Knittable.pdf|PDF]]
+	- topics: Graphics Fabrication Design
 	- method groups: LLM / Reasoning / Alignment
+	- methods: Instruction Graphs (UFO Properties and Compiler)
+	- datasets: Interlock sheet with stockinette pocket, Two-color striped tube with twist, Infinity scarf
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.md|LINGO Autonomous Character Scene Interaction Synthesis from Text Instruction (SIGGRAPH_ASIA_2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -167,6 +174,12 @@ generated: 2026-06-24T20:47
 	- method groups: LLM / Reasoning / Alignment
 	- methods: ReMoGPT
 	- datasets: HumanML3D, Motion-X
+- [[obsidian-vault/analysis/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.md|Auto-Connect: Connectivity-Preserving RigFormer with Direct Preference Optimization (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Auto-Connect_Connectivity-Preserving_RigFormer_with_Direct_Preference_Optimization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: LLM / Reasoning / Alignment, Optimization / Theory
+	- methods: Auto-Connect (RigFormer + DPO post-training + Geodesic-aware module)
+	- datasets: Art-XL2.0 & ModelsResource, Art-XL2.0
 - [[obsidian-vault/analysis/arxiv_2025/DanceChat_Large_Language_Model_Guided_Music_to_Dance_Generation.md|DanceChat: Large Language Model-Guided Music-to-Dance Generation (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/DanceChat_Large_Language_Model_Guided_Music_to_Dance_Generation.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -322,14 +335,50 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: HMVLM (Human Motion-Vision-Language Model)
 	- datasets: MT-Bench, HumanML3D, Human3.6M + 3DPW
+- [[obsidian-vault/analysis/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.md|Mesh-RFT: Enhancing Mesh Generation via Fine-grained Reinforcement Fine-Tuning (NeurIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- methods: Mesh-RFT
+	- datasets: 全局 DPO, Artist meshes 测试集, Dense meshes 测试集
 - [[obsidian-vault/analysis/NEURIPS_2025/SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization.md|SoPo Text to Motion Generation Using Semi Online Preference Optimization (NEURIPS 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: Semi-Online Preference Optimization (SoPo)
 	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Automatic_Interpretation_of_Ancient_Egyptian_Texts_for_Education_and_Research.md|Automatic Interpretation of Ancient Egyptian Texts for Education and Research (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Automatic_Interpretation_of_Ancient_Egyptian_Texts_for_Education_and_Research.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, LLM / Reasoning / Alignment
+	- methods: Hieroglyphic Interpretation Pipeline
+	- datasets: Custom TLA-derived detection dataset, Custom TLA classification dataset, TLA test set
 - Text-based Animatable 3D Avatars with Morphable Model Alignment (SIGGRAPH 2025 2025)
 	- method groups: LLM / Reasoning / Alignment, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/High-Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.md|High-Fidelity Dynamic Portrait Animation via Direct Preference Optimization and Temporal Motion Modulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/High_Fidelity_Dynamic_Portrait_Animation_via_Direct_Preference_Optimization_and_Temporal_Motion_Modulation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: Hallo4 (DPO-enhanced portrait animation framework)
+	- datasets: Celeb-V, HDTF, EMTD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/How_Does_a_Virtual_Agent_Decide_Where_to_Look_Symbolic_Cognitive_Reasoning_for_Embodied_Head_Rotation.md|How Does a Virtual Agent Decide Where to Look? Symbolic Cognitive Reasoning for Embodied Head Rotation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/How_Does_a_Virtual_Agent_Decide_Where_to_Look_Symbolic_Cognitive_Reasoning_for_Embodied_Head_Rotation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
+	- methods: SCORE (Symbolic COgnitive Reasoning for Embodied Head Rotation)
+	- datasets: Bus, Café, Crossing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/LLM-Primitives_Large_Language_Model_for_3D_Reconstruction_with_Primitives.md|LLM-Primitives: Large Language Model for 3D Reconstruction with Primitives (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/LLM_Primitives_Large_Language_Model_for_3D_Reconstruction_with_Primitives.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: LLM-Primitives
+	- datasets: ShapeNet, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Procedural_Scene_Programs_for_Open-Universe_Scene_Generation_LLM-Free_Error_Correction_via_Program_Search.md|Procedural Scene Programs for Open-Universe Scene Generation: LLM-Free Error Correction via Program Search (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Procedural_Scene_Programs_for_Open_Universe_Scene_Generation_LLM_Free_Error_Correction_via_Program_Search.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
+	- methods: Procedural Scene Programs with PSDL and Program Search Error Correction
+	- datasets: 按物体数量分组子集 vs. Holodeck
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.md|Social Agent: Mastering Dyadic Nonverbal Behavior Generation via Conversational LLM Agents (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
@@ -365,6 +414,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: ZOMG (Zero-Shot Open-Vocabulary Motion Grounding)
 	- datasets: HumanML3D, KIT-ML, BABEL
+- [[obsidian-vault/analysis/arxiv_2026/CamReasoner_Reinforcing_Camera_Movement_Understanding_via_Structured_Spatial_Reasoning.md|CamReasoner: Reinforcing Camera Movement Understanding via Structured Spatial Reasoning (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/CamReasoner_Reinforcing_Camera_Movement_Understanding_via_Structured_Spatial_Reasoning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: CamReasoner
+	- datasets: CameraBench
 - [[obsidian-vault/analysis/arxiv_2026/MaxSim_Fine_grained_Motion_Retrieval_via_Joint_Angle_Motion_Images_and_Token_Patch_Late_Interaction.md|MaxSim: Fine-grained Motion Retrieval via Joint-Angle Motion Images and Token-Patch Late Interaction (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/MaxSim_Fine_grained_Motion_Retrieval_via_Joint_Angle_Motion_Images_and_Token_Patch_Late_Interaction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -389,6 +444,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: UniMo
 	- datasets: HumanML3D
+- [[obsidian-vault/analysis/arxiv_2026/VERTIGO_Visual_Preference_Optimization_for_Cinematic_Camera_Trajectory_Generation.md|VERTIGO: Visual Preference Optimization for Cinematic Camera Trajectory Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/VERTIGO_Visual_Preference_Optimization_for_Cinematic_Camera_Trajectory_Generation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
+	- methods: VERTIGO
+	- datasets: Unity-rendered trajectories, User study on Unity rendering, User study on Wan 2.2 VACE video-to-video transfer
 - [[obsidian-vault/analysis/CVPR_2026/phi_DPO_Fairness_Direct_Preference_Optimization_Approach_to_Continual_Learning_in_Large_Multimodal_Models.md|$\phi$-DPO: Fairness Direct Preference Optimization Approach to Continual Learning in Large Multimodal Models (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/phi_DPO_Fairness_Direct_Preference_Optimization_Approach_to_Continual_Learning_in_Large_Multimodal_Models.pdf|PDF]]
 	- topics: Other / Unclear

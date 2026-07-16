@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Graph / Geometric / Structured Data
@@ -51,11 +51,24 @@ generated: 2026-06-24T20:47
 	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
 	- methods: GWA（Geometric-Wave Acoustic混合仿真与数据集生成流程）
 	- datasets: AMI corpus, VOICES corpus
-- Node Graph Optimization Using Differentiable Proxies (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
-- Rewriting Geometric Rules of a GAN (SIGGRAPH 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rewriting_Geometric_Rules_of_a_GAN.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Graph / Geometric / Structured Data
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_Soccer_Juggling_Skills_With_Layer-wise_Mixture_of_Experts.md|Learning Soccer Juggling Skills With Layer-wise Mixture of Experts (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_Soccer_Juggling_Skills_With_Layer_wise_Mixture_of_Experts.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: Control Graph Driven Layer-wise MOE Policy
+	- datasets: Multi-skill juggling with transitions, Robustness against external forces, Training time
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Spelunking_the_Deep_Guaranteed_Queries_on_General_Neural_Implicit_Surfaces_via_Range_Analysis.md|Spelunking the Deep: Guaranteed Queries on General Neural Implicit Surfaces via Range Analysis (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Spelunking_the_Deep_Guaranteed_Queries_on_General_Neural_Implicit_Surfaces_via_Range_Analysis.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Range Analysis-Based Geometric Queries for Neural Implicit Surfaces
+	- datasets: Ray casting on general neural implicit surface, Mesh extraction, Surface sampling
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Robust_and_Efficient_Structure-from-Motion_Method_for_Ambiguous_Large-Scale_Indoor_Scene.md|Robust and Efficient Structure-from-Motion Method for Ambiguous Large-Scale Indoor Scene (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Robust_and_Efficient_Structure_from_Motion_Method_for_Ambiguous_Large_Scale_Indoor_Scene.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: Proposed Method (IMU-guided Sequence Graph Expansion)
+	- datasets: Scene Department_Building, Scene Library
 - [[obsidian-vault/analysis/CVPR_2023/G_MSM_Unsupervised_Multi_Shape_Matching_with_Graph_based_Affinity_Priors.md|G-MSM: Unsupervised Multi-Shape Matching with Graph-based Affinity Priors (CVPR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2023/G_MSM_Unsupervised_Multi_Shape_Matching_with_Graph_based_Affinity_Priors.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -80,31 +93,50 @@ generated: 2026-06-24T20:47
 	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
 	- methods: Gravo MG (A Fast Geometric Multigrid Method for Curved Surfaces)
 	- datasets: Poisson 方程, 数据平滑
-- Example-based Procedural Modeling Using Graph Grammars (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ArrangementNet_Learning_Scene_Arrangements_for_Vectorized_Indoor_Scene_Modeling.md|ArrangementNet: Learning Scene Arrangements for Vectorized Indoor Scene Modeling (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ArrangementNet_Learning_Scene_Arrangements_for_Vectorized_Indoor_Scene_Modeling.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: ArrangementNet
+	- datasets: Self-collected large scenes, Floor-SP dataset, Large-scene dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Example-based_Procedural_Modeling_Using_Graph_Grammars.md|Example-based Procedural Modeling Using Graph Grammars (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Example_based_Procedural_Modeling_Using_Graph_Grammars.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
-- Geometric Optimisation via Spectral Shifting (SIGGRAPH 2023 2023)
-	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
-- Helix-free Stripes for Knit Graph Design (SIGGRAPH 2023 2023)
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: Example-based Procedural Modeling Using Graph Grammars
+	- datasets: Various 2D/3D shapes
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Helix-free_Stripes_for_Knit_Graph_Design.md|Helix-free Stripes for Knit Graph Design (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Helix_free_Stripes_for_Knit_Graph_Design.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
-- Procedural Metamaterials: A Unified Procedural Graph for Metamaterial Design (SIGGRAPH 2023 2023)
-	- method groups: Graph / Geometric / Structured Data
-- GeoLatent: A Geometric Approach to Latent Space Design for Deformable Shape Generators (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
-- Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Fabrication Design
+	- method groups: Optimization / Theory, Graph / Geometric / Structured Data
+	- methods: Helix-free Stripe Optimization Framework (S1 & S2)
+	- datasets: 多种三维网格模型
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ShapeCoder_Discovering_Abstractions_for_Visual_Programs_From_Unstructured_Primitives.md|ShapeCoder: Discovering Abstractions for Visual Programs From Unstructured Primitives (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ShapeCoder_Discovering_Abstractions_for_Visual_Programs_From_Unstructured_Primitives.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: ShapeCoder
+	- datasets: Chair, Table, Storage
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.md|Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
+	- methods: GeGnn
+	- datasets: ShapeNet, ShapeNet-A, ShapeNet-B
 - Neural Motion Graph (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Motion_Graph.pdf|PDF]]
 	- method groups: Graph / Geometric / Structured Data
-- Sparse Stress Structures from Optimal Geometric Measures (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Sparse_Stress_Structures_from_Optimal_Geometric_Measures.md|Sparse Stress Structures from Optimal Geometric Measures (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Sparse_Stress_Structures_from_Optimal_Geometric_Measures.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
-- Stable Discrete Bending by Analytic Eigensystem and Adaptive Orthotropic Geometric Stiffness (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Minimax Flow Algorithm with (p,q)-Spectral Norm Minimization
+	- datasets: Single Cable Test, Force Sheets Test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Stable_Discrete_Bending_by_Analytic_Eigensystem_and_Adaptive_Orthotropic_Geometric_Stiffness.md|Stable Discrete Bending by Analytic Eigensystem and Adaptive Orthotropic Geometric Stiffness (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Stable_Discrete_Bending_by_Analytic_Eigensystem_and_Adaptive_Orthotropic_Geometric_Stiffness.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Analytic Eigensystem Projection and Adaptive Orthotropic Geometric Stiffness (AOGS+CSA)
+	- datasets: T-shirt with different scuba fabrics, Twisting cylinder, Compressing cylinder
 - [[obsidian-vault/analysis/ECCV_2024/SPAMming_Labels_Efficient_Annotations_for_the_Trackers_of_Tomorrow.md|SPAMming Labels: Efficient Annotations for the Trackers of Tomorrow (ECCV 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/ECCV_2024/SPAMming_Labels_Efficient_Annotations_for_the_Trackers_of_Tomorrow.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -117,18 +149,36 @@ generated: 2026-06-24T20:47
 	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
 	- methods: Graph Metanetworks (GMNs)
 	- datasets: Varying CNNs, Diverse Architectures
-- Binary Opacity Grids: Capturing Fine Geometric Detail for Mesh-based View Synthesis (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Repulsive_Shells.md|Repulsive Shells (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Repulsive_Shells.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Repulsive Shells
+	- datasets: Hand interleaving interpolation, Camel through needle, Interpolation comparison
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Singular_Foliations_for_Knit_Graph_Design.md|Singular Foliations for Knit Graph Design (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Singular_Foliations_for_Knit_Graph_Design.pdf|PDF]]
+	- topics: Graphics Fabrication Design
 	- method groups: Graph / Geometric / Structured Data
-- Singular Foliations for Knit Graph Design (SIGGRAPH 2024 2024)
-	- method groups: Graph / Geometric / Structured Data
-- Curly-Cue: Geometric Methods for Highly Coiled Hair (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Curly_Cue_Geometric_Methods_for_Highly_Coiled_Hair.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
-- LLM-enhanced Scene Graph Learning for Household Rearrangement (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Graph / Geometric / Structured Data
-- SING: Stability-Incorporated Neighborhood Graph (SIGGRAPH ASIA 2024 2024)
+	- methods: Singular Foliations for Knit Graph Design
+	- datasets: 多种三维模型
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Neural_Garment_Dynamic_Super-Resolution.md|Neural Garment Dynamic Super-Resolution (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Neural_Garment_Dynamic_Super_Resolution.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: GDSR (Neural Garment Dynamic Super‑Resolution)
+	- datasets: Generalization across unseen motions, garments, and body shapes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Neural_Laplacian_Operator_for_3D_Point_Clouds.md|Neural Laplacian Operator for 3D Point Clouds (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Neural_Laplacian_Operator_for_3D_Point_Clouds.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
+	- methods: Neural Laplacian Operator (NeLo)
+	- datasets: ShapeNet test set, Real-world Kinect v2, ScanNet scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SING_Stability-Incorporated_Neighborhood_Graph.md|SING: Stability-Incorporated Neighborhood Graph (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SING_Stability_Incorporated_Neighborhood_Graph.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Graph / Geometric / Structured Data
+	- methods: SING (Stability-Incorporated Neighborhood Graph)
+	- datasets: Oldenburg road network simplification, Stipple patterns, Multi-class disk distribution
 - [[obsidian-vault/analysis/arxiv_2025/NOOUGAT_Towards_Unified_Online_and_Offline_Multi_Object_Tracking.md|NOOUGAT: Towards Unified Online and Offline Multi-Object Tracking (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/NOOUGAT_Towards_Unified_Online_and_Offline_Multi_Object_Tracking.pdf|PDF]]
 	- topics: Other / Unclear
@@ -153,15 +203,26 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Graph / Geometric / Structured Data
 	- methods: MCBLT
 	- datasets: AICity'24, WildTrack, AICity'24 仓库场景
-- Differentiable Geometric Acoustic Path Tracing using Time-Resolved Path Replay Backpropagation (SIGGRAPH 2025 2025)
-	- method groups: Graph / Geometric / Structured Data
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Differentiable_Geometric_Acoustic_Path_Tracing_using_Time-Resolved_Path_Replay_Backpropagation.md|Differentiable Geometric Acoustic Path Tracing using Time-Resolved Path Replay Backpropagation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Differentiable_Geometric_Acoustic_Path_Tracing_using_Time_Resolved_Path_Replay_Backpropagation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: AcousticPRB (基于时间分辨路径回放反向传播的可微声学路径追踪)
+	- datasets: 标准鞋盒房间, 走廊场景深度扩展性测试, 音乐厅天花板反射板角度优化
 - Geometric Contact Potential (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Geometric_Contact_Potential.pdf|PDF]]
 	- method groups: Graph / Geometric / Structured Data
-- Inverse Geometric Locomotion (SIGGRAPH 2025 2025)
-	- method groups: Graph / Geometric / Structured Data
-- Offset Geometric Contact (SIGGRAPH 2025 2025)
-	- method groups: Graph / Geometric / Structured Data
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Learning_to_Assemble_with_Alternative_Plans.md|Learning to Assemble with Alternative Plans (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Learning_to_Assemble_with_Alternative_Plans.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: 基于强化学习的拆卸策略框架（含GPU稳定模拟、课程学习与FT-GNN）
+	- datasets: Vault-62 稳定性模拟, Bottle-12 策略准确率, Bottle 物理装配偏差
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Offset_Geometric_Contact.md|Offset Geometric Contact (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Offset_Geometric_Contact.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Offset Geometric Contact (OGC)
 - [[obsidian-vault/analysis/TMLR_2025/Directed_Graph_Generation_with_Heat_Kernels.md|Directed Graph Generation with Heat Kernels (TMLR 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/TMLR_2025/Directed_Graph_Generation_with_Heat_Kernels.pdf|PDF]]
 	- topics: Generative Models / Diffusion

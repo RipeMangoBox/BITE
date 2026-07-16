@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Average
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/OmnimatteZero_Fast_Training-free_Omnimatte_with_Pre-trained_Video_Diffusion_Models.md|OmnimatteZero: Fast Training-free Omnimatte with Pre-trained Video Diffusion Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/OmnimatteZero_Fast_Training_free_Omnimatte_with_Pre_trained_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmnimatteZero
+	- datasets: Movie, Kubric, Average
 - [[obsidian-vault/analysis/CVPR_2026/ReMoRa_Multimodal_Large_Language_Model_based_on_Refined_Motion_Representation_for_Long_Video_Understanding.md|ReMoRa: Multimodal Large Language Model based on Refined Motion Representation for Long-Video Understanding (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/ReMoRa_Multimodal_Large_Language_Model_based_on_Refined_Motion_Representation_for_Long_Video_Understanding.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer

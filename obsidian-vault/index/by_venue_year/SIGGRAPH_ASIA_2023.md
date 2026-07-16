@@ -4,7 +4,7 @@ type: paper-index
 dimension: venue_year
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Venue_Year: SIGGRAPH_ASIA_2023
@@ -18,568 +18,1136 @@ generated: 2026-06-24T20:47
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/3D_B_zier_Guarding_Boundary_Conforming_Curved_Tetrahedral_Meshing.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- A Hessian-Based Field Deformer for Real-Time Topology-Aware Shape Editing (SIGGRAPH ASIA 2023 2023)
+	- methods: 3D Bézier Guarding
+	- datasets: Set A, Set B, Set C
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Hessian-Based_Field_Deformer_for_Real-Time_Topology-Aware_Shape_Editing.md|A Hessian-Based Field Deformer for Real-Time Topology-Aware Shape Editing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Hessian_Based_Field_Deformer_for_Real_Time_Topology_Aware_Shape_Editing.pdf|PDF]]
-- A Locality-based Neural Solver for Optical Motion Capture (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Hessian-Based Field Deformer
+	- datasets: Target reproduction tasks, Interactive editing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Locality-based_Neural_Solver_for_Optical_Motion_Capture.md|A Locality-based Neural Solver for Optical Motion Capture (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Locality_based_Neural_Solver_for_Optical_Motion_Capture.pdf|PDF]]
-	- method groups: Optimization / Theory
-- A Micrograin BSDF Model for the Rendering of Porous Layers (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: LocalMoCap (基于局部性的异构图神经求解器)
+	- datasets: Real dataset, Synthetic dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Micrograin_BSDF_Model_for_the_Rendering_of_Porous_Layers.md|A Micrograin BSDF Model for the Rendering of Porous Layers (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Micrograin_BSDF_Model_for_the_Rendering_of_Porous_Layers.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
+	- methods: Micrograin BSDF Model
+	- datasets: NDF形状验证, GAF遮蔽项
 - A Neural Implicit Representation for the Image Stack: Depth, All in Focus, and High Dynamic Range (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Neural_Implicit_Representation_for_the_Image_Stack_Depth_All_in_Focus_and_High_Dynamic_Range.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
-- A Neural Space-Time Representation for Text-to-Image Personalization (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Neural_Space-Time_Representation_for_Text-to-Image_Personalization.md|A Neural Space-Time Representation for Text-to-Image Personalization (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Neural_Space_Time_Representation_for_Text_to_Image_Personalization.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- A Parametric Kinetic Solver for Simulating Boundary-Dominated Turbulent Flow Phenomena (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: NeTI (Neural Textual Inversion)
+	- datasets: User Study, Reconstruction-Editability Tradeoff, Disk Usage per Concept
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary-Dominated_Turbulent_Flow_Phenomena.md|A Parametric Kinetic Solver for Simulating Boundary-Dominated Turbulent Flow Phenomena (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Parametric_Kinetic_Solver_for_Simulating_Boundary_Dominated_Turbulent_Flow_Phenomena.pdf|PDF]]
-	- method groups: Optimization / Theory
-- A Physically-inspired Approach to the Simulation of Plant Wilting (SIGGRAPH ASIA 2023 2023)
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Optimization / Theory
+	- methods: Parametric Kinetic Boundary Treatment Model
+	- datasets: 球体绕流, Notchback车背压力分布, 球体绕流阻力危机预测
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Physically-inspired_Approach_to_the_Simulation_of_Plant_Wilting.md|A Physically-inspired Approach to the Simulation of Plant Wilting (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Physically_inspired_Approach_to_the_Simulation_of_Plant_Wilting.pdf|PDF]]
-- ACE: Adversarial Correspondence Embedding for Cross Morphology Motion Retargeting from Human to Nonhuman Characters (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Physically-inspired Water Diffusion Model for Plant Wilting Simulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ACE_Adversarial_Correspondence_Embedding_for_Cross_Morphology_Motion_Retargeting_from_Human_to_Nonhuman_Characters.md|ACE: Adversarial Correspondence Embedding for Cross Morphology Motion Retargeting from Human to Nonhuman Characters (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ACE_Adversarial_Correspondence_Embedding_for_Cross_Morphology_Motion_Retargeting_from_Human_to_Nonhuman_Characters.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Adversarial Correspondence Embedding (ACE)
+	- datasets: Spot robot retargeting, User study
 - ActRay: Online Active Ray Sampling for Radiance Fields (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ActRay_Online_Active_Ray_Sampling_for_Radiance_Fields.pdf|PDF]]
-- Adaptive Recurrent Frame Prediction with Learnable Motion Vectors (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Recurrent_Frame_Prediction_with_Learnable_Motion_Vectors.md|Adaptive Recurrent Frame Prediction with Learnable Motion Vectors (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Recurrent_Frame_Prediction_with_Learnable_Motion_Vectors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: FSNet (Feature Streaming Network)
+	- datasets: Five rendered scenes, WestTown scene
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md|Adaptive Shells for Efficient Neural Radiance Field Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: Adaptive Shells
 	- datasets: Shelly, DTU
-- Adaptive Tracking of a Single-Rigid-Body Character in Various Environments (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Tracking_of_a_Single-Rigid-Body_Character_in_Various_Environments.md|Adaptive Tracking of a Single-Rigid-Body Character in Various Environments (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Tracking_of_a_Single_Rigid_Body_Character_in_Various_Environments.pdf|PDF]]
-- Amortizing Samples in Physics-Based Inverse Rendering using ReSTIR (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Adaptive Single-Rigid-Body Tracking (Ours)
+	- datasets: 样本效率
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Amortizing_Samples_in_Physics-Based_Inverse_Rendering_using_ReSTIR.md|Amortizing Samples in Physics-Based Inverse Rendering using ReSTIR (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Amortizing_Samples_in_Physics_Based_Inverse_Rendering_using_ReSTIR.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- An Adaptive Fast-Multipole-Accelerated Hybrid Boundary Integral Equation Method for Accurate Diffusion Curves (SIGGRAPH ASIA 2023 2023)
+	- methods: ReSTIR-based spatiotemporal reuse for differentiable direct illumination
+	- datasets: 动态场景可微渲染, 逆渲染重建
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Adaptive_Fast-Multipole-Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.md|An Adaptive Fast-Multipole-Accelerated Hybrid Boundary Integral Equation Method for Accurate Diffusion Curves (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Adaptive_Fast_Multipole_Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- An Architecture and Implementation of Real-Time Sound Propagation Hardware for Mobile Devices (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Architecture_and_Implementation_of_Real-Time_Sound_Propagation_Hardware_for_Mobile_Devices.md|An Architecture and Implementation of Real-Time Sound Propagation Hardware for Mobile Devices (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Architecture_and_Implementation_of_Real_Time_Sound_Propagation_Hardware_for_Mobile_Devices.pdf|PDF]]
-- An Implicit Physical Face Model Driven by Expression and Style (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Sound Propagation Unit (SPU)
+	- datasets: Sibenik, ASIC Evaluation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Implicit_Physical_Face_Model_Driven_by_Expression_and_Style.md|An Implicit Physical Face Model Driven by Expression and Style (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicit_Physical_Face_Model_Driven_by_Expression_and_Style.pdf|PDF]]
-- An Implicitly Stable Mixture Model for Dynamic Multi-fluid Simulations (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Implicit Physical Face Model Driven by Expression and Style
+	- datasets: Test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi-fluid_Simulations.md|An Implicitly Stable Mixture Model for Dynamic Multi-fluid Simulations (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Implicitly_Stable_Mixture_Model_for_Dynamic_Multi_fluid_Simulations.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Implicit Mixture Model (隐式稳定混合模型)
+	- datasets: Collide scene, Rotate scene, Two-phase separation
 - An Unified $\lambda$-subdivision Scheme for Quadrilateral Meshes with Optimal Curvature Performance in Extraordinary Regions (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Unified_lambda_subdivision_Scheme_for_Quadrilateral_Meshes_with_Optimal_Curvature_Performance_in_Extraordinary_Regions.pdf|PDF]]
-- Analysis and Synthesis of Digital Dyadic Sequences (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Analysis_and_Synthesis_of_Digital_Dyadic_Sequences.md|Analysis and Synthesis of Digital Dyadic Sequences (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Analysis_and_Synthesis_of_Digital_Dyadic_Sequences.pdf|PDF]]
-- Animating Street View (SIGGRAPH ASIA 2023 2023)
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: ξ-sequences (self-similar dyadic sequences) 与数字二元网转序列算法
+	- datasets: Star Discrepancy
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Animating_Street_View.md|Animating Street View (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Animating_Street_View.pdf|PDF]]
-- AniPortraitGAN: Animatable 3D Portrait Generation from 2D Image Collections (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Procedural Modeling
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/AniPortraitGAN_Animatable_3D_Portrait_Generation_from_2D_Image_Collections.md|AniPortraitGAN: Animatable 3D Portrait Generation from 2D Image Collections (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/AniPortraitGAN_Animatable_3D_Portrait_Generation_from_2D_Image_Collections.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Anti-Aliased Neural Implicit Surfaces with Encoding Level of Detail (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AniPortraitGAN
+	- datasets: SHHQ-HS face 2562, SHHQ-HS full 5122
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Anti-Aliased_Neural_Implicit_Surfaces_with_Encoding_Level_of_Detail.md|Anti-Aliased Neural Implicit Surfaces with Encoding Level of Detail (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Anti_Aliased_Neural_Implicit_Surfaces_with_Encoding_Level_of_Detail.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 - Anything to Glyph: Artistic Font Synthesis via Text-to-Image Diffusion Model (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Anything_to_Glyph_Artistic_Font_Synthesis_via_Text_to_Image_Diffusion_Model.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- ART-Owen Scrambling (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ART-Owen_Scrambling.md|ART-Owen Scrambling (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ART_Owen_Scrambling.pdf|PDF]]
-- AvatarStudio: Text-driven Editing of 3D Dynamic Human Head Avatars (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ART-Owen Scrambling
+	- datasets: Rendering scene Fig. 1 on NVIDIA 4090 RTX, Gaussian integration, Adaptive sampling test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/AvatarStudio_Text-driven_Editing_of_3D_Dynamic_Human_Head_Avatars.md|AvatarStudio: Text-driven Editing of 3D Dynamic Human Head Avatars (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/AvatarStudio_Text_driven_Editing_of_3D_Dynamic_Human_Head_Avatars.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- BakedAvatar: Baking Neural Fields for Real-Time Head Avatar Synthesis (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: AvatarStudio
+	- datasets: User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/BakedAvatar_Baking_Neural_Fields_for_Real-Time_Head_Avatar_Synthesis.md|BakedAvatar: Baking Neural Fields for Real-Time Head Avatar Synthesis (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/BakedAvatar_Baking_Neural_Fields_for_Real_Time_Head_Avatar_Synthesis.pdf|PDF]]
-- Break-A-Scene: Extracting Multiple Concepts from a Single Image (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: BakedAvatar
+	- datasets: Self-Reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Break-A-Scene_Extracting_Multiple_Concepts_from_a_Single_Image.md|Break-A-Scene: Extracting Multiple Concepts from a Single Image (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Break_A_Scene_Extracting_Multiple_Concepts_from_a_Single_Image.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Break-A-Scene
+	- datasets: Automatic evaluation dataset
 - Bézier Spline Simplification Using Locally Integrated Error Metrics (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/B_zier_Spline_Simplification_Using_Locally_Integrated_Error_Metrics.pdf|PDF]]
-- C-shells: Deployable Gridshells with Curved Beams (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/C-shells_Deployable_Gridshells_with_Curved_Beams.md|C-shells: Deployable Gridshells with Curved Beams (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/C_shells_Deployable_Gridshells_with_Curved_Beams.pdf|PDF]]
-- CamP: Camera Preconditioning for Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: C-shells
+	- datasets: Dome, Hexagon, Circular Boundary
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/CamP_Camera_Preconditioning_for_Neural_Radiance_Fields.md|CamP: Camera Preconditioning for Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/CamP_Camera_Preconditioning_for_Neural_Radiance_Fields.pdf|PDF]]
-- Capturing Animation-Ready Isotropic Materials Using Systematic Poking (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Camera Preconditioning (CamP)
+	- datasets: Mip-NeRF 360, Perturbed Mip-NeRF 360, Perturbed NeRF Synthetic
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Capturing_Animation-Ready_Isotropic_Materials_Using_Systematic_Poking.md|Capturing Animation-Ready Isotropic Materials Using Systematic Poking (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Capturing_Animation_Ready_Isotropic_Materials_Using_Systematic_Poking.pdf|PDF]]
-- CLIPXPlore: Coupled CLIP and Shape Spaces for 3D Shape Exploration (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Generalized Neo-Hookean Material with Systematic Poking Optimization
+	- datasets: Soma Foama 15 material, Synthetic material recovery, Material stability tests
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/CLIPXPlore_Coupled_CLIP_and_Shape_Spaces_for_3D_Shape_Exploration.md|CLIPXPlore: Coupled CLIP and Shape Spaces for 3D Shape Exploration (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/CLIPXPlore_Coupled_CLIP_and_Shape_Spaces_for_3D_Shape_Exploration.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: CLIPXPlore
+	- datasets: Binary-attribute-guided, Text-guided, Sketch-guided
 - Close the Design-to-Manufacturing Gap in Computational Optics with a ’Real2Sim’ Learned Two-Photon Neural Lithography Simulator (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Close_the_Design_to_Manufacturing_Gap_in_Computational_Optics_with_a_Real2Sim_Learned_Two_Photon_Neural_Lithography_Simulator.pdf|PDF]]
-- ClothCombo: Modeling Inter-Cloth Interaction for Draping Multi-Layered Clothes (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ClothCombo_Modeling_Inter-Cloth_Interaction_for_Draping_Multi-Layered_Clothes.md|ClothCombo: Modeling Inter-Cloth Interaction for Draping Multi-Layered Clothes (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ClothCombo_Modeling_Inter_Cloth_Interaction_for_Draping_Multi_Layered_Clothes.pdf|PDF]]
-- Collapsing Embedded Cell Complexes for Safer Hexahedral Meshing (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Collapsing_Embedded_Cell_Complexes_for_Safer_Hexahedral_Meshing.md|Collapsing Embedded Cell Complexes for Safer Hexahedral Meshing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Collapsing_Embedded_Cell_Complexes_for_Safer_Hexahedral_Meshing.pdf|PDF]]
-- Commonsense Knowledge-Driven Joint Reasoning Approach for Object Retrieval in Virtual Reality (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Collapsing Embedded Cell Complexes (嵌入胞腔复形坍缩与分块映射)
+	- datasets: 三个数据集共129个含零元素的模型, 第三数据集110个非平凡模型, 第三数据集非平凡实例
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Commonsense_Knowledge-Driven_Joint_Reasoning_Approach_for_Object_Retrieval_in_Virtual_Reality.md|Commonsense Knowledge-Driven Joint Reasoning Approach for Object Retrieval in Virtual Reality (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Commonsense_Knowledge_Driven_Joint_Reasoning_Approach_for_Object_Retrieval_in_Virtual_Reality.pdf|PDF]]
-	- method groups: LLM / Reasoning / Alignment
-- Compact Neural Graphic Primitives with Learned Hash Probing (SIGGRAPH ASIA 2023 2023)
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: LLM / Reasoning / Alignment, Benchmark / Evaluation
+	- methods: Commonsense Knowledge-Driven Joint Reasoning Approach (IntelligentGrasp)
+	- datasets: Evaluation 1 user study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Compact_Neural_Graphic_Primitives_with_Learned_Hash_Probing.md|Compact Neural Graphic Primitives with Learned Hash Probing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Compact_Neural_Graphic_Primitives_with_Learned_Hash_Probing.pdf|PDF]]
+	- topics: Other / Unclear
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Compact_Neural_Graphics_Primitives_with_Learned_Hash_Probing.md|Compact Neural Graphics Primitives with Learned Hash Probing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Compact_Neural_Graphics_Primitives_with_Learned_Hash_Probing.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: Compact NGP
 	- datasets: NeRF Synthetic Dataset, Kodak Image Dataset, Pluto 8000×8000 Image
-- Computational Design of Flexible Planar Microstructures (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Computational_Design_of_Flexible_Planar_Microstructures.md|Computational Design of Flexible Planar Microstructures (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Computational_Design_of_Flexible_Planar_Microstructures.pdf|PDF]]
-- Computational Design of LEGO Sketch Art (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Adaptive interpolation-accelerated nonlinear homogenization and parametric shape optimization for finite-strain metamaterial design
+	- datasets: Catalog of isotropic Hooke's laws, Same catalog, with collision penalty
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Computational_Design_of_LEGO_Sketch_Art.md|Computational Design of LEGO Sketch Art (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Computational_Design_of_LEGO_Sketch_Art.pdf|PDF]]
-- Computational Design of Wiring Layout on Tight Suits with Minimal Motion Resistance (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: LEGO Sketch Generation via Graph Optimization
+	- datasets: Guitar, Apple, Running human
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Computational_Design_of_Wiring_Layout_on_Tight_Suits_with_Minimal_Motion_Resistance.md|Computational Design of Wiring Layout on Tight Suits with Minimal Motion Resistance (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Computational_Design_of_Wiring_Layout_on_Tight_Suits_with_Minimal_Motion_Resistance.pdf|PDF]]
-- Concept Decomposition for Visual Exploration and Inspiration (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Deformation-weighted Steiner Tree Wiring Optimization
+	- datasets: Tesla Suit Motion Capture 配置, Xsens 配置, Tesla Haptic Feedback 配置
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Concept_Decomposition_for_Visual_Exploration_and_Inspiration.md|Concept Decomposition for Visual Exploration and Inspiration (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Concept_Decomposition_for_Visual_Exploration_and_Inspiration.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
-- Conditional Resampled Importance Sampling and ReSTIR (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Concept Decomposition via Binary Tree
+	- datasets: Same 13 concepts, Human consistency preference, Aspect recognition perceptual study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Conditional_Resampled_Importance_Sampling_and_ReSTIR.md|Conditional Resampled Importance Sampling and ReSTIR (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Conditional_Resampled_Importance_Sampling_and_ReSTIR.pdf|PDF]]
-- Constrained Delaunay Tetrahedrization: A Robust and Practical Approach (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Conditional Resampled Importance Sampling (CRIS) with Suffix ReSTIR
+	- datasets: Veach Ajar, Tower Bridge
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Constrained_Delaunay_Tetrahedrization_A_Robust_and_Practical_Approach.md|Constrained Delaunay Tetrahedrization: A Robust and Practical Approach (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Constrained_Delaunay_Tetrahedrization_A_Robust_and_Practical_Approach.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: SteinerCDT (indirect floating-point CDT algorithm)
+	- datasets: Thingi10k
 - Constructive Solid Geometry on Neural Signed Distance Fields (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Constructive_Solid_Geometry_on_Neural_Signed_Distance_Fields.pdf|PDF]]
-- Content-based Search for Deep Generative Models (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Content-based_Search_for_Deep_Generative_Models.md|Content-based Search for Deep Generative Models (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Content_based_Search_for_Deep_Generative_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- Controllable Group Choreography using Contrastive Diffusion (SIGGRAPH ASIA 2023 2023)
+	- methods: 概率检索与对比特征适配的模型检索框架
+	- datasets: Internet Model Zoo, Runtime
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.md|Controllable Group Choreography using Contrastive Diffusion (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Group Contrastive Diffusion (GCD)
+	- datasets: AIOZ-GDance
 - Curl Noise Jittering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Curl_Noise_Jittering.pdf|PDF]]
-- C·ASE: Learning Conditional Adversarial Skill Embeddings for Physics-based Characters (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/CASE_Learning_Conditional_Adversarial_Skill_Embeddings_for_Physics-based_Characters.md|C·ASE: Learning Conditional Adversarial Skill Embeddings for Physics-based Characters (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/C_ASE_Learning_Conditional_Adversarial_Skill_Embeddings_for_Physics_based_Characters.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- Decaf: Monocular Deformation Capture for Face and Hand Interactions (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: C·ASE
+	- datasets: Sword&Shield
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Decaf_Monocular_Deformation_Capture_for_Face_and_Hand_Interactions.md|Decaf: Monocular Deformation Capture for Face and Hand Interactions (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Decaf_Monocular_Deformation_Capture_for_Face_and_Hand_Interactions.pdf|PDF]]
+	- topics: Graphics Animation Interaction
+	- method groups: Other Method Family
+	- methods: Decaf
 - DeepBasis: Hand-Held Single-Image SVBRDF Capture via Two-Level Basis Material Model (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DeepBasis_Hand_Held_Single_Image_SVBRDF_Capture_via_Two_Level_Basis_Material_Model.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D
-- Depolarized Holography with Polarization-multiplexing Metasurface (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Depolarized_Holography_with_Polarization-multiplexing_Metasurface.md|Depolarized Holography with Polarization-multiplexing Metasurface (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Depolarized_Holography_with_Polarization_multiplexing_Metasurface.pdf|PDF]]
-- Developable Quad Meshes and Contact Element Nets (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Developable_Quad_Meshes_and_Contact_Element_Nets.md|Developable Quad Meshes and Contact Element Nets (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Developable_Quad_Meshes_and_Contact_Element_Nets.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: 基于接触元素网的可展四边形网格优化方法
 - Differentiable Dynamic Visible-Light Tomography (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Differentiable_Dynamic_Visible_Light_Tomography.pdf|PDF]]
-- Differentiable Rendering of Parametric Geometry (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Differentiable_Rendering_of_Parametric_Geometry.md|Differentiable Rendering of Parametric Geometry (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Differentiable_Rendering_of_Parametric_Geometry.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- DiffFR: Differentiable SPH-based Fluid-Rigid Coupling for Rigid Body Control (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DiffFR_Differentiable_SPH_based_Fluid_Rigid_Coupling_for_Rigid_Body_Control.pdf|PDF]]
-- Diffusing Colors: Image Colorization with Text Guided Diffusion (SIGGRAPH ASIA 2023 2023)
+	- methods: Differentiable Tessellation-based Rendering for Parametric Surfaces and Curves
+	- datasets: ABC dataset multi-view reconstruction, Height field reconstruction, Runtime comparison for Bézier curve derivatives
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DiffFR_Differentiable_SPH-based_Fluid-Rigid_Coupling_for_Rigid_Body_Control.md|DiffFR: Differentiable SPH-based Fluid-Rigid Coupling for Rigid Body Control (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DiffFR_Differentiable_SPH-based_Fluid-Rigid_Coupling_for_Rigid_Body_Control.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: DiffFR (Differentiable SPH-based Two-way Fluid-Rigid Coupling Simulator)
+	- datasets: Water Bottle Flip, Stone Skipping, Water Rafting
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusing_Colors_Image_Colorization_with_Text_Guided_Diffusion.md|Diffusing Colors: Image Colorization with Text Guided Diffusion (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusing_Colors_Image_Colorization_with_Text_Guided_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Diffusion Posterior Illumination for Ambiguity-aware Inverse Rendering (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Cold-Diffusion Model (LCDM)
+	- datasets: User Study, ImageNet 10k, COCO-Stuff 5k
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusion_Posterior_Illumination_for_Ambiguity-aware_Inverse_Rendering.md|Diffusion Posterior Illumination for Ambiguity-aware Inverse Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_Posterior_Illumination_for_Ambiguity_aware_Inverse_Rendering.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Diffusion-based Holistic Texture Rectification and Synthesis (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion Posterior Illumination
+	- datasets: Synthetic indoor scenes, Synthetic outdoor scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusion-based_Holistic_Texture_Rectification_and_Synthesis.md|Diffusion-based Holistic Texture Rectification and Synthesis (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_based_Holistic_Texture_Rectification_and_Synthesis.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Discontinuity-Aware 2D Neural Fields (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Occlusion-aware Latent Diffusion Model for Texture Rectification
+	- datasets: Synthetic test dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Discontinuity-Aware_2D_Neural_Fields.md|Discontinuity-Aware 2D Neural Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Discontinuity_Aware_2D_Neural_Fields.pdf|PDF]]
-- Discovering Fatigued Movements for Virtual Character Animation (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Discontinuity-Aware 2D Neural Fields
+	- datasets: 物理信息扩散曲线, Helmholtz 方程有限元解压缩
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Discovering_Fatigued_Movements_for_Virtual_Character_Animation.md|Discovering Fatigued Movements for Virtual Character Animation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Discovering_Fatigued_Movements_for_Virtual_Character_Animation.pdf|PDF]]
-- Domain-Agnostic Tuning-Encoder for Fast Personalization of Text-To-Image Models (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Fatigue-Aware 3CC-GAIL
+	- datasets: Various athletic motions
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Domain-Agnostic_Tuning-Encoder_for_Fast_Personalization_of_Text-To-Image_Models.md|Domain-Agnostic Tuning-Encoder for Fast Personalization of Text-To-Image Models (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Domain_Agnostic_Tuning_Encoder_for_Fast_Personalization_of_Text_To_Image_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Doppler Time-of-Flight Rendering (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Domain-Agnostic Tuning-Encoder
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Doppler_Time-of-Flight_Rendering.md|Doppler Time-of-Flight Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Doppler_Time_of_Flight_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- DR-Occluder: Generating Occluders using Differentiable Rendering (SIGGRAPH ASIA 2023 2023)
+	- methods: Antithetic Time-Path Sampling for Doppler Time-of-Flight Rendering
+	- datasets: Cornell-Box场景, 完美差频模式, 不同归一化差频ω_r ∈
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DR-Occluder_Generating_Occluders_using_Differentiable_Rendering.md|DR-Occluder: Generating Occluders using Differentiable Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DR_Occluder_Generating_Occluders_using_Differentiable_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- DreamEditor: Text-Driven 3D Scene Editing with Neural Fields (SIGGRAPH ASIA 2023 2023)
+	- methods: DR-Occluder
+	- datasets: Stanford 3D Models, Thingi10K Buildings, Unreal Engine SOC
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DreamEditor_Text-Driven_3D_Scene_Editing_with_Neural_Fields.md|DreamEditor: Text-Driven 3D Scene Editing with Neural Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DreamEditor_Text_Driven_3D_Scene_Editing_with_Neural_Fields.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Drivable Avatar Clothing: Faithful Full-Body Telepresence with Dynamic Clothing Driven by Sparse RGB-D Input (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamEditor
+	- datasets: 自建场景编辑基准
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Drivable_Avatar_Clothing_Faithful_Full-Body_Telepresence_with_Dynamic_Clothing_Driven_by_Sparse_RGB-D_Input.md|Drivable Avatar Clothing: Faithful Full-Body Telepresence with Dynamic Clothing Driven by Sparse RGB-D Input (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Drivable_Avatar_Clothing_Faithful_Full_Body_Telepresence_with_Dynamic_Clothing_Driven_by_Sparse_RGB_D_Input.pdf|PDF]]
-- DROP: Dynamics Responses from Human Motion Prior and Projective Dynamics (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Drivable Avatar Clothing (N-ICP + Texel-conditioned Avatar)
+	- datasets: 捕获的宽松T恤与长裙序列
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DROP_Dynamics_Responses_from_Human_Motion_Prior_and_Projective_Dynamics.md|DROP: Dynamics Responses from Human Motion Prior and Projective Dynamics (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DROP_Dynamics_Responses_from_Human_Motion_Prior_and_Projective_Dynamics.pdf|PDF]]
-- Editing Motion Graphics Video via Motion Vectorization and Transformation (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: DROP
+	- datasets: 消融分析
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Editing_Motion_Graphics_Video_via_Motion_Vectorization_and_Transformation.md|Editing Motion Graphics Video via Motion Vectorization and Transformation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Editing_Motion_Graphics_Video_via_Motion_Vectorization_and_Transformation.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Efficient Cone Singularity Construction for Conformal Parameterizations (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Motion Vectorization Pipeline and Program Transformation API
+	- datasets: User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Cone_Singularity_Construction_for_Conformal_Parameterizations.md|Efficient Cone Singularity Construction for Conformal Parameterizations (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Cone_Singularity_Construction_for_Conformal_Parameterizations.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Systems / Efficiency / Compression
-- Efficient Graphics Representation with Differentiable Indirection (SIGGRAPH ASIA 2023 2023)
+	- methods: Moving and Adding Cones (MovingCones)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Graphics_Representation_with_Differentiable_Indirection.md|Efficient Graphics Representation with Differentiable Indirection (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Graphics_Representation_with_Differentiable_Indirection.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- topics: Graphics Rendering Materials, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Differentiable Indirection (DIn)
+	- datasets: SDF表示, Disney BRDF近似, 端到端PBR着色
 - Efficient Human Motion Reconstruction from Monocular Videos with Physical Consistency Loss (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Human_Motion_Reconstruction_from_Monocular_Videos_with_Physical_Consistency_Loss.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Hybrid Zoom using Camera Fusion on Mobile Phones (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Hybrid_Zoom_using_Camera_Fusion_on_Mobile_Phones.md|Efficient Hybrid Zoom using Camera Fusion on Mobile Phones (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Hybrid_Zoom_using_Camera_Fusion_on_Mobile_Phones.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Efficient Visualization of Light Pollution for the Night Sky (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HZSR (Hybrid Zoom Super-Resolution)
+	- datasets: CameraFusion, DRealSR, Hzsr dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Visualization_of_Light_Pollution_for_the_Night_Sky.md|Efficient Visualization of Light Pollution for the Night Sky (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Visualization_of_Light_Pollution_for_the_Night_Sky.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Ego3DPose: Capturing 3D Cues from Binocular Egocentric Views (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Ego3DPose_Capturing_3D_Cues_from_Binocular_Egocentric_Views.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Emotional Speech-Driven Animation with Content-Emotion Disentanglement (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Emotional_Speech_Driven_Animation_with_Content_Emotion_Disentanglement.pdf|PDF]]
-- EMS: 3D Eyebrow Modeling from Single-view Images (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EMS_3D_Eyebrow_Modeling_from_Single_view_Images.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Enhancing Diffusion Models with 3D Perspective Geometry Constraints (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Example-Based Sampling with Diffusion Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Example_Based_Sampling_with_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- EXIM: A Hybrid Explicit-Implicit Representation for Text-Guided 3D Shape Generation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit_Implicit_Representation_for_Text_Guided_3D_Shape_Generation.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
-- Explorable Mesh Deformation Subspaces from Unstructured 3D Generative Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Explorable_Mesh_Deformation_Subspaces_from_Unstructured_3D_Generative_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Extended Path Space Manifolds for Physically Based Differentiable Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Extended_Path_Space_Manifolds_for_Physically_Based_Differentiable_Rendering.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- ExtraSS: A Framework for Joint Spatial Super Sampling and Frame Extrapolation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ExtraSS_A_Framework_for_Joint_Spatial_Super_Sampling_and_Frame_Extrapolation.pdf|PDF]]
-- Face0: Instantaneously Conditioning a Text-to-Image Model on a Face (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text_to_Image_Model_on_a_Face.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Fast-MSX: Fast Multiple Scattering Approximation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fast_MSX_Fast_Multiple_Scattering_Approximation.pdf|PDF]]
-- FLARE: Fast Learning of Animatable and Relightable Mesh Avatars (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FLARE_Fast_Learning_of_Animatable_and_Relightable_Mesh_Avatars.pdf|PDF]]
-- Fluid Simulation on Neural Flow Maps (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fluid_Simulation_on_Neural_Flow_Maps.pdf|PDF]]
-- From Skin to Skeleton : Towards Biomechanically Accurate 3D Digital Humans (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/From_Skin_to_Skeleton_Towards_Biomechanically_Accurate_3D_Digital_Humans.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- FuseSR: Super Resolution for Real-time Rendering through Efficient Multi-resolution Fusion (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real_time_Rendering_through_Efficient_Multi_resolution_Fusion.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Fusing Monocular Images and Sparse IMU Signals for Real-time Human Motion Capture (SIGGRAPH ASIA 2023 2023)
+	- methods: 基于PCA与FFT的天空辉光快速计算方法
+	- datasets: Custom terrain with variable lighting cells, Precomputed data storage, Multiple scattering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Ego3DPose_Capturing_3D_Cues_from_Binocular_Egocentric_Views.md|Ego3DPose: Capturing 3D Cues from Binocular Egocentric Views (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Ego3DPose_Capturing_3D_Cues_from_Binocular_Egocentric_Views.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Ego3DPose
+	- datasets: UnrealEgo, EgoCap
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Emotional_Speech-Driven_Animation_with_Content-Emotion_Disentanglement.md|Emotional Speech-Driven Animation with Content-Emotion Disentanglement (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Emotional_Speech_Driven_Animation_with_Content_Emotion_Disentanglement.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EMOTE
+	- datasets: MEAD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/EMS_3D_Eyebrow_Modeling_from_Single-view_Images.md|EMS: 3D Eyebrow Modeling from Single-view Images (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EMS_3D_Eyebrow_Modeling_from_Single_view_Images.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: EMS
+	- datasets: EBStore 测试集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.md|Enhancing Diffusion Models with 3D Perspective Geometry Constraints (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Perspective Geometric Constraint for Diffusion Models
+	- datasets: KITTI
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Example-Based_Sampling_with_Diffusion_Models.md|Example-Based Sampling with Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Example_Based_Sampling_with_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Diffusion-based Example-Led Point Set Sampler (基于示例的扩散点集采样器)
+	- datasets: SOT均匀采样, 高斯函数与Heaviside函数积分
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit-Implicit_Representation_for_Text-Guided_3D_Shape_Generation.md|EXIM: A Hybrid Explicit-Implicit Representation for Text-Guided 3D Shape Generation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/EXIM_A_Hybrid_Explicit_Implicit_Representation_for_Text_Guided_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: EXIM (混合显式-隐式表征)
+	- datasets: ShapeNet
+- Explorable Mesh Deformation Subspaces from Unstructured 3D Generative Models (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Extended_Path_Space_Manifolds_for_Physically_Based_Differentiable_Rendering.md|Extended Path Space Manifolds for Physically Based Differentiable Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Extended_Path_Space_Manifolds_for_Physically_Based_Differentiable_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Extended Path Space Manifolds (EPSMs)
+	- datasets: Bathroom scene, Shadow scene, CornellBox scene
+- ExtraSS: A Framework for Joint Spatial Super Sampling and Frame Extrapolation (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text-to-Image_Model_on_a_Face.md|Face0: Instantaneously Conditioning a Text-to-Image Model on a Face (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text_to_Image_Model_on_a_Face.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Face0
+	- datasets: Synthetic faces, LFW
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Fast-MSX_Fast_Multiple_Scattering_Approximation.md|Fast-MSX: Fast Multiple Scattering Approximation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fast_MSX_Fast_Multiple_Scattering_Approximation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Fast-MSX
+	- datasets: Shaderball场景 + 环境贴图 在 Mitsuba 0.6 中渲染
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/FLARE_Fast_Learning_of_Animatable_and_Relightable_Mesh_Avatars.md|FLARE: Fast Learning of Animatable and Relightable Mesh Avatars (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FLARE_Fast_Learning_of_Animatable_and_Relightable_Mesh_Avatars.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Graphics Animation Interaction
+	- method groups: Vision / Multimodal / 3D
+	- methods: FLARE
+	- datasets: Real Data, Synthetic Data
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Fluid_Simulation_on_Neural_Flow_Maps.md|Fluid Simulation on Neural Flow Maps (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fluid_Simulation_on_Neural_Flow_Maps.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Neural Flow Maps (NFM)
+	- datasets: Average Wall Time per Step
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/From_Skin_to_Skeleton_Towards_Biomechanically_Accurate_3D_Digital_Humans.md|From Skin to Skeleton : Towards Biomechanically Accurate 3D Digital Humans (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/From_Skin_to_Skeleton_Towards_Biomechanically_Accurate_3D_Digital_Humans.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: SKEL
+	- datasets: DFAUST, AMASS subsets, DFAUST mesh fitting
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real-time_Rendering_through_Efficient_Multi-resolution_Fusion.md|FuseSR: Super Resolution for Real-time Rendering through Efficient Multi-resolution Fusion (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real_time_Rendering_through_Efficient_Multi_resolution_Fusion.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FuseSR
+	- datasets: Kite scene, Showdown scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Fusing_Monocular_Images_and_Sparse_IMU_Signals_for_Real-time_Human_Motion_Capture.md|Fusing Monocular Images and Sparse IMU Signals for Real-time Human Motion Capture (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Fusing_Monocular_Images_and_Sparse_IMU_Signals_for_Real_time_Human_Motion_Capture.pdf|PDF]]
-- GANeRF: Leveraging Discriminators to Optimize Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RobustCap
+	- datasets: TotalCapture, AIST++
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GANeRF_Leveraging_Discriminators_to_Optimize_Neural_Radiance_Fields.md|GANeRF: Leveraging Discriminators to Optimize Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GANeRF_Leveraging_Discriminators_to_Optimize_Neural_Radiance_Fields.pdf|PDF]]
-- GARM-LS: A Gradient-Augmented Reference-Map Method for Level-Set Fluid Simulation (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GANeRF
+	- datasets: ScanNet++, Tanks and Temples
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GARM-LS_A_Gradient-Augmented_Reference-Map_Method_for_Level-Set_Fluid_Simulation.md|GARM-LS: A Gradient-Augmented Reference-Map Method for Level-Set Fluid Simulation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GARM_LS_A_Gradient_Augmented_Reference_Map_Method_for_Level_Set_Fluid_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Optimization / Theory
-- GarmentCode: Programming Parametric Sewing Patterns (SIGGRAPH ASIA 2023 2023)
+	- methods: GARM-LS
+	- datasets: Zalesak’s disk, Distorted circle, LeVeque’s sphere
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GarmentCode_Programming_Parametric_Sewing_Patterns.md|GarmentCode: Programming Parametric Sewing Patterns (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GarmentCode_Programming_Parametric_Sewing_Patterns.pdf|PDF]]
-- GeoLatent: A Geometric Approach to Latent Space Design for Deformable Shape Generators (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
-- GroomGen: A High-Quality Generative Hair Model Using Hierarchical Latent Representations (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroomGen_A_High_Quality_Generative_Hair_Model_Using_Hierarchical_Latent_Representations.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- GroundLink: A Dataset Unifying Human Body Movement and Ground Reaction Dynamics (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroundLink_A_Dataset_Unifying_Human_Body_Movement_and_Ground_Reaction_Dynamics.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation
-- Hand Pose Estimation with Mems-Ultrasonic Sensors (SIGGRAPH ASIA 2023 2023)
+	- methods: GarmentCode
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.md|GeoLatent: A Geometric Approach to Latent Space Design for Deformable Shape Generators (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GeoLatent
+	- datasets: Human, Animal, User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GroomGen_A_High-Quality_Generative_Hair_Model_Using_Hierarchical_Latent_Representations.md|GroomGen: A High-Quality Generative Hair Model Using Hierarchical Latent Representations (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroomGen_A_High_Quality_Generative_Hair_Model_Using_Hierarchical_Latent_Representations.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: GroomGen
+	- datasets: Volumetric occupancy, Hair-head penetration rate, Strand reconstruction
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GroundLink_A_Dataset_Unifying_Human_Body_Movement_and_Ground_Reaction_Dynamics.md|GroundLink: A Dataset Unifying Human Body Movement and Ground Reaction Dynamics (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroundLink_A_Dataset_Unifying_Human_Body_Movement_and_Ground_Reaction_Dynamics.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: GroundLinkNet
+	- datasets: GroundLink 测试集, GroundLink 留一交叉验证
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Hand_Pose_Estimation_with_Mems-Ultrasonic_Sensors.md|Hand Pose Estimation with Mems-Ultrasonic Sensors (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Hand_Pose_Estimation_with_Mems_Ultrasonic_Sensors.pdf|PDF]]
-- High Density Ratio Multi-fluid Simulation with Peridynamics (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: UltraGlove
+	- datasets: Mechanical Hand, Real Hand, Sensor Localization Accuracy
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/High_Density_Ratio_Multi-fluid_Simulation_with_Peridynamics.md|High Density Ratio Multi-fluid Simulation with Peridynamics (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/High_Density_Ratio_Multi_fluid_Simulation_with_Peridynamics.pdf|PDF]]
-- High-Fidelity and Real-Time Novel View Synthesis for Dynamic Scenes (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Peridynamic Mixture-model Fluid (PMF)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/High-Fidelity_and_Real-Time_Novel_View_Synthesis_for_Dynamic_Scenes.md|High-Fidelity and Real-Time Novel View Synthesis for Dynamic Scenes (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/High_Fidelity_and_Real_Time_Novel_View_Synthesis_for_Dynamic_Scenes.pdf|PDF]]
-- High-Order Moment-Encoded Kinetic Simulation of Turbulent Flows (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Im4D
+	- datasets: DNA-Rendering, ZJU-MoCap, NHR
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/High-Order_Moment-Encoded_Kinetic_Simulation_of_Turbulent_Flows.md|High-Order Moment-Encoded Kinetic Simulation of Turbulent Flows (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/High_Order_Moment_Encoded_Kinetic_Simulation_of_Turbulent_Flows.pdf|PDF]]
-- Holographic Near-eye Display with Real-time Embedded Rendering (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: HOME-LBM
+	- datasets: flow past a sphere, maximum grid resolution on 24 GB GPU
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Holographic_Near-eye_Display_with_Real-time_Embedded_Rendering.md|Holographic Near-eye Display with Real-time Embedded Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Holographic_Near_eye_Display_with_Real_time_Embedded_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- HyperDreamer: Hyper-Realistic 3D Content Generation and Editing from a Single Image (SIGGRAPH ASIA 2023 2023)
+	- methods: Embedded binocular color hologram synthesis with amplitude-only microdisplays and layer-based propagation
+	- datasets: 双目彩色全息图实时计算, 成像质量
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/HyperDreamer_Hyper-Realistic_3D_Content_Generation_and_Editing_from_a_Single_Image.md|HyperDreamer: Hyper-Realistic 3D Content Generation and Editing from a Single Image (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/HyperDreamer_Hyper_Realistic_3D_Content_Generation_and_Editing_from_a_Single_Image.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- IconShop: Text-Guided Vector Icon Synthesis with Autoregressive Transformers (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HyperDreamer
+	- datasets: Online 20 images, DTU dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/IconShop_Text-Guided_Vector_Icon_Synthesis_with_Autoregressive_Transformers.md|IconShop: Text-Guided Vector Icon Synthesis with Autoregressive Transformers (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/IconShop_Text_Guided_Vector_Icon_Synthesis_with_Autoregressive_Transformers.pdf|PDF]]
-- Inovis: Instant Novel-View Synthesis (SIGGRAPH ASIA 2023 2023)
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: IconShop
+	- datasets: FIGR-8-SVG, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Inovis_Instant_Novel-View_Synthesis.md|Inovis: Instant Novel-View Synthesis (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Inovis_Instant_Novel_View_Synthesis.pdf|PDF]]
-- Input-Dependent Uncorrelated Weighting for Monte Carlo Denoising (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: Inovis
+	- datasets: Redwood, Kitti-360 & Custom streaming sequences, Various
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Input-Dependent_Uncorrelated_Weighting_for_Monte_Carlo_Denoising.md|Input-Dependent Uncorrelated Weighting for Monte Carlo Denoising (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Input_Dependent_Uncorrelated_Weighting_for_Monte_Carlo_Denoising.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Interaction-Driven Active 3D Reconstruction with Object Interiors (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Input-Dependent Uncorrelated Weighting (IDUW)
+	- datasets: Multiple scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Interaction-Driven_Active_3D_Reconstruction_with_Object_Interiors.md|Interaction-Driven Active 3D Reconstruction with Object Interiors (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Interaction_Driven_Active_3D_Reconstruction_with_Object_Interiors.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Interactive Story Visualization with Multiple Characters (SIGGRAPH ASIA 2023 2023)
+	- methods: Interaction-Driven Active 3D Reconstruction
+	- datasets: PartNet-Mobility
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Interactive_Story_Visualization_with_Multiple_Characters.md|Interactive Story Visualization with Multiple Characters (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Interactive_Story_Visualization_with_Multiple_Characters.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: TaleCrafter
+	- datasets: User study with 50 participants on 9 stories
 - Intrinsic Harmonization for Illumination-Aware Image Compositing (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Intrinsic_Harmonization_for_Illumination_Aware_Image_Compositing.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D
-- Joint Sampling and Optimisation for Inverse Rendering (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.md|Joint Sampling and Optimisation for Inverse Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Joint_Sampling_and_Optimisation_for_Inverse_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- K-surfaces: Bézier-Splines Interpolating at Gaussian Curvature Extrema (SIGGRAPH ASIA 2023 2023)
+	- methods: Gradient Meta-estimation（梯度元估计）
+	- datasets: Spiral material optimisation, Exponential distribution rate parameter, Texture optimisation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/K-surfaces_Bézier-Splines_Interpolating_at_Gaussian_Curvature_Extrema.md|K-surfaces: Bézier-Splines Interpolating at Gaussian Curvature Extrema (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/K_surfaces_B_zier_Splines_Interpolating_at_Gaussian_Curvature_Extrema.pdf|PDF]]
-- Kirchhoff-Love Shells with Arbitrary Hyperelastic Materials (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: K-surface
+	- datasets: 随机生成的双二次Bézier patches测试集, 视觉对比:K-surfaces vs 固定参数Bézier样条, 全局优化性能:规则patch网格
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Kirchhoff-Love_Shells_with_Arbitrary_Hyperelastic_Materials.md|Kirchhoff-Love Shells with Arbitrary Hyperelastic Materials (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Kirchhoff_Love_Shells_with_Arbitrary_Hyperelastic_Materials.pdf|PDF]]
-- Learning based 2D Irregular Shape Packing (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Kirchhoff-Love Thin-Shell with Arbitrary Hyperelastic Materials
+	- datasets: Convergence to analytical ground truth, Out-of-plane ribbon deformation, In-plane stretching
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_based_2D_Irregular_Shape_Packing.md|Learning based 2D Irregular Shape Packing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_based_2D_Irregular_Shape_Packing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Learning-Assisted Hierarchical Super-Patch Packing (Ours)
+	- datasets: General test set
 - Learning Contact Deformations with General Collider Descriptors (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_Contact_Deformations_with_General_Collider_Descriptors.pdf|PDF]]
-- Learning Gradient Fields for Scalable and Generalizable Irregular Packing (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.md|Learning Gradient Fields for Scalable and Generalizable Irregular Packing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.pdf|PDF]]
-	- method groups: Optimization / Theory
-- Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: 基于分数扩散模型的梯度场学习排样方法（Score-based Diffusion Packing）
+	- datasets: Garment dataset, Dental dataset, Scalability test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.md|Learning the Geodesic Embedding with Graph Neural Networks (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_the_Geodesic_Embedding_with_Graph_Neural_Networks.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Graph / Geometric / Structured Data
-- LiCROM: Linear-Subspace Continuous Reduced Order Modeling with Neural Fields (SIGGRAPH ASIA 2023 2023)
+	- methods: GeGnn
+	- datasets: ShapeNet, ShapeNet-A, ShapeNet-B
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/LiCROM_Linear-Subspace_Continuous_Reduced_Order_Modeling_with_Neural_Fields.md|LiCROM: Linear-Subspace Continuous Reduced Order Modeling with Neural Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/LiCROM_Linear_Subspace_Continuous_Reduced_Order_Modeling_with_Neural_Fields.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: LiCROM
+	- datasets: 不同形状弹性体压缩, 渐进切割
 - Light-Efficient Holographic Illumination for Continuous-Wave Time-of-Flight Imaging (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Light_Efficient_Holographic_Illumination_for_Continuous_Wave_Time_of_Flight_Imaging.pdf|PDF]]
 	- method groups: Systems / Efficiency / Compression
 - LitNeRF: Intrinsic Radiance Decomposition for High-Quality View Synthesis and Relighting of Faces (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/LitNeRF_Intrinsic_Radiance_Decomposition_for_High_Quality_View_Synthesis_and_Relighting_of_Faces.pdf|PDF]]
-- LiveNVS: Neural View Synthesis on Live RGB-D Streams (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/LiveNVS_Neural_View_Synthesis_on_Live_RGB-D_Streams.md|LiveNVS: Neural View Synthesis on Live RGB-D Streams (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/LiveNVS_Neural_View_Synthesis_on_Live_RGB_D_Streams.pdf|PDF]]
-- Locally-Adaptive Level-of-Detail for Hardware-Accelerated Ray Tracing (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: LiveNVS
+	- datasets: SCANNET, Live RGB-D Stream
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Locally-Adaptive_Level-of-Detail_for_Hardware-Accelerated_Ray_Tracing.md|Locally-Adaptive Level-of-Detail for Hardware-Accelerated Ray Tracing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Locally_Adaptive_Level_of_Detail_for_Hardware_Accelerated_Ray_Tracing.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
+	- method groups: Other Method Family
+	- methods: Locally-Adaptive Level-of-Detail for Hardware-Accelerated Ray Tracing
+	- datasets: Terrain / Cloth / Teapot scenes, Cloth model primary rays, Cloth model secondary rays
 - Lock-free Vertex Clustering for Multicore Mesh Reduction (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Lock_free_Vertex_Clustering_for_Multicore_Mesh_Reduction.pdf|PDF]]
-- Low-Light Image Enhancement with Wavelet-based Diffusion Models (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Low-Light_Image_Enhancement_with_Wavelet-based_Diffusion_Models.md|Low-Light Image Enhancement with Wavelet-based Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Low_Light_Image_Enhancement_with_Wavelet_based_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Manifold Path Guiding for Importance Sampling Specular Chains (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiffLL
+	- datasets: LOLv1 test set, UHD-LL test set, Unpaired datasets
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Manifold_Path_Guiding_for_Importance_Sampling_Specular_Chains.md|Manifold Path Guiding for Importance Sampling Specular Chains (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Manifold_Path_Guiding_for_Importance_Sampling_Specular_Chains.pdf|PDF]]
-- MatFusion: A Generative Diffusion Model for SVBRDF Capture (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Manifold Path Guiding
+	- datasets: Various scenes with long specular chains, Flower scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MatFusion_A_Generative_Diffusion_Model_for_SVBRDF_Capture.md|MatFusion: A Generative Diffusion Model for SVBRDF Capture (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MatFusion_A_Generative_Diffusion_Model_for_SVBRDF_Capture.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MatFusion
+	- datasets: 合成SVBRDF测试集
 - MCNeRF: Monte Carlo Rendering and Denoising for Real-Time NeRFs (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MCNeRF_Monte_Carlo_Rendering_and_Denoising_for_Real_Time_NeRFs.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Meshes with Spherical Faces (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Meshes_with_Spherical_Faces.md|Meshes with Spherical Faces (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Meshes_with_Spherical_Faces.pdf|PDF]]
-- MetaLayer: A Meta-learned BSDF Model for Layered Materials (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Sphere Meshes (球形面网格优化与生成方法)
+	- datasets: Visual smoothness, Intersection angle distribution, Support structure existence
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MetaLayer_A_Meta-learned_BSDF_Model_for_Layered_Materials.md|MetaLayer: A Meta-learned BSDF Model for Layered Materials (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MetaLayer_A_Meta_learned_BSDF_Model_for_Layered_Materials.pdf|PDF]]
-- Metric Optimization in Penner Coordinates (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: MetaLayer
+	- datasets: LayeredBRDF test set, Shoe scene, Dragon scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.md|Metric Optimization in Penner Coordinates (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Metric_Optimization_in_Penner_Coordinates.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
 	- method groups: Benchmark / Evaluation, Optimization / Theory
-- MIPS-Fusion: Multi-Implicit-Submaps for Scalable and Robust Online Neural RGB-D Reconstruction (SIGGRAPH ASIA 2023 2023)
+	- methods: Penner Coordinate Metric Optimization
+	- datasets: Myles et al. 2014 完整数据集及其变体
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MIPS-Fusion_Multi-Implicit-Submaps_for_Scalable_and_Robust_Online_Neural_RGB-D_Reconstruction.md|MIPS-Fusion: Multi-Implicit-Submaps for Scalable and Robust Online Neural RGB-D Reconstruction (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MIPS_Fusion_Multi_Implicit_Submaps_for_Scalable_and_Robust_Online_Neural_RGB_D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
-- MOCHA: Real-Time Motion Characterization via Context Matching (SIGGRAPH ASIA 2023 2023)
+	- methods: MIPS-Fusion
+	- datasets: ScanNet, Replica, FastCaMo-Synth
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MOCHA_Real-Time_Motion_Characterization_via_Context_Matching.md|MOCHA: Real-Time Motion Characterization via Context Matching (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MOCHA_Real_Time_Motion_Characterization_via_Context_Matching.pdf|PDF]]
-- Multi-color Holograms Improve Brightness in Holographic Displays (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MOCHA
+	- datasets: MOCHA dataset, Adult2child dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Multi-color_Holograms_Improve_Brightness_in_Holographic_Displays.md|Multi-color Holograms Improve Brightness in Holographic Displays (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multi_color_Holograms_Improve_Brightness_in_Holographic_Displays.pdf|PDF]]
-- Multiple-bounce Smith Microfacet BRDFs using the Invariance Principle (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: 多色全息图驱动方案 (Multi-color Hologram Driving Scheme)
+	- datasets: AR Glasses scene, Fruit lady scene, Dog scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Multiple-bounce_Smith_Microfacet_BRDFs_using_the_Invariance_Principle.md|Multiple-bounce Smith Microfacet BRDFs using the Invariance Principle (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multiple_bounce_Smith_Microfacet_BRDFs_using_the_Invariance_Principle.pdf|PDF]]
-- Multisource Holography (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: Multiple-bounce Smith Microfacet BRDF using the Invariance Principle
+	- datasets: DecorativeSet scene, Matpreview scene, Vase scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Multisource_Holography.md|Multisource Holography (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Multisource_Holography.pdf|PDF]]
-- MuscleVAE: Model-Based Controllers of Muscle-Actuated Characters (SIGGRAPH ASIA 2023 2023)
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Multisource Holography
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MuscleVAE_Model-Based_Controllers_of_Muscle-Actuated_Characters.md|MuscleVAE: Model-Based Controllers of Muscle-Actuated Characters (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MuscleVAE_Model_Based_Controllers_of_Muscle_Actuated_Characters.pdf|PDF]]
-- MyStyle++: A Controllable Personalized Generative Prior (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: MuscleVAE
+	- datasets: LaFAN locomotion dataset, custom arm-holding task
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MyStyle_A_Controllable_Personalized_Generative_Prior.md|MyStyle++: A Controllable Personalized Generative Prior (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MyStyle_A_Controllable_Personalized_Generative_Prior.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MyStyle++
+	- datasets: Controlled Synthesis, Scarlett Johansson 身份与多样性, Real Image Editing
 - Neural Cache for Monte Carlo Partial Differential Equation Solver (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Cache_for_Monte_Carlo_Partial_Differential_Equation_Solver.pdf|PDF]]
 	- method groups: Optimization / Theory
-- Neural Categorical Priors for Physics-Based Character Control (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Categorical_Priors_for_Physics-Based_Character_Control.md|Neural Categorical Priors for Physics-Based Character Control (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Categorical_Priors_for_Physics_Based_Character_Control.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Neural Categorical Priors (NCP)
+	- datasets: Sword & Shield motion dataset, Sword & Shield Strike task, Two-player boxing game
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.md|Neural Collision Fields for Triangle Primitives (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning
 	- methods: Neural Collision Fields (NCF)
 	- datasets: GPU triangle-pair query time, Integrated value accuracy on generated test set, Erleben contact point benchmark
-- Neural Field Convolutions by Repeated Differentiation (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Field_Convolutions_by_Repeated_Differentiation.md|Neural Field Convolutions by Repeated Differentiation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Field_Convolutions_by_Repeated_Differentiation.pdf|PDF]]
-- Neural Gradient Learning and Optimization for Oriented Point Normal Estimation (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Neural Field Convolutions by Repeated Differentiation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.md|Neural Gradient Learning and Optimization for Oriented Point Normal Estimation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Gradient_Learning_and_Optimization_for_Oriented_Point_Normal_Estimation.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Optimization / Theory
-- Neural Metamaterial Networks for Nonlinear Material Design (SIGGRAPH ASIA 2023 2023)
+	- methods: NGLO (Neural Gradient Learning and Optimization)
+	- datasets: PCPNet, FamousShape, Sparse point clouds
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Metamaterial_Networks_for_Nonlinear_Material_Design.md|Neural Metamaterial Networks for Nonlinear Material Design (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Metamaterial_Networks_for_Nonlinear_Material_Design.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: Neural Metamaterial Networks (NMN)
+	- datasets: Isohedral tiling家族测试集
 - Neural Motion Graph (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Motion_Graph.pdf|PDF]]
 	- method groups: Graph / Geometric / Structured Data
-- Neural Packing: from Visual Sensing to Reinforcement Learning (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Packing_from_Visual_Sensing_to_Reinforcement_Learning.md|Neural Packing: from Visual Sensing to Reinforcement Learning (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Packing_from_Visual_Sensing_to_Reinforcement_Learning.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
-- Neural Point-based Volumetric Avatar: Surface-guided Neural Points for Efficient and Photorealistic Volumetric Head Avatar (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: TAP-Net++
+	- datasets: Single container, PPSG input, 随意堆叠部分观测场景
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Point-based_Volumetric_Avatar_Surface-guided_Neural_Points_for_Efficient_and_Photorealistic_Volumetric_Head_Avatar.md|Neural Point-based Volumetric Avatar: Surface-guided Neural Points for Efficient and Photorealistic Volumetric Head Avatar (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Point_based_Volumetric_Avatar_Surface_guided_Neural_Points_for_Efficient_and_Photorealistic_Volumetric_Head_Avatar.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Neural Spectro-polarimetric Fields (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: NPVA (Neural Point-based Volumetric Avatar)
+	- datasets: Multiface, Single-frame fitting, Ablation on lightweight decoding
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Spectro-polarimetric_Fields.md|Neural Spectro-polarimetric Fields (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Spectro_polarimetric_Fields.pdf|PDF]]
-- Neural Stochastic Poisson Surface Reconstruction (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Graphics Physical Simulation, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: Neural Spectro-polarimetric Fields (NeSpoF)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Stochastic_Poisson_Surface_Reconstruction.md|Neural Stochastic Poisson Surface Reconstruction (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Stochastic_Poisson_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Neural Stress Fields for Reduced-order Elastoplasticity and Fracture (SIGGRAPH ASIA 2023 2023)
+	- methods: Neural Stochastic Screened Poisson Reconstruction
+	- datasets: Next-view selection quality
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Stress_Fields_for_Reduced-order_Elastoplasticity_and_Fracture.md|Neural Stress Fields for Reduced-order Elastoplasticity and Fracture (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Stress_Fields_for_Reduced_order_Elastoplasticity_and_Fracture.pdf|PDF]]
-- Neural-Singular-Hessian: Implicit Neural Representation of Unoriented Point Clouds by Enforcing Singular Hessian (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Neural Stress Fields (NSF)
+	- datasets: Cake cutting, Bread tearing, Sand column collapse
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural-Singular-Hessian_Implicit_Neural_Representation_of_Unoriented_Point_Clouds_by_Enforcing_Singular_Hessian.md|Neural-Singular-Hessian: Implicit Neural Representation of Unoriented Point Clouds by Enforcing Singular Hessian (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Singular_Hessian_Implicit_Neural_Representation_of_Unoriented_Point_Clouds_by_Enforcing_Singular_Hessian.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer
+	- methods: Neural-Singular-Hessian
+	- datasets: DFAUST, ABC & Thingi10K
 - NodeGit: Diffing and Merging Node Graphs (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/NodeGit_Diffing_and_Merging_Node_Graphs.pdf|PDF]]
-- Non-Newtonian ViRheometry via Similarity Analysis (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Non-Newtonian_ViRheometry_via_Similarity_Analysis.md|Non-Newtonian ViRheometry via Similarity Analysis (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Non_Newtonian_ViRheometry_via_Similarity_Analysis.pdf|PDF]]
-- Nonlinear Ray Tracing for Displacement and Shell Mapping (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Nonlinear_Ray_Tracing_for_Displacement_and_Shell_Mapping.pdf|PDF]]
-- Object Motion Guided Human Motion Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Object_Motion_Guided_Human_Motion_Synthesis.pdf|PDF]]
-- Online Scene CAD Recomposition via Autonomous Scanning (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.pdf|PDF]]
-- OpenSVBRDF: A Database of Measured Spatially-Varying Reflectance (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/OpenSVBRDF_A_Database_of_Measured_Spatially_Varying_Reflectance.pdf|PDF]]
-- Optimal Design of Robotic Character Kinematics (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Optimal_Design_of_Robotic_Character_Kinematics.pdf|PDF]]
-- Perceptual error optimization for Monte Carlo animation rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Optimization / Theory
-- Perceptual Requirements for World-Locked Rendering in AR and VR (SIGGRAPH ASIA 2023 2023)
+	- methods: Video-based Herschel-Bulkley parameter estimation with similarity-aware multi-setup optimization (ViRheometry)
+- Nonlinear Ray Tracing for Displacement and Shell Mapping (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Object_Motion_Guided_Human_Motion_Synthesis.md|Object Motion Guided Human Motion Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Object_Motion_Guided_Human_Motion_Synthesis.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: OMOMO (Object MOtion guided Human MOtion synthesis)
+	- datasets: Custom Dataset - Contact F1, Human Perceptual Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.md|Online Scene CAD Recomposition via Autonomous Scanning (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Online_Scene_CAD_Recomposition_via_Autonomous_Scanning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: RelCAD+RelNBV (关系引导在线CAD重组框架)
+	- datasets: ScanNet
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/OpenSVBRDF_A_Database_of_Measured_Spatially-Varying_Reflectance.md|OpenSVBRDF: A Database of Measured Spatially-Varying Reflectance (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/OpenSVBRDF_A_Database_of_Measured_Spatially_Varying_Reflectance.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: OpenSVBRDF integrated acquisition system
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Optimal_Design_of_Robotic_Character_Kinematics.md|Optimal Design of Robotic Character Kinematics (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Optimal_Design_of_Robotic_Character_Kinematics.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Optimal Kinematic Design via Dynamic Programming
+	- datasets: Kickbot 人形机器人, Legs 腿机构, Bear 熊机器人
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.md|Perceptual error optimization for Monte Carlo animation rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Spatio-temporal perceptual error optimization via sliced optimal transport
+	- datasets: Chopper scene TAA, vs Wolfe et al.
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Perceptual_Requirements_for_World-Locked_Rendering_in_AR_and_VR.md|Perceptual Requirements for World-Locked Rendering in AR and VR (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_Requirements_for_World_Locked_Rendering_in_AR_and_VR.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
+	- methods: WLR-capable Testbed with Custom Bite Bar and Rotating Chin Rest
+	- datasets: Near Display AR Tracking Error, Near Display AR Fit Error, Near Display VR Tracking Error
 - Perceptually Adaptive Real-Time Tone Mapping (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptually_Adaptive_Real_Time_Tone_Mapping.pdf|PDF]]
 - Pose and Skeleton-aware Neural IK for Pose and Motion Editing (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Pose_and_Skeleton_aware_Neural_IK_for_Pose_and_Motion_Editing.pdf|PDF]]
-- Power Plastics: A Hybrid Lagrangian/Eulerian Solver for Mesoscale Inelastic Flows (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Power_Plastics_A_Hybrid_LagrangianEulerian_Solver_for_Mesoscale_Inelastic_Flows.md|Power Plastics: A Hybrid Lagrangian/Eulerian Solver for Mesoscale Inelastic Flows (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Power_Plastics_A_Hybrid_Lagrangian_Eulerian_Solver_for_Mesoscale_Inelastic_Flows.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: Power Plastics
+	- datasets: 冲洗气泡, 沙子柱坍塌, 瑞利-泰勒不稳定性
 - Progressive Shell Quasistatics for Unstructured Meshes (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Progressive_Shell_Quasistatics_for_Unstructured_Meshes.pdf|PDF]]
-- Projective Sampling for Differentiable Rendering of Geometry (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Projective_Sampling_for_Differentiable_Rendering_of_Geometry.md|Projective Sampling for Differentiable Rendering of Geometry (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Projective_Sampling_for_Differentiable_Rendering_of_Geometry.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- ProSpect: Prompt Spectrum for Attribute-Aware Personalization of Diffusion Models (SIGGRAPH ASIA 2023 2023)
+	- methods: Projective Sampling (投影采样)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute-Aware_Personalization_of_Diffusion_Models.md|ProSpect: Prompt Spectrum for Attribute-Aware Personalization of Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute_Aware_Personalization_of_Diffusion_Models.pdf|PDF]]
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- PSDR-Room: Single Photo to Scene using Differentiable Rendering (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ProSpect (Prompt Spectrum)
+	- datasets: Material-aware image generation, Style-aware image generation, Content-aware image generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/PSDR-Room_Single_Photo_to_Scene_using_Differentiable_Rendering.md|PSDR-Room: Single Photo to Scene using Differentiable Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/PSDR_Room_Single_Photo_to_Scene_using_Differentiable_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Quantum Ray Marching for Reformulating Light Transport Simulation (SIGGRAPH ASIA 2023 2023)
+	- methods: PSDR-Room
+	- datasets: Real indoor photos, Rendering optimization performance
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Quantum_Ray_Marching_for_Reformulating_Light_Transport_Simulation.md|Quantum Ray Marching for Reformulating Light Transport Simulation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Quantum_Ray_Marching_for_Reformulating_Light_Transport_Simulation.pdf|PDF]]
-- Reach For the Spheres: Tangency-aware surface reconstruction of SDFs (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Quantum Ray Marching (Quantum Light Transport Simulation)
+	- datasets: Modified Cornell box / 3D test scene
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Reach_For_the_Spheres_Tangency-aware_surface_reconstruction_of_SDFs.md|Reach For the Spheres: Tangency-aware surface reconstruction of SDFs (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Reach_For_the_Spheres_Tangency_aware_surface_reconstruction_of_SDFs.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Real-time Height-field Simulation of Sand and Water Mixtures (SIGGRAPH ASIA 2023 2023)
+	- methods: Reach For the Spheres (球体接触流)
+	- datasets: mushroom, nefertiti
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Real-time_Height-field_Simulation_of_Sand_and_Water_Mixtures.md|Real-time Height-field Simulation of Sand and Water Mixtures (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Real_time_Height_field_Simulation_of_Sand_and_Water_Mixtures.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Real-time Height-field Simulation of Sand and Water Mixtures
+	- datasets: Castle scene, Letters scene, Real-time GPU performance
 - Reconstructing Close Human Interaction from Multiple Views (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Reconstructing_Close_Human_Interaction_from_Multiple_Views.pdf|PDF]]
-- Reconstruction of Machine-Made Shapes from Bitmap Sketches (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Reconstruction_of_Machine-Made_Shapes_from_Bitmap_Sketches.md|Reconstruction of Machine-Made Shapes from Bitmap Sketches (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Reconstruction_of_Machine_Made_Shapes_from_Bitmap_Sketches.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Rectifying Strip Patterns (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Primitive-based Joint 3D Sketch Reconstruction
+	- datasets: Custom sketch dataset, Perceptual user study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Rectifying_Strip_Patterns.md|Rectifying Strip Patterns (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Rectifying_Strip_Patterns.pdf|PDF]]
-- ReparamCAD: Zero-shot CAD Re-Parameterization for Interactive Manipulation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ReparamCAD_Zero_shot_CAD_Re_Parameterization_for_Interactive_Manipulation.pdf|PDF]]
-- Repurposing Diffusion Inpainters for Novel View Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Rerender A Video: Zero-Shot Text-Guided Video-to-Video Translation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Rerender_A_Video_Zero_Shot_Text_Guided_Video_to_Video_Translation.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- ReShader: View-Dependent Highlights for Single Image View-Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ReShader_View_Dependent_Highlights_for_Single_Image_View_Synthesis.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- RMIP: Displacement ray tracing via inversion and oblong bounding (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/RMIP_Displacement_ray_tracing_via_inversion_and_oblong_bounding.pdf|PDF]]
-- Robust Zero Level-Set Extraction from Unsigned Distance Fields Based on Double Covering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Robust_Zero_Level_Set_Extraction_from_Unsigned_Distance_Fields_Based_on_Double_Covering.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- RT-Octree: Accelerate PlenOctree Rendering with Batched Regular Tracking and Neural Denoising for Real-time Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/RT_Octree_Accelerate_PlenOctree_Rendering_with_Batched_Regular_Tracking_and_Neural_Denoising_for_Real_time_Neural_Radiance_Fields.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- SAILOR: Synergizing Radiance and Occupancy Fields for Live Human Performance Capture (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAILOR_Synergizing_Radiance_and_Occupancy_Fields_for_Live_Human_Performance_Capture.pdf|PDF]]
-- SAME: Skeleton-Agnostic Motion Embedding for Character Animation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAME_Skeleton_Agnostic_Motion_Embedding_for_Character_Animation.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer
-- ScaNeRF: Scalable Bundle-Adjusting Neural Radiance Fields for Large-Scale Scene Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ScaNeRF_Scalable_Bundle_Adjusting_Neural_Radiance_Fields_for_Large_Scale_Scene_Rendering.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D
-- Scene-aware Activity Program Generation with Language Guidance (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Scene_aware_Activity_Program_Generation_with_Language_Guidance.pdf|PDF]]
-- SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
+	- methods: Discrete level-set optimization for rectifying strip patterns
+	- datasets: Fig. 12, Fig. 1
+- ReparamCAD: Zero-shot CAD Re-Parameterization for Interactive Manipulation (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.md|Repurposing Diffusion Inpainters for Novel View Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: iNVS
+	- datasets: Google Scanned Objects
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Rerender_A_Video_Zero-Shot_Text-Guided_Video-to-Video_Translation.md|Rerender A Video: Zero-Shot Text-Guided Video-to-Video Translation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Rerender_A_Video_Zero_Shot_Text_Guided_Video_to_Video_Translation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Rerender A Video
+	- datasets: User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ReShader_View-Dependent_Highlights_for_Single_Image_View-Synthesis.md|ReShader: View-Dependent Highlights for Single Image View-Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ReShader_View_Dependent_Highlights_for_Single_Image_View_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ReShader
+	- datasets: Veach Ajar, Bathroom, Modern Hall
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/RMIP_Displacement_ray-tracing_via_inversion_and_oblong_bounding.md|RMIP: Displacement ray tracing via inversion and oblong bounding (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/RMIP_Displacement_ray-tracing_via_inversion_and_oblong_bounding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: RMIP (Rectangular Minmax Image Pyramid) displacement ray tracing
+	- datasets: 所有测试场景, Ninja Head, Desert Tire
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Robust_Zero_Level-Set_Extraction_from_Unsigned_Distance_Fields_Based_on_Double_Covering.md|Robust Zero Level-Set Extraction from Unsigned Distance Fields Based on Double Covering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Robust_Zero_Level_Set_Extraction_from_Unsigned_Distance_Fields_Based_on_Double_Covering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: DoubleCoverUDF (DCUDF)
+	- datasets: Deep Fashion3D
+- RT-Octree: Accelerate PlenOctree Rendering with Batched Regular Tracking and Neural Denoising for Real-time Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SAILOR_Synergizing_Radiance_and_Occupancy_Fields_for_Live_Human_Performance_Capture.md|SAILOR: Synergizing Radiance and Occupancy Fields for Live Human Performance Capture (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAILOR_Synergizing_Radiance_and_Occupancy_Fields_for_Live_Human_Performance_Capture.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SAILOR
+	- datasets: THuman2.0, Our Real-captured Dataset, Real-captured
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SAME_Skeleton-Agnostic_Motion_Embedding_for_Character_Animation.md|SAME: Skeleton-Agnostic Motion Embedding for Character Animation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAME_Skeleton_Agnostic_Motion_Embedding_for_Character_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SAME (Skeleton-Agnostic Motion Embedding)
+	- datasets: CMU运动数据库分类
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ScaNeRF_Scalable_Bundle-Adjusting_Neural_Radiance_Fields_for_Large-Scale_Scene_Rendering.md|ScaNeRF: Scalable Bundle-Adjusting Neural Radiance Fields for Large-Scale Scene Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ScaNeRF_Scalable_Bundle_Adjusting_Neural_Radiance_Fields_for_Large_Scale_Scene_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ScaNeRF
+	- datasets: Coffee Shop, Community, Park
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Scene-aware_Activity_Program_Generation_with_Language_Guidance.md|Scene-aware Activity Program Generation with Language Guidance (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Scene_aware_Activity_Program_Generation_with_Language_Guidance.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Scene-aware Activity Program Generation with Language Guidance
+	- datasets: VirtualHome-Env
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.md|SeamlessNeRF: Stitching Part NeRFs with Gradient Propagation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SeamlessNeRF_Stitching_Part_NeRFs_with_Gradient_Propagation.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Optimization / Theory
+	- methods: SeamlessNeRF
+	- datasets: Objaverse, Custom scenes
 - Second-Order Finite Elements for Deformable Surfaces (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Second_Order_Finite_Elements_for_Deformable_Surfaces.pdf|PDF]]
-- Self-Calibrating, Fully Differentiable NLOS Inverse Rendering (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Self-Calibrating_Fully_Differentiable_NLOS_Inverse_Rendering.md|Self-Calibrating, Fully Differentiable NLOS Inverse Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Self_Calibrating_Fully_Differentiable_NLOS_Inverse_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 - SFLSH: Shape-Dependent Soft-Flesh Avatars (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SFLSH_Shape_Dependent_Soft_Flesh_Avatars.pdf|PDF]]
-- ShaDDR: Interactive Example-Based Geometry and Texture Generation via 3D Shape Detailization and Differentiable Rendering (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ShaDDR_Interactive_Example-Based_Geometry_and_Texture_Generation_via_3D_Shape_Detailization_and_Differentiable_Rendering.md|ShaDDR: Interactive Example-Based Geometry and Texture Generation via 3D Shape Detailization and Differentiable Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ShaDDR_Interactive_Example_Based_Geometry_and_Texture_Generation_via_3D_Shape_Detailization_and_Differentiable_Rendering.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Shadow Harmonization for Realistic Compositing (SIGGRAPH ASIA 2023 2023)
+	- methods: ShaDDR
+	- datasets: 椅子几何生成, 汽车纹理生成
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Shadow_Harmonization_for_Realistic_Compositing.md|Shadow Harmonization for Realistic Compositing (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shadow_Harmonization_for_Realistic_Compositing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Shadow Harmonization for Realistic Compositing
+	- datasets: DESOBA, ISTD
 - ShapeSonic: Sonifying Fingertip Interactions for Non-Visual Virtual Shape Perception (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ShapeSonic_Sonifying_Fingertip_Interactions_for_Non_Visual_Virtual_Shape_Perception.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D
-- Shrink & Morph: 3D-printed self-shaping shells actuated by a shape memory effect (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Shrink_Morph_3D-printed_self-shaping_shells_actuated_by_a_shape_memory_effect.md|Shrink & Morph: 3D-printed self-shaping shells actuated by a shape memory effect (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shrink_Morph_3D_printed_self_shaping_shells_actuated_by_a_shape_memory_effect.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- SimpleNeRF: Regularizing Sparse Input Neural Radiance Fields with Simpler Solutions (SIGGRAPH ASIA 2023 2023)
+	- methods: Shrink & Morph
+	- datasets: Hemisphere, Saddle, Beetle
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SimpleNeRF_Regularizing_Sparse_Input_Neural_Radiance_Fields_with_Simpler_Solutions.md|SimpleNeRF: Regularizing Sparse Input Neural Radiance Fields with Simpler Solutions (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SimpleNeRF_Regularizing_Sparse_Input_Neural_Radiance_Fields_with_Simpler_Solutions.pdf|PDF]]
-- Simultaneous Color Computer Generated Holography (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D
+	- methods: SimpleNeRF
+	- datasets: RealEstate-10K, LLFF
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Simultaneous_Color_Computer_Generated_Holography.md|Simultaneous Color Computer Generated Holography (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Simultaneous_Color_Computer_Generated_Holography.pdf|PDF]]
-- Single-Image 3D Human Digitization with Shape-guided Diffusion (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Simultaneous Color Holography Framework with Perceptual Loss and Camera-calibrated Model
+	- datasets: Simulation comparison against RGB loss, Simulation comparison against depth/bit division methods, Experimental 2D capture
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Single-Image_3D_Human_Digitization_with_Shape-guided_Diffusion.md|Single-Image 3D Human Digitization with Shape-guided Diffusion (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Single_Image_3D_Human_Digitization_with_Shape_guided_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- SinMPI: Novel View Synthesis from a Single Image with Expanded Multiplane Images (SIGGRAPH ASIA 2023 2023)
+	- methods: Shape-guided Diffusion Human Digitization
+	- datasets: THuman2.0, DeepFashion
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SinMPI_Novel_View_Synthesis_from_a_Single_Image_with_Expanded_Multiplane_Images.md|SinMPI: Novel View Synthesis from a Single Image with Expanded Multiplane Images (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SinMPI_Novel_View_Synthesis_from_a_Single_Image_with_Expanded_Multiplane_Images.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- SLANG.D: Fast, Modular and Differentiable Shader Programming (SIGGRAPH ASIA 2023 2023)
+	- methods: SinMPI
+	- datasets: LLFF, NeRF Synthetic
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SLANG.D_Fast_Modular_and_Differentiable_Shader_Programming.md|SLANG.D: Fast, Modular and Differentiable Shader Programming (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SLANG_D_Fast_Modular_and_Differentiable_Shader_Programming.pdf|PDF]]
-- Slippage-Preserving Reshaping of Human-Made 3D Content (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: SLANG.D
+	- datasets: Falcor 逆渲染, nvdiffmodeling 物理着色内核, nvdiffrec 变换内核
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Slippage-Preserving_Reshaping_of_Human-Made_3D_Content.md|Slippage-Preserving Reshaping of Human-Made 3D Content (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Slippage_Preserving_Reshaping_of_Human_Made_3D_Content.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- SOL-NeRF: Sunlight Modeling for Outdoor Scene Decomposition and Relighting (SIGGRAPH ASIA 2023 2023)
+	- methods: Slippage-Preserving Reshaping
+	- datasets: 自建多样化人造三维模型集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SOL-NeRF_Sunlight_Modeling_for_Outdoor_Scene_Decomposition_and_Relighting.md|SOL-NeRF: Sunlight Modeling for Outdoor Scene Decomposition and Relighting (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SOL_NeRF_Sunlight_Modeling_for_Outdoor_Scene_Decomposition_and_Relighting.pdf|PDF]]
-- Sparse Stress Structures from Optimal Geometric Measures (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Rendering Materials, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Vision / Multimodal / 3D
+	- methods: SOL-NeRF
+	- datasets: Synthetic dataset, OSR real dataset, Hybrid lighting approximation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Sparse_Stress_Structures_from_Optimal_Geometric_Measures.md|Sparse Stress Structures from Optimal Geometric Measures (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Sparse_Stress_Structures_from_Optimal_Geometric_Measures.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
-- Stable Discrete Bending by Analytic Eigensystem and Adaptive Orthotropic Geometric Stiffness (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Minimax Flow Algorithm with (p,q)-Spectral Norm Minimization
+	- datasets: Single Cable Test, Force Sheets Test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Stable_Discrete_Bending_by_Analytic_Eigensystem_and_Adaptive_Orthotropic_Geometric_Stiffness.md|Stable Discrete Bending by Analytic Eigensystem and Adaptive Orthotropic Geometric Stiffness (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Stable_Discrete_Bending_by_Analytic_Eigensystem_and_Adaptive_Orthotropic_Geometric_Stiffness.pdf|PDF]]
-	- method groups: Graph / Geometric / Structured Data
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Graph / Geometric / Structured Data
+	- methods: Analytic Eigensystem Projection and Adaptive Orthotropic Geometric Stiffness (AOGS+CSA)
+	- datasets: T-shirt with different scuba fabrics, Twisting cylinder, Compressing cylinder
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.md|Subspace Mixed Finite Elements for Real-Time Heterogeneous Elastodynamics (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.pdf|PDF]]
 	- topics: Optimization / Theory / Probabilistic ML
 	- method groups: Optimization / Theory
 	- methods: Subspace Mixed Finite Element Method (MFEM)
 	- datasets: Mammoth, Crab, Sword
-- Subspace-Preconditioned GPU Projective Dynamics with Contact for Cloth Simulation (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Subspace-Preconditioned_GPU_Projective_Dynamics_with_Contact_for_Cloth_Simulation.md|Subspace-Preconditioned GPU Projective Dynamics with Contact for Cloth Simulation (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Preconditioned_GPU_Projective_Dynamics_with_Contact_for_Cloth_Simulation.pdf|PDF]]
-- Text-Guided Synthesis of Eulerian Cinemagraphs (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation
+	- method groups: Other Method Family
+	- methods: Subspace-Preconditioned Projective Dynamics (SP-PD)
+	- datasets: Kick, Ribbons, Cloth on sphere
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Text-Guided_Synthesis_of_Eulerian_Cinemagraphs.md|Text-Guided Synthesis of Eulerian Cinemagraphs (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Text_Guided_Synthesis_of_Eulerian_Cinemagraphs.pdf|PDF]]
-- Text-Guided Vector Graphics Customization (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: Text2Cinemagraph
+	- datasets: Real Video Dataset, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Text-Guided_Vector_Graphics_Customization.md|Text-Guided Vector Graphics Customization (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Text_Guided_Vector_Graphics_Customization.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Text-Guided Vector Graphics Customization Pipeline
 - Texture Atlas Compression Based on Repeated Content Removal (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Texture_Atlas_Compression_Based_on_Repeated_Content_Removal.pdf|PDF]]
 	- method groups: Systems / Efficiency / Compression
 - The effect of display capabilities on the gloss consistency between real and virtual objects (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/The_effect_of_display_capabilities_on_the_gloss_consistency_between_real_and_virtual_objects.pdf|PDF]]
-- The Shortest Route Is Not Always the Fastest: Probability-Modeled Stereoscopic Eye Movement Completion Time in VR (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/The_Shortest_Route_Is_Not_Always_the_Fastest_Probability-Modeled_Stereoscopic_Eye_Movement_Completion_Time_in_VR.md|The Shortest Route Is Not Always the Fastest: Probability-Modeled Stereoscopic Eye Movement Completion Time in VR (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/The_Shortest_Route_Is_Not_Always_the_Fastest_Probability_Modeled_Stereoscopic_Eye_Movement_Completion_Time_in_VR.pdf|PDF]]
-- Thin On-Sensor Nanophotonic Array Cameras (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: 立体眼动完成时间的 ExGauss+RBF 概率预测模型
+	- datasets: 内部心理物理数据集, 四款 VR 游戏 vs 2D 基线, 户外/室内深度数据集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Thin_On-Sensor_Nanophotonic_Array_Cameras.md|Thin On-Sensor Nanophotonic Array Cameras (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Thin_On_Sensor_Nanophotonic_Array_Cameras.pdf|PDF]]
-- Topology Guaranteed B-Spline Surface/Surface Intersection (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Nanophotonic Array Camera with Probabilistic Reconstruction
+	- datasets: Synthetic Aberrated & Noisy Images, Synthetic 3×3 Array Simulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Topology_Guaranteed_B-Spline_SurfaceSurface_Intersection.md|Topology Guaranteed B-Spline Surface/Surface Intersection (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Topology_Guaranteed_B_Spline_Surface_Surface_Intersection.pdf|PDF]]
-- ToRoS: A Topology Optimization Approach for Designing Robotic Skins (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Topology guaranteed B-Spline surface intersection algorithm
+	- datasets: B-spline surface intersection, Torus-ellipsoid intersection
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ToRoS_A_Topology_Optimization_Approach_for_Designing_Robotic_Skins.md|ToRoS: A Topology Optimization Approach for Designing Robotic Skins (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ToRoS_A_Topology_Optimization_Approach_for_Designing_Robotic_Skins.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Optimization / Theory
-- Towards Garment Sewing Pattern Reconstruction from a Single Image (SIGGRAPH ASIA 2023 2023)
+	- methods: ToRoS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Towards_Garment_Sewing_Pattern_Reconstruction_from_a_Single_Image.md|Towards Garment Sewing Pattern Reconstruction from a Single Image (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Towards_Garment_Sewing_Pattern_Reconstruction_from_a_Single_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- Towards Practical Capture of High-Fidelity Relightable Avatars (SIGGRAPH ASIA 2023 2023)
+	- methods: Sewformer
+	- datasets: SewFactory test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Towards_Practical_Capture_of_High-Fidelity_Relightable_Avatars.md|Towards Practical Capture of High-Fidelity Relightable Avatars (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Towards_Practical_Capture_of_High_Fidelity_Relightable_Avatars.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: TRAvatar
+	- datasets: Multiface Dataset, Single-view portrait relighting
 - Transparent Object Reconstruction via Implicit Differentiable Refraction Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Transparent_Object_Reconstruction_via_Implicit_Differentiable_Refraction_Rendering.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D
-- TwinTex: Geometry-aware Texture Generation for Abstracted 3D Architectural Models (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/TwinTex_Geometry-aware_Texture_Generation_for_Abstracted_3D_Architectural_Models.md|TwinTex: Geometry-aware Texture Generation for Abstracted 3D Architectural Models (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/TwinTex_Geometry_aware_Texture_Generation_for_Abstracted_3D_Architectural_Models.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
-- UVDoc: Neural Grid-based Document Unwarping (SIGGRAPH ASIA 2023 2023)
+	- methods: TwinTex
+	- datasets: Center, Artsci, Library
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/UVDoc_Neural_Grid-based_Document_Unwarping.md|UVDoc: Neural Grid-based Document Unwarping (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/UVDoc_Neural_Grid_based_Document_Unwarping.pdf|PDF]]
-- Variational Barycentric Coordinates (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Variational_Barycentric_Coordinates.pdf|PDF]]
-- VASCO: Volume and Surface Co-Decomposition for Hybrid Manufacturing (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co_Decomposition_for_Hybrid_Manufacturing.pdf|PDF]]
-- VET: Visual Error Tomography for Point Cloud Completion and High-Quality Neural Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VET_Visual_Error_Tomography_for_Point_Cloud_Completion_and_High_Quality_Neural_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
+	- methods: UVDoc
+	- datasets: DocUNet, UVDoc
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Variational_Barycentric_Coordinates.md|Variational Barycentric Coordinates (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Variational_Barycentric_Coordinates.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Other Method Family
+	- methods: Variational Barycentric Coordinates (VBC)
+	- datasets: 软体物理模拟网格, 人体网格
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co-Decomposition_for_Hybrid_Manufacturing.md|VASCO: Volume and Surface Co-Decomposition for Hybrid Manufacturing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VASCO_Volume_and_Surface_Co_Decomposition_for_Hybrid_Manufacturing.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: VASCO (Volume-And-Surface Co-decomposition) with beam-guided top-down block decomposition
+	- datasets: Kitten, Four-way pipe, Impeller
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/VET_Visual_Error_Tomography_for_Point_Cloud_Completion_and_High-Quality_Neural_Rendering.md|VET: Visual Error Tomography for Point Cloud Completion and High-Quality Neural Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VET_Visual_Error_Tomography_for_Point_Cloud_Completion_and_High_Quality_Neural_Rendering.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: VET (Visual Error Tomography)
+	- datasets: Tanks&Temples, Mip-NeRF 360
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ViCMA_Visual_Control_of_Multibody_Animations.md|ViCMA: Visual Control of Multibody Animations (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ViCMA_Visual_Control_of_Multibody_Animations.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: ViCMA (Visual Control of Multibody Animations)
 	- datasets: SIGGRAPH Card Trick, Pachinko-style machine, Bunchinko
-- VMesh: Hybrid Volume-Mesh Representation for Efficient View Synthesis (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/VMesh_Hybrid_Volume-Mesh_Representation_for_Efficient_View_Synthesis.md|VMesh: Hybrid Volume-Mesh Representation for Efficient View Synthesis (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VMesh_Hybrid_Volume_Mesh_Representation_for_Efficient_View_Synthesis.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
-- VR-NeRF: High-Fidelity Virtualized Walkable Spaces (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: VMesh
+	- datasets: NeRF-Synthetic, Multi-device rendering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/VR-NeRF_High-Fidelity_Virtualized_Walkable_Spaces.md|VR-NeRF: High-Fidelity Virtualized Walkable Spaces (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VR_NeRF_High_Fidelity_Virtualized_Walkable_Spaces.pdf|PDF]]
-- Warped-Area Reparameterization of Differential Path Integrals (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Warped_Area_Reparameterization_of_Differential_Path_Integrals.pdf|PDF]]
-- What is the Best Automated Metric for Text to Motion Generation? (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/What_is_the_Best_Automated_Metric_for_Text_to_Motion_Generation.pdf|PDF]]
-	- method groups: Benchmark / Evaluation
-- Zero-Shot 3D Shape Correspondence (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Zero_Shot_3D_Shape_Correspondence.pdf|PDF]]
+	- topics: Graphics Rendering Materials
 	- method groups: Vision / Multimodal / 3D
+	- methods: VR-NeRF
+	- datasets: Eyeful Tower test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Warped-Area_Reparameterization_of_Differential_Path_Integrals.md|Warped-Area Reparameterization of Differential Path Integrals (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Warped_Area_Reparameterization_of_Differential_Path_Integrals.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Warped-Area Reparameterization of Differential Path Integrals
+	- datasets: Star-shaped area light scene, Bunny in glass 逆渲染, Chess piece shadow 逆渲染
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/What_is_the_Best_Automated_Metric_for_Text_to_Motion_Generation.md|What is the Best Automated Metric for Text to Motion Generation? (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/What_is_the_Best_Automated_Metric_for_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: MoBERT
+	- datasets: Human-annotated evaluation set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Zero-Shot_3D_Shape_Correspondence.md|Zero-Shot 3D Shape Correspondence (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Zero_Shot_3D_Shape_Correspondence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: ZSM (Zero-Shot 3D Shape Correspondence)
+	- datasets: SNIS

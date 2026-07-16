@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Agent / RL / Planning
@@ -51,70 +51,143 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning
 	- methods: 基于强化学习的直接墨水书写闭环控制器 (RL-Closed-Loop DIW Controller)
 	- datasets: Simulated printing tasks with constant deposition, Simulated printing tasks with dynamic/noisy deposition, Simulated infill printing under noise
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_Soccer_Juggling_Skills_With_Layer-wise_Mixture_of_Experts.md|Learning Soccer Juggling Skills With Layer-wise Mixture of Experts (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_Soccer_Juggling_Skills_With_Layer_wise_Mixture_of_Experts.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: Control Graph Driven Layer-wise MOE Policy
+	- datasets: Multi-skill juggling with transitions, Robustness against external forces, Training time
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_to_Get_Up.md|Learning to Get Up (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_to_Get_Up.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Three-stage reinforcement learning framework for natural get-up
+	- datasets: Get-up task, Slow get-up task, Get-up with constraints
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Physics-based_Character_Control_Using_Conditional_GAIL.md|Physics-based Character Control Using Conditional GAIL (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Physics_based_Character_Control_Using_Conditional_GAIL.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Conditional GAIL (with auxiliary classifier and dual-reward decomposition)
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/S3-Slicer_A_General_Slicing_Framework_for_Multi-Axis_3D_Printing.md|$S^3$-Slicer: A General Slicing Framework for Multi-Axis 3D Printing (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/S_3_Slicer_A_General_Slicing_Framework_for_Multi_Axis_3D_Printing.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
 	- methods: Implicit Neural Field-Based Multi-Axis Process Planning
 	- datasets: T-Bracket model, Fertility model, Fork model
-- AIP: Adversarial Interaction Priors for Multi-Agent Physics-based Character Control (SIGGRAPH ASIA 2022 2022)
-	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
-- Assemble Them All: Physics-Based Planning for Generalizable Assembly by Disassembly (SIGGRAPH ASIA 2022 2022)
-	- method groups: Agent / RL / Planning
-- Efficient Drone Exploration in Real Unknown Environments (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/AIP_Adversarial_Interaction_Priors_for_Multi-Agent_Physics-based_Character_Control.md|AIP: Adversarial Interaction Priors for Multi-Agent Physics-based Character Control (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/AIP_Adversarial_Interaction_Priors_for_Multi_Agent_Physics_based_Character_Control.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- methods: AIP (Adversarial Interaction Priors)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Assemble_Them_All_Physics-Based_Planning_for_Generalizable_Assembly_by_Disassembly.md|Assemble Them All: Physics-Based Planning for Generalizable Assembly by Disassembly (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Assemble_Them_All_Physics_Based_Planning_for_Generalizable_Assembly_by_Disassembly.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: Physics-based Assembly-by-Disassembly Planning
+	- datasets: Two-part assembly dataset, Rotational assembly dataset, Multi-part assembly dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Efficient_Drone_Exploration_in_Real_Unknown_Environments.md|Efficient Drone Exploration in Real Unknown Environments (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Drone_Exploration_in_Real_Unknown_Environments.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Agent / RL / Planning
+	- methods: Faster-TA-MSNet (within ADES)
+	- datasets: TA-MSNet dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Interactive_exploration_of_tension-compression_mixed_shells.md|Interactive exploration of tension-compression mixed shells (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Interactive_exploration_of_tension_compression_mixed_shells.pdf|PDF]]
+	- topics: Graphics Animation Interaction
 	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
-- Interactive exploration of tension-compression mixed shells (SIGGRAPH ASIA 2022 2022)
-	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
-- Learning Reconstructability for Drone Aerial Path Planning (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Learning_Reconstructability_for_Drone_Aerial_Path_Planning.md|Learning Reconstructability for Drone Aerial Path Planning (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Learning_Reconstructability_for_Drone_Aerial_Path_Planning.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning
-- Realistic Rendering Tool for Pseudo-Structural Coloring with Multi-Color Extrusion of FFF 3D Printing (SIGGRAPH ASIA 2022 2022)
+	- methods: Learned Reconstructability Predictor and Iterative View Planner
+	- datasets: School, Polytech
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Realistic_Rendering_Tool_for_Pseudo-Structural_Coloring_with_Multi-Color_Extrusion_of_FFF_3D_Printing.md|Realistic Rendering Tool for Pseudo-Structural Coloring with Multi-Color Extrusion of FFF 3D Printing (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Realistic_Rendering_Tool_for_Pseudo_Structural_Coloring_with_Multi_Color_Extrusion_of_FFF_3D_Printing.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Fabrication Design, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Houdini-based GCode Rendering Tool for Multi-Color Extrusion
 - [[obsidian-vault/analysis/CVPR_2023/Trace_and_Pace_Controllable_Pedestrian_Animation_via_Guided_Trajectory_Diffusion.md|Trace and Pace: Controllable Pedestrian Animation via Guided Trajectory Diffusion (CVPR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2023/Trace_and_Pace_Controllable_Pedestrian_Animation_via_Guided_Trajectory_Diffusion.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: TRACE and PACER
 	- datasets: ORCA-Maps, nuScenes, Flat 地形
-- A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Temporal_Coherent_Topology_Optimization_Approach_for_Assembly_Planning_of_Bespoke_Frame_Structures.md|A Temporal Coherent Topology Optimization Approach for Assembly Planning of Bespoke Frame Structures (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Temporal_Coherent_Topology_Optimization_Approach_for_Assembly_Planning_of_Bespoke_Frame_Structures.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning, Optimization / Theory
+	- methods: Temporal Coherent Topology Optimization
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.md|Acting as Inverse Inverse Planning (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Acting_as_Inverse_Inverse_Planning.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning
 	- methods: Inverse Inverse Planning
 	- datasets: Grid-world depiction task: Helping, Grid-world depiction task: Hindering, Grid-world depiction task: Indifference
-- AniFaceDrawing: Anime Portrait Exploration During Your Sketching (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/AniFaceDrawing_Anime_Portrait_Exploration_During_Your_Sketching.md|AniFaceDrawing: Anime Portrait Exploration During Your Sketching (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/AniFaceDrawing_Anime_Portrait_Exploration_During_Your_Sketching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: AniFaceDrawing
+	- datasets: 用户自定义草图序列与Danbooru动漫数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Computational_Exploration_of_Multistable_Elastic_Knots.md|Computational Exploration of Multistable Elastic Knots (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Computational_Exploration_of_Multistable_Elastic_Knots.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning
-- Computational Exploration of Multistable Elastic Knots (SIGGRAPH 2023 2023)
-	- method groups: Agent / RL / Planning
-- GREIL-Crowds: Crowd Simulation With Deep Reinforcement Learning and Examples (SIGGRAPH 2023 2023)
+	- methods: 多稳态弹性结计算探索流程 (Multistable Elastic Knots Discovery Pipeline)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/GREIL-Crowds_Crowd_Simulation_With_Deep_Reinforcement_Learning_and_Examples.md|GREIL-Crowds: Crowd Simulation With Deep Reinforcement Learning and Examples (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/GREIL_Crowds_Crowd_Simulation_With_Deep_Reinforcement_Learning_and_Examples.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning
+	- methods: GREIL-Crowds
+	- datasets: Flock-2 / Pedestrian datasets, Long corridor scenario, Crossing scenario
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.md|Interactive Hair Simulation on the GPU using ADMM (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning
 	- methods: ADMM-based GPU Hair Simulation for Discrete Elastic Rods with Coulomb Friction
 	- datasets: Hairball 16k, Hairball 128k, Long 47k
-- ScanBot: Autonomous Reconstruction via Deep Reinforcement Learning (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/PMP_Learning_to_Physically_Interact_With_Environments_Using_Part-wise_Motion_Priors.md|PMP: Learning to Physically Interact With Environments Using Part-wise Motion Priors (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PMP_Learning_to_Physically_Interact_With_Environments_Using_Part_wise_Motion_Priors.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Reinforcement Learning / Planning / Agents
+	- method groups: Agent / RL / Planning
+	- methods: Part-wise Motion Priors (PMP)
+	- datasets: Cart Pulling, Barbell Lifting, Bar Hanging
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ScanBot_Autonomous_Reconstruction_via_Deep_Reinforcement_Learning.md|ScanBot: Autonomous Reconstruction via Deep Reinforcement Learning (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ScanBot_Autonomous_Reconstruction_via_Deep_Reinforcement_Learning.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
-- CLIPXPlore: Coupled CLIP and Shape Spaces for 3D Shape Exploration (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: ScanBot
+	- datasets: Gibson和Matterport3D测试集, Matterport3D test scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Simulation_and_Retargeting_of_Complex_Multi-character_Interactions.md|Simulation and Retargeting of Complex Multi-character Interactions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Simulation_and_Retargeting_of_Complex_Multi_character_Interactions.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Interaction Graph (IG) based control policy
+	- datasets: Custom multi-character interaction sequences
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/CLIPXPlore_Coupled_CLIP_and_Shape_Spaces_for_3D_Shape_Exploration.md|CLIPXPlore: Coupled CLIP and Shape Spaces for 3D Shape Exploration (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/CLIPXPlore_Coupled_CLIP_and_Shape_Spaces_for_3D_Shape_Exploration.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
-- Concept Decomposition for Visual Exploration and Inspiration (SIGGRAPH ASIA 2023 2023)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: CLIPXPlore
+	- datasets: Binary-attribute-guided, Text-guided, Sketch-guided
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Concept_Decomposition_for_Visual_Exploration_and_Inspiration.md|Concept Decomposition for Visual Exploration and Inspiration (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Concept_Decomposition_for_Visual_Exploration_and_Inspiration.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Concept Decomposition via Binary Tree
+	- datasets: Same 13 concepts, Human consistency preference, Aspect recognition perceptual study
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.md|Neural Collision Fields for Triangle Primitives (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Collision_Fields_for_Triangle_Primitives.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning
 	- methods: Neural Collision Fields (NCF)
 	- datasets: GPU triangle-pair query time, Integrated value accuracy on generated test set, Erleben contact point benchmark
-- Neural Packing: from Visual Sensing to Reinforcement Learning (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Packing_from_Visual_Sensing_to_Reinforcement_Learning.md|Neural Packing: from Visual Sensing to Reinforcement Learning (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Packing_from_Visual_Sensing_to_Reinforcement_Learning.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: TAP-Net++
+	- datasets: Single container, PPSG input, 随意堆叠部分观测场景
 - [[obsidian-vault/analysis/TOG_2023/AdaptNet_Policy_Adaptation_for_Physics_Based_Character_Control.md|AdaptNet: Policy Adaptation for Physics-Based Character Control (TOG 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/TOG_2023/AdaptNet_Policy_Adaptation_for_Physics_Based_Character_Control.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
@@ -169,43 +242,71 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
 	- methods: OmniGrasp
 	- datasets: GRAB-Goal-Test, GRAB-IMoS-Test, OakInk-Train
-- HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning (SIGGRAPH 2024 2024)
-	- method groups: Agent / RL / Planning, Optimization / Theory
-- Hand-Object Interaction Controller (HOIC): Deep Reinforcement Learning for Reconstructing Interactions With Physics (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/HAISOR_Human-Aware_Indoor_Scene_Optimization_via_Deep_Reinforcement_Learning.md|HAISOR: Human-Aware Indoor Scene Optimization via Deep Reinforcement Learning (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/HAISOR_Human_Aware_Indoor_Scene_Optimization_via_Deep_Reinforcement_Learning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: HAISOR
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Hand-Object_Interaction_Controller_HOIC_Deep_Reinforcement_Learning_for_Reconstructing_Interactions_With_Physics.md|Hand-Object Interaction Controller (HOIC): Deep Reinforcement Learning for Reconstructing Interactions With Physics (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Hand_Object_Interaction_Controller_HOIC_Deep_Reinforcement_Learning_for_Reconstructing_Interactions_With_Physics.pdf|PDF]]
+	- topics: Graphics Animation Interaction
 	- method groups: Agent / RL / Planning
+	- methods: HOIC
+	- datasets: Box sequence, Bottle sequence, Banana sequence
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Learning_Physically_Realizable_Skills_for_Online_Packing_of_General_3D_Shapes.md|Learning Physically Realizable Skills for Online Packing of General 3D Shapes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Learning_Physically_Realizable_Skills_for_Online_Packing_of_General_3D_Shapes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: 基于候选动作的强化学习打包方法 (Candidate-Action RL)
+	- datasets: General, BlockOut, Kitchen
 - [[obsidian-vault/analysis/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.md|MotionCtrl: A Unified and Flexible Motion Controller for Video Generation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: MotionCtrl
 	- datasets: Camera Motion Control, Object Motion Control, Video Quality
-- SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SMERF_Streamable_Memory_Efficient_Radiance_Fields_for_Real-time_Large-scene_Exploration.md|SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SMERF_Streamable_Memory_Efficient_Radiance_Fields_for_Real_time_Large_scene_Exploration.pdf|PDF]]
+	- topics: Graphics Rendering Materials
 	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+	- methods: SMERF
+	- datasets: Zip-NeRF large scenes, mip-NeRF 360, iPhone 12 Pro
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Strategy_and_Skill_Learning_for_Physics-based_Table_Tennis_Animation.md|Strategy and Skill Learning for Physics-based Table Tennis Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Strategy_and_Skill_Learning_for_Physics_based_Table_Tennis_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Hierarchical Strategy and Skill Controller
+	- datasets: Skill Controller, Strategy, Human-Agent
 - [[obsidian-vault/analysis/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.md|SuperPADL: Scaling Language-Directed Physics-Based Control with Progressive Supervised Distillation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
 	- methods: SuperPADL
 	- datasets: AMASS Motion Quality, Group Controller, Group Controller Training Time
-- Anim-Director: A Large Multimodal Model Powered Agent for Controllable Animation Video Generation (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Anim_Director_A_Large_Multimodal_Model_Powered_Agent_for_Controllable_Animation_Video_Generation.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
-- PC-Planner: Physics-Constrained Self-Supervised Learning for Robust Neural Motion Planning with Shape-Aware Distance Function (SIGGRAPH ASIA 2024 2024)
-	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
-- PDP: Physics-Based Character Animation via Diffusion Policy (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PDP_Physics_Based_Character_Animation_via_Diffusion_Policy.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Procedural_Material_Generation_with_Reinforcement_Learning.md|Procedural Material Generation with Reinforcement Learning (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Procedural_Material_Generation_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
-- Procedural Material Generation with Reinforcement Learning (SIGGRAPH ASIA 2024 2024)
-	- method groups: Agent / RL / Planning
-- PVP-Recon: Progressive View Planning via Warping Consistency for Sparse-View Surface Reconstruction (SIGGRAPH ASIA 2024 2024)
+	- methods: RL-fine-tuned procedural material parameter generator
+	- datasets: Synthetic test set, Real photograph test set, Synthetic and real datasets
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/PVP-Recon_Progressive_View_Planning_via_Warping_Consistency_for_Sparse-View_Surface_Reconstruction.md|PVP-Recon: Progressive View Planning via Warping Consistency for Sparse-View Surface Reconstruction (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PVP_Recon_Progressive_View_Planning_via_Warping_Consistency_for_Sparse_View_Surface_Reconstruction.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: PVP-Recon
+	- datasets: DTU, Blender
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Robot_Motion_Diffusion_Model_Motion_Generation_for_Robotic_Characters.md|Robot Motion Diffusion Model: Motion Generation for Robotic Characters (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Robot_Motion_Diffusion_Model_Motion_Generation_for_Robotic_Characters.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: Robot Motion Diffusion Model (RobotMDM)
 	- datasets: Simulated Tracking
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Synchronize_Dual_Hands_for_Physics-Based_Dexterous_Guitar_Playing.md|Synchronize Dual Hands for Physics-Based Dexterous Guitar Playing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Synchronize_Dual_Hands_for_Physics_Based_Dexterous_Guitar_Playing.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Agent / RL / Planning
+	- methods: Bimanual Policy Synchronization via Latent Space Manipulation
+	- datasets: 同步训练效率
 - [[obsidian-vault/analysis/TOG_2024/MoConVQ_Unified_Physics_Based_Motion_Control_via_Scalable_Discrete_Representations.md|MoConVQ: Unified Physics-Based Motion Control via Scalable Discrete Representations (TOG 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/TOG_2024/MoConVQ_Unified_Physics_Based_Motion_Control_via_Scalable_Discrete_Representations.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -313,10 +414,26 @@ generated: 2026-06-24T20:47
 - AssetDropper: Asset Extraction via Diffusion Models with Reward-Driven Optimization (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AssetDropper_Asset_Extraction_via_Diffusion_Models_with_Reward-Driven_Optimization.pdf|PDF]]
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
-- DesignManager: An Agent-Powered Copilot for Designers to Integrate AI Design Tools into Creative Workflows (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Designing_Pin-pression_Gripper_and_Learning_its_Dexterous_Grasping_with_Online_In-hand_Adjustment.md|Designing Pin-pression Gripper and Learning its Dexterous Grasping with Online In-hand Adjustment (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Designing_Pin_pression_Gripper_and_Learning_its_Dexterous_Grasping_with_Online_In_hand_Adjustment.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Agent / RL / Planning
+	- methods: Pin-pression Gripper with Curriculum Reinforcement Learning
+	- datasets: Challenge - 平坦物体, Sim-to-Sim transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DesignManager_An_Agent-Powered_Copilot_for_Designers_to_Integrate_AI_Design_Tools_into_Creative_Workflows.md|DesignManager: An Agent-Powered Copilot for Designers to Integrate AI Design Tools into Creative Workflows (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/DesignManager_An_Agent_Powered_Copilot_for_Designers_to_Integrate_AI_Design_Tools_into_Creative_Workflows.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Agent / RL / Planning
+	- methods: DesignManager
+	- datasets: 消融技术评估, 开放用户研究
 - EditDuet: A Multi-Agent System for Video Non-Linear Editing (SIGGRAPH 2025 2025)
 	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Learning_to_Assemble_with_Alternative_Plans.md|Learning to Assemble with Alternative Plans (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Learning_to_Assemble_with_Alternative_Plans.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning, Graph / Geometric / Structured Data
+	- methods: 基于强化学习的拆卸策略框架（含GPU稳定模拟、课程学习与FT-GNN）
+	- datasets: Vault-62 稳定性模拟, Bottle-12 策略准确率, Bottle 物理装配偏差
 - [[obsidian-vault/analysis/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.md|PARC: Physics-based Augmentation with Reinforcement Learning for Character Controllers (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.pdf|PDF]]
 	- topics: Motion Animation
@@ -336,6 +453,34 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
 	- methods: SkillMimic-V2
 	- datasets: BallPlay-M, ParaHome
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AniMaker_Multi-Agent_Animated_Storytelling_with_MCTS-Driven_Clip_Generation.md|AniMaker: Multi-Agent Animated Storytelling with MCTS-Driven Clip Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AniMaker_Multi_Agent_Animated_Storytelling_with_MCTS_Driven_Clip_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: AniMaker
+	- datasets: Keyframe Evaluation, VBench, AniEval
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Can_Any_Model_Be_Fabricated_Inverse_Operation_Based_Planning_for_Hybrid_AdditiveâSubtractive_Manufacturing.md|Can Any Model Be Fabricated? Inverse Operation Based Planning for Hybrid Additiveâ€“Subtractive Manufacturing (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Can_Any_Model_Be_Fabricated_Inverse_Operation_Based_Planning_for_Hybrid_Additive_Subtractive_Manufacturing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Inverse Operation Nullification Algorithm (基于逆操作的归零规划)
+	- datasets: Fertility 模型物理制造, MBB 梁物理测试, Thingi10K 随机100模型
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Fast_amp_Stable_Control_of_Coupled_Solid-Fluid_Dynamic_Systems.md|Fast &amp; Stable Control of Coupled Solid-Fluid Dynamic Systems (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Fast_Stable_Control_of_Coupled_Solid_Fluid_Dynamic_Systems.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Off-policy RL with Boltzmann softmax, two-step Bellman, and FEDG
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole-Body_Control_for_Loco-Manipulation.md|MaskedManipulator: Versatile Whole-Body Control for Loco-Manipulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Control_for_Loco_Manipulation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: MaskedManipulator
+	- datasets: GRAB test set, Teleoperation-style pose matching, Long-horizon sparse object goal chaining
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Waste-to-Value_Reutilized_Material_Maximization_for_Additive_and_Subtractive_Hybrid_Remanufacturing.md|Waste-to-Value: Reutilized Material Maximization for Additive and Subtractive Hybrid Remanufacturing (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Waste_to_Value_Reutilized_Material_Maximization_for_Additive_and_Subtractive_Hybrid_Remanufacturing.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: Waste-to-Value: Clipping Planes and MCTS-based ASHRM Process Planning
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.md|Social Agent: Mastering Dyadic Nonverbal Behavior Generation via Conversational LLM Agents (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Social_Agent_Mastering_Dyadic_Nonverbal_Behavior_Generation_via_Conversational_LLM_Agents.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
@@ -2992,6 +3137,18 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning, Vision / Multimodal / 3D
 	- methods: DriveCritic
 	- datasets: DriveCritic test set
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Policy-based_Foveated_Imaging_and_Perception.md|Policy-based Foveated Imaging and Perception (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Policy_based_Foveated_Imaging_and_Perception.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Agent / RL / Planning
+	- methods: Policy-based Foveated Imaging Framework
+	- datasets: SoccerNet Tracking, RoadText-1K, Static ALOHA
+- [[obsidian-vault/analysis/SIGGRAPH_2026/ReActor_Reinforcement_Learning_for_Physics-Aware_Motion_Retargeting.md|ReActor: Reinforcement Learning for Physics-Aware Motion Retargeting (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ReActor_Reinforcement_Learning_for_Physics_Aware_Motion_Retargeting.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: ReActor
+	- datasets: Lima, G1
 - [[obsidian-vault/analysis/WACV_2026/No_MoCap_Needed_Post-Training_Motion_Diffusion_Models_with_Reinforcement_Learning_using_Only_Textual_Prompts.md|No MoCap Needed: Post-Training Motion Diffusion Models with Reinforcement Learning using Only Textual Prompts (WACV 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/WACV_2026/No_MoCap_Needed:_Post-Training_Motion_Diffusion_Models_with_Reinforcement_Learning_using_Only_Textual_Prompts.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

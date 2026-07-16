@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: HOT3D
@@ -21,3 +21,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: UniHand
 	- datasets: DexYCB, HO3D, HOT3D
+- [[obsidian-vault/analysis/SIGGRAPH_2026/EgoForce_Forearm-Guided_Camera-Space_3D_Hand_Pose_from_a_Monocular_Egocentric_Camera.md|EgoForce: Forearm-Guided Camera-Space 3D Hand Pose from a Monocular Egocentric Camera (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/EgoForce_Forearm_Guided_Camera_Space_3D_Hand_Pose_from_a_Monocular_Egocentric_Camera.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: EgoForce
+	- datasets: ARCTIC, HOT3D, H2O

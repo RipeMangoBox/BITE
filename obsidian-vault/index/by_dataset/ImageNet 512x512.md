@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ImageNet 512x512
 
+- [[obsidian-vault/analysis/SIGGRAPH_2022/StyleGAN-XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.md|StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: StyleGAN-XL
+	- datasets: ImageNet 128x128, ImageNet 256x256, ImageNet 512x512
 - [[obsidian-vault/analysis/NEURIPS_2025/Align_Your_Flow_Scaling_Continuous_Time_Flow_Map_Distillation.md|Align Your Flow: Scaling Continuous-Time Flow Map Distillation (NEURIPS 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Align_Your_Flow_Scaling_Continuous_Time_Flow_Map_Distillation.pdf|PDF]]
 	- topics: Generative Models / Diffusion

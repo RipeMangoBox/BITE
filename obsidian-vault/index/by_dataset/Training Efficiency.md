@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Training Efficiency
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: EasyTune
 	- datasets: HumanML3D, KIT-ML, Training Efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_2024/TensoSDF_Roughness-aware_Tensorial_Representation_for_Robust_Geometry_and_Material_Reconstruction.md|TensoSDF: Roughness-aware Tensorial Representation for Robust Geometry and Material Reconstruction (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TensoSDF_Roughness_aware_Tensorial_Representation_for_Robust_Geometry_and_Material_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: TensoSDF
+	- datasets: Stanford-ORB, Training Efficiency
 - [[obsidian-vault/analysis/arxiv_2025/UniFlow_A_Unified_Pixel_Flow_Tokenizer_for_Visual_Understanding_and_Generation.md|UniFlow: A Unified Pixel Flow Tokenizer for Visual Understanding and Generation (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/UniFlow_A_Unified_Pixel_Flow_Tokenizer_for_Visual_Understanding_and_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

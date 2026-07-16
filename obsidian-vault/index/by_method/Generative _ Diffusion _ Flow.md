@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Generative / Diffusion / Flow
@@ -189,12 +189,23 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Agent / RL / Planning
 	- methods: Active Exploration (MCMC-guided on-the-fly data generation with self-tuning sample reuse and adaptive resolution)
 	- datasets: Living Room, Spaceship, ArchViz
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Animating_Portrait_Line_Drawings_From_a_Single_Face_Photo_and_a_Speech_Signal.md|Animating Portrait Line Drawings From a Single Face Photo and a Speech Signal (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Animating_Portrait_Line_Drawings_From_a_Single_Face_Photo_and_a_Speech_Signal.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: AnimatePortrait
+	- datasets: VoxCeleb2 + 互联网视频
 - [[obsidian-vault/analysis/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.md|ASE: Large-Scale Reusable Adversarial Skill Embeddings for Physically Simulated Characters (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
 	- methods: Adversarial Skill Embeddings (ASE)
 	- datasets: Reach, Speed, Steering
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Automatic_Generation_of_a_3D_Braid_Hair_Model_From_a_Single_Image.md|Automatic Generation of a 3D Braid Hair Model From a Single Image (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Automatic_Generation_of_a_3D_Braid_Hair_Model_From_a_Single_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Automatic 3D Braid Hair Model Generation
 - [[obsidian-vault/analysis/SIGGRAPH_2022/AvatarCLIP_Zero-shot_Text-driven_Generation_and_Animation_of_3D_Avatars.md|AvatarCLIP: Zero-shot Text-driven Generation and Animation of 3D Avatars (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/AvatarCLIP_Zero_shot_Text_driven_Generation_and_Animation_of_3D_Avatars.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -207,8 +218,11 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: ComplexGen
 	- datasets: ABC
-- Denoising and Guided Upsampling of Monte Carlo Path Traced Low Resolution Renderings (SIGGRAPH 2022 2022)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Denoising_and_Guided_Upsampling_of_Monte_Carlo_Path_Traced_Low_Resolution_Renderings.md|Denoising and Guided Upsampling of Monte Carlo Path Traced Low Resolution Renderings (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Denoising_and_Guided_Upsampling_of_Monte_Carlo_Path_Traced_Low_Resolution_Renderings.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Proposed Framework (Low-Resolution Rendering + Denoising + Guided Upsampling)
 - [[obsidian-vault/analysis/SIGGRAPH_2022/DiffusionNet_Discretization_Agnostic_Learning_on_Surfaces.md|DiffusionNet: Discretization Agnostic Learning on Surfaces (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/DiffusionNet_Discretization_Agnostic_Learning_on_Surfaces.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -221,35 +235,146 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow
 	- methods: TLGAN (Cyclic Conditioning GAN)
 	- datasets: 自数据集, Mielipidepalsta数据集
-- GAN Applied to Wave Function Collapse for Procedural Map Generation (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/GAN_Applied_to_Wave_Function_Collapse_for_Procedural_Map_Generation.md|GAN Applied to Wave Function Collapse for Procedural Map Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/GAN_Applied_to_Wave_Function_Collapse_for_Procedural_Map_Generation.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
+	- methods: GAN-augmented Wave Function Collapse
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generating_Diverse_Indoor_Furniture_Arrangements.md|Generating Diverse Indoor Furniture Arrangements (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generating_Diverse_Indoor_Furniture_Arrangements.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Space Illumination with StyleGAN3 and CMA-ME for Furniture Arrangement
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Generation_of_Traditional_Japanese_Patterns_From_Natural_Patterns_With_StyleGAN.md|Generation of Traditional Japanese Patterns From Natural Patterns With StyleGAN (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generation_of_Traditional_Japanese_Patterns_From_Natural_Patterns_With_StyleGAN.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: 基于层交换的StyleGAN2迁移学习
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Generative_GaitNet.md|Generative GaitNet (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Generative_GaitNet.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
 	- methods: Generative GaitNet
 	- datasets: Leg length discrepancy simulation, Trendelenburg gait simulation, Crouch gait simulation
-- Learning a Personalized Generative Prior for Face Images (SIGGRAPH 2022 2022)
-	- method groups: Generative / Diffusion / Flow
-- MatFormer: A Generative Model for Procedural Materials (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Learning_a_Personalized_Generative_Prior_for_Face_Images.md|Learning a Personalized Generative Prior for Face Images (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Learning_a_Personalized_Generative_Prior_for_Face_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Personalized Generative Prior
+	- datasets: Inpainting, Super-Resolution, Semantic Editing
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Low-poly_Mesh_Generation_for_Building_Models.md|Low-poly Mesh Generation for Building Models (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Low_poly_Mesh_Generation_for_Building_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Proposed Low-poly Mesh Generation Algorithm
+	- datasets: 单个具有复杂拓扑的流形模型
+- [[obsidian-vault/analysis/SIGGRAPH_2022/MatFormer_A_Generative_Model_for_Procedural_Materials.md|MatFormer: A Generative Model for Procedural Materials (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/MatFormer_A_Generative_Model_for_Procedural_Materials.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- Palette: Image-to-image Diffusion Models (SIGGRAPH 2022 2022)
+	- methods: MatFormer
+	- datasets: Substance Source procedural material generation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Palette_Image-to-image_Diffusion_Models.md|Palette: Image-to-image Diffusion Models (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Palette_Image_to_image_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Palette
+	- datasets: ImageNet ctest10k, ImageNet 20-30% free-form mask, ImageNet
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Parallax_Background_Texture_Generation.md|Parallax Background Texture Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Parallax_Background_Texture_Generation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Rewriting Geometric Rules of a GAN (SIGGRAPH 2022 2022)
+	- methods: Parallax Background Texture Generation Pipeline
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Perceptual_Error_Optimization_for_Monte_Carlo_Rendering.md|Perceptual Error Optimization for Monte Carlo Rendering (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Perceptual_Error_Optimization_for_Monte_Carlo_Rendering.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Perceptual Error Optimization for Monte Carlo Rendering (kernel-based halftoning-inspired framework)
+	- datasets: Bathroom scene, Multiple scenes, Static scene animation
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Physics-based_Character_Controllers_Using_Conditional_VAEs.md|Physics-based Character Controllers Using Conditional VAEs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Physics_based_Character_Controllers_Using_Conditional_VAEs.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PhysicsVAE (conditional VAE with physics simulation layer and helper branch)
+	- datasets: Locomotion rollout, Point-Goal Navigation, Maze Runner
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Rewriting_Geometric_Rules_of_a_GAN.md|Rewriting Geometric Rules of a GAN (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Rewriting_Geometric_Rules_of_a_GAN.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Graph / Geometric / Structured Data
-- Self-conditioned Generative Adversarial Networks for Image Editing (SIGGRAPH 2022 2022)
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: Rewriting Geometric Rules
+	- datasets: AFHQv2 Cat, LSUN Horse, Places House
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Self-conditioned_Generative_Adversarial_Networks_for_Image_Editing.md|Self-conditioned Generative Adversarial Networks for Image Editing (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_conditioned_Generative_Adversarial_Networks_for_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Self-Supervised Post-Correction for Monte Carlo Denoising (SIGGRAPH 2022 2022)
+	- methods: Self-conditioned Generative Adversarial Networks (SC-GAN)
+	- datasets: FFHQ
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Self-distilled_StyleGAN_Towards_Generation_From_Internet_Photos.md|Self-distilled StyleGAN: Towards Generation From Internet Photos (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_distilled_StyleGAN_Towards_Generation_From_Internet_Photos.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Self-Distilled StyleGAN
+	- datasets: LSUN-Bicycle, LSUN-Horse, Internet Elephants
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Self-Supervised_Post-Correction_for_Monte_Carlo_Denoising.md|Self-Supervised Post-Correction for Monte Carlo Denoising (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Self_Supervised_Post_Correction_for_Monte_Carlo_Denoising.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
-- Text2Human: Text-driven Controllable Human Image Generation (SIGGRAPH 2022 2022)
+	- methods: Self-Supervised Post-Correction (SSPC)
+	- datasets: AFGSA 浴室场景
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Semantically_Supervised_Appearance_Decomposition_for_Virtual_Staging_From_a_Single_Panorama.md|Semantically Supervised Appearance Decomposition for Virtual Staging From a Single Panorama (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Semantically_Supervised_Appearance_Decomposition_for_Virtual_Staging_From_a_Single_Panorama.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: Semantically Supervised Appearance Decomposition
+	- datasets: ZInD
+- [[obsidian-vault/analysis/SIGGRAPH_2022/SPAGHETTI_Editing_Implicit_Shapes_Through_Part_Aware_Generation.md|SPAGHETTI: Editing Implicit Shapes Through Part Aware Generation (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/SPAGHETTI_Editing_Implicit_Shapes_Through_Part_Aware_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: SPAGHETTI
+	- datasets: Airplanes, Chairs, Lamps
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Sparsity-specific_Code_Optimization_Using_Expression_Trees.md|Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Sparsity_specific_Code_Optimization_Using_Expression_Trees.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Sparsity-specific Code Generation using Expression Trees
+	- datasets: Sparse algebraic expressions, Cotan Laplacian construction, Dual volumetric Laplacian and mass matrix construction
+- [[obsidian-vault/analysis/SIGGRAPH_2022/TCB-spline-based_Image_Vectorization.md|TCB-spline-based Image Vectorization (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/TCB_spline_based_Image_Vectorization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TCB-spline-based image vectorization
+	- datasets: Gradient mesh comparison, Diffusion curves comparison, Inverse diffusion curves comparison
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Text2Human_Text-driven_Controllable_Human_Image_Generation.md|Text2Human: Text-driven Controllable Human Image Generation (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Text2Human_Text_driven_Controllable_Human_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- VoLux-GAN: A Generative Model for 3D Face Synthesis With HDRI Relighting (SIGGRAPH 2022 2022)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Text2Human
+	- datasets: DeepFashion-MultiModal, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2022/TightCap_3D_Human_Shape_Capture_With_Clothing_Tightness_Field.md|TightCap: 3D Human Shape Capture With Clothing Tightness Field (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/TightCap_3D_Human_Shape_Capture_With_Clothing_Tightness_Field.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TightCap
+	- datasets: CTD, BUFF
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Unified_Many-worlds_Browsing_of_Arbitrary_Physics-based_Animations.md|Unified Many-worlds Browsing of Arbitrary Physics-based Animations (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Unified_Many_worlds_Browsing_of_Arbitrary_Physics_based_Animations.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Unified Many-Worlds Browsing (UMWB)
+	- datasets: Lava Village 存储效率, Jell-O 集合查询性能, 时间 RLE 压缩效果
+- [[obsidian-vault/analysis/SIGGRAPH_2022/VoLux-GAN_A_Generative_Model_for_3D_Face_Synthesis_With_HDRI_Relighting.md|VoLux-GAN: A Generative Model for 3D Face Synthesis With HDRI Relighting (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/VoLux_GAN_A_Generative_Model_for_3D_Face_Synthesis_With_HDRI_Relighting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VoLux-GAN
+	- datasets: CelebA
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Automatic_Deformation-based_animation_of_3D_mesh.md|Automatic Deformation-based animation of 3D mesh (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Automatic_Deformation_based_animation_of_3D_mesh.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Automatic Deformation-based Animation Method
+	- datasets: Generic 3D mesh animation task
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Capturing_and_Animation_of_Body_and_Clothing_from_Monocular_Video.md|Capturing and Animation of Body and Clothing from Monocular Video (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Capturing_and_Animation_of_Body_and_Clothing_from_Monocular_Video.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -262,23 +387,113 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: CLIP-Mesh
 	- datasets: COCO caption object generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Color_Animated_Full-parallax_High-definition_Computer-generated_Hologram.md|Color Animated Full-parallax High-definition Computer-generated Hologram (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Color_Animated_Full_parallax_High_definition_Computer_generated_Hologram.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Animation SDM (ASDM) with erosion-based structured illumination
+	- datasets: Two-frame color animation prototype
 - Control VAE: Model-Based Learning of Generative Controllers for Physics-Based Characters (SIGGRAPH ASIA 2022 2022)
 	- method groups: Generative / Diffusion / Flow
-- MyStyle: A Personalized Generative Prior (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/DynaGAN_Dynamic_Few-shot_Adaptation_of_GANs_to_Multiple_Domains.md|DynaGAN: Dynamic Few-shot Adaptation of GANs to Multiple Domains (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/DynaGAN_Dynamic_Few_shot_Adaptation_of_GANs_to_Multiple_Domains.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: DynaGAN
+	- datasets: Cat-to-dogs, Cat-to-animals, Real-to-artificial faces
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Exact_3D_Path_Generation_via_3D_Cam-Linkage_Mechanisms.md|Exact 3D Path Generation via 3D Cam-Linkage Mechanisms (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Exact_3D_Path_Generation_via_3D_Cam_Linkage_Mechanisms.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3D cam-linkage mechanism
+	- datasets: 连续3D路径精确生成
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Learning-Based_Bending_Stiffness_Parameter_Estimation_by_a_Drape_Tester.md|Learning-Based Bending Stiffness Parameter Estimation by a Drape Tester (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Learning_Based_Bending_Stiffness_Parameter_Estimation_by_a_Drape_Tester.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: Learning-Based Bending Stiffness Parameter Estimation by a Drape Tester (our system)
+	- datasets: Parameter acquisition time, Cusick drape test fidelity, Skirt test user study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/MyStyle_A_Personalized_Generative_Prior.md|MyStyle: A Personalized Generative Prior (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/MyStyle_A_Personalized_Generative_Prior.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
+	- methods: MyStyle
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.md|Neural Brushstroke Engine: Learning a Latent Style Space of Interactive Drawing Tools (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
 	- methods: Neural Brushstroke Engine
 	- datasets: Styles1, User study
-- Neural Wavelet-domain Diffusion for 3D Shape Generation (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Wavelet-domain_Diffusion_for_3D_Shape_Generation.md|Neural Wavelet-domain Diffusion for 3D Shape Generation (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Wavelet_domain_Diffusion_for_3D_Shape_Generation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Stitch it in Time: GAN-Based Facial Editing of Real Videos (SIGGRAPH ASIA 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Stitch_it_in_Time_GAN_Based_Facial_Editing_of_Real_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Wavelet-domain Diffusion
+	- datasets: ShapeNet Chair, ShapeNet Airplane
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Pattern-Based_Cloth_Registration_and_Sparse-View_Animation.md|Pattern-Based Cloth Registration and Sparse-View Animation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Pattern_Based_Cloth_Registration_and_Sparse_View_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Pattern-Based Cloth Registration Pipeline and Garment Avatar
+	- datasets: 自定义多视图布料捕捉数据
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/PopStage_The_Generation_of_Stage_Cross-Editing_Video_based_on_Spatio-Temporal_Matching.md|PopStage: The Generation of Stage Cross-Editing Video based on Spatio-Temporal Matching (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/PopStage_The_Generation_of_Stage_Cross_Editing_Video_based_on_Spatio_Temporal_Matching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PopStage
+	- datasets: Production time for 1m20s StageMix, User Study viewing satisfaction, Camera view temporal continuity
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Real-Time_Facial_Animation_Generation_on_Face_Mask.md|Real-Time Facial Animation Generation on Face Mask (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Real_Time_Facial_Animation_Generation_on_Face_Mask.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Real-Time Facial Animation Generation on Face Mask
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Reconstructing_editable_prismatic_CAD_from_rounded_voxel_models.md|Reconstructing editable prismatic CAD from rounded voxel models (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Reconstructing_editable_prismatic_CAD_from_rounded_voxel_models.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Generative / Diffusion / Flow
+	- methods: 可微挤出自编码器（Differentiable Extrusion Autoencoder）
+	- datasets: DeepCAD test set, ABC subset, DeepCAD profiles
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Reconstructing_Personalized_Semantic_Facial_NeRF_Models_From_Monocular_Video.md|Reconstructing Personalized Semantic Facial NeRF Models From Monocular Video (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Reconstructing_Personalized_Semantic_Facial_NeRF_Models_From_Monocular_Video.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: NeRFBlendShape
+	- datasets: Self-reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Stitch_it_in_Time_GAN-Based_Facial_Editing_of_Real_Videos.md|Stitch it in Time: GAN-Based Facial Editing of Real Videos (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Stitch_it_in_Time_GAN_Based_Facial_Editing_of_Real_Videos.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Stitch it in Time
+	- datasets: In-the-wild videos
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Text2Light_Zero-shot_Text-driven_HDR_Panorama_Generation.md|Text2Light: Zero-shot Text-driven HDR Panorama Generation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Text2Light_Zero_shot_Text_driven_HDR_Panorama_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Text2Light
+	- datasets: LDR Panorama Generation, Zero-shot Text-driven Synthesis, Inverse Tone Mapping
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/TileGen_Tileable_Controllable_Material_Generation_and_Capture.md|TileGen: Tileable, Controllable Material Generation and Capture (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/TileGen_Tileable_Controllable_Material_Generation_and_Capture.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: TILEGEN
+	- datasets: 单张手机闪光照片的SVBRDF重建
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Transformer_Inertial_Poser_Real-time_Human_Motion_Reconstruction_from_Sparse_IMUs_with_Simultaneous_Terrain_Generation.md|Transformer Inertial Poser: Real-time Human Motion Reconstruction from Sparse IMUs with Simultaneous Terrain Generation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Transformer_Inertial_Poser_Real_time_Human_Motion_Reconstruction_from_Sparse_IMUs_with_Simultaneous_Terrain_Generation.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Transformer Inertial Poser (TIP)
+	- datasets: DIPEval, TotalCapture, DanceDB
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Video-driven_Neural_Physically-based_Facial_Asset_for_Production.md|Video-driven Neural Physically-based Facial Asset for Production (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Video_driven_Neural_Physically_based_Facial_Asset_for_Production.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Multi-VAE Neural Physically-based Facial Asset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/VOCAL_Vowel_and_Consonant_Layering_for_Expressive_Animator-Centric_Singing_Animation.md|VOCAL: Vowel and Consonant Layering for Expressive Animator-Centric Singing Animation (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/VOCAL_Vowel_and_Consonant_Layering_for_Expressive_Animator_Centric_Singing_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VOCAL
+	- datasets: VocalSet
 - [[obsidian-vault/analysis/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.md|DeepPhase: periodic autoencoders for learning motion phase manifolds (TOG 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer
@@ -365,6 +580,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MoVideo
 	- datasets: UCF-101, MSR-VTT, DAVIS
+- [[obsidian-vault/analysis/arxiv_2023/ShapeGPT_3D_Shape_Generation_with_A_Unified_Multi-modal_Language_Model.md|ShapeGPT: 3D Shape Generation with A Unified Multi-modal Language Model (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/ShapeGPT_3D_Shape_Generation_with_A_Unified_Multi-modal_Language_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ShapeGPT
+	- datasets: Image-to-Shape on ShapeNet, Text-to-Shape on ShapeNet, Multi-modal-to-Shape on ShapeNet
 - [[obsidian-vault/analysis/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.md|VideoControlNet: A Motion-Guided Video-to-Video Translation Framework by Using Diffusion Model with ControlNet (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
@@ -479,124 +700,438 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: 3DShape2VecSet
 	- datasets: ShapeNet形状自编码, ShapeNet无条件生成
-- Attend-and-Excite: Attention-based Semantic Guidance for Text-to-image Diffusion Models (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/A_Hybrid_Generator_Architecture_for_Controllable_Face_Synthesis.md|A Hybrid Generator Architecture for Controllable Face Synthesis (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/A_Hybrid_Generator_Architecture_for_Controllable_Face_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hybrid Generator Architecture
+	- datasets: FFHQ-U
+- [[obsidian-vault/analysis/SIGGRAPH_2023/As-continuous-as-possible_Extrusion-based_Fabrication_of_Surface_Models.md|As-continuous-as-possible Extrusion-based Fabrication of Surface Models (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/As_continuous_as_possible_Extrusion_based_Fabrication_of_Surface_Models.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Fabrication Design, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: ACAP (As-Continuous-As-Possible toolpath generation)
+	- datasets: Multiple self-supporting shell models, Grail model, Various models
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Attend-and-Excite_Attention-based_Semantic_Guidance_for_Text-to-image_Diffusion_Models.md|Attend-and-Excite: Attention-based Semantic Guidance for Text-to-image Diffusion Models (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Attend_and_Excite_Attention_based_Semantic_Guidance_for_Text_to_image_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Attend-and-Excite
+	- datasets: 自定义动物-动物、动物-物体、物体-物体提示集
+- [[obsidian-vault/analysis/SIGGRAPH_2023/AvatarMAV_Fast_3D_Head_Avatar_Reconstruction_Using_Motion-aware_Neural_Voxels.md|AvatarMAV: Fast 3D Head Avatar Reconstruction Using Motion-aware Neural Voxels (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/AvatarMAV_Fast_3D_Head_Avatar_Reconstruction_Using_Motion_aware_Neural_Voxels.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AvatarMAV
+	- datasets: Self-reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Bidirectional_GaitNet_A_Bidirectional_Prediction_Model_of_Human_Gait_and_Anatomical_Conditions.md|Bidirectional GaitNet: A Bidirectional Prediction Model of Human Gait and Anatomical Conditions (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Bidirectional_GaitNet_A_Bidirectional_Prediction_Model_of_Human_Gait_and_Anatomical_Conditions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Blended Latent Diffusion (SIGGRAPH 2023 2023)
+	- methods: Bidirectional GaitNet
+	- datasets: unseen simulated gait data, real patient gaits
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Blended_Latent_Diffusion.md|Blended Latent Diffusion (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Blended_Latent_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- Denoising-aware Adaptive Sampling for Monte Carlo Ray Tracing (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- Diffusion Image Analogies (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Drag Your GAN: Interactive Point-based Manipulation on the Generative Image Manifold (SIGGRAPH 2023 2023)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Blended Latent Diffusion
+	- datasets: Local text-driven editing - 100 real images with random masks, Inference time - A10 NVIDIA GPU, batch mode
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ClipFace_Text-guided_Editing_of_Textured_3D_Morphable_Models.md|ClipFace: Text-guided Editing of Textured 3D Morphable Models (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ClipFace_Text_guided_Editing_of_Textured_3D_Morphable_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ClipFace
+	- datasets: FFHQ subset - Texture Generation, FFHQ subset - Text-guided Texture & Expression Manipulation, FFHQ subset - Text-guided Manipulation
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Composite_Motion_Learning_With_Task_Control.md|Composite Motion Learning With Task Control (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Composite_Motion_Learning_With_Task_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Composite Motion Learning with Task Control
+- [[obsidian-vault/analysis/SIGGRAPH_2023/ConTesse_Accurate_Occluding_Contours_for_Subdivision_Surfaces.md|ConTesse: Accurate Occluding Contours for Subdivision Surfaces (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/ConTesse_Accurate_Occluding_Contours_for_Subdivision_Surfaces.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ConTesse
+	- datasets: Killeroo model view, Angela, Bunny
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Denoising-aware_Adaptive_Sampling_for_Monte_Carlo_Ray_Tracing.md|Denoising-aware Adaptive Sampling for Monte Carlo Ray Tracing (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Denoising_aware_Adaptive_Sampling_for_Monte_Carlo_Ray_Tracing.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Denoising-aware Adaptive Sampling
+	- datasets: Tone-mapped rendering
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Diffusion_Image_Analogies.md|Diffusion Image Analogies (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Diffusion_Image_Analogies.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion Image Analogies
+	- datasets: 图像类比任务, 与文本驱动扩散模型的对比, 消融:独立优化 vs. 联合优化 / 有无令牌正则化 / 有无数据增强 / 令牌数量限制
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Drag_Your_GAN_Interactive_Point-based_Manipulation_on_the_Generative_Image_Manifold.md|Drag Your GAN: Interactive Point-based Manipulation on the Generative Image Manifold (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Drag_Your_GAN_Interactive_Point_based_Manipulation_on_the_Generative_Image_Manifold.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Encoder-based Domain Tuning for Fast Personalization of Text-to-image Models (SIGGRAPH 2023 2023)
+	- methods: DragGAN
+	- datasets: FFHQ 面部关键点操控, Lion 配对图像重建
+- [[obsidian-vault/analysis/SIGGRAPH_2023/DreamFace_Progressive_Generation_of_Animatable_3D_Faces_Under_Text_Guidance.md|DreamFace: Progressive Generation of Animatable 3D Faces Under Text Guidance (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/DreamFace_Progressive_Generation_of_Animatable_3D_Faces_Under_Text_Guidance.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamFace
+	- datasets: Runtime Comparison, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Efficient_Video_Portrait_Reenactment_via_Grid-based_Codebook.md|Efficient Video Portrait Reenactment via Grid-based Codebook (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Efficient_Video_Portrait_Reenactment_via_Grid_based_Codebook.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Video Portrait via Grid-based Codebook (VPGC)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Encoder-based_Domain_Tuning_for_Fast_Personalization_of_Text-to-image_Models.md|Encoder-based Domain Tuning for Fast Personalization of Text-to-image Models (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Encoder_based_Domain_Tuning_for_Fast_Personalization_of_Text_to_image_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: E4T (Encoder for Tuning)
+	- datasets: LFW
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Example-based_Motion_Synthesis_via_Generative_Motion_Matching.md|Example-based Motion Synthesis via Generative Motion Matching (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Example_based_Motion_Synthesis_via_Generative_Motion_Matching.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Example-based Motion Synthesis via Generative Motion Matching (SIGGRAPH 2023 2023)
+	- methods: GenMM (Generative Motion Matching)
+	- datasets: 复杂骨架
+- [[obsidian-vault/analysis/SIGGRAPH_2023/FashionTex_Controllable_Virtual_Try-on_With_Text_and_Texture.md|FashionTex: Controllable Virtual Try-on With Text and Texture (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/FashionTex_Controllable_Virtual_Try_on_With_Text_and_Texture.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Graphics Animation Interaction
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FashionTex
+	- datasets: Deepfashion-MultiModal
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Generating_Procedural_Materials_From_Text_or_Image_Prompts.md|Generating Procedural Materials From Text or Image Prompts (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generating_Procedural_Materials_From_Text_or_Image_Prompts.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Multi-modal Conditional Node Graph Generation Transformer
+	- datasets: Storage footprint, Validity test
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Generative_Design_of_Sheet_Metal_Structures.md|Generative Design of Sheet Metal Structures (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Generative_Design_of_Sheet_Metal_Structures.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- Generative Design of Sheet Metal Structures (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- GestureDiffuCLIP: Gesture Diffusion Model With CLIP Latents (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- HiGAN+: Handwriting Imitation GAN With Disentangled Representations (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- Iterative alpha-(de)Blending: A Minimalist Deterministic Diffusion Model (SIGGRAPH 2023 2023)
+	- methods: Segment Discovery and Composition Framework
+	- datasets: Avionics bay expert comparison, Maze environment exploration
+- [[obsidian-vault/analysis/SIGGRAPH_2023/GestureDiffuCLIP_Gesture_Diffusion_Model_With_CLIP_Latents.md|GestureDiffuCLIP: Gesture Diffusion Model With CLIP Latents (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/GestureDiffuCLIP_Gesture_Diffusion_Model_With_CLIP_Latents.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GestureDiffuCLIP
+	- datasets: BEAT User Study, ZeroEGGS User Study, BEAT Quantitative
+- [[obsidian-vault/analysis/SIGGRAPH_2023/HiGAN_Handwriting_Imitation_GAN_With_Disentangled_Representations.md|HiGAN+: Handwriting Imitation GAN With Disentangled Representations (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/HiGAN_Handwriting_Imitation_GAN_With_Disentangled_Representations.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: HiGAN+
+	- datasets: IAM
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Iterative_alpha-deBlending_A_Minimalist_Deterministic_Diffusion_Model.md|Iterative alpha-(de)Blending: A Minimalist Deterministic Diffusion Model (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Iterative_alpha_de_Blending_A_Minimalist_Deterministic_Diffusion_Model.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Key-locked Rank One Editing for Text-to-image Personalization (SIGGRAPH 2023 2023)
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Iterative α-(de)Blending (IADB)
+	- datasets: AFHQ Cats, CelebA, LSUN Bedrooms
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Key-locked_Rank_One_Editing_for_Text-to-image_Personalization.md|Key-locked Rank One Editing for Text-to-image Personalization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Key_locked_Rank_One_Editing_for_Text_to_image_Personalization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Perfusion
+	- datasets: 形状保留提示与每组提示
+- [[obsidian-vault/analysis/SIGGRAPH_2023/LatentAvatar_Learning_Latent_Expression_Code_for_Expressive_Neural_Head_Avatar.md|LatentAvatar: Learning Latent Expression Code for Expressive Neural Head Avatar (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/LatentAvatar_Learning_Latent_Expression_Code_for_Expressive_Neural_Head_Avatar.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LatentAvatar
+	- datasets: Self Reenactment
 - [[obsidian-vault/analysis/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.md|Learning Physically Simulated Tennis Skills from Broadcast Videos (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Video-to-Player3D / hierarchical physics-based tennis skill control
-- Listen, Denoise, Action! Audio-Driven Motion Synthesis with Diffusion Models (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- Locally Attentional SDF Diffusion for Controllable 3D Shape Generation (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Modulating Pretrained Diffusion Models for Multimodal Image Synthesis (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Listen_Denoise_Action_Audio-Driven_Motion_Synthesis_with_Diffusion_Models.md|Listen, Denoise, Action! Audio-Driven Motion Synthesis with Diffusion Models (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Listen_Denoise_Action_Audio_Driven_Motion_Synthesis_with_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Listen, Denoise, Action (LDA)
+	- datasets: TSG gesture dataset, ZeroEGGS gesture dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Locally_Attentional_SDF_Diffusion_for_Controllable_3D_Shape_Generation.md|Locally Attentional SDF Diffusion for Controllable 3D Shape Generation (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Locally_Attentional_SDF_Diffusion_for_Controllable_3D_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LAS-Diffusion (Locally Attentional SDF Diffusion)
+	- datasets: Category-conditioned generation
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Mesh_Density_Adaptation_for_Template-based_Shape_Reconstruction.md|Mesh Density Adaptation for Template-based Shape Reconstruction (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Mesh_Density_Adaptation_for_Template_based_Shape_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Graphics Geometry Processing
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Mesh Density Adaptation
+	- datasets: Inverse rendering
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Modulating_Pretrained_Diffusion_Models_for_Multimodal_Image_Synthesis.md|Modulating Pretrained Diffusion Models for Multimodal Image Synthesis (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Modulating_Pretrained_Diffusion_Models_for_Multimodal_Image_Synthesis.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- Neural Partitioning Pyramids for Denoising Monte Carlo Renderings (SIGGRAPH 2023 2023)
-	- method groups: Generative / Diffusion / Flow
-- Sketch-guided Text-to-image Diffusion Models (SIGGRAPH 2023 2023)
+	- methods: Multimodal Conditioning Modules (MCM)
+	- datasets: MM-CelebA-HQ
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Neural_Partitioning_Pyramids_for_Denoising_Monte_Carlo_Renderings.md|Neural Partitioning Pyramids for Denoising Monte Carlo Renderings (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Neural_Partitioning_Pyramids_for_Denoising_Monte_Carlo_Renderings.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Partitioning Pyramids (NPPD)
+	- datasets: Inference time
+- [[obsidian-vault/analysis/SIGGRAPH_2023/NOFA_NeRF-based_One-shot_Facial_Avatar_Reconstruction.md|NOFA: NeRF-based One-shot Facial Avatar Reconstruction (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/NOFA_NeRF_based_One_shot_Facial_Avatar_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Graphics Animation Interaction
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: NOFA
+	- datasets: CelebV-HQ Same-ID reenactment, CelebV-HQ Cross-ID reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_2023/PhotoMat_A_Material_Generator_Learned_From_Single_Flash_Photos.md|PhotoMat: A Material Generator Learned From Single Flash Photos (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/PhotoMat_A_Material_Generator_Learned_From_Single_Flash_Photos.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PhotoMat
+	- datasets: 用户感知真实性比较
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Real-time_Radiance_Fields_for_Single-image_Portrait_View_Synthesis.md|Real-time Radiance Fields for Single-image Portrait View Synthesis (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Real_time_Radiance_Fields_for_Single_image_Portrait_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Our feedforward triplane encoder
+	- datasets: FFHQ, FFHQ foreground, H3DS
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Single-shot_Implicit_Morphable_Faces_With_Consistent_Texture_Parameterization.md|Single-shot Implicit Morphable Faces With Consistent Texture Parameterization (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Single_shot_Implicit_Morphable_Faces_With_Consistent_Texture_Parameterization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Single-shot Implicit Morphable Faces with Consistent Texture Parameterization
+	- datasets: FFHQ, H3DS, Self-reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Sketch-guided_Text-to-image_Diffusion_Models.md|Sketch-guided Text-to-image Diffusion Models (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Sketch_guided_Text_to_image_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- UniTune: Text-driven Image Editing by Fine Tuning a Diffusion Model on a Single Image (SIGGRAPH 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/UniTune_Text_driven_Image_Editing_by_Fine_Tuning_a_Diffusion_Model_on_a_Single_Image.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- A Neural Space-Time Representation for Text-to-Image Personalization (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Neural_Space_Time_Representation_for_Text_to_Image_Personalization.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- An Adaptive Fast-Multipole-Accelerated Hybrid Boundary Integral Equation Method for Accurate Diffusion Curves (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Adaptive_Fast_Multipole_Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Anything to Glyph: Artistic Font Synthesis via Text-to-Image Diffusion Model (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Anything_to_Glyph_Artistic_Font_Synthesis_via_Text_to_Image_Diffusion_Model.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Content-based Search for Deep Generative Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Content_based_Search_for_Deep_Generative_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Controllable Group Choreography using Contrastive Diffusion (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- Diffusing Colors: Image Colorization with Text Guided Diffusion (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusing_Colors_Image_Colorization_with_Text_Guided_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Diffusion Posterior Illumination for Ambiguity-aware Inverse Rendering (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_Posterior_Illumination_for_Ambiguity_aware_Inverse_Rendering.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Diffusion-based Holistic Texture Rectification and Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_based_Holistic_Texture_Rectification_and_Synthesis.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Domain-Agnostic Tuning-Encoder for Fast Personalization of Text-To-Image Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Domain_Agnostic_Tuning_Encoder_for_Fast_Personalization_of_Text_To_Image_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Enhancing Diffusion Models with 3D Perspective Geometry Constraints (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Example-Based Sampling with Diffusion Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Example_Based_Sampling_with_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Explorable Mesh Deformation Subspaces from Unstructured 3D Generative Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Explorable_Mesh_Deformation_Subspaces_from_Unstructured_3D_Generative_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Face0: Instantaneously Conditioning a Text-to-Image Model on a Face (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text_to_Image_Model_on_a_Face.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- GroomGen: A High-Quality Generative Hair Model Using Hierarchical Latent Representations (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GroomGen_A_High_Quality_Generative_Hair_Model_Using_Hierarchical_Latent_Representations.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- Input-Dependent Uncorrelated Weighting for Monte Carlo Denoising (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Input_Dependent_Uncorrelated_Weighting_for_Monte_Carlo_Denoising.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Low-Light Image Enhancement with Wavelet-based Diffusion Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Low_Light_Image_Enhancement_with_Wavelet_based_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- MatFusion: A Generative Diffusion Model for SVBRDF Capture (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MatFusion_A_Generative_Diffusion_Model_for_SVBRDF_Capture.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- MCNeRF: Monte Carlo Rendering and Denoising for Real-Time NeRFs (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MCNeRF_Monte_Carlo_Rendering_and_Denoising_for_Real_Time_NeRFs.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- MyStyle++: A Controllable Personalized Generative Prior (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MyStyle_A_Controllable_Personalized_Generative_Prior.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- ProSpect: Prompt Spectrum for Attribute-Aware Personalization of Diffusion Models (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute_Aware_Personalization_of_Diffusion_Models.pdf|PDF]]
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- Repurposing Diffusion Inpainters for Novel View Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- RT-Octree: Accelerate PlenOctree Rendering with Batched Regular Tracking and Neural Denoising for Real-time Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/RT_Octree_Accelerate_PlenOctree_Rendering_with_Batched_Regular_Tracking_and_Neural_Denoising_for_Real_time_Neural_Radiance_Fields.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Single-Image 3D Human Digitization with Shape-guided Diffusion (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Single_Image_3D_Human_Digitization_with_Shape_guided_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Sketch-Guided Diffusion with Latent Edge Predictor (LEP)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Synthesizing_Dexterous_Nonprehensile_Pregrasp_for_Ungraspable_Objects.md|Synthesizing Dexterous Nonprehensile Pregrasp for Ungraspable Objects (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Synthesizing_Dexterous_Nonprehensile_Pregrasp_for_Ungraspable_Objects.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Nonprehensile Pregrasp Synthesis via Contact Graph and Score-guided Optimization
+	- datasets: Bookshelf, Plate, Marker
+- [[obsidian-vault/analysis/SIGGRAPH_2023/UniTune_Text-driven_Image_Editing_by_Fine_Tuning_a_Diffusion_Model_on_a_Single_Image.md|UniTune: Text-driven Image Editing by Fine Tuning a Diffusion Model on a Single Image (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/UniTune_Text_driven_Image_Editing_by_Fine_Tuning_a_Diffusion_Model_on_a_Single_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UniTune
+	- datasets: 自定义93对数据集, 含动物、人物、物体、食物、风景
+- [[obsidian-vault/analysis/SIGGRAPH_2023/VideoDoodles_Hand-drawn_Animations_on_Videos_With_Scene-aware_Canvases.md|VideoDoodles: Hand-drawn Animations on Videos With Scene-aware Canvases (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/VideoDoodles_Hand_drawn_Animations_on_Videos_With_Scene_aware_Canvases.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoDoodles
+	- datasets: TAP-Vid DAVIS
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Word-as-image_for_Semantic_Typography.md|Word-as-image for Semantic Typography (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Word_as_image_for_Semantic_Typography.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: LSDS-based Letter Deformation for Semantic Typography
+	- datasets: Perceptual Study
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Étendue_Expansion_in_Holographic_Near_Eye_Displays_Through_Sparse_Eye-box_Generation_Using_Lens_Array_Eyepiece.md|Étendue Expansion in Holographic Near Eye Displays Through Sparse Eye-box Generation Using Lens Array Eyepiece (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/tendue_Expansion_in_Holographic_Near_Eye_Displays_Through_Sparse_Eye_box_Generation_Using_Lens_Array_Eyepiece.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Étendue Expansion via Sparse Eye-box Generation with Lens Array Eyepiece
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/A_Physically-inspired_Approach_to_the_Simulation_of_Plant_Wilting.md|A Physically-inspired Approach to the Simulation of Plant Wilting (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/A_Physically_inspired_Approach_to_the_Simulation_of_Plant_Wilting.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Physically-inspired Water Diffusion Model for Plant Wilting Simulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/An_Adaptive_Fast-Multipole-Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.md|An Adaptive Fast-Multipole-Accelerated Hybrid Boundary Integral Equation Method for Accurate Diffusion Curves (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/An_Adaptive_Fast_Multipole_Accelerated_Hybrid_Boundary_Integral_Equation_Method_for_Accurate_Diffusion_Curves.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Analysis_and_Synthesis_of_Digital_Dyadic_Sequences.md|Analysis and Synthesis of Digital Dyadic Sequences (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Analysis_and_Synthesis_of_Digital_Dyadic_Sequences.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: ξ-sequences (self-similar dyadic sequences) 与数字二元网转序列算法
+	- datasets: Star Discrepancy
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/AniPortraitGAN_Animatable_3D_Portrait_Generation_from_2D_Image_Collections.md|AniPortraitGAN: Animatable 3D Portrait Generation from 2D Image Collections (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/AniPortraitGAN_Animatable_3D_Portrait_Generation_from_2D_Image_Collections.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AniPortraitGAN
+	- datasets: SHHQ-HS face 2562, SHHQ-HS full 5122
+- Anything to Glyph: Artistic Font Synthesis via Text-to-Image Diffusion Model (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/BakedAvatar_Baking_Neural_Fields_for_Real-Time_Head_Avatar_Synthesis.md|BakedAvatar: Baking Neural Fields for Real-Time Head Avatar Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/BakedAvatar_Baking_Neural_Fields_for_Real_Time_Head_Avatar_Synthesis.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: BakedAvatar
+	- datasets: Self-Reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Capturing_Animation-Ready_Isotropic_Materials_Using_Systematic_Poking.md|Capturing Animation-Ready Isotropic Materials Using Systematic Poking (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Capturing_Animation_Ready_Isotropic_Materials_Using_Systematic_Poking.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Generalized Neo-Hookean Material with Systematic Poking Optimization
+	- datasets: Soma Foama 15 material, Synthetic material recovery, Material stability tests
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Computational_Design_of_LEGO_Sketch_Art.md|Computational Design of LEGO Sketch Art (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Computational_Design_of_LEGO_Sketch_Art.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: LEGO Sketch Generation via Graph Optimization
+	- datasets: Guitar, Apple, Running human
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Content-based_Search_for_Deep_Generative_Models.md|Content-based Search for Deep Generative Models (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Content_based_Search_for_Deep_Generative_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: 概率检索与对比特征适配的模型检索框架
+	- datasets: Internet Model Zoo, Runtime
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.md|Controllable Group Choreography using Contrastive Diffusion (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Controllable_Group_Choreography_using_Contrastive_Diffusion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: Group Contrastive Diffusion (GCD)
+	- datasets: AIOZ-GDance
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusing_Colors_Image_Colorization_with_Text_Guided_Diffusion.md|Diffusing Colors: Image Colorization with Text Guided Diffusion (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusing_Colors_Image_Colorization_with_Text_Guided_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Cold-Diffusion Model (LCDM)
+	- datasets: User Study, ImageNet 10k, COCO-Stuff 5k
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusion_Posterior_Illumination_for_Ambiguity-aware_Inverse_Rendering.md|Diffusion Posterior Illumination for Ambiguity-aware Inverse Rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_Posterior_Illumination_for_Ambiguity_aware_Inverse_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion Posterior Illumination
+	- datasets: Synthetic indoor scenes, Synthetic outdoor scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Diffusion-based_Holistic_Texture_Rectification_and_Synthesis.md|Diffusion-based Holistic Texture Rectification and Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Diffusion_based_Holistic_Texture_Rectification_and_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Occlusion-aware Latent Diffusion Model for Texture Rectification
+	- datasets: Synthetic test dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Discovering_Fatigued_Movements_for_Virtual_Character_Animation.md|Discovering Fatigued Movements for Virtual Character Animation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Discovering_Fatigued_Movements_for_Virtual_Character_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Fatigue-Aware 3CC-GAIL
+	- datasets: Various athletic motions
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/DreamEditor_Text-Driven_3D_Scene_Editing_with_Neural_Fields.md|DreamEditor: Text-Driven 3D Scene Editing with Neural Fields (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/DreamEditor_Text_Driven_3D_Scene_Editing_with_Neural_Fields.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamEditor
+	- datasets: 自建场景编辑基准
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.md|Enhancing Diffusion Models with 3D Perspective Geometry Constraints (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Perspective Geometric Constraint for Diffusion Models
+	- datasets: KITTI
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Example-Based_Sampling_with_Diffusion_Models.md|Example-Based Sampling with Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Example_Based_Sampling_with_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Diffusion-based Example-Led Point Set Sampler (基于示例的扩散点集采样器)
+	- datasets: SOT均匀采样, 高斯函数与Heaviside函数积分
+- Explorable Mesh Deformation Subspaces from Unstructured 3D Generative Models (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text-to-Image_Model_on_a_Face.md|Face0: Instantaneously Conditioning a Text-to-Image Model on a Face (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Face0_Instantaneously_Conditioning_a_Text_to_Image_Model_on_a_Face.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Face0
+	- datasets: Synthetic faces, LFW
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.md|GeoLatent: A Geometric Approach to Latent Space Design for Deformable Shape Generators (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GeoLatent
+	- datasets: Human, Animal, User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/HyperDreamer_Hyper-Realistic_3D_Content_Generation_and_Editing_from_a_Single_Image.md|HyperDreamer: Hyper-Realistic 3D Content Generation and Editing from a Single Image (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/HyperDreamer_Hyper_Realistic_3D_Content_Generation_and_Editing_from_a_Single_Image.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HyperDreamer
+	- datasets: Online 20 images, DTU dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Input-Dependent_Uncorrelated_Weighting_for_Monte_Carlo_Denoising.md|Input-Dependent Uncorrelated Weighting for Monte Carlo Denoising (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Input_Dependent_Uncorrelated_Weighting_for_Monte_Carlo_Denoising.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Input-Dependent Uncorrelated Weighting (IDUW)
+	- datasets: Multiple scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.md|Learning Gradient Fields for Scalable and Generalizable Irregular Packing (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Learning_Gradient_Fields_for_Scalable_and_Generalizable_Irregular_Packing.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: 基于分数扩散模型的梯度场学习排样方法（Score-based Diffusion Packing）
+	- datasets: Garment dataset, Dental dataset, Scalability test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Low-Light_Image_Enhancement_with_Wavelet-based_Diffusion_Models.md|Low-Light Image Enhancement with Wavelet-based Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Low_Light_Image_Enhancement_with_Wavelet_based_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiffLL
+	- datasets: LOLv1 test set, UHD-LL test set, Unpaired datasets
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MatFusion_A_Generative_Diffusion_Model_for_SVBRDF_Capture.md|MatFusion: A Generative Diffusion Model for SVBRDF Capture (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MatFusion_A_Generative_Diffusion_Model_for_SVBRDF_Capture.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MatFusion
+	- datasets: 合成SVBRDF测试集
+- MCNeRF: Monte Carlo Rendering and Denoising for Real-Time NeRFs (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MyStyle_A_Controllable_Personalized_Generative_Prior.md|MyStyle++: A Controllable Personalized Generative Prior (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MyStyle_A_Controllable_Personalized_Generative_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MyStyle++
+	- datasets: Controlled Synthesis, Scarlett Johansson 身份与多样性, Real Image Editing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.md|Perceptual error optimization for Monte Carlo animation rendering (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Perceptual_error_optimization_for_Monte_Carlo_animation_rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Spatio-temporal perceptual error optimization via sliced optimal transport
+	- datasets: Chopper scene TAA, vs Wolfe et al.
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute-Aware_Personalization_of_Diffusion_Models.md|ProSpect: Prompt Spectrum for Attribute-Aware Personalization of Diffusion Models (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ProSpect_Prompt_Spectrum_for_Attribute_Aware_Personalization_of_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ProSpect (Prompt Spectrum)
+	- datasets: Material-aware image generation, Style-aware image generation, Content-aware image generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.md|Repurposing Diffusion Inpainters for Novel View Synthesis (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Repurposing_Diffusion_Inpainters_for_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: iNVS
+	- datasets: Google Scanned Objects
+- RT-Octree: Accelerate PlenOctree Rendering with Batched Regular Tracking and Neural Denoising for Real-time Neural Radiance Fields (SIGGRAPH ASIA 2023 2023)
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/SAME_Skeleton-Agnostic_Motion_Embedding_for_Character_Animation.md|SAME: Skeleton-Agnostic Motion Embedding for Character Animation (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/SAME_Skeleton_Agnostic_Motion_Embedding_for_Character_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SAME (Skeleton-Agnostic Motion Embedding)
+	- datasets: CMU运动数据库分类
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Scene-aware_Activity_Program_Generation_with_Language_Guidance.md|Scene-aware Activity Program Generation with Language Guidance (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Scene_aware_Activity_Program_Generation_with_Language_Guidance.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Scene-aware Activity Program Generation with Language Guidance
+	- datasets: VirtualHome-Env
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Single-Image_3D_Human_Digitization_with_Shape-guided_Diffusion.md|Single-Image 3D Human Digitization with Shape-guided Diffusion (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Single_Image_3D_Human_Digitization_with_Shape_guided_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Shape-guided Diffusion Human Digitization
+	- datasets: THuman2.0, DeepFashion
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Towards_Practical_Capture_of_High-Fidelity_Relightable_Avatars.md|Towards Practical Capture of High-Fidelity Relightable Avatars (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Towards_Practical_Capture_of_High_Fidelity_Relightable_Avatars.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: TRAvatar
+	- datasets: Multiface Dataset, Single-view portrait relighting
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/What_is_the_Best_Automated_Metric_for_Text_to_Motion_Generation.md|What is the Best Automated Metric for Text to Motion Generation? (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/What_is_the_Best_Automated_Metric_for_Text_to_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: MoBERT
+	- datasets: Human-annotated evaluation set
 - [[obsidian-vault/analysis/TMLR_2023/Differentially_Private_Diffusion_Models.md|Differentially Private Diffusion Models (TMLR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/TMLR_2023/Differentially_Private_Diffusion_Models.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -810,6 +1345,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MotionCLR
 	- datasets: HumanML3D, HVerb / HVerb-wild, Example-based motion generation
+- [[obsidian-vault/analysis/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.md|PivotMesh: Generic 3D Mesh Generation via Pivot Vertices Guidance (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PivotMesh
+	- datasets: ShapeNet, Objaverse, Objaverse-xl
 - [[obsidian-vault/analysis/arxiv_2024/ReCapture_Generative_Video_Camera_Controls_for_User_Provided_Videos_using_Masked_Video_Fine_Tuning.md|ReCapture: Generative Video Camera Controls for User-Provided Videos using Masked Video Fine-Tuning (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/ReCapture_Generative_Video_Camera_Controls_for_User_Provided_Videos_using_Masked_Video_Fine_Tuning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -822,6 +1363,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: RefFusion
 	- datasets: SPIn-NeRF Dataset, SPIn-NeRF User Study
+- [[obsidian-vault/analysis/arxiv_2024/Scaling_Mesh_Generation_via_Compressive_Tokenization.md|Scaling Mesh Generation via Compressive Tokenization (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Scaling_Mesh_Generation_via_Compressive_Tokenization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Blocked and Patchified Tokenization (BPT)
+	- datasets: Custom test set of 500 dense meshes generated from other models, Identical input images from EdgeRunner gallery
 - [[obsidian-vault/analysis/arxiv_2024/Training_free_Camera_Control_for_Video_Generation.md|Training-free Camera Control for Video Generation (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/Training_free_Camera_Control_for_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -1103,6 +1650,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Autoregressive Conditional Diffusion Model
 	- datasets: TRUMANS, Human study
+- [[obsidian-vault/analysis/CVPR_2024/ViewFusion_Towards_Multi-View_Consistency_via_Interpolated_Denoising.md|ViewFusion: Towards Multi-View Consistency via Interpolated Denoising (CVPR 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2024/ViewFusion_Towards_Multi-View_Consistency_via_Interpolated_Denoising.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: ViewFusion
+	- datasets: ABO, GSO
 - [[obsidian-vault/analysis/CVPR_2024/VMC_Video_Motion_Customization_using_Temporal_Attention_Adaption_for_Text_to_Video_Diffusion_Models.md|VMC: Video Motion Customization using Temporal Attention Adaption for Text-to-Video Diffusion Models (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/VMC_Video_Motion_Customization_using_Temporal_Attention_Adaption_for_Text_to_Video_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -1281,6 +1834,11 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: TLControl
 	- datasets: HumanML3D, KIT, Runtime
+- [[obsidian-vault/analysis/ECCV_2024/Towards_motion_from_video_diffusion_models.md|Towards motion from video diffusion models (ECCV 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2024/Towards_motion_from_video_diffusion_models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MotionDistill
 - [[obsidian-vault/analysis/ECCV_2024/Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions.md|Towards Open Domain Text Driven Synthesis of Multi Person Motions (ECCV 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/ECCV_2024/Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -1478,89 +2036,265 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MOFT-guided training-free motion control
 	- datasets: 点拖拽精度, 用户偏好研究
-- 2D Gaussian Splatting for Geometrically Accurate Radiance Fields (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- 3D Gaussian Splatting With Deferred Reflection (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Analogist: Out-of-the-box Visual In-context Learning With Image Diffusion Model (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/2D_Gaussian_Splatting_for_Geometrically_Accurate_Radiance_Fields.md|2D Gaussian Splatting for Geometrically Accurate Radiance Fields (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/2D_Gaussian_Splatting_for_Geometrically_Accurate_Radiance_Fields.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 2D Gaussian Splatting (2DGS)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/3D_Gaussian_Blendshapes_for_Head_Avatar_Animation.md|3D Gaussian Blendshapes for Head Avatar Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/3D_Gaussian_Blendshapes_for_Head_Avatar_Animation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3D Gaussian Blendshapes
+	- datasets: INSTA dataset, NeRFBlendShape dataset, Performance
+- [[obsidian-vault/analysis/SIGGRAPH_2024/3D_Gaussian_Splatting_With_Deferred_Reflection.md|3D Gaussian Splatting With Deferred Reflection (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/3D_Gaussian_Splatting_With_Deferred_Reflection.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Deferred Gaussian Splatting for Specular Reflection
+	- datasets: Shiny Blender, Real Scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2024/A_Neural_Network_Model_for_Efficient_Musculoskeletal-driven_Skin_Deformation.md|A Neural Network Model for Efficient Musculoskeletal-driven Skin Deformation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/A_Neural_Network_Model_for_Efficient_Musculoskeletal_driven_Skin_Deformation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Passive and Active Neural Network (PNN+ANN) Enhanced Linear Blend Skinning with Inverse Activation Solving
+	- datasets: Biceps curl animation, Shoulder flexion and abduction activation estimation, Runtime efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Adaptive_Grid_Generation_for_Discretizing_Implicit_Complexes.md|Adaptive Grid Generation for Discretizing Implicit Complexes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Adaptive_Grid_Generation_for_Discretizing_Implicit_Complexes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Longest Refinable Edge Bisection (LREB)
+	- datasets: Tear-drop surface / Tear-drop surface of revolution, Hermite RBF surface, Multi-scale SDF surface
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Analogist_Out-of-the-box_Visual_In-context_Learning_With_Image_Diffusion_Model.md|Analogist: Out-of-the-box Visual In-context Learning With Image Diffusion Model (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Analogist_Out_of_the_box_Visual_In_context_Learning_With_Image_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Analogist
+	- datasets: 推理时间
+- [[obsidian-vault/analysis/SIGGRAPH_2024/BlockFusion_Expandable_3D_Scene_Generation_Using_Latent_Tri-plane_Extrapolation.md|BlockFusion: Expandable 3D Scene Generation Using Latent Tri-plane Extrapolation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/BlockFusion_Expandable_3D_Scene_Generation_Using_Latent_Tri_plane_Extrapolation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: BlockFusion
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Blue_Noise_for_Diffusion_Models.md|Blue Noise for Diffusion Models (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Blue_Noise_for_Diffusion_Models.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Time-varying Noise Diffusion Model (BNDM)
 	- datasets: AFHQ-Cat 64×64, CelebA 64×64, LSUN-Church 64×64
-- BrepGen: A B-rep Generative Diffusion Model With Structured Latent Geometry (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+- [[obsidian-vault/analysis/SIGGRAPH_2024/BrepGen_A_B-rep_Generative_Diffusion_Model_With_Structured_Latent_Geometry.md|BrepGen: A B-rep Generative Diffusion Model With Structured Latent Geometry (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/BrepGen_A_B_rep_Generative_Diffusion_Model_With_Structured_Latent_Geometry.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: BrepGen
+	- datasets: DeepCAD unconditional generation, ABC unconditional generation
 - [[obsidian-vault/analysis/SIGGRAPH_2024/CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control.md|CAMDM Taming Diffusion Probabilistic Models for Character Control (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Conditional Autoregressive Motion Diffusion Model (CAMDM)
 	- datasets: 单风格控制, 实时推理效率
-- CLAY: A Controllable Large-scale Generative Model for Creating High-quality 3D Assets (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- ConceptLab: Creative Concept Generation using VLM-Guided Diffusion Prior Constraints (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/CharacterGen_Efficient_3D_Character_Generation_From_Single_Images_With_Multi-view_Pose_Canonicalization.md|CharacterGen: Efficient 3D Character Generation From Single Images With Multi-view Pose Canonicalization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CharacterGen_Efficient_3D_Character_Generation_From_Single_Images_With_Multi_view_Pose_Canonicalization.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CharacterGen
+	- datasets: Anime3D test split, CLIP分数
+- [[obsidian-vault/analysis/SIGGRAPH_2024/CLAY_A_Controllable_Large-scale_Generative_Model_for_Creating_High-quality_3D_Assets.md|CLAY: A Controllable Large-scale Generative Model for Creating High-quality 3D Assets (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CLAY_A_Controllable_Large_scale_Generative_Model_for_Creating_High_quality_3D_Assets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CLAY
+	- datasets: Text-to-3D, Image-to-3D, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Coin3D_Controllable_and_Interactive_3D_Assets_Generation_With_Proxy-guided_Conditioning.md|Coin3D: Controllable and Interactive 3D Assets Generation With Proxy-guided Conditioning (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Coin3D_Controllable_and_Interactive_3D_Assets_Generation_With_Proxy_guided_Conditioning.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Coin3D
+	- datasets: Controllable 3D Generation
+- [[obsidian-vault/analysis/SIGGRAPH_2024/ConceptLab_Creative_Concept_Generation_using_VLM-Guided_Diffusion_Prior_Constraints.md|ConceptLab: Creative Concept Generation using VLM-Guided Diffusion Prior Constraints (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/ConceptLab_Creative_Concept_Generation_using_VLM_Guided_Diffusion_Prior_Constraints.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: ConceptLab
+	- datasets: User Study
 - [[obsidian-vault/analysis/SIGGRAPH_2024/DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_Generation_via_Diffusion_Models.md|DiffPoseTalk Speech Driven Stylistic 3D Facial Animation and Head Pose Generation via Diffusion Models (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_Generation_via_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: DiffPoseTalk
 	- datasets: TFHP
-- Diffusion Illusions: Hiding Images in Plain Sight (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Diffusion_Illusions_Hiding_Images_in_Plain_Sight.md|Diffusion Illusions: Hiding Images in Plain Sight (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Diffusion_Illusions_Hiding_Images_in_Plain_Sight.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Diffusion Illusions
+	- datasets: Hidden Overlay Illusions
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Diffusion_Texture_Painting.md|Diffusion Texture Painting (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Diffusion_Texture_Painting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Diffusion Texture Painting
 	- datasets: Pexels textures
-- DiLightNet: Fine-grained Lighting Control for Diffusion-based Image Generation (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DiLightNet_Fine-grained_Lighting_Control_for_Diffusion-based_Image_Generation.md|DiLightNet: Fine-grained Lighting Control for Diffusion-based Image Generation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiLightNet_Fine_grained_Lighting_Control_for_Diffusion_based_Image_Generation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DiLightNet (Diffusion Lighting ControlNet)
+	- datasets: Synthetic test set, User study - lighting similarity, User study - appearance consistency under rotated lighting
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.md|Direct-a-Video: Customized Video Generation with User-Directed Camera Movement and Object Motion (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Direct-a-Video
 	- datasets: Camera Control, Object Control
-- DMHomo: Learning Homography with Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- DreamMat: High-quality PBR Material Generation With Geometry- and Light-aware Diffusion Models (SIGGRAPH 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DreamMat_High_quality_PBR_Material_Generation_With_Geometry_and_Light_aware_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Filter-Guided Diffusion for Controllable Image Generation (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DMHomo_Learning_Homography_with_Diffusion_Models.md|DMHomo: Learning Homography with Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DMHomo_Learning_Homography_with_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Flexible Motion In-betweening With Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
+	- methods: DMHomo
+	- datasets: CAHomo test set, GHOF test set, HPatches illumination change
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Dragons_Path_Synthesizing_User-centered_Flying_Creature_Animation_Paths_for_Outdoor_Augmented_Reality_Experiences.md|Dragon's Path: Synthesizing User-centered Flying Creature Animation Paths for Outdoor Augmented Reality Experiences (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Dragon_s_Path_Synthesizing_User_centered_Flying_Creature_Animation_Paths_for_Outdoor_Augmented_Reality_Experiences.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Dragon's Path
+	- datasets: Campus Scenes with virtual dragon, Changing viewpoint scenarios
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DreamFont3D_Personalized_Text-to-3D_Artistic_Font_Generation.md|DreamFont3D: Personalized Text-to-3D Artistic Font Generation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DreamFont3D_Personalized_Text_to_3D_Artistic_Font_Generation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamFont3D
+	- datasets: Custom Font Dataset, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DreamMat_High-quality_PBR_Material_Generation_With_Geometry-_and_Light-aware_Diffusion_Models.md|DreamMat: High-quality PBR Material Generation With Geometry- and Light-aware Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DreamMat_High_quality_PBR_Material_Generation_With_Geometry_and_Light_aware_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamMat
+	- datasets: 用户研究
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DressCode_Autoregressively_Sewing_and_Generating_Garments_From_Text_Guidance.md|DressCode: Autoregressively Sewing and Generating Garments From Text Guidance (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DressCode_Autoregressively_Sewing_and_Generating_Garments_From_Text_Guidance.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: DressCode
+	- datasets: Text-to-garment generation, User study, Runtime efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_2024/EASI-Tex_Edge-Aware_Mesh_Texturing_from_Single_Image.md|EASI-Tex: Edge-Aware Mesh Texturing from Single Image (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/EASI_Tex_Edge_Aware_Mesh_Texturing_from_Single_Image.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EASI-Tex
+	- datasets: User Study, Texture encoding time
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Fabric_Tessellation_Realizing_Freeform_Surfaces_by_Smocking.md|Fabric Tessellation: Realizing Freeform Surfaces by Smocking (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Fabric_Tessellation_Realizing_Freeform_Surfaces_by_Smocking.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Tangram-based Smocking Inverse Design
+	- datasets: Diverse 3D shapes, Optimization runtime, Preview generation
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Filter-Guided_Diffusion_for_Controllable_Image_Generation.md|Filter-Guided Diffusion for Controllable Image Generation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Filter_Guided_Diffusion_for_Controllable_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Filter-Guided Diffusion (FGD)
+	- datasets: AFHQ 子集, AFHQ, CelebA
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Flexible_Motion_In-betweening_With_Diffusion_Models.md|Flexible Motion In-betweening With Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Flexible_Motion_In_betweening_With_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Conditional Motion Diffusion In-betweening (CondMDI)
+	- datasets: HumanML3D test set, HumanML3D
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Flexible_Motion_In_betweening_with_Diffusion_Models_CondMDI.md|Flexible Motion In-betweening with Diffusion Models (CondMDI) (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: CondMDI (Conditional Motion Diffusion In-betweening)
 	- datasets: HumanML3D
-- GEM3D: GEnerative Medial Abstractions for 3D Shape Synthesis (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Generative Escher Meshes (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- HeadArtist: Text-conditioned 3D Head Generation With Self Score Distillation (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/GEM3D_GEnerative_Medial_Abstractions_for_3D_Shape_Synthesis.md|GEM3D: GEnerative Medial Abstractions for 3D Shape Synthesis (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/GEM3D_GEnerative_Medial_Abstractions_for_3D_Shape_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GEM3D
+	- datasets: ShapeNet, ShapeNet reconstruction, Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Generative_Escher_Meshes.md|Generative Escher Meshes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Generative_Escher_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Generative Escher Meshes
+- [[obsidian-vault/analysis/SIGGRAPH_2024/HeadArtist_Text-conditioned_3D_Head_Generation_With_Self_Score_Distillation.md|HeadArtist: Text-conditioned 3D Head Generation With Self Score Distillation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/HeadArtist_Text_conditioned_3D_Head_Generation_With_Self_Score_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HeadArtist
+- [[obsidian-vault/analysis/SIGGRAPH_2024/I2V-Adapter_A_General_Image-to-Video_Adapter_for_Diffusion_Models.md|I2V-Adapter: A General Image-to-Video Adapter for Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/I2V_Adapter_A_General_Image_to_Video_Adapter_for_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: I2V-Adapter
+	- datasets: MJHQ-30K
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Implicit_Swept_Volume_SDF_Enabling_Continuous_Collision-free_Trajectory_Generation_for_Arbitrary_Shapes.md|Implicit Swept Volume SDF: Enabling Continuous Collision-free Trajectory Generation for Arbitrary Shapes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Implicit_Swept_Volume_SDF_Enabling_Continuous_Collision_free_Trajectory_Generation_for_Arbitrary_Shapes.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Implicit Swept Volume SDF with Hierarchical Optimization (Implicit-SVSDF-Planner)
+	- datasets: SVSDF 内部点计算
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.md|Interactive Character Control with Auto-Regressive Motion Diffusion Models (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
 	- methods: A-MDM (Auto-Regressive Motion Diffusion Model)
 	- datasets: HumanML3D, LaFAN1
-- IntrinsicDiffusion: Joint Intrinsic Layers From Latent Diffusion Models (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Interactive_Design_of_Stylized_Walking_Gaits_for_Robotic_Characters.md|Interactive Design of Stylized Walking Gaits for Robotic Characters (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Interactive_Design_of_Stylized_Walking_Gaits_for_Robotic_Characters.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Interactive Procedural Animation System for Stylized Walking Gaits
+	- datasets: Push Recovery, Dino Gait Frequency Scaling, Sim-to-Real Tracking Error
+- [[obsidian-vault/analysis/SIGGRAPH_2024/IntrinsicDiffusion_Joint_Intrinsic_Layers_From_Latent_Diffusion_Models.md|IntrinsicDiffusion: Joint Intrinsic Layers From Latent Diffusion Models (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/IntrinsicDiffusion_Joint_Intrinsic_Layers_From_Latent_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: IntrinsicDiffusion
+	- datasets: IIW, ARAP, SAW
+- [[obsidian-vault/analysis/SIGGRAPH_2024/InvertAvatar_Incremental_GAN_Inversion_for_Generalized_Head_Avatars.md|InvertAvatar: Incremental GAN Inversion for Generalized Head Avatars (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/InvertAvatar_Incremental_GAN_Inversion_for_Generalized_Head_Avatars.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Incremental 3D GAN Inversion (InvertAvatar)
+	- datasets: FFHQ / HDTF, HDTF Same-ID reenactment, VFHQ-Test
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Joint_Stroke_Tracing_and_Correspondence_for_2D_Animation.md|Joint Stroke Tracing and Correspondence for 2D Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Joint_Stroke_Tracing_and_Correspondence_for_2D_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Joint Stroke Tracing and Correspondence
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Latent_L-systems_Transformer-based_Tree_Generator.md|Latent L-systems: Transformer-based Tree Generator (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Latent_L_systems_Transformer_based_Tree_Generator.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- InvertAvatar: Incremental GAN Inversion for Generalized Head Avatars (SIGGRAPH 2024 2024)
+	- methods: Latent L-systems
+	- datasets: ICTree感知真实度, 树特征
+- [[obsidian-vault/analysis/SIGGRAPH_2024/LGTM_Local-to-Global_Text-driven_Human_Motion_Diffusion_Model.md|LGTM: Local-to-Global Text-driven Human Motion Diffusion Model (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/LGTM_Local_to_Global_Text_driven_Human_Motion_Diffusion_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LGTM
+	- datasets: HumanML3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Lightning-fast_Method_of_Fundamental_Solutions.md|Lightning-fast Method of Fundamental Solutions (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Lightning_fast_Method_of_Fundamental_Solutions.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Kaporin变分逆Cholesky稀疏预条件器（Sparse Variational Inverse-Cholesky Preconditioner）
+	- datasets: Pixel diffusion, Helmholtz scattering, Densely constrained Kelvinlets
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Matting_by_Generation.md|Matting by Generation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Matting_by_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- LGTM: Local-to-Global Text-driven Human Motion Diffusion Model (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
+	- methods: alphaLDM (Matting by Generation)
+	- datasets: PPM-100, P3M-P
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Mob-FGSR_Frame_Generation_and_Super_Resolution_for_Mobile_Real-time_Rendering.md|Mob-FGSR: Frame Generation and Super Resolution for Mobile Real-time Rendering (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Mob_FGSR_Frame_Generation_and_Super_Resolution_for_Mobile_Real_time_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Mob-FGSR
+	- datasets: Unity scenes, UE scene, Snapdragon 8 Gen 3
 - [[obsidian-vault/analysis/SIGGRAPH_2024/Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Explicit_Motion_Modeling.md|Motion-I2V: Consistent and Controllable Image-to-Video Generation with Explicit Motion Modeling (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Explicit_Motion_Modeling.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -1573,228 +2307,656 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: MotionCtrl
 	- datasets: Camera Motion Control, Object Motion Control, Video Quality
-- MVD^2: Efficient Multiview 3D Reconstruction for Multiview Diffusion (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/MVD2_Efficient_Multiview_3D_Reconstruction_for_Multiview_Diffusion.md|MVD^2: Efficient Multiview 3D Reconstruction for Multiview Diffusion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/MVD_2_Efficient_Multiview_3D_Reconstruction_for_Multiview_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MVD^2
+	- datasets: GSO dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Object-level_Scene_Deocclusion.md|Object-level Scene Deocclusion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Object_level_Scene_Deocclusion.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow
+	- methods: PACO
+	- datasets: COCOA 验证集
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Physics-based_Scene_Layout_Generation_From_Human_Motion.md|Physics-based Scene Layout Generation From Human Motion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Physics_based_Scene_Layout_Generation_From_Human_Motion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: INFERACT
+	- datasets: SAMP
 - [[obsidian-vault/analysis/SIGGRAPH_2024/PhysicsPingPong_Strategy_and_Skill_Learning_for_Physics_based_Table_Tennis_Animation.md|PhysicsPingPong Strategy and Skill Learning for Physics based Table Tennis Animation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/PhysicsPingPong_Strategy_and_Skill_Learning_for_Physics_based_Table_Tennis_Animation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: PhysicsPingPong
 	- datasets: Table Tennis Skill Evaluation, Ball Control Task, Agent-Agent Competition
-- Promptable Game Models: Text-Guided Game Simulation via Masked Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
-- RGB↔X: Image Decomposition and Synthesis Using Material- and Lighting-aware Diffusion Models (SIGGRAPH 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/RGB_X_Image_Decomposition_and_Synthesis_Using_Material_and_Lighting_aware_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- RTG-SLAM: Real-time 3D Reconstruction at Scale Using Gaussian Splatting (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Practical_Error_Estimation_for_Denoised_Monte_Carlo_Image_Synthesis.md|Practical Error Estimation for Denoised Monte Carlo Image Synthesis (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Practical_Error_Estimation_for_Denoised_Monte_Carlo_Image_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- Separate-and-Enhance: Compositional Finetuning for Text-to-image Diffusion Models (SIGGRAPH 2024 2024)
+	- methods: Hierarchical SURE-based Error Estimation and Stopping Criterion
+	- datasets: BATHROOM场景运行时开销
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Primal-dual_Non-smooth_Friction_for_Rigid_Body_Animation.md|Primal-dual Non-smooth Friction for Rigid Body Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Primal_dual_Non_smooth_Friction_for_Rigid_Body_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Progressive_Dynamics_for_Cloth_and_Shell_Animation.md|Progressive Dynamics for Cloth and Shell Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Progressive_Dynamics_for_Cloth_and_Shell_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Progressive Dynamics
+	- datasets: Laundry Basket, Smushing Octocats, Bouncing Jumble
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Promptable_Game_Models_Text-Guided_Game_Simulation_via_Masked_Diffusion_Models.md|Promptable Game Models: Text-Guided Game Simulation via Masked Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Promptable_Game_Models_Text_Guided_Game_Simulation_via_Masked_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Promptable Game Models (PGM)
+	- datasets: Tennis dataset, Minecraft dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Proxy_Asset_Generation_for_Cloth_Simulation_in_Games.md|Proxy Asset Generation for Cloth Simulation in Games (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Proxy_Asset_Generation_for_Cloth_Simulation_in_Games.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Automatic Proxy Mesh Generation and Skinning Weight Optimization Pipeline
+- [[obsidian-vault/analysis/SIGGRAPH_2024/QT-Font_High-efficiency_Font_Synthesis_via_Quadtree-based_Diffusion_Models.md|QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/QT_Font_High_efficiency_Font_Synthesis_via_Quadtree_based_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: QT-Font
+	- datasets: SFUC, UFSC, UFUC
+- [[obsidian-vault/analysis/SIGGRAPH_2024/RealFill_Reference-driven_Generation_for_Authentic_Image_Completion.md|RealFill: Reference-driven Generation for Authentic Image Completion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/RealFill_Reference_driven_Generation_for_Authentic_Image_Completion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RealFill
+	- datasets: RealBench, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/RGBX_Image_Decomposition_and_Synthesis_Using_Material-_and_Lighting-aware_Diffusion_Models.md|RGB↔X: Image Decomposition and Synthesis Using Material- and Lighting-aware Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/RGB_X_Image_Decomposition_and_Synthesis_Using_Material_and_Lighting_aware_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RGB↔X
+	- datasets: Hypersim test set, Evermotion test set
+- [[obsidian-vault/analysis/SIGGRAPH_2024/RTG-SLAM_Real-time_3D_Reconstruction_at_Scale_Using_Gaussian_Splatting.md|RTG-SLAM: Real-time 3D Reconstruction at Scale Using Gaussian Splatting (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/RTG_SLAM_Real_time_3D_Reconstruction_at_Scale_Using_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RTG-SLAM
+	- datasets: Replica Office 0, Azure Home, TUM-RGBD
+- [[obsidian-vault/analysis/SIGGRAPH_2024/S3_Speech_Script_and_Scene_Driven_Head_and_Eye_Animation.md|S3: Speech, Script, and Scene Driven Head and Eye Animation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/S3_Speech_Script_and_Scene_Driven_Head_and_Eye_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: S^3
+	- datasets: Audition dataset, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Separate-and-Enhance_Compositional_Finetuning_for_Text-to-image_Diffusion_Models.md|Separate-and-Enhance: Compositional Finetuning for Text-to-image Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Separate_and_Enhance_Compositional_Finetuning_for_Text_to_image_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SketchDream_Sketch-based_Text-to-3D_Generation_and_Editing.md|SketchDream: Sketch-based Text-to-3D Generation and Editing (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SketchDream_Sketch_based_Text_to_3D_Generation_and_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 - [[obsidian-vault/analysis/SIGGRAPH_2024/SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction.md|SMEAR Stylized Motion Exaggeration with ARt direction (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: SMEAR
 	- datasets: Motion offsets pre-processing performance, Memory usage per frame, Qualitative comparison: elongated in-betweens vs. swept volumes
-- Spice-E: Structural Priors in 3D Diffusion Using Cross-Entity Attention (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- ST-4DGS: Spatial-Temporally Consistent 4D Gaussian Splatting for Efficient Dynamic Scene Rendering (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- StopThePop: Sorted Gaussian Splatting for View-consistent Real-time Rendering (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Streetscapes: Large-scale Consistent Street View Generation Using Autoregressive Video Diffusion (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Subject-Diffusion: Open Domain Personalized Text-to-image Generation Without Test-time Fine-tuning (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Taming Diffusion Probabilistic Models for Character Control (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- Target-aware Image Denoising for Inverse Monte Carlo Rendering (SIGGRAPH 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Target_aware_Image_Denoising_for_Inverse_Monte_Carlo_Rendering.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Spice-E_Structural_Priors_in_3D_Diffusion_Using_Cross-Entity_Attention.md|Spice-E: Structural Priors in 3D Diffusion Using Cross-Entity Attention (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Spice_E_Structural_Priors_in_3D_Diffusion_Using_Cross_Entity_Attention.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Spice·E
+	- datasets: ShapeTalk, Primitive-based Text-conditional Abstraction-to-3D
+- [[obsidian-vault/analysis/SIGGRAPH_2024/ST-4DGS_Spatial-Temporally_Consistent_4D_Gaussian_Splatting_for_Efficient_Dynamic_Scene_Rendering.md|ST-4DGS: Spatial-Temporally Consistent 4D Gaussian Splatting for Efficient Dynamic Scene Rendering (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/ST_4DGS_Spatial_Temporally_Consistent_4D_Gaussian_Splatting_for_Efficient_Dynamic_Scene_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2024/StopThePop_Sorted_Gaussian_Splatting_for_View-consistent_Real-time_Rendering.md|StopThePop: Sorted Gaussian Splatting for View-consistent Real-time Rendering (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/StopThePop_Sorted_Gaussian_Splatting_for_View_consistent_Real_time_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: StopThePop (Hierarchical Sorted Gaussian Splatting)
+	- datasets: Mip-NeRF 360 Outdoor, Deep Blending, Mip-NeRF 360 Indoor
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Streetscapes_Large-scale_Consistent_Street_View_Generation_Using_Autoregressive_Video_Diffusion.md|Streetscapes: Large-scale Consistent Street View Generation Using Autoregressive Video Diffusion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Streetscapes_Large_scale_Consistent_Street_View_Generation_Using_Autoregressive_Video_Diffusion.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Streetscapes
+	- datasets: Large-scale consistent street view generation, Perpetual street view generation
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Subject-Diffusion_Open_Domain_Personalized_Text-to-image_Generation_Without_Test-time_Fine-tuning.md|Subject-Diffusion: Open Domain Personalized Text-to-image Generation Without Test-time Fine-tuning (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Subject_Diffusion_Open_Domain_Personalized_Text_to_image_Generation_Without_Test_time_Fine_tuning.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Subject-Diffusion
+	- datasets: DreamBench, OpenImage testset, Two-subject DreamBench
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Super-resolution_Cloth_Animation_With_Spatial_and_Temporal_Coherence.md|Super-resolution Cloth Animation With Spatial and Temporal Coherence (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Super_resolution_Cloth_Animation_With_Spatial_and_Temporal_Coherence.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Spatially and Temporally Coherent Super-Resolution Cloth Animation
+	- datasets: Custom garment examples, Cloth falling onto a rabbit, Various garments
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Taming_Diffusion_Probabilistic_Models_for_Character_Control.md|Taming Diffusion Probabilistic Models for Character Control (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Taming_Diffusion_Probabilistic_Models_for_Character_Control.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Conditional Autoregressive Motion Diffusion Model (CAMDM)
+	- datasets: Multi-style character control, Intra-style Diversity
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Target-aware_Image_Denoising_for_Inverse_Monte_Carlo_Rendering.md|Target-aware Image Denoising for Inverse Monte Carlo Rendering (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Target_aware_Image_Denoising_for_Inverse_Monte_Carlo_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Target-Aware Image Denoising
+	- datasets: Veach-ajar scene, Janga scene, Curtain scene
 - [[obsidian-vault/analysis/SIGGRAPH_2024/TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis.md|TEDi Temporally Entangled Diffusion for Long Term Motion Synthesis (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: TEDi (Temporally-Entangled Diffusion)
 	- datasets: Perceptual study
-- Temporally Stable Metropolis Light Transport Denoising Using Recurrent Transformer Blocks (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Temporally_Stable_Metropolis_Light_Transport_Denoising_Using_Recurrent_Transformer_Blocks.md|Temporally Stable Metropolis Light Transport Denoising Using Recurrent Transformer Blocks (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Temporally_Stable_Metropolis_Light_Transport_Denoising_Using_Recurrent_Transformer_Blocks.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- TexPainter: Generative Mesh Texturing With Multi-view Consistency (SIGGRAPH 2024 2024)
+	- methods: Recurrent Transformer Denoiser
+	- datasets: OpenRooms test set, Monkey scene
+- [[obsidian-vault/analysis/SIGGRAPH_2024/TexPainter_Generative_Mesh_Texturing_With_Multi-view_Consistency.md|TexPainter: Generative Mesh Texturing With Multi-view Consistency (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TexPainter_Generative_Mesh_Texturing_With_Multi_view_Consistency.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- TexSliders: Diffusion-based Texture Editing in CLIP Space (SIGGRAPH 2024 2024)
+	- methods: TexPainter
+- [[obsidian-vault/analysis/SIGGRAPH_2024/TexSliders_Diffusion-based_Texture_Editing_in_CLIP_Space.md|TexSliders: Diffusion-based Texture Editing in CLIP Space (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/TexSliders_Diffusion_based_Texture_Editing_in_CLIP_Space.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- The Chosen One: Consistent Characters in Text-to-image Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Training-free Consistent Text-to-image Generation (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Transparent Image Layer Diffusion Using Latent Transparency (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- VR-GS: A Physical Dynamics-aware Interactive Gaussian Splatting System in Virtual Reality (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: TexSliders
+	- datasets: Test dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Text-to-vector_Generation_With_Neural_Path_Representation.md|Text-to-vector Generation With Neural Path Representation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Text_to_vector_Generation_With_Neural_Path_Representation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: T2V-NPR (Text-to-Vector Neural Path Representation)
+	- datasets: Text-to-vector generation, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/The_Chosen_One_Consistent_Characters_in_Text-to-image_Diffusion_Models.md|The Chosen One: Consistent Characters in Text-to-image Diffusion Models (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/The_Chosen_One_Consistent_Characters_in_Text_to_image_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: The Chosen One
+	- datasets: Custom character prompts generated by ChatGPT, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Training-free_Consistent_Text-to-image_Generation.md|Training-free Consistent Text-to-image Generation (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Training_free_Consistent_Text_to_image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- methods: ConsiStory
+	- datasets: Custom prompts dataset, Runtime comparison, User study - Visual Consistency & Textual Alignment
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Transparent_Image_Layer_Diffusion_Using_Latent_Transparency.md|Transparent Image Layer Diffusion Using Latent Transparency (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Transparent_Image_Layer_Diffusion_Using_Latent_Transparency.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Transparency
+	- datasets: User Study, Human-in-the-loop Data Collection
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Versatile_Vision_Foundation_Model_for_Image_and_Video_Colorization.md|Versatile Vision Foundation Model for Image and Video Colorization (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Versatile_Vision_Foundation_Model_for_Image_and_Video_Colorization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VVFM (Versatile Vision Foundation Model)
+	- datasets: COCO validation set, NTIRE Video Colorization validation set, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2024/VR-GS_A_Physical_Dynamics-aware_Interactive_Gaussian_Splatting_System_in_Virtual_Reality.md|VR-GS: A Physical Dynamics-aware Interactive Gaussian Splatting System in Virtual Reality (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/VR_GS_A_Physical_Dynamics_aware_Interactive_Gaussian_Splatting_System_in_Virtual_Reality.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VR-GS
+	- datasets: Various demos, User Study
 - [[obsidian-vault/analysis/SIGGRAPH_2024/X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attention.md|X-Portrait: Expressive Portrait Animation with Hierarchical Motion Attention (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attention.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: X-Portrait
 	- datasets: Ablation on Cross-Identity Training, Ablation on Local Control Module, User Study
-- 360-degree Human Video Generation with 4D Diffusion Transformer (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/360-degree_Human_Video_Generation_with_4D_Diffusion_Transformer.md|360-degree Human Video Generation with 4D Diffusion Transformer (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/360_degree_Human_Video_Generation_with_4D_Diffusion_Transformer.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Human4DiT
+	- datasets: Single-view video, Multi-view video
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3DGSR_Implicit_Surface_Reconstruction_with_3D_Gaussian_Splatting.md|3DGSR: Implicit Surface Reconstruction with 3D Gaussian Splatting (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/3DGSR_Implicit_Surface_Reconstruction_with_3D_Gaussian_Splatting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: 3DGSR
 	- datasets: NeRF-synthetic, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Mesh-based_Simulation_Framework_using_Automatic_Code_Generation.md|A Mesh-based Simulation Framework using Automatic Code Generation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Mesh_based_Simulation_Framework_using_Automatic_Code_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Physical Simulation, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Symbolic mesh-based simulation framework
+	- datasets: Stable neo-Hookean simulation on 1M tetrahedra, Stable neo-Hookean energy Hessian/gradient evaluation on 1M tetrahedra, Sparse matrix-vector product on 1M vertices
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/A_Statistical_Approach_to_Monte_Carlo_Denoising.md|A Statistical Approach to Monte Carlo Denoising (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/A_Statistical_Approach_to_Monte_Carlo_Denoising.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Generative / Diffusion / Flow
 	- methods: Statistical Denoising Method (StatMC)
 	- datasets: Wooden Staircase, Bathroom, Salle de Bain
-- AdR-Gaussian: Accelerating Gaussian Splatting with Adaptive Radius (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/AdR-Gaussian_Accelerating_Gaussian_Splatting_with_Adaptive_Radius.md|AdR-Gaussian: Accelerating Gaussian Splatting with Adaptive Radius (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/AdR_Gaussian_Accelerating_Gaussian_Splatting_with_Adaptive_Radius.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- BlobGEN-3D: Compositional 3D-Consistent Freeview Image Generation with 3D Blobs (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- BSDF importance sampling using a diffusion model (SIGGRAPH ASIA 2024 2024)
+	- methods: AdR-Gaussian
+	- datasets: Mip-NeRF360, Tanks&Temples, Deep Blending
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Anim-Director_A_Large_Multimodal_Model_Powered_Agent_for_Controllable_Animation_Video_Generation.md|Anim-Director: A Large Multimodal Model Powered Agent for Controllable Animation Video Generation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Anim_Director_A_Large_Multimodal_Model_Powered_Agent_for_Controllable_Animation_Video_Generation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Anim-Director
+	- datasets: TinyStories-based narratives, VBench metrics
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Architectural_Co-LOD_Generation.md|Architectural Co-LOD Generation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Architectural_Co_LOD_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Co-LOD
+	- datasets: 所有测试场景
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Autonomous_Character-Scene_Interaction_Synthesis_from_Text_Instruction.md|Autonomous Character-Scene Interaction Synthesis from Text Instruction (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Autonomous HSI Synthesis (Autoregressive Diffusion + Dual Voxel + Frame-embedded Text + Scheduler)
+	- datasets: Interactive motion synthesis, Locomotion, Object reaching
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/BlobGEN-3D_Compositional_3D-Consistent_Freeview_Image_Generation_with_3D_Blobs.md|BlobGEN-3D: Compositional 3D-Consistent Freeview Image Generation with 3D Blobs (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/BlobGEN_3D_Compositional_3D_Consistent_Freeview_Image_Generation_with_3D_Blobs.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: BlobGEN-3D
+	- datasets: ScanNet++, AI2Thor++
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Body_Gesture_Generation_for_Multimodal_Conversational_Agents.md|Body Gesture Generation for Multimodal Conversational Agents (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Body_Gesture_Generation_for_Multimodal_Conversational_Agents.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Adversarial Learned Motion Matching with Gesture Phasing
+	- datasets: Proprietary conversation gesture dataset, Ablation comparison
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Boosting_3D_Object_Generation_through_PBR_Materials.md|Boosting 3D Object Generation through PBR Materials (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Boosting_3D_Object_Generation_through_PBR_Materials.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PBR Material Boosting
+	- datasets: CRM, InstantMesh, TripoSR
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/BSDF_importance_sampling_using_a_diffusion_model.md|BSDF importance sampling using a diffusion model (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/BSDF_importance_sampling_using_a_diffusion_model.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Camera Settings as Tokens: Modeling Photography on Latent Diffusion Models (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- Customizing Text-to-Image Diffusion with Object Viewpoint Control (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Diffusion BSDF Sampling
+	- datasets: RGL dataset, Disney BSDFs, Sampling time on 1024x1024 image
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Camera_Settings_as_Tokens_Modeling_Photography_on_Latent_Diffusion_Models.md|Camera Settings as Tokens: Modeling Photography on Latent Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Camera_Settings_as_Tokens_Modeling_Photography_on_Latent_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Camera Settings as Tokens
+	- datasets: 零样本亲和性:数值相机设置 vs 摄影术语, 与ControlNet的融合
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Content-aware_Tile_Generation_using_Exterior_Boundary_Inpainting.md|Content-aware Tile Generation using Exterior Boundary Inpainting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Content_aware_Tile_Generation_using_Exterior_Boundary_Inpainting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: 基于外部边界修复的内容感知瓦片生成 (Exterior Boundary Inpainting for Content-aware Tile Generation)
+	- datasets: Classic Texture, Semantic Textures, Self-tiling on Classic Texture
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/CPoser_An_Optimization-after-Parsing_Approach_for_Text-to-Pose_Generation_Using_Large_Language_Models.md|CPoser: An Optimization-after-Parsing Approach for Text-to-Pose Generation Using Large Language Models. (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/CPoser_An_Optimization_after_Parsing_Approach_for_Text_to_Pose_Generation_Using_Large_Language_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CPoser
+	- datasets: 泛化能力, 重建能力
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Curly-Cue_Geometric_Methods_for_Highly_Coiled_Hair.md|Curly-Cue: Geometric Methods for Highly Coiled Hair (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Curly_Cue_Geometric_Methods_for_Highly_Coiled_Hair.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Curly-Cue
+	- datasets: Scalp region realism, Switchback controllability, Period skipping effect
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Customizing_Text-to-Image_Diffusion_with_Object_Viewpoint_Control.md|Customizing Text-to-Image Diffusion with Object Viewpoint Control (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Customizing_Text_to_Image_Diffusion_with_Object_Viewpoint_Control.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Customizing Text-to-Image Models with a Single Image Pair (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CustomDiffusion360
+	- datasets: Human Preference Study, Viewpoint Accuracy
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Customizing_Text-to-Image_Models_with_a_Single_Image_Pair.md|Customizing Text-to-Image Models with a Single Image Pair (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Customizing_Text_to_Image_Models_with_a_Single_Image_Pair.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- DARTS: Diffusion Approximated Residual Time Sampling for Time-of-flight Rendering in Homogeneous Scattering Media (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- DifFRelight: Diffusion-Based Facial Performance Relighting (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Dance-to-Music_Generation_with_Encoder-based_Textual_Inversion.md|Dance-to-Music Generation with Encoder-based Textual Inversion (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Dance_to_Music_Generation_with_Encoder_based_Textual_Inversion.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Dual-path Rhythm-Genre Inversion (Encoder-based Textual Inversion)
+	- datasets: AIST++, InDV
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DARTS_Diffusion_Approximated_Residual_Time_Sampling_for_Time-of-flight_Rendering_in_Homogeneous_Scattering_Media.md|DARTS: Diffusion Approximated Residual Time Sampling for Time-of-flight Rendering in Homogeneous Scattering Media (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DARTS_Diffusion_Approximated_Residual_Time_Sampling_for_Time_of_flight_Rendering_in_Homogeneous_Scattering_Media.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DARTS (Diffusion Approximated Residual Time Sampling)
+	- datasets: GLOSSY DRAGON, STAIRCASE
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DifFRelight_Diffusion-Based_Facial_Performance_Relighting.md|DifFRelight: Diffusion-Based Facial Performance Relighting (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DifFRelight_Diffusion_Based_Facial_Performance_Relighting.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- EVSplitting: An Efficient and Visually Consistent Splitting Algorithm for 3D Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/EVSplitting_An_Efficient_and_Visually_Consistent_Splitting_Algorithm_for_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Fashion-VDM: Video Diffusion Model for Virtual Try-On (SIGGRAPH ASIA 2024 2024)
+	- methods: DifFRelight
+	- datasets: Novel Light, Novel Expression, Novel View
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DrawingSpinUp_3D_Animation_from_Single_Character_Drawings.md|DrawingSpinUp: 3D Animation from Single Character Drawings (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DrawingSpinUp_3D_Animation_from_Single_Character_Drawings.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DrawingSpinUp
+	- datasets: User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/FabricDiffusion_High-Fidelity_Texture_Transfer_for_3D_Garments_Generation_from_In-The-Wild_Images.md|FabricDiffusion: High-Fidelity Texture Transfer for 3D Garments Generation from In-The-Wild Images (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/FabricDiffusion_High_Fidelity_Texture_Transfer_for_3D_Garments_Generation_from_In_The_Wild_Images.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FabricDiffusion
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Fashion-VDM_Video_Diffusion_Model_for_Virtual_Try-On.md|Fashion-VDM: Video Diffusion Model for Virtual Try-On (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Fashion_VDM_Video_Diffusion_Model_for_Virtual_Try_On.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Fast High-Resolution Image Synthesis with Latent Adversarial Diffusion Distillation (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Fashion-VDM
+	- datasets: UBC Test Dataset, Our Test Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Fast_High-Resolution_Image_Synthesis_with_Latent_Adversarial_Diffusion_Distillation.md|Fast High-Resolution Image Synthesis with Latent Adversarial Diffusion Distillation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Fast_High_Resolution_Image_Synthesis_with_Latent_Adversarial_Diffusion_Distillation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- FragmentDiff: A Diffusion Model for Fractured Object Assembly (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Latent Adversarial Diffusion Distillation (LADD)
+	- datasets: Human Preference Study, COCO Inpainting, PIE-Bench
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Follow-Your-Emoji_Fine-Controllable_and_Expressive_Freestyle_Portrait_Animation.md|Follow-Your-Emoji: Fine-Controllable and Expressive Freestyle Portrait Animation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Follow_Your_Emoji_Fine_Controllable_and_Expressive_Freestyle_Portrait_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Follow-Your-Emoji
+	- datasets: EmojiBench
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/FragmentDiff_A_Diffusion_Model_for_Fractured_Object_Assembly.md|FragmentDiff: A Diffusion Model for Fractured Object Assembly (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/FragmentDiff_A_Diffusion_Model_for_Fractured_Object_Assembly.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- GaussianObject: High-Quality 3D Object Reconstruction from Four Views with Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: FragmentDiff
+	- datasets: Everyday subset, Artifact subset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Frankenstein_Generating_Semantic-Compositional_3D_Scenes_in_One_Tri-Plane.md|Frankenstein: Generating Semantic-Compositional 3D Scenes in One Tri-Plane (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Frankenstein_Generating_Semantic_Compositional_3D_Scenes_in_One_Tri_Plane.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Frankenstein
+	- datasets: Avatar Generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/FreeAvatar_Robust_3D_Facial_Animation_Transfer_by_Learning_an_Expression_Foundation_Model.md|FreeAvatar: Robust 3D Facial Animation Transfer by Learning an Expression Foundation Model (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/FreeAvatar_Robust_3D_Facial_Animation_Transfer_by_Learning_an_Expression_Foundation_Model.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FreeAvatar
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/GaussianObject_High-Quality_3D_Object_Reconstruction_from_Four_Views_with_Gaussian_Splatting.md|GaussianObject: High-Quality 3D Object Reconstruction from Four Views with Gaussian Splatting (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/GaussianObject_High_Quality_3D_Object_Reconstruction_from_Four_Views_with_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- Generative Portrait Shadow Removal (SIGGRAPH ASIA 2024 2024)
+	- methods: GaussianObject (含变体 CF-GaussianObject)
+	- datasets: MipNeRF360, OpenIllumination
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Generative_Portrait_Shadow_Removal.md|Generative Portrait Shadow Removal (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Generative_Portrait_Shadow_Removal.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
-- GS^3: Efficient Relighting with Triple Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
-- I2VEdit: First-Frame-Guided Video Editing via Image-to-Video Diffusion Models (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/I2VEdit_First_Frame_Guided_Video_Editing_via_Image_to_Video_Diffusion_Models.pdf|PDF]]
+	- methods: Generative Portrait Shadow Removal (Ours)
+	- datasets: 用户研究
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/GGHead_Fast_and_Generalizable_3D_Gaussian_Heads.md|GGHead: Fast and Generalizable 3D Gaussian Heads (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/GGHead_Fast_and_Generalizable_3D_Gaussian_Heads.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- InstanceTex: Instance-level Controllable Texture Synthesis for 3D Scenes via Diffusion Priors (SIGGRAPH ASIA 2024 2024)
+	- methods: Generative Gaussian Heads (GGHead)
+	- datasets: FFHQ-M
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/GS3_Efficient_Relighting_with_Triple_Gaussian_Splatting.md|GS^3: Efficient Relighting with Triple Gaussian Splatting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/GS_3_Efficient_Relighting_with_Triple_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- L3DG: Latent 3D Gaussian Diffusion (SIGGRAPH ASIA 2024 2024)
+	- methods: GS^3 (Triple Gaussian Splatting)
+	- datasets: Hotdog, Lego, MaterialBalls
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/HFH-Font_Few-shot_Chinese_Font_Synthesis_with_Higher_Quality_Faster_Speed_and_Higher_Resolution.md|HFH-Font: Few-shot Chinese Font Synthesis with Higher Quality, Faster Speed, and Higher Resolution (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/HFH_Font_Few_shot_Chinese_Font_Synthesis_with_Higher_Quality_Faster_Speed_and_Higher_Resolution.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: HFH-Font
+	- datasets: 大规模字体数据集, 超分辨率 1024×1024 生成
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/I2VEdit_First-Frame-Guided_Video_Editing_via_Image-to-Video_Diffusion_Models.md|I2VEdit: First-Frame-Guided Video Editing via Image-to-Video Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/I2VEdit_First_Frame_Guided_Video_Editing_via_Image_to_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: I2VEdit
+	- datasets: Other tasks, SVD Inversion quality on white-background videos
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/InstanceTex_Instance-level_Controllable_Texture_Synthesis_for_3D_Scenes_via_Diffusion_Priors.md|InstanceTex: Instance-level Controllable Texture Synthesis for 3D Scenes via Diffusion Priors (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/InstanceTex_Instance_level_Controllable_Texture_Synthesis_for_3D_Scenes_via_Diffusion_Priors.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InstanceTex
+	- datasets: Indoor Scenes, Outdoor Scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/InstantDrag_Improving_Interactivity_in_Drag-based_Image_Editing.md|InstantDrag: Improving Interactivity in Drag-based Image Editing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/InstantDrag_Improving_Interactivity_in_Drag_based_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Lumiere: A Space-Time Diffusion Model for Video Generation (SIGGRAPH ASIA 2024 2024)
+	- methods: InstantDrag
+	- datasets: TalkingHead-1KH
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/L3DG_Latent_3D_Gaussian_Diffusion.md|L3DG: Latent 3D Gaussian Diffusion (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/L3DG_Latent_3D_Gaussian_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: L3DG
+	- datasets: PhotoShape Chairs, ABO Tables
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Large_Scale_Farm_Scene_Modeling_from_Remote_Sensing_Imagery.md|Large Scale Farm Scene Modeling from Remote Sensing Imagery (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Large_Scale_Farm_Scene_Modeling_from_Remote_Sensing_Imagery.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- LVCD: Reference-based Lineart Video Colorization with Diffusion Models (SIGGRAPH ASIA 2024 2024)
+	- methods: Parametric Layout Models (PLMs) based farm scene modeling
+	- datasets: Top-down rendered view vs. satellite image, User study realism score, Expert modeling time
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Learn_to_Create_Simple_LEGO_Micro_Buildings.md|Learn to Create Simple LEGO Micro Buildings (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Learn_to_Create_Simple_LEGO_Micro_Buildings.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Learning-based LEGO Micro Building Generation Pipeline
+	- datasets: Custom LEGO Micro Building Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Lumiere_A_Space-Time_Diffusion_Model_for_Video_Generation.md|Lumiere: A Space-Time Diffusion Model for Video Generation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Lumiere_A_Space_Time_Diffusion_Model_for_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Lumiere
+	- datasets: UCF101, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LVCD_Reference-based_Lineart_Video_Colorization_with_Diffusion_Models.md|LVCD: Reference-based Lineart Video Colorization with Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LVCD_Reference_based_Lineart_Video_Colorization_with_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- MagicClay: Sculpting Meshes With Generative Neural Fields (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LVCD
+	- datasets: Similar Testset + General Testset, User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MagicClay_Sculpting_Meshes_With_Generative_Neural_Fields.md|MagicClay: Sculpting Meshes With Generative Neural Fields (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MagicClay_Sculpting_Meshes_With_Generative_Neural_Fields.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MagicClay
+	- datasets: Custom 20-prompt text-to-3D benchmark
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.md|MaskedMimic: Unified Physics-Based Character Control Through Masked Motion Inpainting (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
 	- methods: MaskedMimic
 	- datasets: AMASS
-- MoA: Mixture-of-Attention for Subject-Context Disentanglement in Personalized Image Generation (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MoA_Mixture-of-Attention_for_Subject-Context_Disentanglement_in_Personalized_Image_Generation.md|MoA: Mixture-of-Attention for Subject-Context Disentanglement in Personalized Image Generation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MoA_Mixture_of_Attention_for_Subject_Context_Disentanglement_in_Personalized_Image_Generation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Monkey See, Monkey Do: Harnessing Self-attention in Motion Diffusion for Zero-shot Motion Transfer (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Monkey_See_Monkey_Do_Harnessing_Self_attention_in_Motion_Diffusion_for_Zero_shot_Motion_Transfer.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Mixture-of-Attention (MoA)
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MotionFix_Text_Driven_3D_Human_Motion_Editing.md|MotionFix: Text-Driven 3D Human Motion Editing (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MotionFix_Text_Driven_3D_Human_Motion_Editing.pdf|PDF]]
 	- topics: Motion Animation
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: TMED (Text-Driven Motion Editing Diffusion Model)
 	- datasets: MotionFix 测试集, 数据规模消融
-- MV2MV: Multi-View Image Translation via View-Consistent Diffusion Models (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Neural Kernel Regression for Consistent Monte Carlo Denoising (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- Online Neural Denoising with Cross-Regression for Interactive Rendering (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Online_Neural_Denoising_with_Cross_Regression_for_Interactive_Rendering.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- PALP: Prompt Aligned Personalization of Text-to-Image Models (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- PDP: Physics-Based Character Animation via Diffusion Policy (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PDP_Physics_Based_Character_Animation_via_Diffusion_Policy.pdf|PDF]]
-	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
-- Portrait Video Editing Empowered by Multimodal Generative Priors (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Portrait_Video_Editing_Empowered_by_Multimodal_Generative_Priors.pdf|PDF]]
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/mpcMech_Multi-Point_Conjugation_Mechanisms.md|mpcMech: Multi-Point Conjugation Mechanisms (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/mpcMech_Multi_Point_Conjugation_Mechanisms.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- Real-time Large-scale Deformation of Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
+	- methods: Multi-Point Conjugation Mechanism (mpcMech) Design
+	- datasets: mpcMech modeling efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/MV2MV_Multi-View_Image_Translation_via_View-Consistent_Diffusion_Models.md|MV2MV: Multi-View Image Translation via View-Consistent Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/MV2MV_Multi_View_Image_Translation_via_View_Consistent_Diffusion_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MV2MV
+	- datasets: Mip-NeRF360, Deblurring Dataset, Text-Driven Editing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Neural_Kernel_Regression_for_Consistent_Monte_Carlo_Denoising.md|Neural Kernel Regression for Consistent Monte Carlo Denoising (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Neural_Kernel_Regression_for_Consistent_Monte_Carlo_Denoising.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Generative / Diffusion / Flow
-- ReVersion: Diffusion-Based Relation Inversion from Images (SIGGRAPH ASIA 2024 2024)
+	- methods: Neural Kernel Regression (NKR) for Consistent Monte Carlo Denoising
+	- datasets: SIM, VAR
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/NPGA_Neural_Parametric_Gaussian_Avatars.md|NPGA: Neural Parametric Gaussian Avatars (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/NPGA_Neural_Parametric_Gaussian_Avatars.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Parametric Gaussian Avatars (NPGA)
+	- datasets: NeRSemble self-reenactment, NeRSemble novel-view synthesis
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Online_Neural_Denoising_with_Cross-Regression_for_Interactive_Rendering.md|Online Neural Denoising with Cross-Regression for Interactive Rendering (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Online_Neural_Denoising_with_Cross_Regression_for_Interactive_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Online Neural Denoising with Cross-Regression (Hybrid Denoising Framework)
+	- datasets: Bistro, Emerald Square
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/PALP_Prompt_Aligned_Personalization_of_Text-to-Image_Models.md|PALP: Prompt Aligned Personalization of Text-to-Image Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PALP_Prompt_Aligned_Personalization_of_Text_to_Image_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PALP (Prompt Aligned Personalization)
+	- datasets: Custom evaluation set with style/class/ambiance prompts, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Pano2Room_Novel_View_Synthesis_from_a_Single_Indoor_Panorama.md|Pano2Room: Novel View Synthesis from a Single Indoor Panorama (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Pano2Room_Novel_View_Synthesis_from_a_Single_Indoor_Panorama.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Pano2Room
+	- datasets: Replica Room 0, Replica Office 1, Efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/PDP_Physics-Based_Character_Animation_via_Diffusion_Policy.md|PDP: Physics-Based Character Animation via Diffusion Policy (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PDP_Physics_Based_Character_Animation_via_Diffusion_Policy.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PDP (Physics-Based Character Animation via Diffusion Policy)
+	- datasets: Bump'em, AMASS-Test, HumanML3D/KIT
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Portrait_Video_Editing_Empowered_by_Multimodal_Generative_Priors.md|Portrait Video Editing Empowered by Multimodal Generative Priors (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Portrait_Video_Editing_Empowered_by_Multimodal_Generative_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PortraitGen
+	- datasets: User Study, Efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Procedural_Material_Generation_with_Reinforcement_Learning.md|Procedural Material Generation with Reinforcement Learning (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Procedural_Material_Generation_with_Reinforcement_Learning.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
+	- methods: RL-fine-tuned procedural material parameter generator
+	- datasets: Synthetic test set, Real photograph test set, Synthetic and real datasets
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Real-time_Large-scale_Deformation_of_Gaussian_Splatting.md|Real-time Large-scale Deformation of Gaussian Splatting (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Real_time_Large_scale_Deformation_of_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GaussianMesh
+	- datasets: NeRF-Synthetic dataset, rendering speed
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/ReVersion_Diffusion-Based_Relation_Inversion_from_Images.md|ReVersion: Diffusion-Based Relation Inversion from Images (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/ReVersion_Diffusion_Based_Relation_Inversion_from_Images.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: ReVersion Framework
+	- datasets: ReVersion Benchmark, User Study
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Robot_Motion_Diffusion_Model_Motion_Generation_for_Robotic_Characters.md|Robot Motion Diffusion Model: Motion Generation for Robotic Characters (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Robot_Motion_Diffusion_Model_Motion_Generation_for_Robotic_Characters.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: Robot Motion Diffusion Model (RobotMDM)
 	- datasets: Simulated Tracking
-- Robust Dual Gaussian Splatting for Immersive Human-centric Volumetric Videos (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Robust_Dual_Gaussian_Splatting_for_Immersive_Human_centric_Volumetric_Videos.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
-- SD-𝜋XL: Generating Low-Resolution Quantized Imagery via Score Distillation (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
-- SGEdit: Bridging LLM with Text2Image Generative Model for Scene Graph-based Image Editing (SIGGRAPH ASIA 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
-- SIGGesture: Generalized Co-Speech Gesture Synthesis via Semantic Injection with Large-Scale Pre-Training Diffusion Models (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SD-𝜋XL_Generating_Low-Resolution_Quantized_Imagery_via_Score_Distillation.md|SD-𝜋XL: Generating Low-Resolution Quantized Imagery via Score Distillation (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SD_XL_Generating_Low_Resolution_Quantized_Imagery_via_Score_Distillation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SD-πXL
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SGEdit_Bridging_LLM_with_Text2Image_Generative_Model_for_Scene_Graph-based_Image_Editing.md|SGEdit: Bridging LLM with Text2Image Generative Model for Scene Graph-based Image Editing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SGEdit_Bridging_LLM_with_Text2Image_Generative_Model_for_Scene_Graph_based_Image_Editing.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SGEdit
+	- datasets: PIE-Bench, EditVal
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SIGGesture_Generalized_Co-Speech_Gesture_Synthesis_via_Semantic_Injection_with_Large-Scale_Pre-Training_Diffusion_Models.md|SIGGesture: Generalized Co-Speech Gesture Synthesis via Semantic Injection with Large-Scale Pre-Training Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SIGGesture_Generalized_Co_Speech_Gesture_Synthesis_via_Semantic_Injection_with_Large_Scale_Pre_Training_Diffusion_Models.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- SRIF: Semantic Shape Registration Empowered by Diffusion-based Image Morphing and Flow Estimation (SIGGRAPH ASIA 2024 2024)
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SIGGesture
+	- datasets: BEAT
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/SRIF_Semantic_Shape_Registration_Empowered_by_Diffusion-based_Image_Morphing_and_Flow_Estimation.md|SRIF: Semantic Shape Registration Empowered by Diffusion-based Image Morphing and Flow Estimation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/SRIF_Semantic_Shape_Registration_Empowered_by_Diffusion_based_Image_Morphing_and_Flow_Estimation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- StableNormal: Reducing Diffusion Variance for Stable and Sharp Normal (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SRIF (Semantic Shape Registration based on Diffusion-based Image Morphing and Flow Estimation)
+	- datasets: SHREC'07 + EBCM, EBCM subset, Rotation perturbation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/StableNormal_Reducing_Diffusion_Variance_for_Stable_and_Sharp_Normal.md|StableNormal: Reducing Diffusion Variance for Stable and Sharp Normal (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/StableNormal_Reducing_Diffusion_Variance_for_Stable_and_Sharp_Normal.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Still-Moving: Customized Video Generation without Customized Video Data (SIGGRAPH ASIA 2024 2024)
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: StableNormal
+	- datasets: Variance Analysis, DTU Dataset, DiLiGenT
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Still-Moving_Customized_Video_Generation_without_Customized_Video_Data.md|Still-Moving: Customized Video Generation without Customized Video Data (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Still_Moving_Customized_Video_Generation_without_Customized_Video_Data.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- StyleCrafter: Taming Stylized Video Diffusion with Reference-Augmented Adapter Learning (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/StyleCrafter_Taming_Stylized_Video_Diffusion_with_Reference_Augmented_Adapter_Learning.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- TALK-Act: Enhance Textural-Awareness for 2D Speaking Avatar Reenactment with Diffusion Model (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow
-- TEXGen: a Generative Diffusion Model for Mesh Textures (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Still-Moving
+	- datasets: Personalization, Stylization, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/StyleTex_Style_Image-Guided_Texture_Generation_for_3D_Models.md|StyleTex: Style Image-Guided Texture Generation for 3D Models (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/StyleTex_Style_Image_Guided_Texture_Generation_for_3D_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: StyleTex
+	- datasets: User Study, Style Fidelity
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Synchronize_Dual_Hands_for_Physics-Based_Dexterous_Guitar_Playing.md|Synchronize Dual Hands for Physics-Based Dexterous Guitar Playing (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Synchronize_Dual_Hands_for_Physics_Based_Dexterous_Guitar_Playing.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Agent / RL / Planning
+	- methods: Bimanual Policy Synchronization via Latent Space Manipulation
+	- datasets: 同步训练效率
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/TALK-Act_Enhance_Textural-Awareness_for_2D_Speaking_Avatar_Reenactment_with_Diffusion_Model.md|TALK-Act: Enhance Textural-Awareness for 2D Speaking Avatar Reenactment with Diffusion Model (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/TALK_Act_Enhance_Textural_Awareness_for_2D_Speaking_Avatar_Reenactment_with_Diffusion_Model.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TALK-Act
+	- datasets: PATS full test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/TEXGen_a_Generative_Diffusion_Model_for_Mesh_Textures.md|TEXGen: a Generative Diffusion Model for Mesh Textures (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/TEXGen_a_Generative_Diffusion_Model_for_Mesh_Textures.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- Text-Guided Texturing by Synchronized Multi-View Diffusion (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TEXGen
+	- datasets: Objaverse test set, User Study, MLLM Score
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Text-Guided_Texturing_by_Synchronized_Multi-View_Diffusion.md|Text-Guided Texturing by Synchronized Multi-View Diffusion (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Text_Guided_Texturing_by_Synchronized_Multi_View_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- ToonCrafter: Generative Cartoon Interpolation (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Synchronized Multi-View Diffusion (同步多视图扩散)
+	- datasets: 多类3D网格纹理生成
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/ToonCrafter_Generative_Cartoon_Interpolation.md|ToonCrafter: Generative Cartoon Interpolation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/ToonCrafter_Generative_Cartoon_Interpolation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
-- TrailBlazer: Trajectory Control for Diffusion-Based Video Generation (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ToonCrafter
+	- datasets: User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/TrailBlazer_Trajectory_Control_for_Diffusion-Based_Video_Generation.md|TrailBlazer: Trajectory Control for Diffusion-Based Video Generation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/TrailBlazer_Trajectory_Control_for_Diffusion_Based_Video_Generation.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- TurboEdit: Text-Based Image Editing Using Few-Step Diffusion Models (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TrailBlazer
+	- datasets: AnimalKingdom, Dynamic bbox experiment, Static bbox experiment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/TurboEdit_Text-Based_Image_Editing_Using_Few-Step_Diffusion_Models.md|TurboEdit: Text-Based Image Editing Using Few-Step Diffusion Models (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/TurboEdit_Text_Based_Image_Editing_Using_Few_Step_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- VidPanos: Generative Panoramic Videos from Casual Panning Videos (SIGGRAPH ASIA 2024 2024)
+	- methods: TurboEdit
+	- datasets: Edit Benchmark, Editing Speed
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/VidPanos_Generative_Panoramic_Videos_from_Casual_Panning_Videos.md|VidPanos: Generative Panoramic Videos from Casual Panning Videos (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/VidPanos_Generative_Panoramic_Videos_from_Casual_Panning_Videos.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: VidPanos
+	- datasets: Synthetic Panning Videos
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/VOODOO_XP_Expressive_One-Shot_Head_Reenactment_for_VR_Telepresence.md|VOODOO XP: Expressive One-Shot Head Reenactment for VR Telepresence (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/VOODOO_XP_Expressive_One_Shot_Head_Reenactment_for_VR_Telepresence.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VOODOO XP
+	- datasets: Self-reenactment, Cross-reenactment
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/WaveBlender_Practical_Sound_Source_Animation_in_Blended_Domains.md|WaveBlender: Practical Sound-Source Animation in Blended Domains (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/WaveBlender_Practical_Sound_Source_Animation_in_Blended_Domains.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -1937,6 +3099,12 @@ generated: 2026-06-24T20:47
 	- [[obsidian-vault/paperPDFs/arxiv_2025/A_Survey_on_Camera_Trajectory_Generation_in_AIGC.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/arxiv_2025/Articulated_Kinematics_Distillation_from_Video_Diffusion_Models.md|Articulated Kinematics Distillation from Video Diffusion Models (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Articulated_Kinematics_Distillation_from_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Articulated Kinematics Distillation (AKD)
+	- datasets: Text-to-4D Generation
 - [[obsidian-vault/analysis/arxiv_2025/Beyond_Static_Scenes_Camera_controllable_Background_Generation_for_Human_Motion.md|Beyond Static Scenes: Camera-controllable Background Generation for Human Motion (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Beyond_Static_Scenes_Camera_controllable_Background_Generation_for_Human_Motion.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -2077,6 +3245,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Hunyuan3D 2.5
 	- datasets: Shape generation, Texture generation
+- [[obsidian-vault/analysis/arxiv_2025/Hunyuan3D_Studio_End-to-End_AI_Pipeline_for_Game-Ready_3D_Asset_Generation.md|Hunyuan3D Studio: End-to-End AI Pipeline for Game-Ready 3D Asset Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Hunyuan3D_Studio_End_to_End_AI_Pipeline_for_Game_Ready_3D_Asset_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hunyuan3D Studio
+	- datasets: FAM Benchmark, Toys4K Benchmark, User Study
+- [[obsidian-vault/analysis/arxiv_2025/Hunyuan3D-Omni_A_Unified_Framework_for_Controllable_Generation_of_3D_Assets.md|Hunyuan3D-Omni: A Unified Framework for Controllable Generation of 3D Assets (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Hunyuan3D_Omni_A_Unified_Framework_for_Controllable_Generation_of_3D_Assets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hunyuan3D-Omni
+	- datasets: Custom dataset
 - [[obsidian-vault/analysis/arxiv_2025/HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation.md|HY-Motion 1.0: Scaling Flow Matching Models for Text-To-Motion Generation (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -2148,6 +3328,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MARRS
 	- datasets: NTU120-AS, Chi3D-AS
+- [[obsidian-vault/analysis/arxiv_2025/MatPedia_A_Universal_Generative_Foundation_for_High-Fidelity_Material_Synthesis.md|MatPedia: A Universal Generative Foundation for High-Fidelity Material Synthesis (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/MatPedia_A_Universal_Generative_Foundation_for_High-Fidelity_Material_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MatPedia
+	- datasets: 文本到材质生成, 图像到材质生成, 材质分解
 - [[obsidian-vault/analysis/arxiv_2025/Matrix-Game_2.0_An_Open-Source_Real-Time_and_Streaming_Interactive_World_Model.md|Matrix-Game 2.0: An Open-Source, Real-Time, and Streaming Interactive World Model (arXiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Matrix-Game_2.0:_An_Open-Source,_Real-Time,_and_Streaming_Interactive_World_Model.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -2298,7 +3484,7 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: SemanticGen
 	- datasets: VBench-Long, VBench short
-- [[obsidian-vault/analysis/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.md|Separate Motion from Appearance Customizing Motion via Customizing Text to Video Diffusion Models (arxiv 2025 2025)]]
+- [[obsidian-vault/analysis/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.md|Separate Motion from Appearance Customizing Motion via Customizing Text to Video Diffusion Models (arXiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
@@ -2367,18 +3553,36 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: UniHM
 	- datasets: OMOMO, Lingo, HumanML3D
+- [[obsidian-vault/analysis/arxiv_2025/Unleashing_Vecset_Diffusion_Model_for_Fast_Shape_Generation.md|Unleashing Vecset Diffusion Model for Fast Shape Generation (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/Unleashing_Vecset_Diffusion_Model_for_Fast_Shape_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FlashVDM
+	- datasets: Shape Reconstruction, Image-to-3D Generation
 - [[obsidian-vault/analysis/arxiv_2025/VideoPanda_Video_Panoramic_Diffusion_with_Multi_view_Attention.md|VideoPanda: Video Panoramic Diffusion with Multi-view Attention (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/VideoPanda_Video_Panoramic_Diffusion_with_Multi_view_Attention.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: VideoPanda
 	- datasets: WEB360 test set, Out-of-distribution prompts
+- [[obsidian-vault/analysis/arxiv_2025/X-Part_high_fidelity_and_structure_coherent_shape_decomposition.md|X-Part: high fidelity and structure coherent shape decomposition (arXiv 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2025/X-Part_high_fidelity_and_structure_coherent_shape_decomposition.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: X-Part
+	- datasets: Image-to-3D Part Generation
 - [[obsidian-vault/analysis/CORL_2025/Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction.md|Motion Blender Gaussian Splatting for Dynamic Scene Reconstruction (CORL 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/CORL_2025/Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Motion Blender Gaussian Splatting (MBGS)
 	- datasets: iPhone dataset, HyperNeRF vrig dataset
+- [[obsidian-vault/analysis/CVPR_2025/Ego4o_Egocentric_Human_Motion_Capture_and_Understanding_from_Multi-Modal_Input.md|Ego4o: Egocentric Human Motion Capture and Understanding from Multi-Modal Input (CVPR 2025)]]
+	- [[obsidian-vault/paperPDFs/CVPR_2025/Ego4o_Egocentric_Human_Motion_Capture_and_Understanding_from_Multi_Modal_Input.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Part-aware motion VQ-VAE, multimodal Transformer motion-code prediction, egocentric motion understanding with LLaVA/LoRA
+	- datasets: DIP-IMU, Nymeria
 - [[obsidian-vault/analysis/CVPR_2025/3DGUT_Enabling_Distorted_Cameras_and_Secondary_Rays_in_Gaussian_Splatting.md|3DGUT: Enabling Distorted Cameras and Secondary Rays in Gaussian Splatting (CVPR 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2025/3DGUT_Enabling_Distorted_Cameras_and_Secondary_Rays_in_Gaussian_Splatting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -2729,6 +3933,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MagicMotion
 	- datasets: MagicBench, DAVIS
+- [[obsidian-vault/analysis/ICCV_2025/MaterialMVP_Illumination-Invariant_Material_Generation_via_Multi-view_PBR_Diffusion.md|MaterialMVP: Illumination-Invariant Material Generation via Multi-view PBR Diffusion (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/MaterialMVP_Illumination-Invariant_Material_Generation_via_Multi-view_PBR_Diffusion.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: MaterialMVP
+	- datasets: Objaverse subset
 - [[obsidian-vault/analysis/ICCV_2025/MonSTeR_a_Unified_Model_for_Motion_Scene_Text_Retrieval.md|MonSTeR: a Unified Model for Motion, Scene, Text Retrieval (ICCV 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/ICCV_2025/MonSTeR_a_Unified_Model_for_Motion_Scene_Text_Retrieval.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -2759,6 +3969,12 @@ generated: 2026-06-24T20:47
 	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
 	- methods: Moto
 	- datasets: SIMPLER, CALVIN, Real-world
+- [[obsidian-vault/analysis/ICCV_2025/Nautilus_Locality-aware_Autoencoder_for_Scalable_Mesh_Generation.md|Nautilus: Locality-aware Autoencoder for Scalable Mesh Generation (ICCV 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICCV_2025/Nautilus_Locality-aware_Autoencoder_for_Scalable_Mesh_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Nautilus
+	- datasets: 令牌化效率, 点云条件网格生成, 拓扑质量
 - [[obsidian-vault/analysis/ICCV_2025/PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customizable_Motion_Generation_of_Arbitrary_Sized_Groups.md|PINO Person Interaction Noise Optimization for Long Duration and Customizable Motion Generation of Arbitrary Sized Groups (ICCV 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/ICCV_2025/PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customizable_Motion_Generation_of_Arbitrary_Sized_Groups.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -2960,6 +4176,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Being-M0
 	- datasets: HumanML3D, Motion-X-eval, MotionLib-eval
+- [[obsidian-vault/analysis/ICML_2025/FreeMesh_Boosting_Mesh_Generation_with_Coordinates_Merging.md|FreeMesh: Boosting Mesh Generation with Coordinates Merging (ICML 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/ICML_2025/FreeMesh_Boosting_Mesh_Generation_with_Coordinates_Merging.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: FreeMesh
+	- datasets: Point Cloud Conditioned Mesh Generation
 - [[obsidian-vault/analysis/ICML_2025/MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_aware_Pose_Guidance.md|MimicMotion: High-Quality Human Motion Video Generation with Confidence-aware Pose Guidance (ICML 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/ICML_2025/MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_aware_Pose_Guidance.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -2995,6 +4217,12 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
 	- methods: Fg-T2M++
 	- datasets: KIT-ML
+- [[obsidian-vault/analysis/NEURIPS_2025/CineTechBench_A_Benchmark_for_Cinematographic_Technique_Understanding_and_Generation.md|CineTechBench: A Benchmark for Cinematographic Technique Understanding and Generation (NEURIPS 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/CineTechBench_A_Benchmark_for_Cinematographic_Technique_Understanding_and_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: CineTechBench Benchmark
+	- datasets: CineTechBench Static Cinematographic Technique QA, CineTechBench Camera Movement QA, CineTechBench Description Generation
 - [[obsidian-vault/analysis/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.md|MOSPA: Human Motion Generation Driven by Spatial Audio (NEURIPS 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3025,6 +4253,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MEGADance
 	- datasets: FineDance, AIST++, Codebook Utilization
+- [[obsidian-vault/analysis/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.md|Mesh-RFT: Enhancing Mesh Generation via Fine-grained Reinforcement Fine-Tuning (NeurIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- methods: Mesh-RFT
+	- datasets: 全局 DPO, Artist meshes 测试集, Dense meshes 测试集
 - Movo: Can Text-to-Video Models Generate Responsible Realistic Human Motion? (NeurIPS 2025 2025)
 	- [[obsidian-vault/paperPDFs/Uncategorized/NeurIPS_2025/2025_Movo_Can_Text_to_Video_Models_Generate_Responsible_Realistic_Human_Motion.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
@@ -3084,13 +4318,13 @@ generated: 2026-06-24T20:47
 	- datasets: FAUST, SCAPE, SHREC19
 - 3DGS2: Near Second-order Converging 3D Gaussian Splatting (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
-	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AlignTex_Pixel-Precise_Texture_Generation_from_Multi-view_Artwork.md|AlignTex: Pixel-Precise Texture Generation from Multi-view Artwork (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AlignTex_Pixel_Precise_Texture_Generation_from_Multi_view_Artwork.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-	- methods: AnyTop
-	- datasets: Truebones Zoo - Quadrupeds subset, Truebones Zoo - Bipeds subset, Truebones Zoo - Flying subset
-- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop: Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
+	- methods: AlignTex
+	- datasets: Runtime on RTX3090
+- [[obsidian-vault/analysis/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.md|AnyTop Character Animation Diffusion with Any Topology (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/AnyTop_Character_Animation_Diffusion_with_Any_Topology.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
@@ -3102,8 +4336,12 @@ generated: 2026-06-24T20:47
 - BANG: Dividing 3D Assets via Generative Exploded Dynamics (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/BANG_Dividing_3D_Assets_via_Generative_Exploded_Dynamics.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- BrepDiff: Single-Stage B-rep Diffusion Model (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2025/BrepDiff_Single-Stage_B-rep_Diffusion_Model.md|BrepDiff: Single-Stage B-rep Diffusion Model (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/BrepDiff_Single_Stage_B_rep_Diffusion_Model.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: BrepDiff
+	- datasets: DeepCAD, ABC
 - [[obsidian-vault/analysis/SIGGRAPH_2025/CineMaster_A_3D-Aware_and_Controllable_Framework_for_Cinematic_Text-to-Video_Generation.md|CineMaster: A 3D-Aware and Controllable Framework for Cinematic Text-to-Video Generation (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CineMaster_A_3D_Aware_and_Controllable_Framework_for_Cinematic_Text_to_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3113,12 +4351,30 @@ generated: 2026-06-24T20:47
 - CMD: Controllable Multiview Diffusion for 3D Editing and Progressive Generation (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/CMD_Controllable_Multiview_Diffusion_for_3D_Editing_and_Progressive_Generation.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Compensating Spatiotemporally Inconsistent Observations for Online Dynamic 3D Gaussian Splatting (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Cora: Correspondence-aware image editing using few step diffusion (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- DC-VSR: Spatially and Temporally Consistent Video Super-Resolution with Video Diffusion Prior (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Co-Speech_Gesture_and_Facial_Expression_Generation_for_Non-Photorealistic_3D_Characters.md|Co-Speech Gesture and Facial Expression Generation for Non-Photorealistic 3D Characters (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Co_Speech_Gesture_and_Facial_Expression_Generation_for_Non_Photorealistic_3D_Characters.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Proposed method
+	- datasets: User Study on MEAD dataset
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Compensating_Spatiotemporally_Inconsistent_Observations_for_Online_Dynamic_3D_Gaussian_Splatting.md|Compensating Spatiotemporally Inconsistent Observations for Online Dynamic 3D Gaussian Splatting (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Compensating_Spatiotemporally_Inconsistent_Observations_for_Online_Dynamic_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Observation-Restoring Online Reconstruction (OR2)
+	- datasets: Neural 3D Video & MeetRoom, Sync-NeRF
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Cora_Correspondence-aware_image_editing_using_few_step_diffusion.md|Cora: Correspondence-aware image editing using few step diffusion (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Cora_Correspondence_aware_image_editing_using_few_step_diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Cora
+	- datasets: 文本驱动图像编辑
+- [[obsidian-vault/analysis/SIGGRAPH_2025/DC-VSR_Spatially_and_Temporally_Consistent_Video_Super-Resolution_with_Video_Diffusion_Prior.md|DC-VSR: Spatially and Temporally Consistent Video Super-Resolution with Video Diffusion Prior (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/DC_VSR_Spatially_and_Temporally_Consistent_Video_Super_Resolution_with_Video_Diffusion_Prior.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DC-VSR
+	- datasets: REDS4, MS-COCO 2014 validation, VideoLQ
 - [[obsidian-vault/analysis/SIGGRAPH_2025/Diffuse-CLoC_Guided_Diffusion_for_Physics-based_Character_Look-ahead_Control.md|Diffuse-CLoC: Guided Diffusion for Physics-based Character Look-ahead Control (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Diffuse_CLoC_Guided_Diffusion_for_Physics_based_Character_Look_ahead_Control.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3131,10 +4387,25 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Diffusion as Shader (DaS)
 	- datasets: Camera Control, Motion Transfer, Mesh-to-Video Generation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Digital_Animation_of_Powder-Snow_Avalanches.md|Digital Animation of Powder-Snow Avalanches (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Digital_Animation_of_Powder_Snow_Avalanches.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Procedural Two‑Layer Finite Volume Method (FVM) for Powder‑Snow Avalanches
+	- datasets: Curved ramp simulation, PSA plume profile validation against Bartelt et al. 2013
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Disentangled_Phoneme-Prosody_Mapping_for_Controllable_3D_Facial_Animation.md|Disentangled Phoneme-Prosody Mapping for Controllable 3D Facial Animation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Disentangled_Phoneme_Prosody_Mapping_for_Controllable_3D_Facial_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Disentangled Phoneme-Prosody Mapping for Controllable 3D Facial Animation
 - Drag Your Gaussian: Effective Drag-Based Editing  with Score Distillation for 3D Gaussian Splatting (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Dress-1-to-3: Single Image to Simulation-Ready 3D Outfit with Diffusion Prior and Differentiable Physics (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Dress-1-to-3_Single_Image_to_Simulation-Ready_3D_Outfit_with_Diffusion_Prior_and_Differentiable_Physics.md|Dress-1-to-3: Single Image to Simulation-Ready 3D Outfit with Diffusion Prior and Differentiable Physics (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Dress_1_to_3_Single_Image_to_Simulation_Ready_3D_Outfit_with_Diffusion_Prior_and_Differentiable_Physics.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Dress-1-to-3
+	- datasets: CloSe dataset
 - [[obsidian-vault/analysis/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.md|DuetGen Music Driven Two Person Dance Generation via Hierarchical Masked Modeling (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked_Modeling.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -3153,14 +4424,29 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: ELGAR
 	- datasets: SPD-GEN
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Exploring_AI_Frame_Interpolation_Techniques_for_Watercolour_Animation.md|Exploring AI Frame Interpolation Techniques for Watercolour Animation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Exploring_AI_Frame_Interpolation_Techniques_for_Watercolour_Animation.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: RIFE + Compositing Workflow for Watercolour Animation
+	- datasets: Production of Sensual short film
 - FashionComposer: Compositional Fashion Image Generation (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/FashionComposer_Compositional_Fashion_Image_Generation.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 - FLoD: Integrating Flexible Level of Detail into 3D Gaussian Splatting for Customizable Rendering (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/FLoD_Integrating_Flexible_Level_of_Detail_into_3D_Gaussian_Splatting_for_Customizable_Rendering.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
-- G-FED: G-Buffer Guided Frame Extrapolation in Video Diffusion Models (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Foliager_Procedural_Forest_Generation_From_Natural_Language_Using_Scientific_Data_and_AI.md|Foliager: Procedural Forest Generation From Natural Language Using Scientific Data and AI (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Foliager_Procedural_Forest_Generation_From_Natural_Language_Using_Scientific_Data_and_AI.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Foliager
+- [[obsidian-vault/analysis/SIGGRAPH_2025/G-FED_G-Buffer_Guided_Frame_Extrapolation_in_Video_Diffusion_Models.md|G-FED: G-Buffer Guided Frame Extrapolation in Video Diffusion Models (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/G_FED_G_Buffer_Guided_Frame_Extrapolation_in_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: G-FED
+	- datasets: 场景渲染, Augmentation对比
 - GAIA: Generative Animatable Interactive Avatars with Expression-conditioned Gaussians (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow
 - Generative detail enhancement for physically based materials (SIGGRAPH 2025 2025)
@@ -3172,11 +4458,17 @@ generated: 2026-06-24T20:47
 - Generative Video Matting (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Generative_Video_Matting.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Hide A Bit: A Training-Free and High-Fidelity Steganography Method for 3D Gaussian Splatting Based on Bit Manipulation and RSA Encryption (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Haunting_Horizons_HumanAI_Auto-Cartography_of_Tasmanian_Island_Experience.md|Haunting Horizons: Human–AI Auto-Cartography of Tasmanian Island Experience (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Haunting_Horizons_Human_AI_Auto_Cartography_of_Tasmanian_Island_Experience.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- High-Fidelity Novel View Synthesis via Splatting-Guided Diffusion (SIGGRAPH 2025 2025)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/High-Fidelity_Novel_View_Synthesis_via_Splatting-Guided_Diffusion.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow
+	- methods: haunting horizons
+- [[obsidian-vault/analysis/SIGGRAPH_2025/High-Fidelity_Novel_View_Synthesis_via_Splatting-Guided_Diffusion.md|High-Fidelity Novel View Synthesis via Splatting-Guided Diffusion (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/High_Fidelity_Novel_View_Synthesis_via_Splatting_Guided_Diffusion.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SplatDiff
+	- datasets: Spring Dataset
 - [[obsidian-vault/analysis/SIGGRAPH_2025/HumanRAM_Feed-forward_Human_Reconstruction_and_Animation_Model_using_Transformers.md|HumanRAM: Feed-forward Human Reconstruction and Animation Model using Transformers (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/HumanRAM_Feed_forward_Human_Reconstruction_and_Animation_Model_using_Transformers.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -3206,6 +4498,16 @@ generated: 2026-06-24T20:47
 	- datasets: VBench, User Study, DAVIS
 - LightLab: Controlling Light Sources in Images with Diffusion Models (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/LightLab_Controlling_Light_Sources_in_Images_with_Diffusion_Models.pdf|PDF]]
+	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Lightning-fast_Boundary_Element_Method.md|Lightning-fast Boundary Element Method (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Lightning_fast_Boundary_Element_Method.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Inverse-LU Preconditioner for Boundary Element Method
+	- datasets: Diffusion Contours, Diffusion Curves, Diffusion Points vs. Curves
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Linear-Time_Transport_with_Rectified_Flows.md|Linear-Time Transport with Rectified Flows (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Linear_Time_Transport_with_Rectified_Flows.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
 - [[obsidian-vault/analysis/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.md|MECo Motion example controlled Co speech Gesture Generation Leveraging Large Language Models (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_Large_Language_Models.pdf|PDF]]
@@ -3252,54 +4554,568 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Graph-driven Interaction Sampling
 	- datasets: InterHuman test set, Close interaction subset, Multi-person interactions
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Nested_Attention_Semantic-aware_Attention_Values_for_Concept_Personalization.md|Nested Attention: Semantic-aware Attention Values for Concept Personalization (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Nested_Attention_Semantic_aware_Attention_Values_for_Concept_Personalization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Nested Attention (嵌套注意力)
+	- datasets: Human Face Personalization, Injection Mechanism Comparison, Multi-Subject Generation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/NeurCross_A_Neural_Approach_to_Computing_Cross_Fields_for_Quad_Mesh_Generation.md|NeurCross: A Neural Approach to Computing Cross Fields for Quad Mesh Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/NeurCross_A_Neural_Approach_to_Computing_Cross_Fields_for_Quad_Mesh_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: NeurCross
+	- datasets: ShapeNet, Thingi10K
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Order_Matters_Learning_Element_Ordering_for_Graphic_Design_Generation.md|Order Matters: Learning Element Ordering for Graphic Design Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Order_Matters_Learning_Element_Ordering_for_Graphic_Design_Generation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Generative Order Learner (GOL)
+	- datasets: Crello, CGL, CLAY
 - PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- PDT: Point Distribution Transformation with Diffusion Models (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PDT_Point_Distribution_Transformation_with_Diffusion_Models.md|PDT: Point Distribution Transformation with Diffusion Models (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PDT_Point_Distribution_Transformation_with_Diffusion_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: PDT
+	- datasets: Objaverse重网格化, ModelsResource骨骼关节点预测
 - Policy-Space Diffusion for Physics-Based Character Animation (SIGGRAPH 2025 2025)
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 - pOps: Photo-Inspired Diffusion Operators (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow
-- Revisiting Tradition and Beyond: A Customized Bilateral Filtering Framework for Point Cloud Denoising (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Progressive_Dynamics_A_Framework_for_Stable_Continuous_and_Consistent_Animation_Across_Resolution_and_Time.md|Progressive Dynamics++: A Framework for Stable, Continuous, and Consistent Animation Across Resolution and Time (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Progressive_Dynamics_A_Framework_for_Stable_Continuous_and_Consistent_Animation_Across_Resolution_and_Time.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Progressive Dynamics++ (VelPro Integrator)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Revisiting_Tradition_and_Beyond_A_Customized_Bilateral_Filtering_Framework_for_Point_Cloud_Denoising.md|Revisiting Tradition and Beyond: A Customized Bilateral Filtering Framework for Point Cloud Denoising (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Revisiting_Tradition_and_Beyond_A_Customized_Bilateral_Filtering_Framework_for_Point_Cloud_Denoising.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- SAWNA: Space-Aware Text to Image Generation (SIGGRAPH 2025 2025)
+	- methods: CustomBF
+	- datasets: Large test set at 0.5% noise, Lower noise, avg over densities
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SAWNA_Space-Aware_Text_to_Image_Generation.md|SAWNA: Space-Aware Text to Image Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SAWNA_Space_Aware_Text_to_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Single View Garment Reconstruction Using Diffusion Mapping Via Pattern Coordinates (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Sketch-based Fluid Video Generation Using Motion-Guided Diffusion Models in Still Landscape Images (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: SAWNA
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SEE-2-SOUND_Zero-Shot_Spatial_Environment-to-Spatial_Sound.md|SEE-2-SOUND: Zero-Shot Spatial Environment-to-Spatial Sound (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SEE_2_SOUND_Zero_Shot_Spatial_Environment_to_Spatial_Sound.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: SEE-2-SOUND
+	- datasets: Marginal Scene Guidance, CLIP Score on COCO test set
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Single_View_Garment_Reconstruction_Using_Diffusion_Mapping_Via_Pattern_Coordinates.md|Single View Garment Reconstruction Using Diffusion Mapping Via Pattern Coordinates (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Single_View_Garment_Reconstruction_Using_Diffusion_Mapping_Via_Pattern_Coordinates.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DISP (Diffusion Implicit Sewing Patterns)
+	- datasets: Skirt, Shirt, Trousers
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Sketch-based_Fluid_Video_Generation_Using_Motion-Guided_Diffusion_Models_in_Still_Landscape_Images.md|Sketch-based Fluid Video Generation Using Motion-Guided Diffusion Models in Still Landscape Images (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Sketch_based_Fluid_Video_Generation_Using_Motion_Guided_Diffusion_Models_in_Still_Landscape_Images.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Sketch-based Fluid Video Generation Framework
+	- datasets: Landscape fluid video dataset
 - [[obsidian-vault/analysis/SIGGRAPH_2025/Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation.md|Sketch2Anim: Towards Transferring Sketch Storyboards into 3D Animation (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation.pdf|PDF]]
 	- topics: Sketch To Animation, Motion Diffusion, Pose Trajectory Control, Character Animation
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Multi-conditional motion diffusion, trajectory ControlNet, keypose adapter
 	- datasets: HumanML3D
-- Spatiotemporally Consistent Indoor Lighting Estimation with Diffusion Priors (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Spatiotemporally_Consistent_Indoor_Lighting_Estimation_with_Diffusion_Priors.md|Spatiotemporally Consistent Indoor Lighting Estimation with Diffusion Priors (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Spatiotemporally_Consistent_Indoor_Lighting_Estimation_with_Diffusion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Our method (基于扩散先验的时空一致室内光照估计)
+	- datasets: Infinigen Indoor, Laval Indoor Spatially Varying
 - [[obsidian-vault/analysis/SIGGRAPH_2025/Splat4D_Diffusion-Enhanced_4D_Gaussian_Splatting_for_Temporally_and_Spatially_Consistent_Content_Creation.md|Splat4D: Diffusion-Enhanced 4D Gaussian Splatting for Temporally and Spatially Consistent Content Creation (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Splat4D_Diffusion_Enhanced_4D_Gaussian_Splatting_for_Temporally_and_Spatially_Consistent_Content_Creation.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow
 	- methods: Splat4D
 	- datasets: Consistent4D
-- SpotLessSplats: Ignoring Distractors in 3D Gaussian Splatting (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SpotLessSplats_Ignoring_Distractors_in_3D_Gaussian_Splatting.md|SpotLessSplats: Ignoring Distractors in 3D Gaussian Splatting (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SpotLessSplats_Ignoring_Distractors_in_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 - Stable-Makeup: When Real-World Makeup Transfer Meets Diffusion Model (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow, Representation / Self-Supervised / Transfer
-- Streaming-Aware Neural Monte Carlo Rendering Framework with Unified Denoising-Compression and Client Collaboration (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Style Customization of Text-to-Vector Generation with Image Diffusion Priors (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Streaming-Aware_Neural_Monte_Carlo_Rendering_Framework_with_Unified_Denoising-Compression_and_Client_Collaboration.md|Streaming-Aware Neural Monte Carlo Rendering Framework with Unified Denoising-Compression and Client Collaboration (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Streaming_Aware_Neural_Monte_Carlo_Rendering_Framework_with_Unified_Denoising_Compression_and_Client_Collaboration.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Streaming-Aware Neural Monte Carlo Rendering Framework
+- [[obsidian-vault/analysis/SIGGRAPH_2025/StructInbet_Integrating_Explicit_Structural_Guidance_Into_Inbetween_Frame_Generation.md|StructInbet: Integrating Explicit Structural Guidance Into Inbetween Frame Generation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/StructInbet_Integrating_Explicit_Structural_Guidance_Into_Inbetween_Frame_Generation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: StructInbet
+	- datasets: Custom animation inbetweening dataset, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2025/StructRe_Rewriting_for_Structured_Shape_Modeling.md|StructRe: Rewriting for Structured Shape Modeling (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/StructRe_Rewriting_for_Structured_Shape_Modeling.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: StructRe
+	- datasets: PartNet, PartNet partial scans, PartNet generation
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Style_Customization_of_Text-to-Vector_Generation_with_Image_Diffusion_Priors.md|Style Customization of Text-to-Vector Generation with Image Diffusion Priors (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Style_Customization_of_Text_to_Vector_Generation_with_Image_Diffusion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Two-stage SVG Style Customization Pipeline
+	- datasets: Table 1
 - SwiftSketch: A Diffusion Model for Image-to-Vector Sketch Generation (SIGGRAPH 2025 2025)
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
-- Taking Control: Procedural Diffusion Guidance for Architectural Facade Editing (SIGGRAPH 2025 2025)
-	- method groups: Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Taking_Control_Procedural_Diffusion_Guidance_for_Architectural_Facade_Editing.md|Taking Control: Procedural Diffusion Guidance for Architectural Facade Editing (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Taking_Control_Procedural_Diffusion_Guidance_for_Architectural_Facade_Editing.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Procedural Diffusion Guidance
+	- datasets: Facade editing task, User study
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Tiny_is_not_small_enough_High_quality_low-resource_facial_animation_models_through_hybrid_knowledge_distillation.md|Tiny is not small enough: High quality, low-resource facial animation models through hybrid knowledge distillation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Tiny_is_not_small_enough_High_quality_low_resource_facial_animation_models_through_hybrid_knowledge_distillation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Hybrid Knowledge Distillation (with pseudo-labeling)
+	- datasets: In-house test set, Resource usage
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Two-Stage_Sketch-Based_Smoke_Illustration_Generation_Using_Stream_Function.md|Two-Stage Sketch-Based Smoke Illustration Generation Using Stream Function (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Two_Stage_Sketch_Based_Smoke_Illustration_Generation_Using_Stream_Function.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Two-Stage Sketch-Based Smoke Illustration Generation Using Stream Function
+	- datasets: 收集的二维烟雾模拟数据集
 - [[obsidian-vault/analysis/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.md|VideoAnydoor: High-fidelity Video Object Insertion with Precise Motion Control (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: VideoAnydoor
 	- datasets: Custom benchmark, User study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/3DPR_Single_Image_3D_Portrait_Relighting_with_Generative_Priors.md|3DPR: Single Image 3D Portrait Relighting with Generative Priors (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/3DPR_Single_Image_3D_Portrait_Relighting_with_Generative_Priors.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 3DPR
+	- datasets: WeyrichOLAT test set, FaceOLAT test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/4DSloMo_4D_Reconstruction_for_High_Speed_Scene_with_Asynchronous_Capture.md|4DSloMo: 4D Reconstruction for High Speed Scene with Asynchronous Capture (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/4DSloMo_4D_Reconstruction_for_High_Speed_Scene_with_Asynchronous_Capture.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 4DSloMo
+	- datasets: Neural3DV, DNA-Rendering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/A_fast_efficient_and_robust_feature_protected_denoising_method.md|A fast, efficient, and robust feature protected denoising method (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/A_fast_efficient_and_robust_feature_protected_denoising_method.pdf|PDF]]
+	- topics: Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Feature-Protected Denoising via Modified Lengyel-Epstein Model
+	- datasets: Fandisk, Nicolo, Multiple models
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AD-GS_Alternating_Densification_for_Sparse-Input_3D_Gaussian_Splatting.md|AD-GS: Alternating Densification for Sparse-Input 3D Gaussian Splatting (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AD_GS_Alternating_Densification_for_Sparse_Input_3D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Anchored_4D_Gaussian_Splatting_for_Dynamic_Novel_View_Synthesis.md|Anchored 4D Gaussian Splatting for Dynamic Novel View Synthesis (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Anchored_4D_Gaussian_Splatting_for_Dynamic_Novel_View_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Anchored 4DGS
+	- datasets: N3DV, Technicolor
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Animus3D_Text-driven_3D_Animation_via_Motion_Score_Distillation.md|Animus3D: Text-driven 3D Animation via Motion Score Distillation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Animus3D_Text_driven_3D_Animation_via_Motion_Score_Distillation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Animus3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/ARTalk_Speech-Driven_3D_Head_Animation_via_Autoregressive_Model.md|ARTalk: Speech-Driven 3D Head Animation via Autoregressive Model (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/ARTalk_Speech_Driven_3D_Head_Animation_via_Autoregressive_Model.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ARTalk
+	- datasets: TFHP, VOCASET
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/ArtiLatent_Realistic_Articulated_3D_Object_Generation_via_Structured_Latents.md|ArtiLatent: Realistic Articulated 3D Object Generation via Structured Latents (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/ArtiLatent_Realistic_Articulated_3D_Object_Generation_via_Structured_Latents.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ArtiLatent
+	- datasets: PartNet-Mobility, ACD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Assembler_Scalable_3D_Part_Assembly_via_Anchor_Point_Diffusion.md|Assembler: Scalable 3D Part Assembly via Anchor Point Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Assembler_Scalable_3D_Part_Assembly_via_Anchor_Point_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Assembler
+	- datasets: PartNet Chair, PartNet Table, PartNet Lamp
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Audio_Driven_Real-Time_Facial_Animation_for_Social_Telepresence.md|Audio Driven Real-Time Facial Animation for Social Telepresence (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Audio_Driven_Real_Time_Facial_Animation_for_Social_Telepresence.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Audio-Driven Real-Time Facial Animation System
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Audio_Driven_Universal_Gaussian_Head_Avatars.md|Audio Driven Universal Gaussian Head Avatars (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Audio_Driven_Universal_Gaussian_Head_Avatars.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Our universal audio-driven avatar synthesis framework (UHAP + diffusion)
+	- datasets: Multiface test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AutoBrep_Autoregressive_B-Rep_Generation_with_Unified_Topology_and_Geometry.md|AutoBrep : Autoregressive B-Rep Generation with Unified Topology and Geometry (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AutoBrep_Autoregressive_B_Rep_Generation_with_Unified_Topology_and_Geometry.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: AutoBrep
+	- datasets: ABC-1M
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Bokeh_Diffusion_Defocus_Blur_Control_in_Text-to-Image_Diffusion_Models.md|Bokeh Diffusion: Defocus Blur Control in Text-to-Image Diffusion Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Bokeh_Diffusion_Defocus_Blur_Control_in_Text_to_Image_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Bokeh Diffusion
+	- datasets: User Study, Automatic Accuracy, Automatic Consistency
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/CamPVG_Camera-Controlled_Panoramic_Video_Generation_with_Epipolar-Aware_Diffusion.md|CamPVG: Camera-Controlled Panoramic Video Generation with Epipolar-Aware Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/CamPVG_Camera_Controlled_Panoramic_Video_Generation_with_Epipolar_Aware_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CamPVG
+	- datasets: Panoramic Video Generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Clustered_Error_Correction_with_Grouped_4D_Gaussian_Splatting.md|Clustered Error Correction with Grouped 4D Gaussian Splatting (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Clustered_Error_Correction_with_Grouped_4D_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CEM-4DGS (Grouped 4D Gaussian Splatting with Elliptical Error Correction)
+	- datasets: Technicolor Light Field, Neural 3D Video
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/ComposeMe_Attribute-Specific_Image_Prompts_for_Controllable_Human_Image_Generation.md|ComposeMe: Attribute-Specific Image Prompts for Controllable Human Image Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/ComposeMe_Attribute_Specific_Image_Prompts_for_Controllable_Human_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ComposeMe
+	- datasets: Multi-Attribute Single-ID Personalization, Single-Attribute Single-ID Personalization, Single-ID Full-Body Personalization
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Constructing_Diffusion_Avatar_with_Learnable_Embeddings.md|Constructing Diffusion Avatar with Learnable Embeddings (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Constructing_Diffusion_Avatar_with_Learnable_Embeddings.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Learn2Control
+	- datasets: VFHQ testset self-reenactment, VFHQ testset cross-reenactment, NeRSemble testset self-reenactment
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/DeMapGS_Simultaneous_Mesh_Deformation_and_Surface_Attribute_Mapping_via_Gaussian_Splatting.md|DeMapGS: Simultaneous Mesh Deformation and Surface Attribute Mapping via Gaussian Splatting (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/DeMapGS_Simultaneous_Mesh_Deformation_and_Surface_Attribute_Mapping_via_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DeMapGS
+	- datasets: Sketchfab 3D Scans
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Designing_with_Tension_Nearly-Developable_Patch_Layouts.md|Designing with Tension: Nearly-Developable Patch Layouts (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Designing_with_Tension_Nearly_Developable_Patch_Layouts.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Nearly-Developable Tensile Structure Generation from Curvature-Aligned Patch Decomposition
+	- datasets: Figure 8a model, Physical replica, Fabric thin shell simulation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Diffusion-Guided_Relighting_for_Single-Image_SVBRDF_Estimation.md|Diffusion-Guided Relighting for Single-Image SVBRDF Estimation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Diffusion_Guided_Relighting_for_Single_Image_SVBRDF_Estimation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DGRSISE (Diffusion-Guided Relighting for Single-Image SVBRDF Estimation)
+	- datasets: INRIA, MatSynth, Real-world
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/DreamID_High-Fidelity_and_Fast_diffusion-based_Face_Swapping_via_Triplet_ID_Group_Learning.md|DreamID: High-Fidelity and Fast diffusion-based Face Swapping via Triplet ID Group Learning (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/DreamID_High_Fidelity_and_Fast_diffusion_based_Face_Swapping_via_Triplet_ID_Group_Learning.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: DreamID
+	- datasets: FFHQ, A100 80G
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/DvD_Unleashing_a_Generative_Paradigm_for_Document_Dewarping_via_Coordinates-based_Diffusion_Model.md|DvD: Unleashing a Generative Paradigm for Document Dewarping via Coordinates-based Diffusion Model (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/DvD_Unleashing_a_Generative_Paradigm_for_Document_Dewarping_via_Coordinates_based_Diffusion_Model.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: DvD
+	- datasets: DocUNet, AnyPhotoDoc6300
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Echo_Enhancing_Conversational_Behavior_Generation_via_Hierarchical_Semantic_Comprehension_with_Large_Language_Models.md|Echo: Enhancing Conversational Behavior Generation via Hierarchical Semantic Comprehension with Large Language Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Echo_Enhancing_Conversational_Behavior_Generation_via_Hierarchical_Semantic_Comprehension_with_Large_Language_Models.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Echo
+	- datasets: conversational behavior dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/ELAD_Blind_Face_Restoration_using_Expectation-based_Likelihood_Approximation_and_Diffusion_Prior.md|ELAD: Blind Face Restoration using Expectation-based Likelihood Approximation and Diffusion Prior (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/ELAD_Blind_Face_Restoration_using_Expectation_based_Likelihood_Approximation_and_Diffusion_Prior.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: ELAD (Expectation-based Likelihood Approximation with Diffusion prior)
+	- datasets: CelebA-Test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/FreeArt3D_Training-Free_Articulated_Object_Generation_using_3D_Diffusion.md|FreeArt3D: Training-Free Articulated Object Generation using 3D Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/FreeArt3D_Training_Free_Articulated_Object_Generation_using_3D_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: FreeArt3D
+	- datasets: PartNet-Mobility
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/FreeMusco_Motion-Free_Learning_of_Latent_Control_for_Morphology-Adaptive_Locomotion_in_Musculoskeletal_Characters.md|FreeMusco: Motion-Free Learning of Latent Control for Morphology-Adaptive Locomotion in Musculoskeletal Characters (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/FreeMusco_Motion_Free_Learning_of_Latent_Control_for_Morphology_Adaptive_Locomotion_in_Musculoskeletal_Characters.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: FreeMusco
+	- datasets: Humanoid musculoskeletal character, Torque-actuated humanoid vs. muscle-actuated Humanoid
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Fuse3D_Generating_3D_Assets_Controlled_by_Multi-Image_Fusion.md|Fuse3D: Generating 3D Assets Controlled by Multi-Image Fusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Fuse3D_Generating_3D_Assets_Controlled_by_Multi_Image_Fusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Fuse3D
+	- datasets: Custom multi-condition 3D generation set, GPTEval3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Generating_360_Video_is_What_You_Need_For_a_3D_Scene.md|Generating 360° Video is What You Need For a 3D Scene (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Generating_360_Video_is_What_You_Need_For_a_3D_Scene.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: WorldPrompter
+	- datasets: Text-to-Scene Generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Generating_Objects_with_Part-Articulation_from_a_Single_Image.md|Generating Objects with Part-Articulation from a Single Image (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Generating_Objects_with_Part_Articulation_from_a_Single_Image.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamArt
+	- datasets: MAPPA test-split, In-the-wild asset generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Generative_Head-Mounted_Camera_Captures_for_Photorealistic_Avatars.md|Generative Head-Mounted Camera Captures for Photorealistic Avatars (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Generative_Head_Mounted_Camera_Captures_for_Photorealistic_Avatars.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: GenHMC
+	- datasets: Held-out test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/GenLit_Reformulating_Single-Image_Relighting_as_Video_Generation.md|GenLit: Reformulating Single-Image Relighting as Video Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/GenLit_Reformulating_Single_Image_Relighting_as_Video_Generation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: GenLit
+	- datasets: SingleObject-Test, MIT Multi-Illumination
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/GSWT_Gaussian_Splatting_Wang_Tiles.md|GSWT: Gaussian Splatting Wang Tiles (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/GSWT_Gaussian_Splatting_Wang_Tiles.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Gaussian Splatting Wang Tiles (GSWT)
+	- datasets: Full-resolution vs LOD on Planet scene, Memory overhead with LOD
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/HiWave_Training-Free_High-Resolution_Image_Generation_via_Wavelet-Based_Diffusion_Sampling.md|HiWave: Training-Free High-Resolution Image Generation via Wavelet-Based Diffusion Sampling (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/HiWave_Training_Free_High_Resolution_Image_Generation_via_Wavelet_Based_Diffusion_Sampling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: HiWave
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/HOMA_Towards_Generic_Human-Object_Interaction_in_Multimodal_Driven_Human_Animation_with_Weak_Conditions.md|HOMA: Towards Generic Human-Object Interaction in Multimodal Driven Human Animation with Weak Conditions (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/HOMA_Towards_Generic_Human_Object_Interaction_in_Multimodal_Driven_Human_Animation_with_Weak_Conditions.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HOMA
+	- datasets: Self-collected test set, AnchorCrafter test set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/How_Does_a_Virtual_Agent_Decide_Where_to_Look_Symbolic_Cognitive_Reasoning_for_Embodied_Head_Rotation.md|How Does a Virtual Agent Decide Where to Look? Symbolic Cognitive Reasoning for Embodied Head Rotation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/How_Does_a_Virtual_Agent_Decide_Where_to_Look_Symbolic_Cognitive_Reasoning_for_Embodied_Head_Rotation.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
+	- methods: SCORE (Symbolic COgnitive Reasoning for Embodied Head Rotation)
+	- datasets: Bus, Café, Crossing
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/In-2-4D_Inbetweening_from_Two_Single-View_Images_to_4D_Generation.md|In-2-4D: Inbetweening from Two Single-View Images to 4D Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/In_2_4D_Inbetweening_from_Two_Single_View_Images_to_4D_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: In-2-4D
+	- datasets: I4D-15, Consistent-4D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/In-Context_Brush_Zero-shot_Customized_Subject_Insertion_with_Context-Aware_Latent_Space_Manipulation.md|In-Context Brush: Zero-shot Customized Subject Insertion with Context-Aware Latent Space Manipulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/In_Context_Brush_Zero_shot_Customized_Subject_Insertion_with_Context_Aware_Latent_Space_Manipulation.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: In-Context Brush
+	- datasets: Customized Subject Insertion, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/InfiniHuman_Realistic_3D_Human_Creation_with_Precise_Control.md|InfiniHuman: Realistic 3D Human Creation with Precise Control (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/InfiniHuman_Realistic_3D_Human_Creation_with_Precise_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: InfiniHuman
+	- datasets: User Study, FID, Generation Time
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Input-Aware_Sparse_Attention_for_Real-Time_Co-Speech_Video_Generation.md|Input-Aware Sparse Attention for Real-Time Co-Speech Video Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Input_Aware_Sparse_Attention_for_Real_Time_Co_Speech_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Input-Aware Sparse Attention (IASA)
+	- datasets: TalkShow dataset, YouTube Talking Video dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/JoruriPuppet_Learning_Tempo-Changing_Mechanisms_Beyond_the_Beat_for_Music-to-Motion_Generation_with_Expressive_Metrics.md|JoruriPuppet: Learning Tempo-Changing Mechanisms Beyond the Beat for Music-to-Motion Generation with Expressive Metrics (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/JoruriPuppet_Learning_Tempo_Changing_Mechanisms_Beyond_the_Beat_for_Music_to_Motion_Generation_with_Expressive_Metrics.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer, Benchmarks / Datasets / Evaluation
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Tempo-Changing Feature Enhancement for Music-to-Motion Generation
+	- datasets: EDGE on AIST++ dataset, LDA on Motorica dataset, Overall
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Learning_to_Refocus_with_Video_Diffusion_Models.md|Learning to Refocus with Video Diffusion Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Learning_to_Refocus_with_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Learning to Refocus with Video Diffusion Models
+	- datasets: User study on real-world refocusing scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/LSF-Animation_Label-Free_Speech-Driven_Facial_Animation_via_Implicit_Feature_Representation.md|LSF-Animation: Label-Free Speech-Driven Facial Animation via Implicit Feature Representation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/LSF_Animation_Label_Free_Speech_Driven_Facial_Animation_via_Implicit_Feature_Representation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: LSF-Animation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MV-Performer_Taming_Video_Diffusion_Model_for_Faithful_and_Synchronized_Multi-view_Performer_Synthesis.md|MV-Performer: Taming Video Diffusion Model for Faithful and Synchronized Multi-view Performer Synthesis (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MV_Performer_Taming_Video_Diffusion_Model_for_Faithful_and_Synchronized_Multi_view_Performer_Synthesis.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MV-Performer
+	- datasets: MVHumanNet, DNA-Rendering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/MVP4D_Multi-View_Portrait_Video_Diffusion_for_Animatable_4D_Avatars.md|MVP4D: Multi-View Portrait Video Diffusion for Animatable 4D Avatars (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/MVP4D_Multi_View_Portrait_Video_Diffusion_for_Animatable_4D_Avatars.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MVP4D (Morphable Multi-view Video Diffusion Model)
+	- datasets: Nersemble self-reenactment, RenderMe-360 360° self-reenactment, Cross-reenactment user study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Navigating_with_Annealing_Guidance_Scale_in_Diffusion_Space.md|Navigating with Annealing Guidance Scale in Diffusion Space (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Navigating_with_Annealing_Guidance_Scale_in_Diffusion_Space.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Annealing Guidance Scheduler
+	- datasets: MSCOCO 2017
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/NeLiF_Neural_Lighting_Function_Generation_for_Real-Time_Indoor_Rendering.md|NeLiF: Neural Lighting Function Generation for Real-Time Indoor Rendering (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/NeLiF_Neural_Lighting_Function_Generation_for_Real_Time_Indoor_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: NeLiF (Neural Lighting Function Generation)
+	- datasets: Unseen indoor scenes and luminaires
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Texture_Splatting_Expressive_3D_Gaussian_Splatting_for_View_Synthesis_Geometry_and_Dynamic_Reconstruction.md|Neural Texture Splatting: Expressive 3D Gaussian Splatting for View Synthesis, Geometry, and Dynamic Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Texture_Splatting_Expressive_3D_Gaussian_Splatting_for_View_Synthesis_Geometry_and_Dynamic_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Texture Splatting (NTS)
+	- datasets: Owlii, Blender, MipNeRF360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Nonlinear_Noise2Noise_for_Efficient_Monte_Carlo_Denoiser_Training.md|Nonlinear Noise2Noise for Efficient Monte Carlo Denoiser Training (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Nonlinear_Noise2Noise_for_Efficient_Monte_Carlo_Denoiser_Training.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Nonlinear Noise2Noise (结合色调映射的噪声对训练)
+	- datasets: SBMC test set, SBMC validation set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Object-level_Visual_Prompts_for_Compositional_Image_Generation.md|Object-level Visual Prompts for Compositional Image Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Object_level_Visual_Prompts_for_Compositional_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VisualComposer
+	- datasets: Compositional Image Generation Benchmark, User Preference Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/OmnimatteZero_Fast_Training-free_Omnimatte_with_Pre-trained_Video_Diffusion_Models.md|OmnimatteZero: Fast Training-free Omnimatte with Pre-trained Video Diffusion Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/OmnimatteZero_Fast_Training_free_Omnimatte_with_Pre_trained_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmnimatteZero
+	- datasets: Movie, Kubric, Average
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/OmniPart_Part-Aware_3D_Generation_with_Semantic_Decoupling_and_Structural_Cohesion.md|OmniPart: Part-Aware 3D Generation with Semantic Decoupling and Structural Cohesion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/OmniPart_Part_Aware_3D_Generation_with_Semantic_Decoupling_and_Structural_Cohesion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmniPart
+	- datasets: PartObjaverse-Tiny, Bounding Box Quality, End-to-end Generation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/PanoDreamer_Optimization-Based_Single_Image_to_360_3D_Scene_With_Diffusion.md|PanoDreamer: Optimization-Based Single Image to 360 3D Scene With Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/PanoDreamer_Optimization_Based_Single_Image_to_360_3D_Scene_With_Diffusion.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PanoDreamer
+	- datasets: Novel View Synthesis, Stanford2D3D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/PhysiOpt_Physics-Driven_Shape_Optimization_for_3D_Generative_Models.md|PhysiOpt: Physics-Driven Shape Optimization for 3D Generative Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/PhysiOpt_Physics_Driven_Shape_Optimization_for_3D_Generative_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PhysiOpt
+	- datasets: Figure 10 examples, DeepSDF, PartGen
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Potentially_Visible_Set_Generation_with_the_Disocclusion_Buffer.md|Potentially Visible Set Generation with the Disocclusion Buffer (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Potentially_Visible_Set_Generation_with_the_Disocclusion_Buffer.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Disocclusion Buffer PVS generation
+	- datasets: Bistro Exterior, Tree Sponza, Viking Village
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Prior-Enhanced_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction_from_Casual_Video.md|Prior-Enhanced Gaussian Splatting for Dynamic Scene Reconstruction from Casual Video (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Prior_Enhanced_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction_from_Casual_Video.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Prior-Enhanced Gaussian Splatting
+	- datasets: iPhone DyCheck, NVIDIA multiview
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Procedural_Scene_Programs_for_Open-Universe_Scene_Generation_LLM-Free_Error_Correction_via_Program_Search.md|Procedural Scene Programs for Open-Universe Scene Generation: LLM-Free Error Correction via Program Search (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Procedural_Scene_Programs_for_Open_Universe_Scene_Generation_LLM_Free_Error_Correction_via_Program_Search.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, LLM / Reasoning / Alignment
+	- methods: Procedural Scene Programs with PSDL and Program Search Error Correction
+	- datasets: 按物体数量分组子集 vs. Holodeck
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/RaRa_Clipper_A_Clipper_for_Gaussian_Splatting_Based_on_Ray_Tracer_and_Rasterizer.md|RaRa Clipper: A Clipper for Gaussian Splatting Based on Ray Tracer and Rasterizer (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/RaRa_Clipper_A_Clipper_for_Gaussian_Splatting_Based_on_Ray_Tracer_and_Rasterizer.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: RaRa Clipper (RaRa Clip)
+	- datasets: Mip-NeRF360 360garden, GaussianHair, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Self-supervised_Underwater_Color_Restoration_via_Wavelet-Diffusion_Model_with_Filtered_Multi-Scale_Feature_Distillation.md|Self-supervised Underwater Color Restoration via Wavelet-Diffusion Model with Filtered Multi-Scale Feature Distillation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Self_supervised_Underwater_Color_Restoration_via_Wavelet_Diffusion_Model_with_Filtered_Multi_Scale_Feature_Distillation.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Wavelet-Diffusion Model with Filtered Multi-Scale Feature Distillation
+	- datasets: 平均四个水下数据集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Single-Image_3D_Human_Reconstruction_with_3D-Aware_Diffusion_Priors_and_Facial_Enhancement.md|Single-Image 3D Human Reconstruction with 3D-Aware Diffusion Priors and Facial Enhancement (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Single_Image_3D_Human_Reconstruction_with_3D_Aware_Diffusion_Priors_and_Facial_Enhancement.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HumanLift
+	- datasets: 用户研究
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Strands2Cards_Automatic_Generation_of_Hair_Cards_from_Strands.md|Strands2Cards: Automatic Generation of Hair Cards from Strands (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Strands2Cards_Automatic_Generation_of_Hair_Cards_from_Strands.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Strands2Cards
+	- datasets: CT2Hair dataset, CT2Hair and MonoHair datasets, USC-Hairsalon database
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/TC-GS_A_Faster_Gaussian_Splatting_Module_Utilizing_Tensor_Cores.md|TC-GS: A Faster Gaussian Splatting Module Utilizing Tensor Cores (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/TC_GS_A_Faster_Gaussian_Splatting_Module_Utilizing_Tensor_Cores.pdf|PDF]]
+	- topics: Graphics Rendering Materials
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: TC-GS
+	- datasets: Tanks & Temple, Deep-Blending, Mip-NeRF360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Teamwork_Collaborative_Diffusion_with_Low-rank_Coordination_and_Adaptation.md|Teamwork: Collaborative Diffusion with Low-rank Coordination and Adaptation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Teamwork_Collaborative_Diffusion_with_Low_rank_Coordination_and_Adaptation.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Teamwork
+	- datasets: Inpainting, SVBRDF Estimation, Intrinsic Image Decomposition
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/The_Aging_Multiverse_Generating_Condition-Aware_Facial_Aging_Tree_via_Training-Free_Diffusion.md|The Aging Multiverse: Generating Condition-Aware Facial Aging Tree via Training-Free Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/The_Aging_Multiverse_Generating_Condition_Aware_Facial_Aging_Tree_via_Training_Free_Diffusion.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Graphics Animation Interaction, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Aging Multiverse (Condition-Aware Facial Aging Tree)
+	- datasets: Celebrity condition-aware age editing, User study, Non-celebrity in-the-wild dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Training-Free_Instance-Aware_3D_Scene_Reconstruction_and_Diffusion-Based_View_Synthesis_from_Sparse_Images.md|Training-Free Instance-Aware 3D Scene Reconstruction and Diffusion-Based View Synthesis from Sparse Images (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Training_Free_Instance_Aware_3D_Scene_Reconstruction_and_Diffusion_Based_View_Synthesis_from_Sparse_Images.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Training-Free Instance-Aware 3D Reconstruction and Diffusion-Based Rendering Pipeline
+	- datasets: Selected ScanNet scenes, Reconstruction scenes, Novel views on selected scenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Uni3C_Unifying_Precisely_3D-Enhanced_Camera_and_Human_Motion_Controls_for_Video_Generation.md|Uni3C: Unifying Precisely 3D-Enhanced Camera and Human Motion Controls for Video Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Uni3C_Unifying_Precisely_3D_Enhanced_Camera_and_Human_Motion_Controls_for_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Uni3C
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Unifying_Latent_Action_and_Latent_State_Pre-training_for_Policy_Learning_from_Videos.md|Unifying Latent Action and Latent State Pre-training for Policy Learning from Videos (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Unifying_Latent_Action_and_Latent_State_Pre_training_for_Policy_Learning_from_Videos.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: UniMimic
+	- datasets: LIBERO, CALVIN D→D, CALVIN ABC→D
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/UTDesign_A_Unified_Framework_for_Stylized_Text_Editing_and_Generation_in_Graphic_Design_Images.md|UTDesign: A Unified Framework for Stylized Text Editing and Generation in Graphic Design Images (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/UTDesign_A_Unified_Framework_for_Stylized_Text_Editing_and_Generation_in_Graphic_Design_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: UTDesign
+	- datasets: UTDesign-Bench-Edit, UTDesign-Bench-Gen
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/VideoFrom3D_3D_Scene_Video_Generation_via_Complementary_Image_and_Video_Diffusion_Models.md|VideoFrom3D: 3D Scene Video Generation via Complementary Image and Video Diffusion Models (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/VideoFrom3D_3D_Scene_Video_Generation_via_Complementary_Image_and_Video_Diffusion_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoFrom3D
+	- datasets: 自定义16场景测试集
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Virtually_Being_Customizing_Camera-Controllable_Video_Diffusion_Models_with_Volumetric_Performance_Captures.md|Virtually Being: Customizing Camera-Controllable Video Diffusion Models with Volumetric Performance Captures (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Virtually_Being_Customizing_Camera_Controllable_Video_Diffusion_Models_with_Volumetric_Performance_Captures.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Virtually Being
+	- datasets: Customization T2V, Camera Control
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Voost_A_Unified_and_Scalable_Diffusion_Transformer_for_Bidirectional_Virtual_Try-On_and_Try-Off.md|Voost: A Unified and Scalable Diffusion Transformer for Bidirectional Virtual Try-On and Try-Off (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Voost_A_Unified_and_Scalable_Diffusion_Transformer_for_Bidirectional_Virtual_Try_On_and_Try_Off.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Voost
+	- datasets: VITON-HD Paired, DressCode Paired, VITON-HD Try-off
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/X-Actor_Emotional_and_Expressive_Long-Range_Portrait_Acting_from_Audio.md|X-Actor: Emotional and Expressive Long-Range Portrait Acting from Audio (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/X_Actor_Emotional_and_Expressive_Long_Range_Portrait_Acting_from_Audio.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: X-Actor
+	- datasets: RAVDESS Self-Driven, In-the-Wild Cross-Driven
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/X-UniMotion_Animating_Human_Images_with_Expressive_Unified_and_Identity-Agnostic_Motion_Latents.md|X-UniMotion: Animating Human Images with Expressive, Unified and Identity-Agnostic Motion Latents (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/X_UniMotion_Animating_Human_Images_with_Expressive_Unified_and_Identity_Agnostic_Motion_Latents.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: X-UniMotion
+	- datasets: Self-reenactment test set, Cross-identity reenactment test set
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.md|AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -3396,6 +5212,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: CMC (Coordinating Multiple Conditions)
 	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/EgoPriMo_Egocentric_Motion_Generation_for_Interactive_Humanoid_Control.md|EgoPriMo: Egocentric Motion Generation for Interactive Humanoid Control (arXiv 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/EgoPriMo_Egocentric_Motion_Generation_for_Interactive_Humanoid_Control.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EgoPriMo
+	- datasets: Nymeria Generation, EgoExo4D Generation, Nymeria Reconstruction
 - [[obsidian-vault/analysis/arxiv_2026/A_Unified_Conditional_Flow_for_Motion_Generation_Editing_and_Intra_Structural_Retargeting.md|A Unified Conditional Flow for Motion Generation, Editing, and Intra-Structural Retargeting (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/A_Unified_Conditional_Flow_for_Motion_Generation_Editing_and_Intra_Structural_Retargeting.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3408,6 +5230,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: AnyLift
 	- datasets: AIST++, BEHAVE
+- [[obsidian-vault/analysis/arxiv_2026/Auteur_Language-Driven_Cinematographic_Framing_for_Human-Centric_Video_Generation.md|Auteur: Language-Driven Cinematographic Framing for Human-Centric Video Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Auteur_Language-Driven_Cinematographic_Framing_for_Human-Centric_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Auteur
+	- datasets: Controlled Diagnostic Benchmark, PulpMotion
 - [[obsidian-vault/analysis/arxiv_2026/CamDirector_Camera_Trajectory_Control_for_Long_term_Video_Generation.md|CamDirector: Camera Trajectory Control for Long-term Video Generation (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arXiv_2026/CamDirector_Camera_Trajectory_Control_for_Long_term_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3468,6 +5296,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: FlowAct-R1
 	- datasets: User study, Real-time performance
+- [[obsidian-vault/analysis/arxiv_2026/Follow_Your_Track_Precise_Skeleton_Animation_Controlled_by_3D_Trajectories.md|Follow Your Track: Precise Skeleton Animation Controlled by 3D Trajectories (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/Follow_Your_Track_Precise_Skeleton_Animation_Controlled_by_3D_Trajectories.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ACT
+	- datasets: Truebones
 - [[obsidian-vault/analysis/arxiv_2026/Geometrically_Consistent_Multi_View_Scene_Generation_from_Freehand_Sketches.md|Geometrically Consistent Multi-View Scene Generation from Freehand Sketches (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/Geometrically_Consistent_Multi_View_Scene_Generation_from_Freehand_Sketches.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
@@ -3486,6 +5320,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: HumanX
 	- datasets: Basketball Catch-Shot, Badminton Hitting, Cargo Pickup
+- [[obsidian-vault/analysis/arxiv_2026/HY3D-Bench_Generation_of_3D_Assets.md|HY3D-Bench: Generation of 3D Assets (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/HY3D_Bench_Generation_of_3D_Assets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: HY3D-Bench
+	- datasets: HY3D-Bench test set
 - [[obsidian-vault/analysis/arxiv_2026/InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human_Object_Interaction_Skills.md|InterReal A Unified Physics Based Imitation Framework for Learning Human Object Interaction Skills (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human_Object_Interaction_Skills.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -3558,6 +5398,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MultiAct
 	- datasets: HumanML3D "while" 子集, 作者构建的复合提示集
+- [[obsidian-vault/analysis/arxiv_2026/NECromancer_Breathing_Life_into_Skeletons_via_BVH_Animation.md|NECromancer: Breathing Life into Skeletons via BVH Animation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/NECromancer_Breathing_Life_into_Skeletons_via_BVH_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: NECromancer (NEC)
+	- datasets: HumanML3D, Objaverse-XL, Truebones Zoo
 - [[obsidian-vault/analysis/arxiv_2026/Now_You_See_That_Learning_End_to_End_Humanoid_Locomotion_from_Raw_Pixels.md|Now You See That: Learning End-to-End Humanoid Locomotion from Raw Pixels (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/Now_You_See_That_Learning_End_to_End_Humanoid_Locomotion_from_Raw_Pixels.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -3600,6 +5446,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Text2BFM
 	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/PolyFlow_Continuous_Topology_Embedding_Flow_Matching_for_Artist-style_Mesh_Generation.md|PolyFlow: Continuous Topology Embedding Flow Matching for Artist-style Mesh Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PolyFlow_Continuous_Topology_Embedding_Flow_Matching_for_Artist-style_Mesh_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: PolyFlow
+	- datasets: Toys4K
 - [[obsidian-vault/analysis/arxiv_2026/PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition.md|PRISM: Streaming Human Motion Generation with Per-Joint Latent Decomposition (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -3618,6 +5470,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Reconstruction-Anchored Diffusion Model (RAM)
 	- datasets: HumanML3D, KIT-ML
+- [[obsidian-vault/analysis/arxiv_2026/ROAR-3D_Routing_Arbitrary_Views_for_High-Fidelity_3D_Generation.md|ROAR-3D: Routing Arbitrary Views for High-Fidelity 3D Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/ROAR-3D_Routing_Arbitrary_Views_for_High-Fidelity_3D_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ROAR-3D
+	- datasets: Held-out test set, Anyview-200
+- [[obsidian-vault/analysis/arxiv_2026/ScaleMoGen_Autoregressive_Next-Scale_Prediction_for_Human_Motion_Generation.md|ScaleMoGen: Autoregressive Next-Scale Prediction for Human Motion Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/ScaleMoGen_Autoregressive_Next-Scale_Prediction_for_Human_Motion_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ScaleMoGen
+	- datasets: HumanML3D, SnapMoGen
 - [[obsidian-vault/analysis/arxiv_2026/SemanticWM.md|SemanticWM: Reconstruction or Semantics? What Makes a Latent Space Useful for Robot World Models (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/SemanticWM.pdf|PDF]]
 	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
@@ -3641,6 +5505,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: TextOp
 	- datasets: BABEL validation set, Generator-produced motion sequences
+- [[obsidian-vault/analysis/arxiv_2026/TokenDial_Continuous_Attribute_Control_in_Text-to-Video_via_Spatiotemporal_Token_Offsets.md|TokenDial: Continuous Attribute Control in Text-to-Video via Spatiotemporal Token Offsets (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/TokenDial_Continuous_Attribute_Control_in_Text-to-Video_via_Spatiotemporal_Token_Offsets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: TokenDial
+	- datasets: Slider controllability, VLM evaluation, Human study
+- [[obsidian-vault/analysis/arxiv_2026/TopoCap_Learning_Topology-Agnostic_Motion_Priors_for_Monocular_Video-to-Animation.md|TopoCap: Learning Topology-Agnostic Motion Priors for Monocular Video-to-Animation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/TopoCap_Learning_Topology-Agnostic_Motion_Priors_for_Monocular_Video-to-Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: TopoCap
+	- datasets: Truebones Zoo, MOBJAVERSE
 - [[obsidian-vault/analysis/arxiv_2026/TrajectoryMover_Generative_Movement_of_Object_Trajectories_in_Videos.md|TrajectoryMover: Generative Movement of Object Trajectories in Videos (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/TrajectoryMover_Generative_Movement_of_Object_Trajectories_in_Videos.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
@@ -3653,6 +5529,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Uni-HOI
 	- datasets: FullBodyManipulation, BEHAVE, GRAB
+- [[obsidian-vault/analysis/arxiv_2026/VideoMDM_Towards_3D_Human_Motion_Generation_From_2D_Supervision.md|VideoMDM: Towards 3D Human Motion Generation From 2D Supervision (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/VideoMDM_Towards_3D_Human_Motion_Generation_From_2D_Supervision.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoMDM
+	- datasets: HumanML3D, Fit3D, NBA
 - [[obsidian-vault/analysis/arxiv_2026/VP-VAE_Rethinking_Vector_Quantization_via_Adaptive_Vector_Perturbation.md|VP-VAE: Rethinking Vector Quantization via Adaptive Vector Perturbation (arXiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/Uncategorized/arXiv_2026/2026_VP_VAE_Rethinking_Vector_Quantization_via_Adaptive_Vector_Perturbation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -7259,6 +9141,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Z-Order Transformer
 	- datasets: RealEstate10K - 2 views, RealEstate10K - 12 views, DL3DV - 12 views
+- [[obsidian-vault/analysis/ECCV_2026/QWERTY_Training-Free_Motion_Control_via_Query-Warped_Video_Diffusion_Transformers.md|QWERTY: Training-Free Motion Control via Query-Warped Video Diffusion Transformers (ECCV 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ECCV_2026/QWERTY_Training-Free_Motion_Control_via_Query-Warped_Video_Diffusion_Transformers.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: QWERTY
+	- datasets: VIPSeg, DL3DV
+- [[obsidian-vault/analysis/ICLR_2026/Thinking_with_Camera_A_Unified_Multimodal_Model_for_Camera-Centric_Understanding_and_Generation.md|Thinking with Camera: A Unified Multimodal Model for Camera-Centric Understanding and Generation (ICLR 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/Thinking_with_Camera_A_Unified_Multimodal_Model_for_Camera_Centric_Understanding_and_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Puffin
+	- datasets: Puffin-Und
 - [[obsidian-vault/analysis/ICLR_2026/mathbfLi_2_A_Framework_on_Dynamics_of_Feature_Emergence_and_Delayed_Generalization.md|$\\mathbf{Li_2}$: A Framework on Dynamics of Feature Emergence and Delayed Generalization (ICLR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2026/mathbfLi_2_A_Framework_on_Dynamics_of_Feature_Emergence_and_Delayed_Generalization.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -8450,6 +10344,12 @@ generated: 2026-06-24T20:47
 	- method groups: Agent / RL / Planning, Generative / Diffusion / Flow
 	- methods: ESPO (ELBO-based Sequence-level Policy Optimization)
 	- datasets: GSM8K, MATH, Countdown
+- [[obsidian-vault/analysis/ICLR_2026/QuadGPT_Native_Quadrilateral_Mesh_Generation_with_Autoregressive_Models.md|QuadGPT: Native Quadrilateral Mesh Generation with Autoregressive Models (ICLR 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICLR_2026/QuadGPT_Native_Quadrilateral_Mesh_Generation_with_Autoregressive_Models.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: QuadGPT
+	- datasets: Dense Meshes, Artist Meshes
 - [[obsidian-vault/analysis/ICLR_2026/Quant_dLLM_Post_Training_Extreme_Low_Bit_Quantization_for_Diffusion_Large_Language_Models.md|Quant-dLLM: Post-Training Extreme Low-Bit Quantization for Diffusion Large Language Models (ICLR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2026/Quant_dLLM_Post_Training_Extreme_Low_Bit_Quantization_for_Diffusion_Large_Language_Models.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -8856,6 +10756,12 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Motive (MOTIon attribution for Video gEneration)
 	- datasets: VBench, Human Evaluation, Wan2.2-TI2V-5B
+- [[obsidian-vault/analysis/ICML_2026/Semantic-Aware_Motion_Encoding_for_Topology-Agnostic_Character_Animation.md|Semantic-Aware Motion Encoding for Topology-Agnostic Character Animation (ICML 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/ICML_2026/Semantic-Aware_Motion_Encoding_for_Topology-Agnostic_Character_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Semantic-Aware Topology-Agnostic (SATA) Motion Autoencoder
+	- datasets: AT-HumanML3D, AT-HumanML3D → AT-AniMo4D, Multi-Dataset Joint Training
 - [[obsidian-vault/analysis/ICML_2026/Variance_Reduction_for_Expectations_with_Diffusion_Teachers.md|Variance Reduction for Expectations with Diffusion Teachers (ICML 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICML_2026/Variance_Reduction_for_Expectations_with_Diffusion_Teachers.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -8874,12 +10780,232 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: OmniDrag
 	- datasets: Move360
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Adaptive_Interpolation-Synthesis_for_Motion_In-Betweening_on_Keyframe-Based_Animation.md|Adaptive Interpolation-Synthesis for Motion In-Betweening on Keyframe-Based Animation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Adaptive_Interpolation_Synthesis_for_Motion_In_Betweening_on_Keyframe_Based_Animation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AIS-BiLSTM
+	- datasets: Algorithmic Test Set, Production Test Set, Random Test Set
+- [[obsidian-vault/analysis/SIGGRAPH_2026/AGILE_Hand-object_Interaction_Reconstruction_from_Video_via_Agentic_Generation.md|AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/AGILE_Hand_object_Interaction_Reconstruction_from_Video_via_Agentic_Generation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AGILE
+	- datasets: DexYCB, HO3D-v3, DexYCB / HO3D-v3
+- [[obsidian-vault/analysis/SIGGRAPH_2026/AniGen_Unified_S3_Fields_for_Animatable_3D_Asset_Generation.md|AniGen: Unified $S^3$ Fields for Animatable 3D Asset Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/AniGen_Unified_S_3_Fields_for_Animatable_3D_Asset_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AniGen
+	- datasets: Inference cost, Rigged-domain test set
 - [[obsidian-vault/analysis/SIGGRAPH_2026/Audio-Omni_Extending_Multi-modal_Understanding_to_Versatile_Audio_Generation_and_Editing.md|Audio-Omni: Extending Multi-modal Understanding to Versatile Audio Generation and Editing (SIGGRAPH 2026)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Audio_Omni_Extending_Multi_modal_Understanding_to_Versatile_Audio_Generation_and_Editing.pdf|PDF]]
 	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Audio-Omni
 	- datasets: MMSU, AudioCaps T2A, Musicaps T2M
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Bringing_Diversity_from_Diffusion_Models_to_Semantic-Guided_Face_Asset_Generation.md|Bringing Diversity from Diffusion Models to Semantic-Guided Face Asset Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Bringing_Diversity_from_Diffusion_Models_to_Semantic_Guided_Face_Asset_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: 语义引导的解耦GAN面部资产生成框架
+	- datasets: 纹理归一化PSNR
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Canvas-to-Image_Compositional_Image_Generation_with_Multimodal_Controls.md|Canvas-to-Image: Compositional Image Generation with Multimodal Controls (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Canvas_to_Image_Compositional_Image_Generation_with_Multimodal_Controls.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Canvas-to-Image
+	- datasets: Pose Guided 4P Composition, Layout-Guided Composition, Multi-Control Composition
+- [[obsidian-vault/analysis/SIGGRAPH_2026/CasLayout_Cascaded_3D_Layout_Diffusion_for_Indoor_Scene_Synthesis_with_Implicit_Relation_Modeling.md|CasLayout: Cascaded 3D Layout Diffusion for Indoor Scene Synthesis with Implicit Relation Modeling (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/CasLayout_Cascaded_3D_Layout_Diffusion_for_Indoor_Scene_Synthesis_with_Implicit_Relation_Modeling.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CasLayout
+	- datasets: Physical Plausibility, User Preference
+- [[obsidian-vault/analysis/SIGGRAPH_2026/CoherentRaster_Efficient_3D_Gaussian_Splatting_for_Light_Field_Displays.md|CoherentRaster: Efficient 3D Gaussian Splatting for Light Field Displays (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/CoherentRaster_Efficient_3D_Gaussian_Splatting_for_Light_Field_Displays.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: CoherentRaster
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Colorful-Noise_Training-Free_Low-Frequency_Noise_Manipulation_for_Color-Based_Conditional_Image_Generation.md|Colorful-Noise: Training-Free Low-Frequency Noise Manipulation for Color-Based Conditional Image Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Colorful_Noise_Training_Free_Low_Frequency_Noise_Manipulation_for_Color_Based_Conditional_Image_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Colorful-Noise
+	- datasets: Colorfield-to-Image, Color Variation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/ComboStoc_Combinatorial_Stochasticity_for_Diffusion_Generative_Models.md|ComboStoc: Combinatorial Stochasticity for Diffusion Generative Models (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ComboStoc_Combinatorial_Stochasticity_for_Diffusion_Generative_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ComboStoc
+	- datasets: ImageNet 256x256, PartNet chair structured 3D shape generation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Composing_People_Together_Iterative_Pose-Image_Generation_for_Multi-Person_Interaction_Scenes.md|Composing People Together: Iterative Pose-Image Generation for Multi-Person Interaction Scenes (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Composing_People_Together_Iterative_Pose_Image_Generation_for_Multi_Person_Interaction_Scenes.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PeopleComposer
+	- datasets: DrawWaldoWorlds, MultiHuman-Testbench, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2026/DreamActor-M2_Universal_Character_Image_Animation_via_Spatiotemporal_In-Context_Learning.md|DreamActor-M2: Universal Character Image Animation via Spatiotemporal In-Context Learning (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/DreamActor_M2_Universal_Character_Image_Animation_via_Spatiotemporal_In_Context_Learning.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: DreamActor-M2
+	- datasets: AW Bench, Subjective GSB
+- [[obsidian-vault/analysis/SIGGRAPH_2026/EchoAvatar_Real-time_Generative_Avatar_Animation_from_Audio_Streams.md|EchoAvatar: Real-time Generative Avatar Animation from Audio Streams (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/EchoAvatar_Real_time_Generative_Avatar_Animation_from_Audio_Streams.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: EchoAvatar
+	- datasets: Multi-domain test set, BEAT2 test set, Real-time latency
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Faster_3D_Gaussian_Splatting_Convergence_via_Structure-Aware_Densification.md|Faster 3D Gaussian Splatting Convergence via Structure-Aware Densification (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Faster_3D_Gaussian_Splatting_Convergence_via_Structure_Aware_Densification.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Structure-Aware Densification (SAD-GS)
+	- datasets: Mip-NeRF360, Deep Blending, Tanks & Temples
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Flatten_the_Complex_Joint_B-Rep_Generation_via_Compositional_k-Cell_Particles.md|Flatten the Complex: Joint B-Rep Generation via Compositional k-Cell Particles (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Flatten_the_Complex_Joint_B_Rep_Generation_via_Compositional_k_Cell_Particles.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Compositional k-Cell Particles (KCPs) with Rectified Flow
+	- datasets: ABC, DeepCAD
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Forget_Superresolution_Sample_Adaptively_when_Path_Tracing.md|Forget Superresolution, Sample Adaptively (when Path Tracing) (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Forget_Superresolution_Sample_Adaptively_when_Path_Tracing.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Generative / Diffusion / Flow, Optimization / Theory
+	- methods: Ours (Stochastic Adaptive Sampling and Denoising Pipeline)
+	- datasets: Production scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Generative_3D_Gaussians_with_Learned_Density_Control.md|Generative 3D Gaussians with Learned Density Control (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Generative_3D_Gaussians_with_Learned_Density_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Density-Sampled Gaussians (DeG)
+	- datasets: Toys4K, Single-image-to-3D generation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/GPC_Large-Scale_Generative_Pretraining_for_Transferable_Motor_Control.md|GPC: Large-Scale Generative Pretraining for Transferable Motor Control (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/GPC_Large_Scale_Generative_Pretraining_for_Transferable_Motor_Control.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: Generative Pretrained Controllers (GPC)
+	- datasets: Bones, AMASS PHC train subset, Perturbation robustness
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Img2CADSeq_Image-to-CAD_Generation_via_Sequence-Based_Diffusion.md|Img2CADSeq: Image-to-CAD Generation via Sequence-Based Diffusion (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Img2CADSeq_Image_to_CAD_Generation_via_Sequence_Based_Diffusion.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Img2CADSeq
+	- datasets: Image-Conditional Generation, Point Cloud-Conditional Generation, Unconditional Generation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/InfiniteDiffusion_Bridging_Learned_Fidelity_and_Procedural_Utility_for_Open-World_Terrain_Generation.md|InfiniteDiffusion: Bridging Learned Fidelity and Procedural Utility for Open-World Terrain Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/InfiniteDiffusion_Bridging_Learned_Fidelity_and_Procedural_Utility_for_Open_World_Terrain_Generation.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: InfiniteDiffusion
+	- datasets: Stable Diffusion panorama generation, Terrain generation - global DEM 1024×1024 tiles
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Inspiration_Seeds_Learning_Non-Literal_Visual_Combinations_for_Generative_Exploration.md|Inspiration Seeds: Learning Non-Literal Visual Combinations for Generative Exploration (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Inspiration_Seeds_Learning_Non_Literal_Visual_Combinations_for_Generative_Exploration.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Inspiration Seeds
+	- datasets: Decomposition Quality, Description Complexity
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MACE-Dance_Motion-Appearance_Cascaded_Experts_for_Music-Driven_Dance_Video_Generation.md|MACE-Dance: Motion-Appearance Cascaded Experts for Music-Driven Dance Video Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MACE_Dance_Motion_Appearance_Cascaded_Experts_for_Music_Driven_Dance_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MACE-Dance
+	- datasets: MA-Data, FineDance
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Matérn_Noise_for_Triangulation-Agnostic_Flow_Matching_on_Meshes.md|Matérn Noise for Triangulation-Agnostic Flow Matching on Meshes (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Mat_rn_Noise_for_Triangulation_Agnostic_Flow_Matching_on_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: Matérn Flow Matching
+	- datasets: MOYO 人体姿态数据集, 合成 GMM 数据集
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.md|MeshFlow: Mesh Generation with Equivariant Flow Matching (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MeshFlow_Mesh_Generation_with_Equivariant_Flow_Matching.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow
+	- methods: MeshFlow
+	- datasets: ShapeNet, Inference Efficiency
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MV-S2V_Multi-View_Subject-Consistent_Video_Generation.md|MV-S2V: Multi-View Subject-Consistent Video Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MV_S2V_Multi_View_Subject_Consistent_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MV-S2V
+- [[obsidian-vault/analysis/SIGGRAPH_2026/OmniRoam_World_Wandering_via_Long-Horizon_Panoramic_Video_Generation.md|OmniRoam: World Wandering via Long-Horizon Panoramic Video Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/OmniRoam_World_Wandering_via_Long_Horizon_Panoramic_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: OmniRoam
+	- datasets: Panoramic Video Generation, Long-horizon Consistency
+- [[obsidian-vault/analysis/SIGGRAPH_2026/On-the-fly_Repulsion_in_the_Contextual_Space_for_Rich_Diversity_in_Diffusion_Transformers.md|On-the-fly Repulsion in the Contextual Space for Rich Diversity in Diffusion Transformers (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/On_the_fly_Repulsion_in_the_Contextual_Space_for_Rich_Diversity_in_Diffusion_Transformers.pdf|PDF]]
+	- topics: Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Generative / Diffusion / Flow, Benchmark / Evaluation
+	- methods: Contextual Space Repulsion
+	- datasets: Flux-dev, Flux-dev Runtime, SD3.5-Large
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Pixal3D_Pixel-Aligned_3D_Generation_from_Images.md|Pixal3D: Pixel-Aligned 3D Generation from Images (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Pixal3D_Pixel_Aligned_3D_Generation_from_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Pixal3D
+	- datasets: In-the-wild test set, Toys4K
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Raster2Seq_Polygon_Sequence_Generation_for_Floorplan_Reconstruction.md|Raster2Seq: Polygon Sequence Generation for Floorplan Reconstruction (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Raster2Seq_Polygon_Sequence_Generation_for_Floorplan_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Raster2Seq
+	- datasets: Structured3D-B, CubiCasa5K, Raster2Graph
+- [[obsidian-vault/analysis/SIGGRAPH_2026/SegviGen_Repurposing_3D_Generative_Model_for_Part_Segmentation.md|SegviGen: Repurposing 3D Generative Model for Part Segmentation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/SegviGen_Repurposing_3D_Generative_Model_for_Part_Segmentation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SegviGen
+	- datasets: PartObjaverse-Tiny, PartNeXT
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Shellular_Metamaterial_Design_via_Compact_Electric_Potential_Parametrization.md|Shellular Metamaterial Design via Compact Electric Potential Parametrization (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Shellular_Metamaterial_Design_via_Compact_Electric_Potential_Parametrization.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Compact Electric Potential Parametrization for Shellular Metamaterials
+	- datasets: Random structure generation, Inverse design for maximum uniaxial stiffness, Inverse design for maximum bulk modulus
+- [[obsidian-vault/analysis/SIGGRAPH_2026/SimArt_Decomposing_Monolithic_Meshes_into_Sim-ready_Articulated_Assets_via_MLLM.md|SimArt: Decomposing Monolithic Meshes into Sim-ready Articulated Assets via MLLM (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/SimArt_Decomposing_Monolithic_Meshes_into_Sim_ready_Articulated_Assets_via_MLLM.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: SIMART
+	- datasets: In-Domain Items, AI-generated Items
+- [[obsidian-vault/analysis/SIGGRAPH_2026/SMP_Reusable_Score-Matching_Motion_Priors_for_Physics-Based_Character_Control.md|SMP: Reusable Score-Matching Motion Priors for Physics-Based Character Control (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/SMP_Reusable_Score_Matching_Motion_Priors_for_Physics_Based_Character_Control.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Score-Matching Motion Priors (SMP)
+	- datasets: Target Location, Steering, Dodgeball
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Strips_as_Tokens_Artist_Mesh_Generation_with_Native_UV_Segmentation.md|Strips as Tokens: Artist Mesh Generation with Native UV Segmentation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Strips_as_Tokens_Artist_Mesh_Generation_with_Native_UV_Segmentation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Strips as Tokens (SATO)
+	- datasets: ShapeNet, UV分割失真
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Toward_Richer_Material_Generation_via_Procedural_Data_Enhancement.md|Toward Richer Material Generation via Procedural Data Enhancement (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Toward_Richer_Material_Generation_via_Procedural_Data_Enhancement.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Procedural Modeling, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Procedural Material Enhancement with Neural Encoding
+	- datasets: Test set
+- [[obsidian-vault/analysis/SIGGRAPH_2026/UniVidX_A_Unified_Multimodal_Framework_for_Versatile_Video_Generation_via_Diffusion_Priors.md|UniVidX: A Unified Multimodal Framework for Versatile Video Generation via Diffusion Priors (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/UniVidX_A_Unified_Multimodal_Framework_for_Versatile_Video_Generation_via_Diffusion_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: UniVidX
+	- datasets: User study, InteriorVid-Test, MAW benchmark
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Video_Analysis_and_Generation_via_a_Semantic_Progress_Function.md|Video Analysis and Generation via a Semantic Progress Function (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Video_Analysis_and_Generation_via_a_Semantic_Progress_Function.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ReTime
+	- datasets: VBench, User Study
+- [[obsidian-vault/analysis/SIGGRAPH_2026/VideoNeuMat_Neural_Material_Extraction_from_Generative_Video_Models.md|VideoNeuMat: Neural Material Extraction from Generative Video Models (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/VideoNeuMat_Neural_Material_Extraction_from_Generative_Video_Models.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: VideoNeuMat
+	- datasets: Open-domain material video realism, Open-domain perceptual material realism, Image-to-texture held-out test materials
 - [[obsidian-vault/analysis/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation.md|ActCam: Zero-Shot Joint Camera and 3D Motion Control for Video Generation (SIGGRAPH 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -8904,6 +11030,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: Edit-Your-Motion
 	- datasets: TikTok benchmark
+- [[obsidian-vault/analysis/TOG_2026/Articulate_That_Object_Part_ATOP_3D_Part_Articulation_via_Text_and_Motion_Personalization.md|Articulate That Object Part (ATOP): 3D Part Articulation via Text and Motion Personalization (TOG 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/TOG_2026/Articulate_That_Object_Part_ATOP_3D_Part_Articulation_via_Text_and_Motion_Personalization.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ATOP
+	- datasets: PartNet-Mobility, ACD, Video generation quality on PartNet-Mobility / Objaverse
 - [[obsidian-vault/analysis/VISUAL_INTELLIGENCE_2026/Temporal_Consistency-Aware_Text-to-Motion_Generation.md|Temporal Consistency-Aware Text-to-Motion Generation (Visual Intelligence 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/VISUAL_INTELLIGENCE_2026/Temporal_Consistency-Aware_Text-to-Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

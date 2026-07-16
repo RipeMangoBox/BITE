@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Matterport3D
@@ -33,3 +33,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: CylinderSplat
 	- datasets: Matterport3D, Replica, Residential
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MTPano_Multi-Task_Panoramic_Scene_Understanding_via_Label-Free_Integration_of_Dense_Prediction_Priors.md|MTPano: Multi-Task Panoramic Scene Understanding via Label-Free Integration of Dense Prediction Priors (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MTPano_Multi_Task_Panoramic_Scene_Understanding_via_Label_Free_Integration_of_Dense_Prediction_Priors.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Data Curation / Synthesis
+	- methods: MTPano
+	- datasets: Matterport3D, Deep360

@@ -4,17 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Object reaching
 
-- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.md|Autonomous Character-Scene Interaction Synthesis from Text Instruction (SIGGRAPH ASIA 2024 2024)]]
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Autonomous_Character-Scene_Interaction_Synthesis_from_Text_Instruction.md|Autonomous Character-Scene Interaction Synthesis from Text Instruction (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf|PDF]]
-	- topics: Vision / Multimodal / Applications
-	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
-	- methods: Proposed autonomous HSI synthesis method
-	- datasets: Interactive motion synthesis, Locomotion in cluttered scenes, Object reaching
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Autonomous HSI Synthesis (Autoregressive Diffusion + Dual Voxel + Frame-embedded Text + Scheduler)
+	- datasets: Interactive motion synthesis, Locomotion, Object reaching
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.md|LINGO Autonomous Character Scene Interaction Synthesis from Text Instruction (SIGGRAPH_ASIA_2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruction.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

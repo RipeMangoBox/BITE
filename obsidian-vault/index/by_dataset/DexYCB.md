@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: DexYCB
@@ -45,3 +45,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, LLM / Reasoning / Alignment
 	- methods: UniHM
 	- datasets: DexYCB, OakInk
+- [[obsidian-vault/analysis/SIGGRAPH_2026/AGILE_Hand-object_Interaction_Reconstruction_from_Video_via_Agentic_Generation.md|AGILE: Hand-object Interaction Reconstruction from Video via Agentic Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/AGILE_Hand_object_Interaction_Reconstruction_from_Video_via_Agentic_Generation.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: AGILE
+	- datasets: DexYCB, HO3D-v3, DexYCB / HO3D-v3

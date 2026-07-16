@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Human Preference
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_Semantic_3D_Motion_Transfer_from_Multiview_Video.md|Gaussian See, Gaussian Do: Semantic 3D Motion Transfer from Multiview Video (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_Semantic_3D_Motion_Transfer_from_Multiview_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Gaussian See, Gaussian Do
+	- datasets: Mini-Mixamo, Cross-Category, Human Preference
 - [[obsidian-vault/analysis/CVPR_2026/Avatar_Forcing_Real_Time_Interactive_Head_Avatar_Generation_for_Natural_Conversation.md|Avatar Forcing: Real-Time Interactive Head Avatar Generation for Natural Conversation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Avatar_Forcing_Real_Time_Interactive_Head_Avatar_Generation_for_Natural_Conversation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

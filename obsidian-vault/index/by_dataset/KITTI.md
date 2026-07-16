@@ -4,17 +4,29 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: KITTI
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.md|Enhancing Diffusion Models with 3D Perspective Geometry Constraints (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Enhancing_Diffusion_Models_with_3D_Perspective_Geometry_Constraints.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Perspective Geometric Constraint for Diffusion Models
+	- datasets: KITTI
 - [[obsidian-vault/analysis/CVPR_2024/Improving_Distant_3D_Object_Detection_Using_2D_Box_Supervision.md|Improving Distant 3D Object Detection Using 2D Box Supervision (CVPR 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2024/Improving_Distant_3D_Object_Detection_Using_2D_Box_Supervision.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: LR3D
 	- datasets: KITTI, nuScenes
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/GigaSLAM_Large-Scale_Monocular_SLAM_with_Hierarchical_Gaussian_Splats.md|GigaSLAM: Large-Scale Monocular SLAM with Hierarchical Gaussian Splats (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/GigaSLAM_Large_Scale_Monocular_SLAM_with_Hierarchical_Gaussian_Splats.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: GigaSLAM
+	- datasets: KITTI, KITTI 360
 - [[obsidian-vault/analysis/arxiv_2026/MoRe_Motion_aware_Feed_forward_4D_Reconstruction_Transformer.md|MoRe: Motion-aware Feed-forward 4D Reconstruction Transformer (arxiv 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2026/MoRe_Motion_aware_Feed_forward_4D_Reconstruction_Transformer.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: FineDance
@@ -27,3 +27,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: RoboPerform
 	- datasets: BEAT2, FineDance
+- [[obsidian-vault/analysis/SIGGRAPH_2026/MACE-Dance_Motion-Appearance_Cascaded_Experts_for_Music-Driven_Dance_Video_Generation.md|MACE-Dance: Motion-Appearance Cascaded Experts for Music-Driven Dance Video Generation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/MACE_Dance_Motion_Appearance_Cascaded_Experts_for_Music_Driven_Dance_Video_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: MACE-Dance
+	- datasets: MA-Data, FineDance

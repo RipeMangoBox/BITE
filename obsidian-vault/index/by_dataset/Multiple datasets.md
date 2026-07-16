@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Multiple datasets
 
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Galaxy_Maps_Localized_Foliations_for_Bijective_Volumetric_Mapping.md|Galaxy Maps: Localized Foliations for Bijective Volumetric Mapping (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Galaxy_Maps_Localized_Foliations_for_Bijective_Volumetric_Mapping.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation
+	- methods: GalaxyMaps
+	- datasets: Multiple datasets, Subset of instances, Single example
 - [[obsidian-vault/analysis/ICLR_2026/On_the_Alignment_Between_Supervised_and_Self_Supervised_Contrastive_Learning.md|On the Alignment Between Supervised and Self-Supervised Contrastive Learning (ICLR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/ICLR_2026/On_the_Alignment_Between_Supervised_and_Self_Supervised_Contrastive_Learning.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer

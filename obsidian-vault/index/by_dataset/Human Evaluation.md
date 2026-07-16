@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Human Evaluation
@@ -15,6 +15,18 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
 	- methods: InstructMotion
 	- datasets: HumanML3D, KIT-ML, Human Evaluation
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AniMaker_Multi-Agent_Animated_Storytelling_with_MCTS-Driven_Clip_Generation.md|AniMaker: Multi-Agent Animated Storytelling with MCTS-Driven Clip Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AniMaker_Multi_Agent_Animated_Storytelling_with_MCTS_Driven_Clip_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: AniMaker
+	- datasets: Keyframe Evaluation, VBench, AniEval
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/SymBridge_A_Human-in-the-Loop_Cyber-Physical_Interactive_System_for_Adaptive_Human-Robot_Symbiosis.md|SymBridge: A Human-in-the-Loop Cyber-Physical Interactive System for Adaptive Human-Robot Symbiosis (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/SymBridge_A_Human_in_the_Loop_Cyber_Physical_Interactive_System_for_Adaptive_Human_Robot_Symbiosis.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: SymBridge
+	- datasets: Inter-HRI, Human Evaluation, Cross Domains
 - [[obsidian-vault/analysis/CVPR_2026/Agentic_Retoucher_for_Text_To_Image_Generation.md|Agentic Retoucher for Text-To-Image Generation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Agentic_Retoucher_for_Text_To_Image_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation

@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: ImageNet 256x256
 
+- [[obsidian-vault/analysis/SIGGRAPH_2022/StyleGAN-XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.md|StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: StyleGAN-XL
+	- datasets: ImageNet 128x128, ImageNet 256x256, ImageNet 512x512
 - [[obsidian-vault/analysis/NEURIPS_2025/ReDi_Boosting_Generative_Image_Modeling_via_Joint_Image_Feature_Synthesis.md|ReDi: Boosting Generative Image Modeling via Joint Image-Feature Synthesis (NEURIPS 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/ReDi_Boosting_Generative_Image_Modeling_via_Joint_Image_Feature_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -39,3 +45,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MADFormer
 	- datasets: FFHQ-1024, ImageNet 256x256
+- [[obsidian-vault/analysis/SIGGRAPH_2026/ComboStoc_Combinatorial_Stochasticity_for_Diffusion_Generative_Models.md|ComboStoc: Combinatorial Stochasticity for Diffusion Generative Models (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/ComboStoc_Combinatorial_Stochasticity_for_Diffusion_Generative_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ComboStoc
+	- datasets: ImageNet 256x256, PartNet chair structured 3D shape generation

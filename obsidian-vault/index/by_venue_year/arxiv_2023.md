@@ -4,7 +4,7 @@ type: paper-index
 dimension: venue_year
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Venue_Year: arxiv_2023
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: AnimateAnything
 	- datasets: MSR-VTT
+- [[obsidian-vault/analysis/arxiv_2023/Consistent123_Improve_Consistency_for_One_Image_to_3D_Object_Synthesis.md|Consistent123: Improve Consistency for One Image to 3D Object Synthesis (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Consistent123_Improve_Consistency_for_One_Image_to_3D_Object_Synthesis.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Consistent123
+	- datasets: Objaverse Testset, GSO, RTMV
 - [[obsidian-vault/analysis/arxiv_2023/Control_A_Video_Controllable_Text_to_Video_Diffusion_Models_with_Motion_Prior_and_Reward_Feedback_Learning.md|Control-A-Video: Controllable Text-to-Video Diffusion Models with Motion Prior and Reward Feedback Learning (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/Control_A_Video_Controllable_Text_to_Video_Diffusion_Models_with_Motion_Prior_and_Reward_Feedback_Learning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -49,6 +55,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
 	- methods: EMER (Explainable Multimodal Emotion Recognition)
 	- datasets: EMER dataset
+- [[obsidian-vault/analysis/arxiv_2023/HiFi4G_High-Fidelity_Human_Performance_Rendering_via_Compact_Gaussian_Splatting.md|HiFi4G: High-Fidelity Human Performance Rendering via Compact Gaussian Splatting (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/HiFi4G_High-Fidelity_Human_Performance_Rendering_via_Compact_Gaussian_Splatting.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: HiFi4G
+	- datasets: our captured dataset
 - [[obsidian-vault/analysis/arxiv_2023/LaMD_Latent_Motion_Diffusion_for_Image_Conditional_Video_Generation.md|LaMD: Latent Motion Diffusion for Image-Conditional Video Generation (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/LaMD_Latent_Motion_Diffusion_for_Image_Conditional_Video_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -72,6 +84,12 @@ generated: 2026-06-24T20:47
 	- method groups: Benchmark / Evaluation
 	- methods: MDSC (Music-Dance Style Consistency)
 	- datasets: AIST++ & AIOZ-GDANCE 测试集, 生成动作
+- [[obsidian-vault/analysis/arxiv_2023/Michelangelo_Conditional_3D_Shape_Generation_based_on_Shape-Image-Text_Aligned_Latent_Representation.md|Michelangelo: Conditional 3D Shape Generation based on Shape-Image-Text Aligned Latent Representation (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/Michelangelo_Conditional_3D_Shape_Generation_based_on_Shape-Image-Text_Aligned_Latent_Representation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: Michelangelo (SITA-VAE + ASLDM)
+	- datasets: ShapeNet, Cartoon Monster
 - [[obsidian-vault/analysis/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.md|Motion-Conditioned Diffusion Model for Controllable Video Synthesis (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -113,6 +131,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
 	- methods: NOVIS
 	- datasets: YouTube-VIS 2019, YouTube-VIS 2021, OVIS
+- [[obsidian-vault/analysis/arxiv_2023/ShapeGPT_3D_Shape_Generation_with_A_Unified_Multi-modal_Language_Model.md|ShapeGPT: 3D Shape Generation with A Unified Multi-modal Language Model (arXiv 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2023/ShapeGPT_3D_Shape_Generation_with_A_Unified_Multi-modal_Language_Model.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ShapeGPT
+	- datasets: Image-to-Shape on ShapeNet, Text-to-Shape on ShapeNet, Multi-modal-to-Shape on ShapeNet
 - [[obsidian-vault/analysis/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.md|TeG-DG: Textually Guided Domain Generalization for Face Anti-Spoofing (arxiv 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Representation / Self-Supervised / Transfer

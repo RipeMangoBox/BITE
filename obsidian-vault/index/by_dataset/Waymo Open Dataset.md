@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Waymo Open Dataset
@@ -32,6 +32,12 @@ generated: 2026-06-24T20:47
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: InfiniCube
+	- datasets: Waymo Open Dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/GS-RoadPatching_Inpainting_Gaussians_via_3D_Searching_and_Placing_for_Driving_Scenes.md|GS-RoadPatching: Inpainting Gaussians via 3D Searching and Placing for Driving Scenes (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/GS_RoadPatching_Inpainting_Gaussians_via_3D_Searching_and_Placing_for_Driving_Scenes.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: GS-RoadPatching
 	- datasets: Waymo Open Dataset
 - [[obsidian-vault/analysis/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.md|DGGT: Feedforward 4D Reconstruction of Dynamic Driving Scenes using Unposed Images (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/DGGT_Feedforward_4D_Reconstruction_of_Dynamic_Driving_Scenes_using_Unposed_Images.pdf|PDF]]

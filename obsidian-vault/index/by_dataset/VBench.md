@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: VBench
@@ -45,6 +45,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: LayerFlow
 	- datasets: VBench, User Study, DAVIS
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AniMaker_Multi-Agent_Animated_Storytelling_with_MCTS-Driven_Clip_Generation.md|AniMaker: Multi-Agent Animated Storytelling with MCTS-Driven Clip Generation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AniMaker_Multi_Agent_Animated_Storytelling_with_MCTS_Driven_Clip_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: AniMaker
+	- datasets: Keyframe Evaluation, VBench, AniEval
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.md|AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/AnimaX_Animating_the_Inanimate_in_3D_with_Joint_Video_Pose_Diffusion_Models.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -201,3 +207,15 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
 	- methods: Motive (MOTIon attribution for Video gEneration)
 	- datasets: VBench, Human Evaluation, Wan2.2-TI2V-5B
+- [[obsidian-vault/analysis/SIGGRAPH_2026/FreeOrbit4D_Training-Free_Arbitrary_Camera_Redirection_for_Monocular_Videos_via_Foreground-Complete_4D_Reconstruction.md|FreeOrbit4D: Training-Free Arbitrary Camera Redirection for Monocular Videos via Foreground-Complete 4D Reconstruction (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/FreeOrbit4D_Training_Free_Arbitrary_Camera_Redirection_for_Monocular_Videos_via_Foreground_Complete_4D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: FreeOrbit4D
+	- datasets: VBench, DINO-SIM, FID-V
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Video_Analysis_and_Generation_via_a_Semantic_Progress_Function.md|Video Analysis and Generation via a Semantic Progress Function (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Video_Analysis_and_Generation_via_a_Semantic_Progress_Function.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: ReTime
+	- datasets: VBench, User Study

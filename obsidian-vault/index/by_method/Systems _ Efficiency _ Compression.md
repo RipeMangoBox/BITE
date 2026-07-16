@@ -4,7 +4,7 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Systems / Efficiency / Compression
@@ -39,16 +39,17 @@ generated: 2026-06-24T20:47
 	- method groups: Optimization / Theory, Systems / Efficiency / Compression
 	- methods: Hardware-Aware Latency Pruning (HALP)
 	- datasets: ImageNet, PASCAL VOC
-- An Efficient B-spline Lagrangian/Eulerian Method for Compressible Flow, Shock Waves, and Fracturing Solids (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/An_Efficient_B-spline_LagrangianEulerian_Method_for_Compressible_Flow_Shock_Waves_and_Fracturing_Solids.md|An Efficient B-spline Lagrangian/Eulerian Method for Compressible Flow, Shock Waves, and Fracturing Solids (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/An_Efficient_B_spline_Lagrangian_Eulerian_Method_for_Compressible_Flow_Shock_Waves_and_Fracturing_Solids.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression
+	- methods: Hybrid B-spline Lagrangian/Eulerian Method with Mixed Reflective/Passable Interfaces
 - [[obsidian-vault/analysis/SIGGRAPH_2022/Automatic_Quantization_for_Physics-based_Simulation.md|Automatic Quantization for Physics-based Simulation (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Automatic_Quantization_for_Physics_based_Simulation.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression
 	- methods: Automatic Quantization (AutoQuantizer)
 	- datasets: Large-scale Eulerian smoke, Large-scale MLS-MPM fluid
-- Compression and Interactive Visualization of Terabyte Scale Volumetric RGBA Data With Voxel-scale Details (SIGGRAPH 2022 2022)
-	- method groups: Systems / Efficiency / Compression
 - [[obsidian-vault/analysis/SIGGRAPH_2022/EARS_Efficiency-aware_Russian_Roulette_and_Splitting.md|EARS: Efficiency-aware Russian Roulette and Splitting (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EARS_Efficiency_aware_Russian_Roulette_and_Splitting.pdf|PDF]]
 	- topics: Other / Unclear
@@ -78,51 +79,67 @@ generated: 2026-06-24T20:47
 	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
 	- methods: EMBER
 	- datasets: Thingi10K
-- Image Features Influence Reaction Time: A Learned Probabilistic Perceptual Model for Saccade Latency (SIGGRAPH 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Image_Features_Influence_Reaction_Time_A_Learned_Probabilistic_Perceptual_Model_for_Saccade_Latency.pdf|PDF]]
-	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy-_and_Computation-efficient_Holography_on_the_Edge.md|Joint Neural Phase Retrieval and Compression for Energy- and Computation-efficient Holography on the Edge (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Joint_Neural_Phase_Retrieval_and_Compression_for_Energy_and_Computation_efficient_Holography_on_the_Edge.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression, LLM / Reasoning / Alignment
-- R2E2: Low-latency Path Tracing of Terabyte-scale Scenes Using Thousands of Cloud CPUs (SIGGRAPH 2022 2022)
+	- methods: DPRC (Joint Neural Phase Retrieval and Compression)
+	- datasets: DIV2K-like 测试集
+- [[obsidian-vault/analysis/SIGGRAPH_2022/R2E2_Low-latency_Path_Tracing_of_Terabyte-scale_Scenes_Using_Thousands_of_Cloud_CPUs.md|R2E2: Low-latency Path Tracing of Terabyte-scale Scenes Using Thousands of Cloud CPUs (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/R2E2_Low_latency_Path_Tracing_of_Terabyte_scale_Scenes_Using_Thousands_of_Cloud_CPUs.pdf|PDF]]
+	- topics: Graphics Procedural Modeling
 	- method groups: Systems / Efficiency / Compression
-- Sparsity-specific Code Optimization Using Expression Trees (SIGGRAPH 2022 2022)
-	- method groups: Optimization / Theory, Systems / Efficiency / Compression
-- StyleGAN-XL: Scaling StyleGAN to Large Diverse Datasets (SIGGRAPH 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/StyleGAN_XL_Scaling_StyleGAN_to_Large_Diverse_Datasets.pdf|PDF]]
+	- methods: R2E2 (Really Elastic Ray Engine)
+	- datasets: Moana-XL, Terrace
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Real-time_Lens_Distortion_Algorithm_on_Embedded_GPU_Systems.md|Real-time Lens Distortion Algorithm on Embedded GPU Systems (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Real_time_Lens_Distortion_Algorithm_on_Embedded_GPU_Systems.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Compressed Lookup Table with Unified Memory
+	- datasets: Jetson Nano, Jetson NX, Overall
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Searching_for_Fast_Demosaicking_Algorithms.md|Searching for Fast Demosaicking Algorithms (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Searching_for_Fast_Demosaicking_Algorithms.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression
-- Volume Parametrization Quantization for Hexahedral Meshing (SIGGRAPH 2022 2022)
+	- methods: Multi-Objective Program Search for Efficient Demosaicking
+	- datasets: Bayer demosaicking, X-Trans demosaicking, Joint demosaicking and super-resolution
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Volume_Parametrization_Quantization_for_Hexahedral_Meshing.md|Volume Parametrization Quantization for Hexahedral Meshing (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Volume_Parametrization_Quantization_for_Hexahedral_Meshing.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: Motorcycle Complex-based Volumetric Parametrization Quantization
+	- datasets: Various models
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/3QNet_3D_Point_Cloud_Geometry_Quantization_Compression_Network.md|3QNet: 3D Point Cloud Geometry Quantization Compression Network (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/3QNet_3D_Point_Cloud_Geometry_Quantization_Compression_Network.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: ImAM (Improved Auto-regressive Model)
 	- datasets: ShapeNet
-- Differentiable Point-Based Radiance Fields for Efficient View Synthesis (SIGGRAPH ASIA 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Differentiable_Point_Based_Radiance_Fields_for_Efficient_View_Synthesis.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Efficient Differentiation of Pixel Reconstruction Filters for Path-Space Differentiable Rendering (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Efficient_Differentiation_of_Pixel_Reconstruction_Filters_for_Path-Space_Differentiable_Rendering.md|Efficient Differentiation of Pixel Reconstruction Filters for Path-Space Differentiable Rendering (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Differentiation_of_Pixel_Reconstruction_Filters_for_Path_Space_Differentiable_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Drone Exploration in Real Unknown Environments (SIGGRAPH ASIA 2022 2022)
-	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
-- Efficient Light Probes for Real-time Global Illumination (SIGGRAPH ASIA 2022 2022)
-	- method groups: Systems / Efficiency / Compression
-- Efficient Neural Radiance Fields for Interactive Free-viewpoint Video (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Efficient_Neural_Radiance_Fields_for_Interactive_Free-viewpoint_Video.md|Efficient Neural Radiance Fields for Interactive Free-viewpoint Video (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Radiance_Fields_for_Interactive_Free_viewpoint_Video.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Neural Style Transfer for Volumetric Simulations (SIGGRAPH ASIA 2022 2022)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Style_Transfer_for_Volumetric_Simulations.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
-- Interactive exploration of tension-compression mixed shells (SIGGRAPH ASIA 2022 2022)
+	- methods: ENeRF
+	- datasets: NeRF Synthetic, DTU, ZJU-MoCap
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Interactive_exploration_of_tension-compression_mixed_shells.md|Interactive exploration of tension-compression mixed shells (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Interactive_exploration_of_tension_compression_mixed_shells.pdf|PDF]]
+	- topics: Graphics Animation Interaction
 	- method groups: Agent / RL / Planning, Systems / Efficiency / Compression
-- MeshTaichi: A Compiler for Efficient Mesh-based Operations (SIGGRAPH ASIA 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/MeshTaichi_A_Compiler_for_Efficient_Mesh-based_Operations.md|MeshTaichi: A Compiler for Efficient Mesh-based Operations (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/MeshTaichi_A_Compiler_for_Efficient_Mesh_based_Operations.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Systems / Efficiency / Compression
-- Neural Bidirectional Texture Function Compression and Rendering (SIGGRAPH ASIA 2022 2022)
+	- methods: MeshTaichi
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Neural_Bidirectional_Texture_Function_Compression_and_Rendering.md|Neural Bidirectional Texture Function Compression and Rendering (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Neural_Bidirectional_Texture_Function_Compression_and_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Robust and Efficient Structure-from-Motion Method for Ambiguous Large-Scale Indoor Scene (SIGGRAPH ASIA 2022 2022)
-	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: NeuBTF
+	- datasets: NeuMIP提供的合成数据集
 - [[obsidian-vault/analysis/CVPR_2023/VoxFormer_Sparse_Voxel_Transformer_for_Camera_based_3D_Semantic_Scene_Completion.md|VoxFormer: Sparse Voxel Transformer for Camera-based 3D Semantic Scene Completion (CVPR 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2023/VoxFormer_Sparse_Voxel_Transformer_for_Camera_based_3D_Semantic_Scene_Completion.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -135,58 +152,71 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: MotionGPT
 	- datasets: HumanML3D
-- Efficient Embeddings in Exact Arithmetic (SIGGRAPH 2023 2023)
-	- method groups: Systems / Efficiency / Compression
-- Efficient Video Portrait Reenactment via Grid-based Codebook (SIGGRAPH 2023 2023)
-	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- MERF: Memory-Efficient Radiance Fields for Real-time View Synthesis in Unbounded Scenes (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Efficient_Embeddings_in_Exact_Arithmetic.md|Efficient Embeddings in Exact Arithmetic (SIGGRAPH 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Efficient_Embeddings_in_Exact_Arithmetic.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: E3A (Efficient Embeddings in Exact Arithmetic)
+	- datasets: Thingi10K meshes, Subdivided meshes up to 3.9M vertices
+- [[obsidian-vault/analysis/SIGGRAPH_2023/MERF_Memory-Efficient_Radiance_Fields_for_Real-time_View_Synthesis_in_Unbounded_Scenes.md|MERF: Memory-Efficient Radiance Fields for Real-time View Synthesis in Unbounded Scenes (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/MERF_Memory_Efficient_Radiance_Fields_for_Real_time_View_Synthesis_in_Unbounded_Scenes.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Min-Deviation-Flow in Bi-directed Graphs for T-Mesh Quantization (SIGGRAPH 2023 2023)
+	- topics: Vision / Multimodal / Applications, Graphics Rendering Materials
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: MERF
+	- datasets: mip-NeRF 360 Outdoor Scenes
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Min-Deviation-Flow_in_Bi-directed_Graphs_for_T-Mesh_Quantization.md|Min-Deviation-Flow in Bi-directed Graphs for T-Mesh Quantization (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Min_Deviation_Flow_in_Bi_directed_Graphs_for_T_Mesh_Quantization.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Systems / Efficiency / Compression
-- Random-access Neural Compression of Material Textures (SIGGRAPH 2023 2023)
+	- methods: Bi-MDF Quantization
+	- datasets: QuadWild 300数据集, Toothbrush-holder1 T-网格
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Random-access_Neural_Compression_of_Material_Textures.md|Random-access Neural Compression of Material Textures (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Random_access_Neural_Compression_of_Material_Textures.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Neural Texture Compression (NTC)
+	- datasets: inkwell rendering, NVIDIA RTX 4090
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md|Adaptive Shells for Efficient Neural Radiance Field Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: Adaptive Shells
 	- datasets: Shelly, DTU
-- Efficient Cone Singularity Construction for Conformal Parameterizations (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Cone_Singularity_Construction_for_Conformal_Parameterizations.md|Efficient Cone Singularity Construction for Conformal Parameterizations (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Cone_Singularity_Construction_for_Conformal_Parameterizations.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Systems / Efficiency / Compression
-- Efficient Graphics Representation with Differentiable Indirection (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Graphics_Representation_with_Differentiable_Indirection.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Moving and Adding Cones (MovingCones)
 - Efficient Human Motion Reconstruction from Monocular Videos with Physical Consistency Loss (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Human_Motion_Reconstruction_from_Monocular_Videos_with_Physical_Consistency_Loss.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Hybrid Zoom using Camera Fusion on Mobile Phones (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Hybrid_Zoom_using_Camera_Fusion_on_Mobile_Phones.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Efficient Visualization of Light Pollution for the Night Sky (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Efficient_Visualization_of_Light_Pollution_for_the_Night_Sky.md|Efficient Visualization of Light Pollution for the Night Sky (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Efficient_Visualization_of_Light_Pollution_for_the_Night_Sky.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- FuseSR: Super Resolution for Real-time Rendering through Efficient Multi-resolution Fusion (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Procedural Modeling, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 基于PCA与FFT的天空辉光快速计算方法
+	- datasets: Custom terrain with variable lighting cells, Precomputed data storage, Multiple scattering
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real-time_Rendering_through_Efficient_Multi-resolution_Fusion.md|FuseSR: Super Resolution for Real-time Rendering through Efficient Multi-resolution Fusion (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/FuseSR_Super_Resolution_for_Real_time_Rendering_through_Efficient_Multi_resolution_Fusion.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FuseSR
+	- datasets: Kite scene, Showdown scene
 - Light-Efficient Holographic Illumination for Continuous-Wave Time-of-Flight Imaging (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Light_Efficient_Holographic_Illumination_for_Continuous_Wave_Time_of_Flight_Imaging.pdf|PDF]]
 	- method groups: Systems / Efficiency / Compression
-- Neural Point-based Volumetric Avatar: Surface-guided Neural Points for Efficient and Photorealistic Volumetric Head Avatar (SIGGRAPH ASIA 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Neural_Point-based_Volumetric_Avatar_Surface-guided_Neural_Points_for_Efficient_and_Photorealistic_Volumetric_Head_Avatar.md|Neural Point-based Volumetric Avatar: Surface-guided Neural Points for Efficient and Photorealistic Volumetric Head Avatar (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Neural_Point_based_Volumetric_Avatar_Surface_guided_Neural_Points_for_Efficient_and_Photorealistic_Volumetric_Head_Avatar.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Shrink & Morph: 3D-printed self-shaping shells actuated by a shape memory effect (SIGGRAPH ASIA 2023 2023)
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: NPVA (Neural Point-based Volumetric Avatar)
+	- datasets: Multiface, Single-frame fitting, Ablation on lightweight decoding
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Shrink_Morph_3D-printed_self-shaping_shells_actuated_by_a_shape_memory_effect.md|Shrink & Morph: 3D-printed self-shaping shells actuated by a shape memory effect (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Shrink_Morph_3D_printed_self_shaping_shells_actuated_by_a_shape_memory_effect.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Shrink & Morph
+	- datasets: Hemisphere, Saddle, Beetle
 - Texture Atlas Compression Based on Repeated Content Removal (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Texture_Atlas_Compression_Based_on_Repeated_Content_Removal.pdf|PDF]]
 	- method groups: Systems / Efficiency / Compression
-- VMesh: Hybrid Volume-Mesh Representation for Efficient View Synthesis (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/VMesh_Hybrid_Volume_Mesh_Representation_for_Efficient_View_Synthesis.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
 - [[obsidian-vault/analysis/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.md|Robustness-Guided Image Synthesis for Data-Free Quantization (AAAI 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/AAAI_2024/Robustness_Guided_Image_Synthesis_for_Data_Free_Quantization.pdf|PDF]]
 	- topics: Motion Animation
@@ -229,23 +259,30 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: DCVQ (Divide-and-Conquer Vector Quantization)
 	- datasets: CIFAR-10 / CelebA, ImageNet-256
-- A Neural Network Model for Efficient Musculoskeletal-driven Skin Deformation (SIGGRAPH 2024 2024)
-	- method groups: Systems / Efficiency / Compression
-- Alignment Conditions for NURBS-based Design of Mixed Tension-compression Grid Shells (SIGGRAPH 2024 2024)
-	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
-- CharacterGen: Efficient 3D Character Generation From Single Images With Multi-view Pose Canonicalization (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/DiffSound_Differentiable_Modal_Sound_Rendering_and_Inverse_Rendering_for_Diverse_Inference_Tasks.md|DiffSound: Differentiable Modal Sound Rendering and Inverse Rendering for Diverse Inference Tasks (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/DiffSound_Differentiable_Modal_Sound_Rendering_and_Inverse_Rendering_for_Diverse_Inference_Tasks.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- DiffSound: Differentiable Modal Sound Rendering and Inverse Rendering for Diverse Inference Tasks (SIGGRAPH 2024 2024)
-	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Debris-flow Simulation for Steep Terrain Erosion (SIGGRAPH 2024 2024)
+	- methods: DiffSound
+	- datasets: Volumetric thickness inference on 4 objects, Geometric shape recovery from impact sound, Real-world impact position inference
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Efficient_Debris-flow_Simulation_for_Steep_Terrain_Erosion.md|Efficient Debris-flow Simulation for Steep Terrain Erosion (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Efficient_Debris_flow_Simulation_for_Steep_Terrain_Erosion.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Procedural Modeling
 	- method groups: Systems / Efficiency / Compression
-- Efficient Position-based Deformable Colon Modeling for Endoscopic Procedures Simulation (SIGGRAPH 2024 2024)
+	- methods: Efficient Debris-flow Simulation for Steep Terrain Erosion
+	- datasets: Synthetic mountain terrain, San Gabriel Mountains real data
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Efficient_Position-based_Deformable_Colon_Modeling_for_Endoscopic_Procedures_Simulation.md|Efficient Position-based Deformable Colon Modeling for Endoscopic Procedures Simulation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Efficient_Position_based_Deformable_Colon_Modeling_for_Endoscopic_Procedures_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Systems / Efficiency / Compression
-- QT-Font: High-efficiency Font Synthesis via Quadtree-based Diffusion Models (SIGGRAPH 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
-- SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)
+	- methods: Efficient Position-based Deformable Colon Modeling (XPBD with Cosserat rod + FSCD)
+	- datasets: Spring Scene, Colonoscopy Insertion Simulation
+- [[obsidian-vault/analysis/SIGGRAPH_2024/SMERF_Streamable_Memory_Efficient_Radiance_Fields_for_Real-time_Large-scene_Exploration.md|SMERF: Streamable Memory Efficient Radiance Fields for Real-time Large-scene Exploration (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SMERF_Streamable_Memory_Efficient_Radiance_Fields_for_Real_time_Large_scene_Exploration.pdf|PDF]]
+	- topics: Graphics Rendering Materials
 	- method groups: Systems / Efficiency / Compression, Agent / RL / Planning
+	- methods: SMERF
+	- datasets: Zip-NeRF large scenes, mip-NeRF 360, iPhone 12 Pro
 - [[obsidian-vault/analysis/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.md|SuperPADL: Scaling Language-Directed Physics-Based Control with Progressive Supervised Distillation (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/SuperPADL_Scaling_Language_Directed_Physics_Based_Control_with_Progressive_Supervised_Distillation.pdf|PDF]]
 	- topics: Reinforcement Learning / Planning / Agents
@@ -258,37 +295,63 @@ generated: 2026-06-24T20:47
 	- method groups: LLM / Reasoning / Alignment, Systems / Efficiency / Compression
 	- methods: VQ-PAE, shared amplitude codebook, phase manifold
 	- datasets: Dog, Human-Locomotion, MOCHA-Clown
-- DirectL: Efficient Radiance Fields Rendering for 3D Light Field Displays (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/DirectL_Efficient_Radiance_Fields_Rendering_for_3D_Light_Field_Displays.md|DirectL: Efficient Radiance Fields Rendering for 3D Light Field Displays (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/DirectL_Efficient_Radiance_Fields_Rendering_for_3D_Light_Field_Displays.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient GPU Cloth Simulation with Non-distance Barriers and Subspace Reuse (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Efficient_GPU_Cloth_Simulation_with_Non-distance_Barriers_and_Subspace_Reuse.md|Efficient GPU Cloth Simulation with Non-distance Barriers and Subspace Reuse (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_GPU_Cloth_Simulation_with_Non_distance_Barriers_and_Subspace_Reuse.pdf|PDF]]
+	- topics: Graphics Physical Simulation
 	- method groups: Systems / Efficiency / Compression
-- Efficient Image-Space Shape Splatting for Monte Carlo Rendering (SIGGRAPH ASIA 2024 2024)
+	- methods: Efficient GPU Cloth Simulation with Non-distance Barriers and Subspace Reuse (NDB + Subspace Reuse)
+	- datasets: Fashion show, Bending strips, Cloth twisting
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Efficient_Image-Space_Shape_Splatting_for_Monte_Carlo_Rendering.md|Efficient Image-Space Shape Splatting for Monte Carlo Rendering (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_Image_Space_Shape_Splatting_for_Monte_Carlo_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Efficient Neural Path Guiding with 4D Modeling (SIGGRAPH ASIA 2024 2024)
+	- methods: Efficient Image-Space Shape Splatting
+	- datasets: 多种测试场景, 视觉比较
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Efficient_Neural_Path_Guiding_with_4D_Modeling.md|Efficient Neural Path Guiding with 4D Modeling (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Efficient_Neural_Path_Guiding_with_4D_Modeling.pdf|PDF]]
-	- method groups: Systems / Efficiency / Compression
-- Exact and Efficient Intersection Resolution for Mesh Arrangements (SIGGRAPH ASIA 2024 2024)
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Ours-4D (4D Neural Path Guiding)
+	- datasets: Living-Room, Tower, Interior
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Exact_and_Efficient_Intersection_Resolution_for_Mesh_Arrangements.md|Exact and Efficient Intersection Resolution for Mesh Arrangements (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Exact_and_Efficient_Intersection_Resolution_for_Mesh_Arrangements.pdf|PDF]]
+	- topics: Graphics Geometry Processing
 	- method groups: Systems / Efficiency / Compression
-- Gaussian Opacity Fields: Efficient Adaptive Surface Reconstruction in Unbounded Scenes (SIGGRAPH ASIA 2024 2024)
+	- methods: Exact and Efficient Intersection Resolution for Mesh Arrangements (Indirect Offset Predicates)
+	- datasets: Thingi10k
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.md|Gaussian Opacity Fields: Efficient Adaptive Surface Reconstruction in Unbounded Scenes (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- gDist: Efficient Distance Computation between 3D Meshes on GPU (SIGGRAPH ASIA 2024 2024)
+	- methods: Gaussian Opacity Fields (GOF)
+	- datasets: Tanks and Temples, DTU, Mip-NeRF 360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/gDist_Efficient_Distance_Computation_between_3D_Meshes_on_GPU.md|gDist: Efficient Distance Computation between 3D Meshes on GPU (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/gDist_Efficient_Distance_Computation_between_3D_Meshes_on_GPU.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Procedural Modeling, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- GFFE: G-buffer Free Frame Extrapolation for Low-latency Real-time Rendering (SIGGRAPH ASIA 2024 2024)
+	- methods: gDist
+	- datasets: Rings, Tools, Comet-Tools
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/GFFE_G-buffer_Free_Frame_Extrapolation_for_Low-latency_Real-time_Rendering.md|GFFE: G-buffer Free Frame Extrapolation for Low-latency Real-time Rendering (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/GFFE_G_buffer_Free_Frame_Extrapolation_for_Low_latency_Real_time_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- GS^3: Efficient Relighting with Triple Gaussian Splatting (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/HFH-Font_Few-shot_Chinese_Font_Synthesis_with_Higher_Quality_Faster_Speed_and_Higher_Resolution.md|HFH-Font: Few-shot Chinese Font Synthesis with Higher Quality, Faster Speed, and Higher Resolution (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/HFH_Font_Few_shot_Chinese_Font_Synthesis_with_Higher_Quality_Faster_Speed_and_Higher_Resolution.pdf|PDF]]
+	- topics: Generative Models / Diffusion
 	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: HFH-Font
+	- datasets: 大规模字体数据集, 超分辨率 1024×1024 生成
 - NeuSmoke: Efficient Smoke Reconstruction and View Synthesis with Neural Transportation Fields (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/NeuSmoke_Efficient_Smoke_Reconstruction_and_View_Synthesis_with_Neural_Transportation_Fields.pdf|PDF]]
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- SD-𝜋XL: Generating Low-Resolution Quantized Imagery via Score Distillation (SIGGRAPH ASIA 2024 2024)
-	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
-- Stripe Embedding: Efficient Maps with Exact Numeric Computation (SIGGRAPH ASIA 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Stripe_Embedding_Efficient_Maps_with_Exact_Numeric_Computation.md|Stripe Embedding: Efficient Maps with Exact Numeric Computation (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Stripe_Embedding_Efficient_Maps_with_Exact_Numeric_Computation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
+	- methods: Stripe Embedding
 - [[obsidian-vault/analysis/CVPR_2025/MDP_Multidimensional_Vision_Model_Pruning_with_Latency_Constraint.md|MDP: Multidimensional Vision Model Pruning with Latency Constraint (CVPR 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2025/MDP_Multidimensional_Vision_Model_Pruning_with_Latency_Constraint.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -310,39 +373,144 @@ generated: 2026-06-24T20:47
 - Capsule: Efficient Player Isolation for Datacenters (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Capsule_Efficient_Player_Isolation_for_Datacenters.pdf|PDF]]
 	- method groups: Systems / Efficiency / Compression
-- Cobra: Efficient Line Art COlorization with BRoAder References (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Cobra_Efficient_Line_Art_COlorization_with_BRoAder_References.md|Cobra: Efficient Line Art COlorization with BRoAder References (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Cobra_Efficient_Line_Art_COlorization_with_BRoAder_References.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression
+	- methods: Cobra
+	- datasets: Cobra-bench
 - ColorSurge: Bringing Vibrancy and Efficiency to Automatic Video Colorization via Dual-Branch Fusion (SIGGRAPH 2025 2025)
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- Creating Fluid-Interactive Virtual Agents by an Efficient Simulator with Local-domain Control (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Creating_Fluid-Interactive_Virtual_Agents_by_an_Efficient_Simulator_with_Local-domain_Control.md|Creating Fluid-Interactive Virtual Agents by an Efficient Simulator with Local-domain Control (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Creating_Fluid_Interactive_Virtual_Agents_by_an_Efficient_Simulator_with_Local_domain_Control.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction
 	- method groups: Systems / Efficiency / Compression
-- Curl Quantization for Automatic Placement of Knit Singularities (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
-- Data-Efficient Discovery of Hyperelastic TPMS Metamaterials with Extreme Energy Dissipation (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
-- Efficient Proxy Raytracer for Optical Systems Using Implicit Neural Representations (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
-- Gaussian Compression for Precomputed Indirect Illumination (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
-- Guided Lens Sampling for Efficient Monte Carlo Circle-of-Confusion Rendering (SIGGRAPH 2025 2025)
+	- methods: MPC-based Local-domain Fluid-Solid Interaction Framework
+	- datasets: Fish点对点巡游任务
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Curl_Quantization_for_Automatic_Placement_of_Knit_Singularities.md|Curl Quantization for Automatic Placement of Knit Singularities (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Curl_Quantization_for_Automatic_Placement_of_Knit_Singularities.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Graphics Fabrication Design, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems (SIGGRAPH 2025 2025)
-	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
-- Patch-Grid: An Efficient and Feature-Preserving Neural Implicit Surface Representation (SIGGRAPH 2025 2025)
+	- methods: Curl Quantization (旋度量化)
+	- datasets: Runtime comparison, Glove model solvability, Rendering quality
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Efficient_Proxy_Raytracer_for_Optical_Systems_Using_Implicit_Neural_Representations.md|Efficient Proxy Raytracer for Optical Systems Using Implicit Neural Representations (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Efficient_Proxy_Raytracer_for_Optical_Systems_Using_Implicit_Neural_Representations.pdf|PDF]]
+	- topics: Graphics Procedural Modeling, Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Systems / Efficiency / Compression
-- Position-Normal Manifold for Efficient Glint Rendering on High-Resolution Normal Maps (SIGGRAPH 2025 2025)
+	- methods: Ray2Ray
+	- datasets: Unseen Grid Cell, Novel Ray Pattern
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Gaussian_Compression_for_Precomputed_Indirect_Illumination.md|Gaussian Compression for Precomputed Indirect Illumination (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Gaussian_Compression_for_Precomputed_Indirect_Illumination.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
-- SqueezeMe: Mobile-Ready Distillation of Gaussian Full-Body Avatars (SIGGRAPH 2025 2025)
+	- methods: Gaussian Probe Compression (GPC)
+	- datasets: Havana scene, OldTown scene
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Guided_Lens_Sampling_for_Efficient_Monte_Carlo_Circle-of-Confusion_Rendering.md|Guided Lens Sampling for Efficient Monte Carlo Circle-of-Confusion Rendering (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Guided_Lens_Sampling_for_Efficient_Monte_Carlo_Circle_of_Confusion_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Lens Importance Sampling (LIS)
+	- datasets: Defocused scenes, All test scenes, Specific pixel
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Piecewise_Ruled_Approximation_for_Freeform_Mesh_Surfaces.md|Piecewise Ruled Approximation for Freeform Mesh Surfaces (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Piecewise_Ruled_Approximation_for_Freeform_Mesh_Surfaces.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Optimization / Theory, Systems / Efficiency / Compression
+	- methods: Piecewise Ruled Approximation via Group-Sparsity Optimization
+	- datasets: Various freeform models in Fig. 13 and Fig. 14, Models in Fig. 15, Models in Table 1
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Position-Normal_Manifold_for_Efficient_Glint_Rendering_on_High-Resolution_Normal_Maps.md|Position-Normal Manifold for Efficient Glint Rendering on High-Resolution Normal Maps (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Position_Normal_Manifold_for_Efficient_Glint_Rendering_on_High_Resolution_Normal_Maps.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Position-Normal Manifold P-NDF
+	- datasets: Isotropic normal map, footprint 2562, Brush normal map
+- [[obsidian-vault/analysis/SIGGRAPH_2025/PS-CAD_Local_Geometry_Guidance_via_Prompting_and_Selection_for_CAD_Reconstruction.md|PS-CAD: Local Geometry Guidance via Prompting and Selection for CAD Reconstruction (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/PS_CAD_Local_Geometry_Guidance_via_Prompting_and_Selection_for_CAD_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: PS-CAD
+	- datasets: DeepCAD, Fusion360
+- [[obsidian-vault/analysis/SIGGRAPH_2025/SqueezeMe_Mobile-Ready_Distillation_of_Gaussian_Full-Body_Avatars.md|SqueezeMe: Mobile-Ready Distillation of Gaussian Full-Body Avatars (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SqueezeMe_Mobile_Ready_Distillation_of_Gaussian_Full_Body_Avatars.pdf|PDF]]
+	- topics: Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: SqueezeMe
+	- datasets: internal multi-view capture dataset, Meta Quest 3 headset
+- [[obsidian-vault/analysis/SIGGRAPH_2025/To_Infinity_and_Beyond_a_GPU-Driven_Memory_Sharing_Pipeline_to_Generate_and_Process_Infinite_Synthetic_Data.md|To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/To_Infinity_and_Beyond_a_GPU_Driven_Memory_Sharing_Pipeline_to_Generate_and_Process_Infinite_Synthetic_Data.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: GPU-resident Memory Sharing Pipeline (GPU内存驻留共享管线)
+	- datasets: 渲染目标共享
+- [[obsidian-vault/analysis/SIGGRAPH_2025/TokenVerse_Versatile_Multi-concept_Personalization_in_Token_Modulation_Space.md|TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/TokenVerse_Versatile_Multi_concept_Personalization_in_Token_Modulation_Space.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Systems / Efficiency / Compression
-- Tiny is not small enough: High quality, low-resource facial animation models through hybrid knowledge distillation (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
-- To Infinity and Beyond: a GPU-Driven Memory Sharing Pipeline to Generate and Process Infinite Synthetic Data (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression, Data Curation / Synthesis
-- TokenVerse: Versatile Multi-concept Personalization in Token Modulation Space (SIGGRAPH 2025 2025)
-	- method groups: Systems / Efficiency / Compression
+	- methods: TokenVerse
+	- datasets: DreamBench++ 及自定义多概念数据集, 用户研究
 - Towards Comprehensive Neural Materials: Dynamic Structure-Preserving Synthesis with Accurate Silhouette at Instant Inference Speed (SIGGRAPH 2025 2025)
 	- method groups: Systems / Efficiency / Compression
-- UltraMeshRenderer: Efficient Structure and Management of GPU Out-of-core Memory for Real-time Rendering of Gigantic 3D Meshes (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/UltraMeshRenderer_Efficient_Structure_and_Management_of_GPU_Out-of-core_Memory_for_Real-time_Rendering_of_Gigantic_3D_Meshes.md|UltraMeshRenderer: Efficient Structure and Management of GPU Out-of-core Memory for Real-time Rendering of Gigantic 3D Meshes (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/UltraMeshRenderer_Efficient_Structure_and_Management_of_GPU_Out_of_core_Memory_for_Real_time_Rendering_of_Gigantic_3D_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: FTFC-ID (Frame-to-Frame Coherence with In-Place Data Management)
+	- datasets: Statue Models, Moana Island and Combined Scene, Comparison with Unreal Nanite on Statue Models
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/A_Highly-Efficient_Hybrid_Simulation_System_for_Flight_Controller_Design_and_Evaluation_of_Unmanned_Aerial_Vehicles.md|A Highly-Efficient Hybrid Simulation System for Flight Controller Design and Evaluation of Unmanned Aerial Vehicles (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/A_Highly_Efficient_Hybrid_Simulation_System_for_Flight_Controller_Design_and_Evaluation_of_Unmanned_Aerial_Vehicles.pdf|PDF]]
+	- topics: Graphics Physical Simulation, Graphics Animation Interaction, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Systems / Efficiency / Compression
+	- methods: Hybrid Fluid-Structure Interaction Simulator (Hybrid FSI Simulator)
+	- datasets: Quadrotor ground effect, Downwash velocity profile, Quadrotor acceleration-braking maneuver
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Cut2Next_Generating_Next_Shot_via_In-Context_Tuning.md|Cut2Next: Generating Next Shot via In-Context Tuning (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Cut2Next_Generating_Next_Shot_via_In_Context_Tuning.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Cut2Next
+	- datasets: CutBench
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Discovering_Folding_Lines_for_Surface_Compression.md|Discovering Folding Lines for Surface Compression (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Discovering_Folding_Lines_for_Surface_Compression.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Systems / Efficiency / Compression
+	- methods: MPM + Folding Line Extraction (FLE)
+	- datasets: Atlas 9, Bunny, Cylinder
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Efficient_and_Scalable_Spatial_Regularization_of_Optimal_Transport.md|Efficient and Scalable Spatial Regularization of Optimal Transport (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Efficient_and_Scalable_Spatial_Regularization_of_Optimal_Transport.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: Spatially Regularized Optimal Transport via Mean Maps
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Efficient_Object_Reconstruction_with_Differentiable_Area_Light_Shading.md|Efficient Object Reconstruction with Differentiable Area Light Shading (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Efficient_Object_Reconstruction_with_Differentiable_Area_Light_Shading.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: 可微面光源逆渲染方法（Active Area Light Inverse Rendering with Differentiable LTC）
+	- datasets: 合成物体重光照, 合成物体粗糙度估计, 优化效率
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/EGG-Fusion_Efficient_3D_Reconstruction_with_Geometry-aware_Gaussian_Surfel_on_the_Fly.md|EGG-Fusion: Efficient 3D Reconstruction with Geometry-aware Gaussian Surfel on the Fly (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/EGG_Fusion_Efficient_3D_Reconstruction_with_Geometry_aware_Gaussian_Surfel_on_the_Fly.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: EGG-Fusion
+	- datasets: Replica, TUM-RGBD, ScanNet++
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Fine-Grained_Spatially_Varying_Material_Selection_in_Images.md|Fine-Grained Spatially Varying Material Selection in Images (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Fine_Grained_Spatially_Varying_Material_Selection_in_Images.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Two-Level Multi-Resolution Material Selection (Ours)
+	- datasets: Materialistic Test, Two-Level Test
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Nonlinear_Noise2Noise_for_Efficient_Monte_Carlo_Denoiser_Training.md|Nonlinear Noise2Noise for Efficient Monte Carlo Denoiser Training (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Nonlinear_Noise2Noise_for_Efficient_Monte_Carlo_Denoiser_Training.pdf|PDF]]
+	- topics: Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Systems / Efficiency / Compression
+	- methods: Nonlinear Noise2Noise (结合色调映射的噪声对训练)
+	- datasets: SBMC test set, SBMC validation set
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/QMF-Blend_Quantized_Matrix_Factorization_for_Efficient_Blendshape_Compression.md|QMF-Blend: Quantized Matrix Factorization for Efficient Blendshape Compression (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/QMF_Blend_Quantized_Matrix_Factorization_for_Efficient_Blendshape_Compression.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Systems / Efficiency / Compression
+	- methods: QMF (Quantized Matrix Factorization)
+	- datasets: Aura model, Jupiter model, Aura
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Sketch2PoseNet_Efficient_and_Generalized_Sketch_to_3D_Human_Pose_Prediction.md|Sketch2PoseNet: Efficient and Generalized Sketch to 3D Human Pose Prediction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Sketch2PoseNet_Efficient_and_Generalized_Sketch_to_3D_Human_Pose_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 - [[obsidian-vault/analysis/TPAMI_2025/SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimation.md|SMPLest X Ultimate Scaling for Expressive Human Pose and Shape Estimation (TPAMI 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/TPAMI_2025/SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimation.pdf|PDF]]
@@ -1127,6 +1295,36 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: WinT3R
 	- datasets: NRGBD, KITTI
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Efficient_B-Spline_Finite_Elements_for_Cloth_Simulation.md|Efficient B-Spline Finite Elements for Cloth Simulation (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Efficient_B_Spline_Finite_Elements_for_Cloth_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Systems / Efficiency / Compression
+	- methods: Efficient B-Spline FEM (BS-Cloth)
+	- datasets: Upright Hanging Cloth, Drape Test, Cloth on Sphere
+- [[obsidian-vault/analysis/SIGGRAPH_2026/EgoForce_Forearm-Guided_Camera-Space_3D_Hand_Pose_from_a_Monocular_Egocentric_Camera.md|EgoForce: Forearm-Guided Camera-Space 3D Hand Pose from a Monocular Egocentric Camera (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/EgoForce_Forearm_Guided_Camera_Space_3D_Hand_Pose_from_a_Monocular_Egocentric_Camera.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: EgoForce
+	- datasets: ARCTIC, HOT3D, H2O
+- [[obsidian-vault/analysis/SIGGRAPH_2026/M-ABD_Scalable_Efficient_and_Robust_Multi-Affine-Body_Dynamics.md|M-ABD: Scalable, Efficient, and Robust Multi-Affine-Body Dynamics (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/M_ABD_Scalable_Efficient_and_Robust_Multi_Affine_Body_Dynamics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: M-ABD (Multi-Affine-Body Dynamics)
+	- datasets: 球关节网I, 球关节网III 可扩展性
+- [[obsidian-vault/analysis/SIGGRAPH_2026/UCM_Unified_Modeling_of_Camera_Control_and_Memory_with_Time-aware_Positional_Encoding_Warping_for_World_Models.md|UCM: Unified Modeling of Camera Control and Memory with Time-aware Positional Encoding Warping for World Models (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/UCM_Unified_Modeling_of_Camera_Control_and_Memory_with_Time_aware_Positional_Encoding_Warping_for_World_Models.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: UCM
+	- datasets: 多源测试集, Long-term Memory: Memory Initialization, Long-term Memory: Cycle Trajectory
+- [[obsidian-vault/analysis/SIGGRAPH_2026/VecSet-Edit_Unleashing_Pre-trained_LRM_for_Mesh_Editing_from_Single_Image.md|VecSet-Edit: Unleashing Pre-trained LRM for Mesh Editing from Single Image (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/VecSet_Edit_Unleashing_Pre_trained_LRM_for_Mesh_Editing_from_Single_Image.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: VecSet-Edit
+	- datasets: Edit3D-Bench, User Study, Efficiency
 - [[obsidian-vault/analysis/WHITEPAPER_2026/Kimodo_Scaling_Controllable_Human_Motion_Generation.md|Kimodo: Scaling Controllable Human Motion Generation (WHITEPAPER 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/WHITEPAPER_2026/Kimodo_Scaling_Controllable_Human_Motion_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

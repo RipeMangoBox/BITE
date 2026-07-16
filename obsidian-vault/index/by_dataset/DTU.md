@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: DTU
@@ -15,12 +15,24 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: CVP-MVSNet（Cost Volume Pyramid based Multi-View Stereo Network）
 	- datasets: DTU, Tanks and Temples
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Efficient_Neural_Radiance_Fields_for_Interactive_Free-viewpoint_Video.md|Efficient Neural Radiance Fields for Interactive Free-viewpoint Video (SIGGRAPH ASIA 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Efficient_Neural_Radiance_Fields_for_Interactive_Free_viewpoint_Video.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Graphics Animation Interaction, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: ENeRF
+	- datasets: NeRF Synthetic, DTU, ZJU-MoCap
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.md|Adaptive Shells for Efficient Neural Radiance Field Rendering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
 	- methods: Adaptive Shells
 	- datasets: Shelly, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_2024/High-quality_Surface_Reconstruction_Using_Gaussian_Surfels.md|High-quality Surface Reconstruction Using Gaussian Surfels (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/High_quality_Surface_Reconstruction_Using_Gaussian_Surfels.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Gaussian Surfels
+	- datasets: DTU, BlendedMVS
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.md|3D Reconstruction with Fast Dipole Sums (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -33,12 +45,48 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: 3DGSR
 	- datasets: NeRF-synthetic, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.md|Gaussian Opacity Fields: Efficient Adaptive Surface Reconstruction in Unbounded Scenes (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Gaussian_Opacity_Fields_Efficient_Adaptive_Surface_Reconstruction_in_Unbounded_Scenes.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Systems / Efficiency / Compression
+	- methods: Gaussian Opacity Fields (GOF)
+	- datasets: Tanks and Temples, DTU, Mip-NeRF 360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/PVP-Recon_Progressive_View_Planning_via_Warping_Consistency_for_Sparse-View_Surface_Reconstruction.md|PVP-Recon: Progressive View Planning via Warping Consistency for Sparse-View Surface Reconstruction (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/PVP_Recon_Progressive_View_Planning_via_Warping_Consistency_for_Sparse_View_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Agent / RL / Planning
+	- methods: PVP-Recon
+	- datasets: DTU, Blender
 - [[obsidian-vault/analysis/CVPR_2025/VGGT_Visual_Geometry_Grounded_Transformer.md|VGGT: Visual Geometry Grounded Transformer (CVPR 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2025/VGGT_Visual_Geometry_Grounded_Transformer.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D
 	- methods: VGGT (Visual Geometry Grounded Transformer)
 	- datasets: RealEstate10K, CO3Dv2, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_2025/IMLS-Splatting_Efficient_Mesh_Reconstruction_from_Multi-view_Images_via_Point_Representation.md|IMLS-Splatting: Efficient Mesh Reconstruction from Multi-view Images via Point Representation (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/IMLS_Splatting_Efficient_Mesh_Reconstruction_from_Multi_view_Images_via_Point_Representation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Representation / Self-Supervised / Transfer
+	- methods: IMLS-Splatting
+	- datasets: DTU, NeRF Synthetic
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Radiance_Surfaces_Optimizing_Surface_Representations_with_a_5D_Radiance_Field_Loss.md|Radiance Surfaces: Optimizing Surface Representations with a 5D Radiance Field Loss (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Radiance_Surfaces_Optimizing_Surface_Representations_with_a_5D_Radiance_Field_Loss.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Vision / Multimodal / 3D
+	- methods: Radiance Surfaces (spatio-directional radiance field loss)
+	- datasets: MipNeRF360 Indoor, MipNeRF360 Outdoor, DTU
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Texture_Splatting_Expressive_3D_Gaussian_Splatting_for_View_Synthesis_Geometry_and_Dynamic_Reconstruction.md|Neural Texture Splatting: Expressive 3D Gaussian Splatting for View Synthesis, Geometry, and Dynamic Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Texture_Splatting_Expressive_3D_Gaussian_Splatting_for_View_Synthesis_Geometry_and_Dynamic_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Neural Texture Splatting (NTS)
+	- datasets: Owlii, Blender, MipNeRF360
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/SOF_Sorted_Opacity_Fields_for_Fast_Unbounded_Surface_Reconstruction.md|SOF: Sorted Opacity Fields for Fast Unbounded Surface Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/SOF_Sorted_Opacity_Fields_for_Fast_Unbounded_Surface_Reconstruction.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Sorted Opacity Fields (SOF)
+	- datasets: Tanks & Temples, Barn scene Training, DTU
 - [[obsidian-vault/analysis/CVPR_2026/GIFSplat_Generative_Prior_Guided_Iterative_Feed_Forward_3D_Gaussian_Splatting_from_Sparse_Views.md|GIFSplat: Generative Prior-Guided Iterative Feed-Forward 3D Gaussian Splatting from Sparse Views (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/GIFSplat_Generative_Prior_Guided_Iterative_Feed_Forward_3D_Gaussian_Splatting_from_Sparse_Views.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion

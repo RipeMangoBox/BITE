@@ -4,7 +4,7 @@ type: paper-index
 dimension: venue_year
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Venue_Year: arxiv_2024
@@ -204,6 +204,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MotionCLR
 	- datasets: HumanML3D, HVerb / HVerb-wild, Example-based motion generation
+- [[obsidian-vault/analysis/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.md|PivotMesh: Generic 3D Mesh Generation via Pivot Vertices Guidance (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/PivotMesh_Generic_3D_Mesh_Generation_via_Pivot_Vertices_Guidance.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: PivotMesh
+	- datasets: ShapeNet, Objaverse, Objaverse-xl
 - [[obsidian-vault/analysis/arxiv_2024/PlanAgent_A_Multi_modal_Large_Language_Agent_for_Closed_loop_Vehicle_Motion_Planning.md|PlanAgent: A Multi-modal Large Language Agent for Closed-loop Vehicle Motion Planning (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/PlanAgent_A_Multi_modal_Large_Language_Agent_for_Closed_loop_Vehicle_Motion_Planning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -222,6 +228,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: RefFusion
 	- datasets: SPIn-NeRF Dataset, SPIn-NeRF User Study
+- [[obsidian-vault/analysis/arxiv_2024/Scaling_Mesh_Generation_via_Compressive_Tokenization.md|Scaling Mesh Generation via Compressive Tokenization (arXiv 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2024/Scaling_Mesh_Generation_via_Compressive_Tokenization.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
+	- methods: Blocked and Patchified Tokenization (BPT)
+	- datasets: Custom test set of 500 dense meshes generated from other models, Identical input images from EdgeRunner gallery
 - [[obsidian-vault/analysis/arxiv_2024/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation.md|Structured 3D Latents for Scalable and Versatile 3D Generation (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

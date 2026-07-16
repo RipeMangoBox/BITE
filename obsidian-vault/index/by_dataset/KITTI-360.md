@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: KITTI-360
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/LetsGo_Large-Scale_Garage_Modeling_and_Rendering_via_LiDAR-Assisted_Gaussian_Primitives.md|LetsGo: Large-Scale Garage Modeling and Rendering via LiDAR-Assisted Gaussian Primitives (SIGGRAPH ASIA 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/LetsGo_Large_Scale_Garage_Modeling_and_Rendering_via_LiDAR_Assisted_Gaussian_Primitives.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: LOD-LiDAR-GS (LetsGo)
+	- datasets: GarageWorld, KITTI-360, ScanNet++
 - [[obsidian-vault/analysis/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.md|A Self-Conditioned Representation Guided Diffusion Model for Realistic Text-to-LiDAR Scene Generation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/A_Self_Conditioned_Representation_Guided_Diffusion_Model_for_Realistic_Text_to_LiDAR_Scene_Generation.pdf|PDF]]
 	- topics: Generative Models / Diffusion, Representation / Self-Supervised / Transfer

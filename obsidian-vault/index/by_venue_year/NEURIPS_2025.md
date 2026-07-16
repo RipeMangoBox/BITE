@@ -4,17 +4,29 @@ type: paper-index
 dimension: venue_year
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Venue_Year: NEURIPS_2025
 
+- [[obsidian-vault/analysis/NEURIPS_2025/CineTechBench_A_Benchmark_for_Cinematographic_Technique_Understanding_and_Generation.md|CineTechBench: A Benchmark for Cinematographic Technique Understanding and Generation (NEURIPS 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/CineTechBench_A_Benchmark_for_Cinematographic_Technique_Understanding_and_Generation.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Generative / Diffusion / Flow
+	- methods: CineTechBench Benchmark
+	- datasets: CineTechBench Static Cinematographic Technique QA, CineTechBench Camera Movement QA, CineTechBench Description Generation
 - [[obsidian-vault/analysis/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.md|MOSPA: Human Motion Generation Driven by Spatial Audio (NEURIPS 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/MOSPA_Human_Motion_Generation_Driven_by_Spatial_Audio.pdf|PDF]]
 	- topics: Motion Animation, Vision / Multimodal / Applications, Generative Models / Diffusion
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MOSPA
 	- datasets: SAM
+- [[obsidian-vault/analysis/NEURIPS_2025/Towards_Understanding_Camera_Motions_in_Any_Video.md|Towards Understanding Camera Motions in Any Video (NEURIPS 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Towards_Understanding_Camera_Motions_in_Any_Video.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: CameraBench (with SFT on Qwen2.5-VL)
+	- datasets: CameraBench Binary Classification, CameraBench VQA, CameraBench Video-Text Retrieval
 - [[obsidian-vault/analysis/NEURIPS_2025/Align_Your_Flow_Scaling_Continuous_Time_Flow_Map_Distillation.md|Align Your Flow: Scaling Continuous-Time Flow Map Distillation (NEURIPS 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Align_Your_Flow_Scaling_Continuous_Time_Flow_Map_Distillation.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -57,6 +69,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MEGADance
 	- datasets: FineDance, AIST++, Codebook Utilization
+- [[obsidian-vault/analysis/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.md|Mesh-RFT: Enhancing Mesh Generation via Fine-grained Reinforcement Fine-Tuning (NeurIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/Mesh-RFT_Enhancing_Mesh_Generation_via_Fine-grained_Reinforcement_Fine-Tuning.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion
+	- method groups: LLM / Reasoning / Alignment, Generative / Diffusion / Flow
+	- methods: Mesh-RFT
+	- datasets: 全局 DPO, Artist meshes 测试集, Dense meshes 测试集
 - Movo: Can Text-to-Video Models Generate Responsible Realistic Human Motion? (NeurIPS 2025 2025)
 	- [[obsidian-vault/paperPDFs/Uncategorized/NeurIPS_2025/2025_Movo_Can_Text_to_Video_Models_Generate_Responsible_Realistic_Human_Motion.pdf|PDF]]
 	- method groups: Generative / Diffusion / Flow, Vision / Multimodal / 3D
@@ -66,6 +84,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D
 	- methods: SeNaTra (Native Segmentation Vision Transformer)
 	- datasets: Pascal VOC, ADE20k, COCO val2017
+- [[obsidian-vault/analysis/NEURIPS_2025/PartNeXt_A_Next-Generation_Dataset_for_Fine-Grained_and_Hierarchical_3D_Part_Understanding.md|PartNeXt: A Next-Generation Dataset for Fine-Grained and Hierarchical 3D Part Understanding (NeurIPS 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/NEURIPS_2025/PartNeXt_A_Next-Generation_Dataset_for_Fine-Grained_and_Hierarchical_3D_Part_Understanding.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Benchmark / Evaluation
+	- methods: PartNeXt
+	- datasets: 类别无关部件分割 mIoU
 - [[obsidian-vault/analysis/NEURIPS_2025/PyraMotion_Attentional_Pyramid-Structured_Motion_Integration_for_Co-Speech_3D_Gesture_Synthesis.md|PyraMotion: Attentional Pyramid-Structured Motion Integration for Co-Speech 3D Gesture Synthesis (NeurIPS 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/NEURIPS_2025/PyraMotion_Attentional_Pyramid-Structured_Motion_Integration_for_Co-Speech_3D_Gesture_Synthesis.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

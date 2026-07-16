@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Dragon
@@ -21,3 +21,9 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D
 	- methods: Bounded Ray Marching with Stratified Bernoulli Impulses
 	- datasets: Dragon, Lion, Cloud
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Neural_Geometry_Fields_for_Meshes.md|Neural Geometry Fields for Meshes (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Neural_Geometry_Fields_for_Meshes.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Other Method Family
+	- methods: Neural Geometry Fields (NGF)
+	- datasets: Dragon, Buddha, Armadillo

@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: BlendedMVS
 
+- [[obsidian-vault/analysis/SIGGRAPH_2024/High-quality_Surface_Reconstruction_Using_Gaussian_Surfels.md|High-quality Surface Reconstruction Using Gaussian Surfels (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/High_quality_Surface_Reconstruction_Using_Gaussian_Surfels.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: Gaussian Surfels
+	- datasets: DTU, BlendedMVS
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.md|3D Reconstruction with Fast Dipole Sums (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/3D_Reconstruction_with_Fast_Dipole_Sums.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications

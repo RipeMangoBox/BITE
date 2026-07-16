@@ -4,11 +4,17 @@ type: paper-index
 dimension: method
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Method: Safety / Privacy / Robustness
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2018/QuadriFlow_A_Scalable_and_Robust_Method_for_Quadrangulation.md|QuadriFlow: A Scalable and Robust Method for Quadrangulation (SIGGRAPH ASIA 2018 2018)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2018/QuadriFlow_A_Scalable_and_Robust_Method_for_Quadrangulation.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness
+	- methods: QuadriFlow
+	- datasets: Fandisk, ShapeNet 110 cars, Hand model
 - [[obsidian-vault/analysis/TOG_2020/Robust_motion_in_betweening.md|Robust motion in-betweening (TOG 2020 2020)]]
 	- [[obsidian-vault/paperPDFs/TOG_2020/Robust_motion_in_betweening.pdf|PDF]]
 	- topics: Generative Models / Diffusion
@@ -33,56 +39,77 @@ generated: 2026-06-24T20:47
 	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
 	- methods: Adversarial Skill Embeddings (ASE)
 	- datasets: Reach, Speed, Steering
-- Blending Camera and 77 GHz Radar Sensing for Equitable, Robust Plethysmography (SIGGRAPH 2022 2022)
-	- method groups: Safety / Privacy / Robustness
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Blending_Camera_and_77_GHz_Radar_Sensing_for_Equitable_Robust_Plethysmography.md|Blending Camera and 77 GHz Radar Sensing for Equitable, Robust Plethysmography (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Blending_Camera_and_77_GHz_Radar_Sensing_for_Equitable_Robust_Plethysmography.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Benchmarks / Datasets / Evaluation
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: RGB-Radar Fusion with Adversarial Debiasing (EquiPleth)
+	- datasets: Custom Multi-Modal Remote Plethysmography Dataset
 - [[obsidian-vault/analysis/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.md|EMBER: Exact Mesh Booleans via Efficient and Robust Local Arrangements (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/EMBER_Exact_Mesh_Booleans_via_Efficient_and_Robust_Local_Arrangements.pdf|PDF]]
 	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
 	- methods: EMBER
 	- datasets: Thingi10K
-- Random Walks for Adversarial Meshes (SIGGRAPH 2022 2022)
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.md|Random Walks for Adversarial Meshes (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Random_Walks_for_Adversarial_Meshes.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- Robust Computation of Implicit Surface Networks for Piecewise Linear Functions (SIGGRAPH 2022 2022)
+	- methods: Imitating Network Attack via Random Walks
+	- datasets: SHREC11, ModelNet40
+- [[obsidian-vault/analysis/SIGGRAPH_2022/Robust_Computation_of_Implicit_Surface_Networks_for_Piecewise_Linear_Functions.md|Robust Computation of Implicit Surface Networks for Piecewise Linear Functions (SIGGRAPH 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/Robust_Computation_of_Implicit_Surface_Networks_for_Piecewise_Linear_Functions.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- TopoCut: Fast and Robust Planar Cutting of Arbitrary Domains (SIGGRAPH 2022 2022)
-	- method groups: Safety / Privacy / Robustness
-- AIP: Adversarial Interaction Priors for Multi-Agent Physics-based Character Control (SIGGRAPH ASIA 2022 2022)
-	- method groups: Agent / RL / Planning, Safety / Privacy / Robustness
-- Interactive and Robust Mesh Booleans (SIGGRAPH ASIA 2022 2022)
+	- methods: Robust Computation of Implicit Surface Networks
+- [[obsidian-vault/analysis/SIGGRAPH_2022/TopoCut_Fast_and_Robust_Planar_Cutting_of_Arbitrary_Domains.md|TopoCut: Fast and Robust Planar Cutting of Arbitrary Domains (SIGGRAPH 2022 2022)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2022/TopoCut_Fast_and_Robust_Planar_Cutting_of_Arbitrary_Domains.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Safety / Privacy / Robustness
+	- methods: TopoCut
+	- datasets: TetWild dataset
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2022/Interactive_and_Robust_Mesh_Booleans.md|Interactive and Robust Mesh Booleans (SIGGRAPH ASIA 2022 2022)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2022/Interactive_and_Robust_Mesh_Booleans.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Graphics Animation Interaction
 	- method groups: Safety / Privacy / Robustness
-- Robust and Efficient Structure-from-Motion Method for Ambiguous Large-Scale Indoor Scene (SIGGRAPH ASIA 2022 2022)
-	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: Interactive and Robust Mesh Booleans
+	- datasets: Thingi10K, Interactive rotation demo, Huge meshes
 - [[obsidian-vault/analysis/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.md|CALM: Conditional Adversarial Latent Models for Directable Virtual Characters (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.pdf|PDF]]
 	- topics: Representation / Self-Supervised / Transfer
 	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
 	- methods: Conditional Adversarial Latent Models (CALM)
 	- datasets: Pre-training: Encoder quality, Pre-training: Motion diversity, Pre-training: Controllability
-- Robust Low-poly Meshing for General 3D Models (SIGGRAPH 2023 2023)
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Robust_Low-poly_Meshing_for_General_3D_Models.md|Robust Low-poly Meshing for General 3D Models (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Robust_Low_poly_Meshing_for_General_3D_Models.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
-- Unsupervised Learning of Robust Spectral Shape Matching (SIGGRAPH 2023 2023)
+	- methods: Robust Low-Poly Meshing
+	- datasets: Thingi10K 子集
+- [[obsidian-vault/analysis/SIGGRAPH_2023/Unsupervised_Learning_of_Robust_Spectral_Shape_Matching.md|Unsupervised Learning of Robust Spectral Shape Matching (SIGGRAPH 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2023/Unsupervised_Learning_of_Robust_Spectral_Shape_Matching.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- ACE: Adversarial Correspondence Embedding for Cross Morphology Motion Retargeting from Human to Nonhuman Characters (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/ACE_Adversarial_Correspondence_Embedding_for_Cross_Morphology_Motion_Retargeting_from_Human_to_Nonhuman_Characters.pdf|PDF]]
-	- method groups: Representation / Self-Supervised / Transfer, Safety / Privacy / Robustness
-- Constrained Delaunay Tetrahedrization: A Robust and Practical Approach (SIGGRAPH ASIA 2023 2023)
+	- methods: Unsupervised Robust Spectral Shape Matching
+	- datasets: SHREC'16 CUTS, SHREC'16 CUTS → HOLES, SHREC'16 HOLES
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Constrained_Delaunay_Tetrahedrization_A_Robust_and_Practical_Approach.md|Constrained Delaunay Tetrahedrization: A Robust and Practical Approach (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Constrained_Delaunay_Tetrahedrization_A_Robust_and_Practical_Approach.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- C·ASE: Learning Conditional Adversarial Skill Embeddings for Physics-based Characters (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/C_ASE_Learning_Conditional_Adversarial_Skill_Embeddings_for_Physics_based_Characters.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- MIPS-Fusion: Multi-Implicit-Submaps for Scalable and Robust Online Neural RGB-D Reconstruction (SIGGRAPH ASIA 2023 2023)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MIPS_Fusion_Multi_Implicit_Submaps_for_Scalable_and_Robust_Online_Neural_RGB_D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
-- Robust Zero Level-Set Extraction from Unsigned Distance Fields Based on Double Covering (SIGGRAPH ASIA 2023 2023)
+	- methods: SteinerCDT (indirect floating-point CDT algorithm)
+	- datasets: Thingi10k
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/MIPS-Fusion_Multi-Implicit-Submaps_for_Scalable_and_Robust_Online_Neural_RGB-D_Reconstruction.md|MIPS-Fusion: Multi-Implicit-Submaps for Scalable and Robust Online Neural RGB-D Reconstruction (SIGGRAPH ASIA 2023 2023)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/MIPS_Fusion_Multi_Implicit_Submaps_for_Scalable_and_Robust_Online_Neural_RGB_D_Reconstruction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: MIPS-Fusion
+	- datasets: ScanNet, Replica, FastCaMo-Synth
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2023/Robust_Zero_Level-Set_Extraction_from_Unsigned_Distance_Fields_Based_on_Double_Covering.md|Robust Zero Level-Set Extraction from Unsigned Distance Fields Based on Double Covering (SIGGRAPH ASIA 2023 2023)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2023/Robust_Zero_Level_Set_Extraction_from_Unsigned_Distance_Fields_Based_on_Double_Covering.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: DoubleCoverUDF (DCUDF)
+	- datasets: Deep Fashion3D
 - [[obsidian-vault/analysis/arxiv_2024/Uncertainty_Estimation_for_3D_Object_Detection_via_Evidential_Learning.md|Uncertainty Estimation for 3D Object Detection via Evidential Learning (arxiv 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2024/Uncertainty_Estimation_for_3D_Object_Detection_via_Evidential_Learning.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -95,29 +122,31 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
 	- methods: PiMForce
 	- datasets: 自定义多模态数据集
-- Learning Images Across Scales Using Adversarial Training (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Learning_Images_Across_Scales_Using_Adversarial_Training.md|Learning Images Across Scales Using Adversarial Training (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Learning_Images_Across_Scales_Using_Adversarial_Training.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Minkowski_Penalties_Robust_Differentiable_Constraint_Enforcement_for_Vector_Graphics.md|Minkowski Penalties: Robust Differentiable Constraint Enforcement for Vector Graphics (SIGGRAPH 2024 2024)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Minkowski_Penalties_Robust_Differentiable_Constraint_Enforcement_for_Vector_Graphics.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- Minkowski Penalties: Robust Differentiable Constraint Enforcement for Vector Graphics (SIGGRAPH 2024 2024)
-	- method groups: Safety / Privacy / Robustness
-- Robust Containment Queries Over Collections of Rational Parametric Curves via Generalized Winding Numbers (SIGGRAPH 2024 2024)
+- [[obsidian-vault/analysis/SIGGRAPH_2024/Robust_Containment_Queries_Over_Collections_of_Rational_Parametric_Curves_via_Generalized_Winding_Numbers.md|Robust Containment Queries Over Collections of Rational Parametric Curves via Generalized Winding Numbers (SIGGRAPH 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2024/Robust_Containment_Queries_Over_Collections_of_Rational_Parametric_Curves_via_Generalized_Winding_Numbers.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- Hairmony: Fairness-aware hairstyle classification (SIGGRAPH ASIA 2024 2024)
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Safety / Privacy / Robustness
+	- methods: Generalized Winding Number for Curved Geometry via Adaptive Polyline Approximation
+	- datasets: 非水密非流形形状
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Hairmony_Fairness-aware_hairstyle_classification.md|Hairmony: Fairness-aware hairstyle classification (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Hairmony_Fairness_aware_hairstyle_classification.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- Manifold Sampling for Differentiable Uncertainty in Radiance Fields (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Manifold_Sampling_for_Differentiable_Uncertainty_in_Radiance_Fields.pdf|PDF]]
-	- method groups: Safety / Privacy / Robustness
-- Robust Dual Gaussian Splatting for Immersive Human-centric Volumetric Videos (SIGGRAPH ASIA 2024 2024)
-	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Robust_Dual_Gaussian_Splatting_for_Immersive_Human_centric_Volumetric_Videos.pdf|PDF]]
-	- method groups: Generative / Diffusion / Flow, Safety / Privacy / Robustness
+	- methods: Hairmony
+	- datasets: FairFace 子集
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2024/Robust_Symmetry_Detection_via_Riemannian_Langevin_Dynamics.md|Robust Symmetry Detection via Riemannian Langevin Dynamics (SIGGRAPH ASIA 2024 2024)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2024/Robust_Symmetry_Detection_via_Riemannian_Langevin_Dynamics.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
 	- methods: Riemannian Langevin Dynamics-based Symmetry Detection
-- RoMo: A Robust Solver for Full-body Unlabeled Optical Motion Capture (SIGGRAPH ASIA 2024 2024)
-	- method groups: Optimization / Theory, Safety / Privacy / Robustness
 - [[obsidian-vault/analysis/arxiv_2025/Centaur_Robust_End_to_End_Autonomous_Driving_with_Test_Time_Training.md|Centaur: Robust End-to-End Autonomous Driving with Test-Time Training (arxiv 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/arxiv_2025/Centaur_Robust_End_to_End_Autonomous_Driving_with_Test_Time_Training.pdf|PDF]]
 	- topics: Other / Unclear
@@ -154,15 +183,27 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
 	- methods: SafeFusion
 	- datasets: Collision2k test set, OpenScene test set, OpenScene hard samples
-- Closed-form Generalized Winding Numbers of Rational Parametric Curves for Robust Containment Queries (SIGGRAPH 2025 2025)
-	- method groups: Safety / Privacy / Robustness
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Closed-form_Generalized_Winding_Numbers_of_Rational_Parametric_Curves_for_Robust_Containment_Queries.md|Closed-form Generalized Winding Numbers of Rational Parametric Curves for Robust Containment Queries (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Closed_form_Generalized_Winding_Numbers_of_Rational_Parametric_Curves_for_Robust_Containment_Queries.pdf|PDF]]
+	- topics: Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Safety / Privacy / Robustness
+	- methods: Closed-form GWN computation for rational parametric curves
+	- datasets: Quarter-ellipse, Quintic rational curve, OpenClipArt
 - Fast But Accurate: A Real-Time Hyperelastic Simulator with Robust Frictional Contact (SIGGRAPH 2025 2025)
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Fast_But_Accurate_A_Real-Time_Hyperelastic_Simulator_with_Robust_Frictional_Contact.pdf|PDF]]
 	- method groups: Safety / Privacy / Robustness
-- Gaze Entropy and Driver Safety: Understanding Cognitive Failure and Situational Response Before Take-over (SIGGRAPH 2025 2025)
+- [[obsidian-vault/analysis/SIGGRAPH_2025/Gaze_Entropy_and_Driver_Safety_Understanding_Cognitive_Failure_and_Situational_Response_Before_Take-over.md|Gaze Entropy and Driver Safety: Understanding Cognitive Failure and Situational Response Before Take-over (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/Gaze_Entropy_and_Driver_Safety_Understanding_Cognitive_Failure_and_Situational_Response_Before_Take_over.pdf|PDF]]
+	- topics: Other / Unclear
 	- method groups: Safety / Privacy / Robustness
-- MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems (SIGGRAPH 2025 2025)
-	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: Gaze Entropy-based Risk Prediction
+	- datasets: 驾驶模拟器场景1和2的60秒接管前数据
+- [[obsidian-vault/analysis/SIGGRAPH_2025/MiSo_A_DSL_for_robust_and_efficient_MINIMIZE_and_SOLVE_problems.md|MiSo: A DSL for robust and efficient MINIMIZE and SOLVE problems (SIGGRAPH 2025 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/MiSo_A_DSL_for_robust_and_efficient_MINIMIZE_and_SOLVE_problems.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Benchmarks / Datasets / Evaluation
+	- method groups: Benchmark / Evaluation, Safety / Privacy / Robustness
+	- methods: MiSo
+	- datasets: EECCD, Cubic triangle CCD, Geometrical validity of order 3 tetrahedra
 - [[obsidian-vault/analysis/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.md|SkillMimic v2 Learning Robust and Generalizable Interaction Skills from Sparse and Noisy Demonstrations (SIGGRAPH 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf|PDF]]
 	- topics: Other / Unclear
@@ -177,6 +218,28 @@ generated: 2026-06-24T20:47
 	- datasets: BallPlay-M, ParaHome
 - Uncertainty for SVBRDF Acquisition using Frequency Analysis (SIGGRAPH 2025 2025)
 	- method groups: Safety / Privacy / Robustness
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/CameraVDP_Perceptual_Display_Assessment_with_Uncertainty_Estimation_via_Camera_and_Visual_Difference_Prediction.md|CameraVDP: Perceptual Display Assessment with Uncertainty Estimation via Camera and Visual Difference Prediction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/CameraVDP_Perceptual_Display_Assessment_with_Uncertainty_Estimation_via_Camera_and_Visual_Difference_Prediction.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: CameraVDP
+	- datasets: Display defective pixel detection, Camera calibration reprojection error, Color correction accuracy
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Reliable_Iterative_Dynamics_A_Versatile_Method_for_Fast_and_Robust_Simulation.md|Reliable Iterative Dynamics: A Versatile Method for Fast and Robust Simulation (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Reliable_Iterative_Dynamics_A_Versatile_Method_for_Fast_and_Robust_Simulation.pdf|PDF]]
+	- topics: Graphics Physical Simulation
+	- method groups: Safety / Privacy / Robustness
+	- methods: Reliable Iterative Dynamics (RID)
+	- datasets: Armadillo悬垂模拟, 混合刚度梁悬垂
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Spectral_Reconstruction_with_Uncertainty_Quantification_via_Differentiable_Rendering_and_Null-Space_Sampling.md|Spectral Reconstruction with Uncertainty Quantification via Differentiable Rendering and Null-Space Sampling (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Spectral_Reconstruction_with_Uncertainty_Quantification_via_Differentiable_Rendering_and_Null_Space_Sampling.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/TrackerSplat_Exploiting_Point_Tracking_for_Fast_and_Robust_Dynamic_3D_Gaussians_Reconstruction.md|TrackerSplat: Exploiting Point Tracking for Fast and Robust Dynamic 3D Gaussians Reconstruction (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/TrackerSplat_Exploiting_Point_Tracking_for_Fast_and_Robust_Dynamic_3D_Gaussians_Reconstruction.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D, Safety / Privacy / Robustness
+	- methods: TrackerSplat
+	- datasets: N3DV short-clip, Dynamic3DGS, MeetingRoom
 - [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Physics_Based_Motion_Imitation_with_Adversarial_Differential_Discriminators.md|Physics-Based Motion Imitation with Adversarial Differential Discriminators (SIGGRAPH ASIA 2025 2025)]]
 	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Physics_Based_Motion_Imitation_with_Adversarial_Differential_Discriminators.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
@@ -667,3 +730,15 @@ generated: 2026-06-24T20:47
 	- method groups: Safety / Privacy / Robustness, LLM / Reasoning / Alignment
 	- methods: BAIT (Binding Artificial perturbations to Incorrect Targets)
 	- datasets: CIFAR-10, CIFAR-100, SVHN
+- [[obsidian-vault/analysis/SIGGRAPH_2026/M-ABD_Scalable_Efficient_and_Robust_Multi-Affine-Body_Dynamics.md|M-ABD: Scalable, Efficient, and Robust Multi-Affine-Body Dynamics (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/M_ABD_Scalable_Efficient_and_Robust_Multi_Affine_Body_Dynamics.pdf|PDF]]
+	- topics: Other / Unclear
+	- method groups: Safety / Privacy / Robustness, Systems / Efficiency / Compression
+	- methods: M-ABD (Multi-Affine-Body Dynamics)
+	- datasets: 球关节网I, 球关节网III 可扩展性
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Robust_Containment_Queries_over_Collections_of_Trimmed_NURBS_Surfaces_via_Generalized_Winding_Numbers.md|Robust Containment Queries over Collections of Trimmed NURBS Surfaces via Generalized Winding Numbers (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Robust_Containment_Queries_over_Collections_of_Trimmed_NURBS_Surfaces_via_Generalized_Winding_Numbers.pdf|PDF]]
+	- topics: Graphics Geometry Processing
+	- method groups: Safety / Privacy / Robustness
+	- methods: TrimmedSurfaceGWN（基于斯托克斯定理及自适应求积的修剪曲面广义绕数算法）
+	- datasets: Vase 形状, Gear 水密CAD模型, Bobbin 形状

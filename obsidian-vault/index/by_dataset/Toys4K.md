@@ -4,11 +4,17 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: Toys4K
 
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Assembler_Scalable_3D_Part_Assembly_via_Anchor_Point_Diffusion.md|Assembler: Scalable 3D Part Assembly via Anchor Point Diffusion (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Assembler_Scalable_3D_Part_Assembly_via_Anchor_Point_Diffusion.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Assembler
+	- datasets: PartNet Chair, PartNet Table, PartNet Lamp
 - [[obsidian-vault/analysis/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.md|Appreciate the View: A Task-Aware Evaluation Framework for Novel View Synthesis (3DV 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.pdf|PDF]]
 	- topics: Benchmarks / Datasets / Evaluation
@@ -21,6 +27,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: EVA01
 	- datasets: Toys4K, Multi-Turn Editing, PointLLM-200 captioning
+- [[obsidian-vault/analysis/arxiv_2026/PolyFlow_Continuous_Topology_Embedding_Flow_Matching_for_Artist-style_Mesh_Generation.md|PolyFlow: Continuous Topology Embedding Flow Matching for Artist-style Mesh Generation (arXiv 2026 2026)]]
+	- [[obsidian-vault/paperPDFs/arxiv_2026/PolyFlow_Continuous_Topology_Embedding_Flow_Matching_for_Artist-style_Mesh_Generation.pdf|PDF]]
+	- topics: Graphics Geometry Processing, Generative Models / Diffusion, Representation / Self-Supervised / Transfer
+	- method groups: Representation / Self-Supervised / Transfer, Generative / Diffusion / Flow
+	- methods: PolyFlow
+	- datasets: Toys4K
 - [[obsidian-vault/analysis/CVPR_2026/Are_We_Ready_for_RL_in_Text_to_3D_Generation_A_Progressive_Investigation.md|Are We Ready for RL in Text-to-3D Generation? A Progressive Investigation (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Are_We_Ready_for_RL_in_Text_to_3D_Generation_A_Progressive_Investigation.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
@@ -57,3 +69,15 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: SpaceControl (SPACECONTROL)
 	- datasets: Toys4K, Chair
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Generative_3D_Gaussians_with_Learned_Density_Control.md|Generative 3D Gaussians with Learned Density Control (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Generative_3D_Gaussians_with_Learned_Density_Control.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Density-Sampled Gaussians (DeG)
+	- datasets: Toys4K, Single-image-to-3D generation
+- [[obsidian-vault/analysis/SIGGRAPH_2026/Pixal3D_Pixel-Aligned_3D_Generation_from_Images.md|Pixal3D: Pixel-Aligned 3D Generation from Images (SIGGRAPH 2026)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_2026/Pixal3D_Pixel_Aligned_3D_Generation_from_Images.pdf|PDF]]
+	- topics: Vision / Multimodal / Applications, Generative Models / Diffusion
+	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
+	- methods: Pixal3D
+	- datasets: In-the-wild test set, Toys4K

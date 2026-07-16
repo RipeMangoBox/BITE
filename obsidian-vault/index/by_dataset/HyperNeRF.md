@@ -4,7 +4,7 @@ type: paper-index
 dimension: dataset
 tags:
   - obsidian-vault/index
-generated: 2026-06-24T20:47
+generated: 2026-07-12T22:32
 ---
 
 # Dataset: HyperNeRF
@@ -15,6 +15,12 @@ generated: 2026-06-24T20:47
 	- method groups: Vision / Multimodal / 3D, Generative / Diffusion / Flow
 	- methods: MotionGS
 	- datasets: NeRF-DS, HyperNeRF
+- [[obsidian-vault/analysis/SIGGRAPH_ASIA_2025/Neural_Hamiltonian_Deformation_Fields_for_Dynamic_Scene_Rendering.md|Neural Hamiltonian Deformation Fields for Dynamic Scene Rendering (SIGGRAPH ASIA 2025)]]
+	- [[obsidian-vault/paperPDFs/SIGGRAPH_ASIA_2025/Neural_Hamiltonian_Deformation_Fields_for_Dynamic_Scene_Rendering.pdf|PDF]]
+	- topics: Graphics Rendering Materials, Vision / Multimodal / Applications
+	- method groups: Vision / Multimodal / 3D
+	- methods: NeHaD
+	- datasets: D-NeRF, HyperNeRF, DyNeRF
 - [[obsidian-vault/analysis/CVPR_2026/Consistent_Instance_Field_for_Dynamic_Scene_Understanding.md|Consistent Instance Field for Dynamic Scene Understanding (CVPR 2026 2026)]]
 	- [[obsidian-vault/paperPDFs/CVPR_2026/Consistent_Instance_Field_for_Dynamic_Scene_Understanding.pdf|PDF]]
 	- topics: Vision / Multimodal / Applications
