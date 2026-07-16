@@ -50,7 +50,7 @@ Generate a BITE → target-domain concept mapping table for user confirmation/ed
 | core_operator | (domain equivalent) | e.g., core technical strategy, core regulation clause, core news angle |
 | primary_logic | (domain equivalent) | e.g., implementation flow, compliance-check flow, editorial flow |
 | paper_list.csv | keep | main tracking log, with domain-adjusted columns |
-| state: Wait→Downloaded→checked | keep or adapt | state machine may need domain adaptation |
+| state: Wait→Downloaded→analysised→checked | keep or adapt | state machine may need domain adaptation |
 
 ### Step 3: Skill mapping confirmation
 
@@ -119,7 +119,7 @@ After user confirmation, generate in one pass:
 1. **Structural symmetry**: keep the collect → build → use three-stage architecture
 2. **Terminology consistency**: use one consistent term per concept across all skills
 3. **Minimum viable generation**: generate only skill definitions (`SKILL.md`), not scripts (agent writes scripts on demand)
-4. **State machine continuity**: keep the three-state main flow `Wait → Downloaded → checked`, with optional domain-specific labels
+4. **State machine continuity**: keep the four-state main flow `Wait → Downloaded → analysised → checked`, with optional domain-specific labels
 5. **Do not modify BITE**: domain-fork reads BITE as template only and must not edit any BITE file
 
 ## Boundaries

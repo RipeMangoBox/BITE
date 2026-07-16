@@ -63,7 +63,7 @@ def load_results(path: Path) -> dict[str, str]:
             if not key:
                 continue
             if record.get("status") == "done":
-                updates[key] = "checked"
+                updates[key] = "analysised"
             elif record.get("status") == "failed":
                 failure_kind = str(record.get("failure_kind") or "")
                 if failure_kind in {"analysis_mismatch", "too_large"}:
@@ -82,7 +82,7 @@ def main() -> None:
 
     updates = load_results(results)
     if not args.allow_failures:
-        updates = {key: state for key, state in updates.items() if state == "checked"}
+        updates = {key: state for key, state in updates.items() if state == "analysised"}
 
     with source.open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)

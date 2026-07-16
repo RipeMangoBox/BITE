@@ -27,7 +27,7 @@ Column notes:
 
 | Column | Meaning |
 | --- | --- |
-| `state` | Pipeline state. Analyze rows that are ready, normally `Downloaded`; skip `checked`, `Skip`, `Missing`, and blank states unless the user says otherwise. |
+| `state` | Pipeline state. Analyze rows that are ready, normally `Downloaded`; skip `analysised`, `checked`, `Skip`, `Missing`, and blank states unless the user says otherwise. |
 | `importance` | Optional priority label such as `S/A/B/C`. Preserve it. |
 | `paper_title` | Paper title used for reporting and fallback naming. |
 | `venue` | Venue label, usually `CVPR 2025`, `ICLR 2026`, or `arXiv YYYY`. |
@@ -140,7 +140,7 @@ python3 scripts/consolidate_paper_list_results.py \
 ```
 
 The consolidation command dry-runs by default and only advances
-`Downloaded -> checked`; add `--no-dry-run` after reviewing the printed changes.
+`Downloaded -> analysised`; add `--no-dry-run` after reviewing the printed changes.
 Use `--allow-failures` only when you intentionally want reviewed
 `analysis_mismatch` / `too_large` failures written back.
 6. After all completed batches finish, automatically run `papers-build-index`

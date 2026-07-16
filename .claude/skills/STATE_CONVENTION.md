@@ -5,7 +5,7 @@ Unified definitions for the `state` column in `paper_list.csv`. All skills must 
 ## State flow
 
 ```
-Wait → Downloaded → checked
+Wait → Downloaded → analysised → checked
   │        │
   │        ├→ too_large          (PDF cannot be parsed within local limits)
   │        └→ analysis_mismatch  (analysis/export validation failed)
@@ -20,13 +20,14 @@ Wait → Downloaded → checked
 |-------|---------|------------|-------------|
 | `Wait` | Newly collected candidate, waiting for download | collect (from-web / from-github-repo) | Run download |
 | `Downloaded` | PDF exists under `obsidian-vault/paperPDFs/` or a reviewed local path is registered in `pdf_path`; ready for the formal local analysis chain | download / import-local-pdfs | Run analyze |
-| `checked` | Structured analysis note exists under `obsidian-vault/analysis/`; when `--export-vault` is used, deterministic vault validation passed | analyze / reviewed batch consolidation | Ready for query / build index |
+| `analysised` | Structured analysis note exists under `obsidian-vault/analysis/`; when `--export-vault` is used, deterministic vault validation passed, but content-quality review is still pending | analyze / batch consolidation | Run content-quality review; usable for query / build index |
+| `checked` | The `analysised` note has passed the later content-quality review | review / audit | Ready as reviewed evidence |
 
 ## Abnormal states (from analyze stage)
 
 | state | Meaning | Written by | Recovery |
 |-------|---------|------------|----------|
-| `analysis_mismatch` | Analysis or vault export exists but validation failed: required sections/frontmatter/PDF embed/image embeds, table wikilink safety, fallback markers, numeric refs, or note length need review | analyze / audit / reviewed batch consolidation | Re-run analyze on this entry, or manually repair the note and set state to `checked` after validation |
+| `analysis_mismatch` | Analysis or vault export exists but validation failed: required sections/frontmatter/PDF embed/image embeds, table wikilink safety, fallback markers, numeric refs, or note length need review | analyze / audit / batch consolidation | Re-run analyze on this entry, or manually repair the note and set state to `analysised` after deterministic validation |
 | `too_large` | PDF cannot be parsed by the local MinerU/analysis environment within current size or resource limits | analyze / download repair | Manually compress, split, or replace the PDF, then set state back to `Downloaded` |
 
 ## Out-of-band states
@@ -37,7 +38,7 @@ Wait → Downloaded → checked
 
 ## Rules
 
-1. Main pipeline moves forward only: `Wait → Downloaded → checked`.
+1. Main pipeline moves forward only: `Wait → Downloaded → analysised → checked`.
 2. `Skip` and `Missing` are set from `Wait`; `too_large` and `analysis_mismatch` are set from `Downloaded`.
 3. Only the user may revert a state (e.g. `Missing → Wait`, `too_large → Downloaded`).
 4. `scripts/run_local_paper_analysis.py` writes per-run `.state` files
@@ -49,11 +50,12 @@ Wait → Downloaded → checked
 6. `scripts/run_paper_list_analysis.py` keeps the source `paper_list.csv`
    unchanged by default and records per-row results under
    `obsidian-vault/batches/<run_id>/`. A manager may consolidate reviewed
-   successes to `checked` after outputs and validation are confirmed.
+   successes to `analysised` after outputs and deterministic validation are confirmed.
 7. Each skill only processes entries at its own input state:
    - download processes `Wait`
    - analyze processes `Downloaded`
-   - build/query/index processes `checked`
+   - build/query/index may process `analysised` and `checked`
+   - content-quality review processes `analysised` and promotes successful rows to `checked`
 8. Import, download, and external migration adapters must preflight the row
    before writing `Downloaded`: local PDF path resolves, file is readable as a
    PDF, and `venue` contains a 4-digit year that can normalize to

@@ -162,7 +162,7 @@ def detect_stage(preferred_log: Path | None) -> str:
         return "download"
     if states.get("downloaded", 0) > 0:
         return "analyze"
-    if states.get("checked", 0) > 0:
+    if states.get("analysised", 0) > 0 or states.get("checked", 0) > 0:
         return "query"
     if analysis_count > 0:
         return "query"

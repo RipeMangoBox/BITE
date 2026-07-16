@@ -211,6 +211,11 @@ The export validator checks:
 Validation is structural. It does not prove semantic correctness; semantic
 audits should be handled by sampling, LLM-as-judge checks, or human review.
 
+A successful deterministic export advances a queued paper from `Downloaded`
+to `analysised`. The later semantic/content-quality review is a separate gate
+that promotes `analysised` to `checked`; the analysis runner must not collapse
+these two guarantees into one state.
+
 ## Data Contract
 
 BITE can start from any of these inputs:

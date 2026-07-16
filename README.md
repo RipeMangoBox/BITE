@@ -84,6 +84,8 @@ collect candidate papers / import local PDFs
   -> download when needed
   -> integrated analysis chain
      (MinerU parse/reuse -> structured analysis -> vault export)
+  -> deterministic validation (`analysised`)
+  -> content-quality review (`checked`)
   -> optional index refresh
   -> query / ideate / review / export
 ```
@@ -220,6 +222,10 @@ python3 scripts/run_paper_list_analysis.py \
 如果遇到 provider 限流、MinerU I/O 压力或本机内存不足，先降到 `--jobs 10`
 或 `--jobs 20`，再按失败日志恢复运行。脚本默认 `--resume`，已完成或已存在
 的 note 会跳过。
+
+批量结果合并只会把结构校验通过的条目推进到 `analysised`；经过后续内容质量
+复核后，才应将其推进到 `checked`。索引和检索可以使用两种状态，但需要已复核
+证据时应筛选 `checked`。
 
 ## 📚 延伸简介
 
