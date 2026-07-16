@@ -46,11 +46,7 @@ claims:
 
 本文提出 **Adaptive Conformal Guidance (AdaConG)**，一种通用且轻量的框架，旨在解决学习系统中引导信号（如教师模型输出、伪标签、模仿策略）不可靠时带来的性能下降问题。AdaConG 的核心思想是利用分裂共形预测（split conformal prediction）量化引导信号的不确定性，并将该不确定性映射为自适应权重，动态调节引导损失在总损失中的贡献。该方法适用于监督学习、半监督学习和模仿引导的强化学习等多种场景。实验表明，AdaConG 在知识蒸馏、半监督图像分类、网格世界导航和自动驾驶转向预测等任务中均能显著提升性能，例如在 CIFAR-100 知识蒸馏任务中最高提升 +10.89% 的 Top-1 准确率，在网格世界导航中收敛后奖励超过最强基线的 6 倍。
 
-
-
 现有学习系统在依赖引导信号时，通常假设引导始终可靠。然而，由于域偏移、有限数据或策略泛化不足，引导信号常带有噪声或不确定性。盲目信任这些信号会导致性能下降甚至错误传播。例如，在知识蒸馏中，教师模型在域偏移下可能产生误导性输出；在半监督学习中，伪标签可能包含大量噪声；在模仿引导的强化学习中，教师策略可能因环境变化而失效。因此，亟需一种能够动态评估引导信号可靠性并据此调整其影响的方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -62,8 +58,6 @@ AdaConG 的核心创新在于：
 
 3. **通用框架**：AdaConG 可无缝集成到监督学习、半监督学习和强化学习的训练循环中，仅需修改引导损失的加权方式，无需改变模型架构。
 
-
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_1gxP0WtOoO_Adaptiv/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the AdaConG approach. AdaConG leverages split CP with calibration to quantify the uncertainty of guidance signals and adaptively modulate their influence. The estimated uncertainty u is converted into an adaptive weight w, which reweights the guidance loss. This weighted guidance loss is then combined with the task loss to update the model, enabling effective learning under uncertain guidance.*
 
@@ -74,8 +68,6 @@ AdaConG 的整体框架如 Figure 1 所示。该框架包含三个核心模块�
 3. **加权损失组合模块**：将自适应加权的引导损失与任务损失结合，更新模型参数。
 
 Figure 1: Overview of the AdaConG approach. AdaConG leverages split CP with calibration to quantify the uncertainty of guidance signals and adaptively modulate their influence. The estimated uncertainty u is converted into an adaptive weight w, which reweights the guidance loss. This weighted guidance loss is then combined with the task loss to update the model, enabling effective learning under uncertain guidance.
-
-
 
 ### 5.1 引导不确定性量化
 
@@ -130,8 +122,6 @@ $$\hat{q}_R^{(t)} \gets (1-\rho) \hat{q}_R^{(t-1)} + \rho \tilde{q}_R^{(t)}$$
 
 $$\epsilon = \min(0.5 \frac{t}{S_{\text{total}}} + 0.5 \frac{e}{E_{\text{total}}}, 1)$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 知识蒸馏
@@ -149,8 +139,6 @@ Table 2 展示了在半监督图像分类基准上，使用交叉熵作为引导
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_1gxP0WtOoO_Adaptiv/figures/003_Table_2.jpg]]
 *Table 2: Top-1 accuracy (%) of various baselines with and without AdaConG on several semisupervised image classification benchmarks, using cross-entropy as the guidance loss. ∆ shows mean performance gain w.r.t. conventional methods without AdaConG, upto +5.98% in accuracy. EXPERIMENTAL RESULTS. We present the results in Table 2. As shown, integrating AdaConG consistently improves performance across all baselines. This highlights the effectiveness of AdaConG in semi-supervised learning. By adaptively reweighting the influence of pseudolabels, AdaConG reduces reliance on noisy supervision, mitigating error propagation and leading to improved overall performance.*
-
-Table 2: Top-1 accuracy (%) of various baselines with and without AdaConG on several semisupervised image classification benchmarks, using cross-entropy as the guidance loss. ∆ shows mean performance gain w.r.t. conventional methods without AdaConG, upto +5.98% in accuracy.
 
 Table 3 展示了使用 MSE 作为引导损失时的结果，AdaConG 同样带来一致提升。
 
@@ -172,8 +160,6 @@ Table 4 展示了在 SullyChen 数据集域偏移下，各种知识迁移方法�
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_1gxP0WtOoO_Adaptiv/figures/009_Table_4.jpg]]
 *Table 4: Mean accuracy (%) of steer prediction of different knowledge transfer methods with and without AdaConG under domain shifts.*
 
-Table 4: Mean accuracy (%) of steer prediction of different knowledge transfer methods with and without AdaConG under domain shifts.
-
 ### 6.5 消融研究
 
 - **异构结构**（Table 5）：在 CIFAR-100 异构结构（如 VGG13/MobileNet-V2）下，KD+AdaConG 相比 KD 提升 +5.69%。
@@ -191,13 +177,9 @@ Table 5: As part of our ablation studies, we evaluate the performance of a heter
 
 Table 6: Top-1 accuracy (%) of various knowledge distillation methods without and with AdaConG using the hard weighting function. We use ∆ to show performance gain relative to conventional knowledge distillation methods and highlight in orange deltas greater than 0.15, indicating non-trivial enhancement following the protocol in (Sun et al., 2024).
 
-Table 7: Top-1 accuracy (%) on CIFAR-100 for the KD approach, comparing direct use of nonconformity scores versus AdaConG using quantile computation. AdaConG outperforms the direct use of nonconformity scores.
-
 Table 8: Top-1 accuracy (%) of different knowledge distillation methods on CIFAR-100-C. ∆ indicates performance gain over the base method. We observe up to +18.62% higher accuracy improvement.
 
 Table 9: Top-1 accuracy (%) of different knowledge distillation methods on Tiny ImageNet. ∆ indicates performance gain over the base method. We observe up to +19.02% higher accuracy.
-
-Figure 4: Top-1 accuracy of KD using AdaConG with varying α values. The results demonstrate that our approach is robust to the choice of α and consistently outperforms standard KD.
 
 Figure 6: Qualitative analysis of adaptive weights. The first row shows original clean images from CIFAR-100, and the second row shows their noisy counterparts. Each image is annotated with the prediction set size (S) and the corresponding adaptive weight (W). Clean images produce smaller prediction sets, indicating lower uncertainty and thus higher weights, while noisy images yield larger prediction sets, reflecting higher uncertainty and consequently lower weights.
 
@@ -207,11 +189,7 @@ Table 10 显示，KD+AdaConG 每 epoch 训练时间为 7.04 秒，相比 KD 的 
 
 Table 10: Comparison of computational overhead between standard KD, KD with AdaConG, and KD with MC dropout.
 
-Table 11: Comparison of computational overhead between FlexMatch and FlexMatch + AdaConG. Incorporating AdaConG adds only minimal computation.
-
 Table 12: Comparison of computational overhead across key RL baselines.
-
-
 
 ## 定位与知识库关联
 
@@ -232,8 +210,6 @@ AdaConG 属于**不确定性感知学习**与**共形预测**交叉领域的方�
 - 在 RL 中，滑动窗口大小 N 和 EMA 因子 ρ 的最优选择是否具有环境无关性？
 - AdaConG 在 NLP 任务（如机器翻译、文本分类）中的引导不确定性量化是否有效？
 - 能否将 AdaConG 与主动学习或持续学习策略结合，以进一步管理复杂不确定性？
-
-
 
 ## 原文 PDF
 
