@@ -11,7 +11,7 @@ aliases:
 source_notes:
   - "[[2026-07-01_storymotion-v6.2-metric-data]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-07-15T19:07:57+0800
+updated: 2026-07-16T10:50:00+0800
 ---
 
 ## 0. 当前裁决
@@ -40,7 +40,7 @@ updated: 2026-07-15T19:07:57+0800
 | Stage2 v7.38 L0 clean 105k | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_joint_strict_20260715/<schedule>/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | same checkpoint directed parallel / human-first cascade | strict `human_first` routing、owning decoder、joint trajectory PNG、world-skeleton MP4、camera-projection MP4、concat MP4 | complete；96 MP4、16 PNG；`L0 schedules` tab on 4090 port `7865` |
 | Stage2 L0 vs Pulp official | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_pulp_official_20260715/render_summary.json` | same 8 fixed pure samples | GT、v7.14 Stage1 identity、L0 parallel、L0 Direct H、Pulp released DiT-xy no-Aux/Aux、HumanML3D fixed-camera reference | same renderer 的 world-skeleton/camera-projection MP4 与 trajectory PNG；Pulp checkpoint/repo/protocol provenance；HumanML3D 明确为非配对 | complete；主对比 tab on 4090 port `7865` |
 | Stage2 L0 task slices | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_direct_tasks_strict_20260715/completion/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | same L0 step105k human-text-only、camera-from-GT-H、joint parallel/cascade | H/C strict single world/projection/concat MP4 与 trajectory PNG；Direct H projection 的 GT camera 仅作外部显示 | complete；80 MP4、16 PNG；`L0 task slices` tab on 4090 port `7865` |
-| Stage2 L0 single-step gate | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/l0_single_step_gate_20260715/render_summary.json` | same 8 fixed pure samples | `human`、`camera`、`joint` × raw GT / `t=999,799,599,399,199` | teacher-forced one-step `pred_x0` 的 world/projection MP4 与 geometry PNG | complete；288 MP4、120 PNG；只作 Go/No-Go 诊断 |
+| Stage2 L0 single-step gate | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/l0_single_step_gate_20260715/render_summary.json` | same 8 fixed pure samples | `human`、`camera`、`joint` × raw GT / `t=999,799,599,399,199` | teacher-forced one-step `pred_x0` 的 world/projection MP4 与 geometry PNG | complete；288 MP4、120 PNG；仅作局部诊断，raw-loss gate 已取消（无效） |
 | HumanML3D human-only adapter | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/humanml3d_fixed_camera_20260715/render_summary.json` | 8 HumanML3D test clips | canonical 263D inverse RIC、Pulp199 joints-level adapter、fixed camera | 每样例 MP4/首帧 PNG/NPZ；与 L0 样例仅作非配对语义近邻展示 | complete；8/8 decode；camera conditioning disabled |
 | Screen projection containment | `runs/visualizations/archived/screen_projection_containment_20260625/*/manifest.json` | legacy diagnostic | `clean_best`, `clean_last`, `screen_best` | per-sample camera projection / camera view videos | archived; exclude from registry |
 
@@ -164,8 +164,9 @@ Gradio registry 禁止递归纳入 `runs/visualizations/archived/`。截至 2026
 | 1 | Stage1 camera projection skeleton mp4 | 目前只有 `npz`，不便 Gradio 直接播放 | 每个 Stage1 sample / variant 输出 `{variant}_camera_projection_skeleton.mp4` |
 | 2 | Stage1 global skeleton canonical row | `fixed_camera` 与 `orbiting_camera` 不等价于 Stage2 global row | 输出 `{variant}_global_skeleton_camera.mp4` |
 | 3 | Stage1 SMPL camera projection / global mp4 | 与 Stage2 四行 grid 对齐 | 如果 Stage1 renderer 能稳定加载 mesh，则补齐；否则明确标 missing |
-| 4 | E.T./DIRECTOR camera completion single assets | 当前 metric 有 baseline/replay，Gradio comparison 还没有统一 single assets | 加入 Stage2 `camera_completion` columns：`et_root_only`, `et_replay` |
-| 5 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | done in `v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709`; remaining work is human last-frame inspection |
+| 4 | Director-C camera completion single assets | corrected Director-C train-only-dev fixed-budget 长训进行中，endpoint、formal official camera callback 与 render 尚未完成；旧 `et_root_only`/`et_replay` 错标 JSON、records、logs/marker 已于 2026-07-16 删除 | 等 fixed endpoint 与 formal pure row 完成后，再加入带 checkpoint/sample hash 的单样本列；prelaunch unmatched N20 smoke 不得展示为 baseline，已删除旧列不得从缓存恢复 |
+| 5 | MotionLab-MFT human completion single assets | representation-matched 长训已启动，但 endpoint、official human callback 与 render 尚未完成 | 等 fixed endpoint 与 official pure row 完成后，再加入带 checkpoint/sample hash 的 human completion 列 |
+| 6 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | done in `v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709`; remaining work is human last-frame inspection |
 
 ## 6. 实现检查
 
@@ -218,10 +219,10 @@ Stage2 两列使用 `joint_concat.mp4`，左侧为 GT skeleton、右侧为当前
 
 共同口径：official pure `4,053`、last checkpoint、non-causal、human199 + absolute camera9、500 epochs / `636,000` updates、seed17。所有 official metric 值有限，两个 records 文件均为 `4,053` 行。
 
-| tokenizer | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| v7.32 separate AE | 268.92 | 12.503 | 67.3% | 22.81 | 61.035 | 83.6% | 0.931 | 14.5% |
-| v7.32 separate VAE | 208.39 | 14.673 | 79.7% | 15.01 | 63.650 | 89.6% | 0.927 | 13.4% |
+| version / run | tokenizer | FDTMR↓ | TMR↑ | HCov↑ | FDCLaTr↓ | CLaTr↑ | CCov↑ | F1↑ | Out↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v7.32 / `v7_32_separate_local_ae_500ep_seed17_5090_20260713` | separate AE | 268.92 | 12.503 | 67.3% | 22.81 | 61.035 | 83.6% | 0.931 | 14.5% |
+| v7.32 / `v7_32_separate_local_vae_500ep_seed17_5090_20260713` | separate VAE | 208.39 | 14.673 | 79.7% | 15.01 | 63.650 | 89.6% | 0.927 | 13.4% |
 
 证据路径：
 
@@ -419,7 +420,7 @@ loss 的单变量归因。
 - task-slice render 为 8 samples、80 MP4、16 PNG；80/80 MP4 通过 OpenCV
   首帧解码。
 
-## 16. 2026-07-15 P0-G、Direct H 与 HumanML3D 最终验收
+## 16. 2026-07-15 旧 P0-G(raw-loss)、Direct H 与 HumanML3D 最终验收
 
 ### 16.1 Strict visualization contract
 
@@ -434,6 +435,7 @@ loss 的单变量归因。
 - single-step 页读取 `vis/l0_single_step_gate_20260715/`：8 samples ×
   human/camera/joint × raw GT/`t=999,799,599,399,199`，共 288 MP4、120 PNG。
   每行是 teacher-forced `q(z_gt,t)→one pred_x0`，不冒充 partial/full reverse。
+  目录名中的 `gate` 是历史 artifact 命名，不代表一个有效 raw-loss 实验 gate。
 
 ### 16.2 HumanML3D boundary
 

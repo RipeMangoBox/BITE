@@ -279,31 +279,11 @@ v6.1 的正常 StoryMotion 对照是 `runs/train/stage2/independent_dropout_ft_2
 
 **解释**：GT-human 使用 PulpMotion dataset 的真实 human raw input，不经过生成，因此 FDTMR、coverage、precision、recall、density 接近理想值。TMR=17.71 与 `unified_human` 的 18.17、human specialist 的 18.24 同量级，说明当前 generated human 的 TMR 分数没有被 GT-camera condition 大幅压制；StoryMotion 的主要缺口仍在 joint coverage、framing 与 camera-human coupling，而不是单纯 human text semantic score。
 
-### E.T. Camera Completion Baseline
+### E.T./DIRECTOR Camera Completion Baseline（legacy tombstone）
 
-**状态**：root-only adapter、stable formal training ckpt 已推进，但 baseline 仍未完成 formal eval。2026-06-26 已在 5090 隔离 clone `robincourant/DIRECTOR` 到 `/data/public/ripemangobox/Motion/baselines/DIRECTOR_storymotion_20260626`。Pulp data view 位于 `/data/public/ripemangobox/Motion/baselines/data/director_pulp_mixed`，目标包含 `traj`、`intrinsics`、`caption`、`caption_cam`、`caption_clip`、`caption_cam_clip`、`cam_segments`、`char`、`char_raw` 和 mixed split 文件。
+**2026-07-16 清理裁决**：这一节原先记录的旧 root-only/shuffle 训练、test-as-validation checkpoint，以及把 StoryMotion checkpoint 错标为 `et_director` 的推理结果均不再是实验资产。相关 run、派生 shuffle data view、JSON/records/logs/marker 与废弃 adapter scaffold 已从 5090 删除；本归档不再保留旧 checkpoint 路径或指标，防止被重新加入表格。
 
-**训练协议**：from scratch on Pulp dataset，不使用 official DIRECTOR checkpoint。当前不是“下载官方 E.T. checkpoint 跑模型”，而是把 E.T. / DIRECTOR 收窄为 PulpMotion / StoryMotion 的 camera completion baseline：输入 camera text、human root trajectory 与可选 human text，输出 camera trajectory。human condition 当前只使用 `smpl_raw["transl"]` 导出的 `(T,3)` root / center trajectory，不使用 Pulp full SMPL、mesh 或 vertices。
-
-**adapter 事实**：本地 `_private/storymotion_baselines/prepare_director_pulp.py` 已包含 `char/<id>.npy = smpl_raw["transl"].astype(float32)` 与 `char_raw/<id>.npy = smpl_raw["transl"].astype(float32)` 的导出逻辑，shape 均为 `(T,3)`。`char_raw` 不能写成 `(3,)`，因为 DIRECTOR `CharacterDataset` 会对 `np.load(center_path)[0]` 取第一帧，`(3,)` 会退化成标量。Pulp 专用 standardization 应写 `pulp0300.yaml`，覆盖 camera translation first-frame shift、camera translation velocity、char center first-frame 与 char velocity 的 mean/std；不能复用 DIRECTOR 原始 `0300.yaml`。
-
-**已知 smoke**：camera-text 最小 loader 曾通过 `traj_feat (B, 9, 300)`、`intrinsics (B, 300, 4)`、`caption_feat (B, 512, 77)`。后续 `traj+caption+char` smoke 已知通过 `traj_feat=(2,9,300)`、`caption_feat=(2,512,77)`、`char_feat=(2,3,300)`、`char_centers=(2,3,300)`。
-
-**formal ablation 边界**：已创建独立 data views 用于 caption shuffle 与 char shuffle，路径分别为 `/data/public/ripemangobox/Motion/baselines/data/director_pulp_mixed_caption_shuffle` 与 `/data/public/ripemangobox/Motion/baselines/data/director_pulp_mixed_char_shuffle`。shuffle 用于证明 camera/human text 与 human root condition 是否被模型使用；在 formal eval 产出 original 与 shuffle 对照前，不能声称文本控制或 human/root condition 有效。
-
-**2026-06-27 严肃复核**：`director_pulp_ablation_formal_20260627` 不能算 formal training。原因是该目录只有 caption shuffle / char shuffle 两个 run，缺 original non-shuffle baseline；并且两个 shuffle log 出现大量 `Found NaN` / `Found Inf` 与 `Skipping optimizer step`，说明训练数值发散。目录名带 `formal` 不等于实验成立。
-
-**修正版落实**：已在 5090 完成修正版 DIRECTOR adapted baseline 的三个训练 ckpt，而不是 original E.T. reproduction。修正版使用 `trainer.precision=32`、`diffuser.optimizer.lr=1e-5`、`+trainer.gradient_clip_val=1.0`，避免旧 `16-mixed` + `1e-4` 配置发散。
-
-- original non-shuffle：`/data/public/ripemangobox/Motion/baselines/runs/director_pulp_formal_fixed_20260627/original_bs64_ep120_lr1e5_fp32/2026-06-27-13-48-48/tensorboard/checkpoints/epoch=119-step=176400.ckpt`
-- caption shuffle：`/data/public/ripemangobox/Motion/baselines/runs/director_pulp_ablation_formal_20260627/caption_shuffle_bs64_ep120/2026-06-27-00-22-59/tensorboard/checkpoints/epoch=119-step=176400.ckpt`
-- char shuffle：`/data/public/ripemangobox/Motion/baselines/runs/director_pulp_ablation_formal_20260627/char_shuffle_bs64_ep120/2026-06-27-00-22-59/tensorboard/checkpoints/epoch=119-step=176400.ckpt`
-
-**eval 边界**：E.T./DIRECTOR baseline 不再走 official `src/evaluate.py` 或 `clatr-e100.ckpt`。本项目只需要把 root-only adapter 的 original、caption-shuffle、char/root-shuffle ckpt 接到 Pulp/StoryMotion Stage2 camera metric pipeline，产出同 split、同 batch 设置的 completed JSON。
-
-**formal 命名边界**：当前只能写作 “E.T./DIRECTOR-inspired root-only camera completion adapter training completed; StoryMotion/Pulp Stage2 camera metric eval is pending”。不能简写为 original E.T.，也不能与 E.T. paper checkpoint result 混表。
-
-**完成条件**：同 split、同 bs64 或明确 batch-invariant camera metric 设置，产出 completed JSON，并补齐 original 与 shuffle/swap 对照。不能只引用 DIRECTOR 论文表、5 epoch smoke、official E.T. eval 或不同协议结果；也不能把该 adapter 写成 original DIRECTOR full character-aware reproduction。
+当前唯一可用的 Director-C baseline 状态、合同与结果入口改由 [[2026-07-16_storymotion-v739-v741-core-experiment-decision]] 管理：train-only derived dev、shuffle DataLoader、fixed-budget endpoint、GT-H 加 camera text、owning official callback。其 prelaunch N20 只作 non-promotable bridge gate；只有 corrected endpoint 的 formal pure4053 row 才能进入 baseline 表。
 
 ### MoLingo Human Baseline
 
