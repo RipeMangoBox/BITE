@@ -141,6 +141,10 @@ def main() -> None:
     args = build_parser().parse_args()
     if args.num_workers < 0 or args.chunk_size <= 0 or args.min_std <= 0:
         raise ValueError("num-workers must be non-negative; chunk-size/min-std must be positive")
+    # These are small per-sequence reductions. Let the process pool provide
+    # parallelism instead of multiplying a BLAS thread pool inside each worker.
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
     if args.output.exists():
         if not args.reuse_existing:
             raise FileExistsError(f"refusing to overwrite immutable human200 statistics: {args.output}")
