@@ -1,0 +1,9 @@
+stage1_model:
+  is_causal: false
+stage1_loss:
+  human_yaw_weight: 0.001
+  human_root_weight: 0.003
+calibration:
+  status: smoke_only_not_final_recipe
+  source: eight_real_pulp_batches_seed17_20260717
+  rule: freeze final weights only after multi-batch loss and gradient-ratio review

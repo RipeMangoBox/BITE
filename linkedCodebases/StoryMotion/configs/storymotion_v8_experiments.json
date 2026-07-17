@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "version": "storymotion-v8-candidate",
+  "status": "active_candidate_not_mainline",
+  "decision_note": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion.md",
+  "invariants": {
+    "mainline_until_promotion": {
+      "stage1": "v7.14 corrected camera14 joint AE",
+      "stage2": "v7.38 L0 clean 105k"
+    },
+    "is_causal": false,
+    "train_ids": 162760,
+    "stage1_final_epochs": 500,
+    "stage1_final_sample_exposures": 81380000,
+    "pure_eval_ids": 4053,
+    "axes_must_be_separate": [
+      "representation_or_loss",
+      "data_curation",
+      "stage2_backbone"
+    ]
+  },
+  "stage1_promotion_gate": {
+    "overall_human_root_aligned_mpjpe_mm_max": 85.0,
+    "overall_human_global_mpjpe_mm_max": 190.0,
+    "long_193plus_human_root_aligned_mpjpe_mm_max": 90.0,
+    "long_193plus_human_global_mpjpe_mm_max": 210.0,
+    "human_root_aligned_slope_mm_per_100_frames_max": 5.0,
+    "human_global_slope_mm_per_100_frames_max": 20.0,
+    "camera_center_ade_mm_max": 50.0,
+    "camera_rotation_deg_max": 0.75,
+    "required_metrics": [
+      "human_root_aligned_mpjpe",
+      "human_global_mpjpe",
+      "human_root_ade",
+      "human_root_fde",
+      "human_integrated_yaw_geodesic",
+      "camera_center_ade",
+      "camera_center_fde",
+      "camera_rotation_deg"
+    ],
+    "length_bins": ["1-64", "65-128", "129-192", "193+"]
+  },
+  "experiments": [
+    {
+      "id": "v8.0-A",
+      "priority": "P0",
+      "kind": "diagnostic",
+      "status": "completed",
+      "question": "Which reconstructed human199 channels cause the v7.14 length-dependent geometry error?",
+      "treatment": "GT channel replacement before the owning decoder",
+      "artifact": "/data/public/ripemangobox/Motion/StoryMotion/runs/stage1/v8_0_representation_oracle_audit_20260717/eval/pure4053_human_channel_oracles.json",
+      "artifact_sha256": "74fe8234da7c62a2a6b85c0258f228d267259263f33d52c31bd636b3360edd6c",
+      "decision": "Accumulated yaw velocity dominates; oracle sensitivity is not a trainable result."
+    },
+    {
+      "id": "v8.0-B",
+      "priority": "P0",
+      "kind": "checkpoint_screen",
+      "status": "completed_no_go",
+      "question": "Can the existing locally reproduced AAMMARDM epoch320 checkpoint directly replace v7.14?",
+      "artifact": "/data/public/ripemangobox/Motion/StoryMotion/runs/stage1/v8_0_pulp_repro_deep_ae_screen_20260717/eval/pure4053_epoch320.json",
+      "artifact_sha256": "c9baf13591cda0cad58d6b0a5eacd14443c6fd4ef292d2cf92e2254d850752ab",
+      "checkpoint_sha256": "396ef423b9d56af98320db165b0fac3a0ce4af56f04e5bd79fbd6ed714bf0282",
+      "mismatch_warning": "94,050 mixed samples, about 30.53M exposures, fixed 64 frames, and equal feature MSE are not matched to v7.14.",
+      "decision": "Do not build a Stage2 cache from this checkpoint; feature MSE is not a promotion metric."
+    },
+    {
+      "id": "v8.1-A",
+      "priority": "P0",
+      "kind": "stage1_train",
+      "status": "finite_optimizer_step_smoke_passed_final_weight_not_frozen",
+      "question": "Does valid-mask-aware integrated yaw/root supervision fix the long-sequence geometry while preserving camera reconstruction?",
+      "fixed_fields": [
+        "v7.14 non-causal architecture",
+        "normalized human199 plus official camera14",
+        "human128 plus camera64",
+        "ordered train IDs",
+        "train-only normalization",
+        "seed 17",
+        "final sample exposure"
+      ],
+      "new_losses": [
+        "one_minus_cosine_of_cumulative_yaw_error",
+        "smooth_l1_of_decoded_world_root_xy"
+      ],
+      "calibration": {
+        "batches": 8,
+        "batch_size": 8,
+        "length_range_seen": "up to 250 frames",
+        "raw_gradient_norm_median": {
+          "base": 0.115438,
+          "yaw_weight_1": 4.339576,
+          "root_weight_1": 3.885294
+        },
+        "smoke_only_weights": {
+          "human_yaw_weight": 0.001,
+          "human_root_weight": 0.003
+        },
+        "optimizer_step_smoke": {
+          "status": "passed",
+          "batch_size": 8,
+          "max_frames": 250,
+          "base_loss": 0.455165,
+          "weighted_yaw_loss": 0.000938,
+          "weighted_root_loss": 0.000151,
+          "total_loss": 0.456254,
+          "preclip_grad_norm": 0.10911,
+          "parameters_finite_after_step": true
+        },
+        "warning": "These weights are for a finite optimizer-step smoke, not the final 81.38M-exposure recipe."
+      },
+      "execution": "loss-scale and gradient-ratio smoke first; freeze one recipe before the 162,760 x 500 final run"
+    },
+    {
+      "id": "v8.1-B",
+      "priority": "P1",
+      "kind": "stage1_train",
+      "status": "conditional",
+      "depends_on": "v8.1-A stable but capacity-limited",
+      "question": "Does a non-causal AAMMARDM-style residual encoder/decoder help under the same geometry loss and matched budget?",
+      "forbidden_checkpoint": "pulp_repro_epoch320"
+    },
+    {
+      "id": "v8.2",
+      "priority": "P1",
+      "kind": "representation_train",
+      "status": "conditional",
+      "depends_on": "v8.1 matched endpoint fails the yaw/length gate",
+      "human_feature_contract": "human200 = root_z1 + root_xy_relative2 + yaw_sincos2 + pose6d132 + local_joints63",
+      "requirements": [
+        "new train-only statistics",
+        "new non-causal Stage1 checkpoint",
+        "new owning decoder",
+        "new Stage2 cache",
+        "no v7.14 checkpoint or cache compatibility claim"
+      ]
+    },
+    {
+      "id": "v8.3",
+      "priority": "P1",
+      "kind": "data_manifest_ablation",
+      "status": "planned",
+      "question": "Does calibrated physical and pair-level semantic quarantine improve quality under a fixed representation and backbone?",
+      "manifest_layers": [
+        "raw",
+        "physical_quarantine",
+        "semantic_pair_quarantine",
+        "clean"
+      ],
+      "semantic_scorers": [
+        "TMR global",
+        "LaMP motion-aware",
+        "PST joint-segment-global when a reproducible checkpoint is available"
+      ],
+      "not_a_scorer": "MARDM-67 is an evaluator/protocol, not an independent retrieval model"
+    },
+    {
+      "id": "v8.4-A",
+      "priority": "P1",
+      "kind": "stage2_train",
+      "status": "blocked_on_stage1_gate",
+      "backbone": "Motion Mamba-style non-autoregressive latent DDPM",
+      "reason": "The simplest two-stage long-sequence pure-diffusion adapter, despite being ECCV 2024 rather than strictly post-2024."
+    },
+    {
+      "id": "v8.4-B",
+      "priority": "P2",
+      "kind": "stage2_control",
+      "status": "blocked_on_v8.4-A",
+      "backbone": "TransPhase-style semantic phase diffusion plus bidirectional adjacent-phase alignment",
+      "requirements": [
+        "same promoted representation and cache as v8.4-A",
+        "aperiodic bypass or phase-confidence control",
+        "separate within-clip and multi-segment transition reporting"
+      ]
+    }
+  ]
+}

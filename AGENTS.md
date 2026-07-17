@@ -31,6 +31,11 @@ codebase:
    Temporal causal tokenizers are forbidden in every Stage1/Stage2 setting;
    constructors, checkpoint/cache loading, training, and evaluation must assert
    `is_causal is False`. Controls may change representation, not causality.
+   The sole exception is a standalone native MotionStreamer baseline kept
+   outside StoryMotion Stage1/Stage2 runs. It may retain MotionStreamer's
+   causal tokenizer only when its contract names MotionStreamer as the owning
+   system and decoder; it must not build, consume, or gate a StoryMotion cache,
+   Unified checkpoint, or representation control.
 2. Fixed representation settings live as code assertions in
    `storymotion/experiment_invariants.py`. Do not repeat them as manually typed
    per-run configuration.
@@ -49,6 +54,15 @@ codebase:
    branch implementation used by Unified-3, or when its weights are explicitly
    transferred and verified. Do not train unrelated specialists as a gate for
    a different three-mode model.
+7. StoryMotion v8 is a candidate family, not a mainline rename. A candidate
+   must pass the preregistered Stage1 root/yaw geometry gate before it can
+   replace v7.14 or build a promotion-bearing Unified cache. On human199,
+   root-aligned MPJPE removes root translation but not heading; do not call it
+   local-pose error without a yaw-aware attribution.
+8. Data cleaning is versioned and reversible. Quarantine caption-motion pairs
+   rather than deleting a whole motion when only one caption is wrong, retain
+   immutable parent manifests and reason codes, and test cleaning separately
+   from representation and generator changes.
 
 Detailed commands and schemas are in:
 
