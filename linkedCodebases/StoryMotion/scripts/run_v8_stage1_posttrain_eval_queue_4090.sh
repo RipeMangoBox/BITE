@@ -44,6 +44,7 @@ run_eval() {
   return "$rc"
 }
 
+echo "$(timestamp) queue_start gpu=${gpu} order=${v82_run},${v81a_run},${v81b_run}"
 failures=0
 run_eval "$v82_run" bash scripts/eval_v8_2_stage1_human200_pure4053_4090.sh "$gpu" "$v82_run" || failures=$((failures + 1))
 run_eval "$v81a_run" bash scripts/eval_v8_1_stage1_pure4053_4090.sh "$gpu" "$v81a_run" pulpmotion_joint_ae_official_199_14_pulp192 || failures=$((failures + 1))
