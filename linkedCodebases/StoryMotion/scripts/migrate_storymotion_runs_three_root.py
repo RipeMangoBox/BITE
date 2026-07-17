@@ -280,6 +280,11 @@ class Migration:
                 self.symlink(train_root / "vis", self.runs / "vis" / stage / child.name)
                 continue
             if child.is_dir():
+                if stage == "stage2" and "_failed_" in child.name:
+                    destination = self.runs / "train/stage2/_failed" / child.name
+                    self.move(child, destination)
+                    self.symlink(child, destination)
+                    continue
                 self.split_atomic_run(stage, child)
             else:
                 self.move(child, self.root / "ops/legacy_stage_roots" / stage / child.name)

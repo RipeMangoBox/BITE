@@ -179,6 +179,20 @@ class StoryMotionRunsMigrationTest(unittest.TestCase):
             self.assertTrue((train / "vis").is_dir())
             self.assertTrue(any(action["operation"] == "replace_broken_symlink" for action in payload["actions"]))
 
+    def test_keeps_failed_bootstrap_out_of_formal_run_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            failed = root / "runs/stage2/run_a_failed_bootstrap_20260717T1345"
+            failed.mkdir(parents=True)
+            (failed / "error.json").write_text("{}", encoding="utf-8")
+
+            Migration(root, apply=True, protected=set()).run()
+
+            destination = root / "runs/train/stage2/_failed/run_a_failed_bootstrap_20260717T1345"
+            self.assertTrue((destination / "error.json").is_file())
+            self.assertTrue(failed.is_symlink())
+            self.assertFalse((root / "runs/eval/stage2/run_a_failed_bootstrap_20260717T1345").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
