@@ -1,0 +1,10 @@
+stage1_model:
+  is_causal: false
+stage1_loss:
+  human_yaw_weight: 0.001
+  human_root_weight: 0.003
+calibration:
+  status: frozen_for_v8_1_matched_endpoint
+  source: eight_real_pulp_batches_seed17_20260717
+  rationale: weighted auxiliary gradient medians are approximately 3.8 and 10.1 percent of the base gradient median
+  selection: fixed_last_endpoint_only
