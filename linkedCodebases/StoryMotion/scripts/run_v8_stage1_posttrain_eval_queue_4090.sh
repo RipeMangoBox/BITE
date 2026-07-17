@@ -23,7 +23,7 @@ wait_for_endpoint() {
       echo "$(timestamp) endpoint_ready run_id=${run_id}"
       return 0
     fi
-    if ! pgrep -f -- "--run-id ${run_id}" >/dev/null; then
+    if ! pgrep -f -- "$run_id" >/dev/null; then
       echo "$(timestamp) endpoint_failed run_id=${run_id} reason=trainer_not_running" >&2
       return 1
     fi
