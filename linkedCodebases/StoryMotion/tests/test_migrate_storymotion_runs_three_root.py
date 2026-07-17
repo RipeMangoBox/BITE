@@ -149,8 +149,35 @@ class StoryMotionRunsMigrationTest(unittest.TestCase):
             Migration(root, apply=True, protected=set()).run()
 
             self.assertTrue((root / "runs/train/stage2/run_a/last.pt").is_file())
+            self.assertTrue((root / "runs/train/stage2/run_a/eval").is_dir())
+            self.assertTrue((root / "runs/train/stage2/run_a/vis").is_dir())
             self.assertTrue((root / "runs/vis/stage1/v7_14_official_contract_stage1_20260710/summary.json").is_file())
             self.assertEqual((root / "runs/visualizations").resolve(), (root / "runs/vis").resolve())
+
+    def test_repairs_old_relative_links_below_symlinked_functional_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            legacy_train = root / "runs/legacy/train"
+            legacy_eval = root / "runs/legacy/eval"
+            legacy_train.mkdir(parents=True)
+            legacy_eval.mkdir(parents=True)
+            (root / "runs/train").symlink_to("legacy/train")
+            (root / "runs/eval").symlink_to("legacy/eval")
+            train = legacy_train / "stage2/run_a"
+            train.mkdir(parents=True)
+            (legacy_eval / "stage2/run_a").mkdir(parents=True)
+            (root / "runs/vis/stage2/run_a").mkdir(parents=True)
+            (train / "eval").symlink_to("../../../eval/stage2/run_a")
+            (train / "vis").symlink_to("../../../vis/stage2/run_a")
+            (root / "runs/stage2").mkdir()
+            (root / "runs/stage2/run_a").symlink_to("../train/stage2/run_a")
+
+            self.assertFalse((train / "vis").exists())
+            payload = Migration(root, apply=True, protected=set()).run()
+
+            self.assertTrue((train / "eval").is_dir())
+            self.assertTrue((train / "vis").is_dir())
+            self.assertTrue(any(action["operation"] == "replace_broken_symlink" for action in payload["actions"]))
 
 
 if __name__ == "__main__":

@@ -185,22 +185,33 @@ class Migration:
 
     def symlink(self, link: Path, target: Path) -> None:
         relative_target = os.path.relpath(target, link.parent)
+        absolute_target = str(target.absolute())
         if link in self.planned_removed:
-            self.record("symlink", None, link, target=relative_target)
+            self.record("symlink", None, link, target=absolute_target)
             if self.apply:
                 link.parent.mkdir(parents=True, exist_ok=True)
-                link.symlink_to(relative_target)
+                link.symlink_to(absolute_target)
             return
         if link.is_symlink():
-            if os.readlink(link) == relative_target:
+            current_target = os.readlink(link)
+            current_path = Path(current_target)
+            if not current_path.is_absolute():
+                current_path = link.parent / current_path
+            if current_path.resolve(strict=False) == target.resolve(strict=False):
+                return
+            if current_target == relative_target and not link.exists():
+                self.record("replace_broken_symlink", link, link, target=absolute_target)
+                if self.apply:
+                    link.unlink()
+                    link.symlink_to(absolute_target)
                 return
             raise RuntimeError(f"different compatibility symlink already exists: {link}")
         if link.exists():
             raise RuntimeError(f"cannot create compatibility symlink over path: {link}")
-        self.record("symlink", None, link, target=relative_target)
+        self.record("symlink", None, link, target=absolute_target)
         if self.apply:
             link.parent.mkdir(parents=True, exist_ok=True)
-            link.symlink_to(relative_target)
+            link.symlink_to(absolute_target)
 
     def split_atomic_run(self, stage: str, source: Path) -> None:
         run_id = source.name
@@ -263,6 +274,10 @@ class Migration:
             if child.name in special:
                 continue
             if child.is_symlink():
+                train_root = self.runs / "train" / stage / child.name
+                self.symlink(child, train_root)
+                self.symlink(train_root / "eval", self.runs / "eval" / stage / child.name)
+                self.symlink(train_root / "vis", self.runs / "vis" / stage / child.name)
                 continue
             if child.is_dir():
                 self.split_atomic_run(stage, child)
@@ -320,7 +335,8 @@ class Migration:
         for source_relative, destination_relative in EVAL_VIS_MOVES:
             source = self.root / source_relative
             destination = self.root / destination_relative
-            if source.is_symlink() and source.resolve() == destination.resolve():
+            if source.is_symlink():
+                self.symlink(source, destination)
                 continue
             if not source.exists() and not source.is_symlink():
                 continue
