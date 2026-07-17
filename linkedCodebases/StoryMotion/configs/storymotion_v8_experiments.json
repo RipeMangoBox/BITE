@@ -202,6 +202,8 @@
           "test_step": 4000,
           "test_total_loss": 0.112649,
           "checkpoint_contract_preflight": "passed",
+          "geometry_runtime_smoke_samples": 2,
+          "geometry_runtime_smoke_sha256": "55d8a6f7c4107ed0f8d9efd0ec37143ab04f86e907aedca02432babbca65a91a",
           "finite": true
         },
         "endpoint_eta_cst": "2026-07-18 03:40-04:20",

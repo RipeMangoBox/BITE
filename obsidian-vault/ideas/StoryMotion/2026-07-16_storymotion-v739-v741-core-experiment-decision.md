@@ -18,7 +18,7 @@ source_notes:
   - "[[2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion]]"
   - "[[2026-07-17_storymotion-v8-3-data-curation-progress]]"
 created: 2026-07-16T01:30:00+0800
-updated: 2026-07-17T18:25:00+0800
+updated: 2026-07-17T18:33:00+0800
 ---
 
 # StoryMotion Core Experiment Execution
@@ -34,7 +34,7 @@ updated: 2026-07-17T18:25:00+0800
 | --- | --- | --- | --- | --- | --- | --- |
 | P0 / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | 4090 / GPU0 | step `54,441/636,000`；近5k=`15.55 step/s`；train total=`0.01751`；test step54k=`0.02645` | frozen yaw/root=`0.001/0.003`；train/test/grad finite；matched `81.38M` contract | endpoint→GPU1 pure4053 geometry；不自动建cache | 07-18 04:45–05:20 CST | 进行中 |
 | P1 / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | 4090 / GPU0 | step `29,268/636,000`；近5k=`12.14 step/s`；train total=`0.03486`；test step28k=`0.07109` | AAMMARDM-style non-causal residual AE；从零训练；train/test/grad finite | endpoint→GPU1 pure4053 geometry；按system comparison解释 | 07-18 08:15–09:15 CST | 进行中 |
-| P1 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | 4090 / GPU1 | step `6,133/636,000`；近5k=`18.81 step/s`；train total=`0.05389`；test step4k=`0.11265` | stats SHA=`70623ea…5011`；checkpoint内嵌human200/camera-first/non-causal contract；preflight passed | endpoint→同GPU pure4053 geometry；通过gate后才允许cache | 07-18 03:40–04:20 CST | 进行中 |
+| P1 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | 4090 / GPU1 | step `6,133/636,000`；近5k=`18.81 step/s`；train total=`0.05389`；test step4k=`0.11265` | stats SHA=`70623ea…5011`；checkpoint内嵌human200/camera-first/non-causal contract；preflight passed；2-sample full evaluator smoke finite | endpoint→同GPU pure4053 geometry；通过gate后才允许cache | 07-18 03:40–04:20 CST | 进行中 |
 | AUTO-EVAL / `v8_stage1_posttrain_eval_g1_20260717` | 4090 / GPU1 queue | tmux存活；顺序=`v8.2 → v8.1A → v8.1B`；等待`status=trained`与endpoint checkpoint | 只等待，不占GPU；单条失败不阻止后续条目 | 对三条各执行ordered pure4053、四长度桶、human/root/yaw/camera geometry | 随各endpoint后约2–4分钟 | 等待 |
 | P1 / v8.3 curation | 不占GPU | plan/progress已创建；gate=`v8_2_full_endpoint before 22:00` closed | processed/annotated/quarantined/manifests/jobs=`0` | v8.2 endpoint核验后另开执行窗口 | 未启动 | waiting_on_v8_2_endpoint |
 | P0 / `v7_47_official_ae_unified_matched_seed17_5090g0_20260717` | 5090 / 仅GPU0 | 18:28 CST step=`46,700/105,000`；loss=`0.12826`；grad=`0.18530` | 原driver继续，finite；本轮未修改 | endpoint后由其既有driver闭合formal | 既有driver管理 | 进行中 |
