@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import ast
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -174,11 +175,11 @@ def test_parallel_stats_are_frame_weighted_ordered_and_immutable(tmp_path: Path)
 
 
 def test_human200_geometry_loss_is_direct_not_cumulative() -> None:
-    if "storymotion.tokenizers.fsq_vae" not in sys.modules:
+    if importlib.util.find_spec("storymotion.tokenizers.fsq_vae") is None:
         fsq_module = ModuleType("storymotion.tokenizers.fsq_vae")
         fsq_module.HierarchicalFSQ = type("HierarchicalFSQ", (nn.Module,), {})
         sys.modules[fsq_module.__name__] = fsq_module
-    if "storymotion.tokenizers.vq_vae" not in sys.modules:
+    if importlib.util.find_spec("storymotion.tokenizers.vq_vae") is None:
         vq_module = ModuleType("storymotion.tokenizers.vq_vae")
         vq_module.EMAVectorQuantizer = type("EMAVectorQuantizer", (nn.Module,), {})
         sys.modules[vq_module.__name__] = vq_module
