@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import torch
 
-from storymotion.tokenizers.joint_human_camera import JointHumanCameraAE, JointHumanCameraTokenizerOutput
+from storymotion.tokenizers.joint_human_camera import (
+    AAMMARDMResidualJointHumanCameraAE,
+    JointHumanCameraAE,
+    JointHumanCameraTokenizerOutput,
+)
 
 
 def test_human199_yaw_and_root_losses_are_masked_and_differentiable() -> None:
@@ -91,3 +95,36 @@ def test_default_zero_weights_preserve_the_existing_total() -> None:
     assert losses["weighted_human_yaw_loss"] == 0
     assert losses["weighted_human_root_loss"] == 0
     assert torch.allclose(losses["total_loss"], previous_total)
+
+
+def test_v8_1b_residual_ae_preserves_non_multiple_sequence_lengths() -> None:
+    for frames, expected_pad in ((65, 3), (67, 1)):
+        model = AAMMARDMResidualJointHumanCameraAE(
+            199,
+            14,
+            human_latent_dim=8,
+            camera_latent_dim=4,
+            hidden_dim=16,
+            downsample=4,
+        )
+        human = torch.randn(2, frames, 199)
+        camera = torch.randn(2, frames, 14)
+
+        output = model(human, camera)
+        losses = model.compute_loss(human, camera, output)
+
+        assert model.is_causal is False
+        assert output.human_recon.shape == human.shape
+        assert output.camera_recon.shape == camera.shape
+        assert output.latent.shape == (2, (frames + 3) // 4, 12)
+        assert int(output.info["right_pad_frames"].item()) == expected_pad
+        assert torch.isfinite(losses["total_loss"])
+
+
+def test_v8_1b_residual_ae_rejects_causality() -> None:
+    try:
+        AAMMARDMResidualJointHumanCameraAE(199, 14, is_causal=True)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("v8.1B must reject a causal tokenizer")

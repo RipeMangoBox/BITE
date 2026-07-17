@@ -38,6 +38,23 @@ from scripts.storymotion_run_layout import init_run, run_paths, update_manifest
 
 
 PRESETS = {
+    "storymotion_v8_1b_residual_joint_ae_199_14": {
+        "tokenizer": "joint_residual_ae",
+        "human_dim": HUMAN_FEATURE_DIM,
+        "camera_dim": OFFICIAL_CAMERA_FEATURE_DIM,
+        "human_latent_dim": 128,
+        "camera_latent_dim": 64,
+        "hidden_dim": 192,
+        "downsample": 4,
+        "residual_depth": 2,
+        "dilation_growth_rate": 3,
+        "residual_activation": "relu",
+        "residual_dropout": 0.2,
+        "human_recon_weight": 1.0,
+        "camera_recon_weight": 1.0,
+        "velocity_weight": 1.0,
+        "feature_contract": OFFICIAL_FEATURE_CONTRACT,
+    },
     "pulpmotion_joint_ae_official_199_14_pulp192": {
         "tokenizer": "joint_ae", "human_dim": HUMAN_FEATURE_DIM, "camera_dim": OFFICIAL_CAMERA_FEATURE_DIM,
         "human_latent_dim": 128, "camera_latent_dim": 64, "hidden_dim": 256, "downsample": 4,
@@ -225,7 +242,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train Pulp-style joint human-camera StoryMotion stage1 tokenizers.")
     parser.add_argument("--preset", choices=sorted(PRESETS), default="pulpmotion_joint_hfsq_199_9")
     parser.add_argument("--loss-config", type=Path, default=None, help="Optional YAML/JSON overrides for Stage1 loss weights and selected train args.")
-    parser.add_argument("--tokenizer", choices=["joint_ae", "joint_vae", "joint_vqvae", "joint_hfsq", "joint_grfsq", "separate_ae", "separate_vae", "separate_grfsq", "separate_hfsq"], default=None)
+    parser.add_argument("--tokenizer", choices=["joint_ae", "joint_residual_ae", "joint_vae", "joint_vqvae", "joint_hfsq", "joint_grfsq", "separate_ae", "separate_vae", "separate_grfsq", "separate_hfsq"], default=None)
     parser.add_argument("--human-manifest", type=Path, default=Path("runs/train/pulpmotion_native_train_manifest_full_fast_20260608.jsonl"))
     parser.add_argument("--camera-manifest", type=Path, default=Path("runs/train/pulpmotion_camera_train_manifest_full_20260610.jsonl"))
     parser.add_argument("--val-human-manifest", type=Path, default=Path("runs/train/pulpmotion_native_test_manifest_full_20260608.jsonl"))
@@ -266,6 +283,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--camera-latent-dim", type=int, default=64)
     parser.add_argument("--hidden-dim", type=int, default=256)
     parser.add_argument("--downsample", type=int, default=4)
+    parser.add_argument("--residual-depth", type=int, default=2)
+    parser.add_argument("--dilation-growth-rate", type=int, default=3)
+    parser.add_argument("--residual-activation", choices=["relu", "gelu", "silu"], default="relu")
+    parser.add_argument("--residual-dropout", type=float, default=0.2)
     parser.add_argument("--codebook-size", type=int, default=512)
     parser.add_argument("--kl-weight", type=float, default=1e-5)
     parser.add_argument("--commitment-weight", type=float, default=0.02)
@@ -289,7 +310,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--hfsq-r-rand-scale", type=float, default=0.0)
     parser.add_argument("--hfsq-w-scale-division", action="store_true")
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--eval-batch-size", type=int, default=0, help="Validation batch size; 0 reuses --batch-size.")
     parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--expected-train-samples", type=int, default=0, help="Fail closed unless the ordered train set has this size; 0 disables the check.")
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--val-every-steps", type=int, default=2000)
     parser.add_argument("--eval-every-steps", type=int, default=5000)
@@ -418,8 +441,8 @@ def configure_human_geometry_loss(model: torch.nn.Module, args: argparse.Namespa
         raise ValueError("human yaw/root loss weights must be non-negative")
     if args.human_yaw_weight == 0.0 and args.human_root_weight == 0.0:
         return
-    if args.tokenizer != "joint_ae" or args.feature_contract != OFFICIAL_FEATURE_CONTRACT or args.human_dim != 199:
-        raise ValueError("human yaw/root loss is restricted to the v8.1 joint-AE normalized human199 contract")
+    if args.tokenizer not in {"joint_ae", "joint_residual_ae"} or args.feature_contract != OFFICIAL_FEATURE_CONTRACT or args.human_dim != 199:
+        raise ValueError("human yaw/root loss is restricted to a v8.1 normalized-human199 joint AE")
     stats = _load_official_stats(args.pulp_root)
     base_model = model.module if hasattr(model, "module") else model
     base_model.geometry_human_mean = stats["human_mean"]
@@ -543,6 +566,32 @@ def sample_ids(dataset) -> list[str]:
     return [str(dataset[index].get("sample_id", index)) for index in range(len(dataset))]
 
 
+def stage1_model_contract(args: argparse.Namespace) -> dict[str, Any]:
+    native_latent_order = (
+        f"camera{args.camera_latent_dim}+human{args.human_latent_dim}"
+        if args.tokenizer == "joint_residual_ae"
+        else f"human{args.human_latent_dim}+camera{args.camera_latent_dim}"
+    )
+    return {
+        "tokenizer": args.tokenizer,
+        "preset": args.preset,
+        "feature_contract": args.feature_contract,
+        "is_causal": False,
+        "human_dim": args.human_dim,
+        "camera_dim": args.camera_dim,
+        "human_latent_dim": args.human_latent_dim,
+        "camera_latent_dim": args.camera_latent_dim,
+        "native_latent_order": native_latent_order,
+        "hidden_dim": args.hidden_dim,
+        "downsample": args.downsample,
+        "residual_depth": args.residual_depth if args.tokenizer == "joint_residual_ae" else None,
+        "dilation_growth_rate": args.dilation_growth_rate if args.tokenizer == "joint_residual_ae" else None,
+        "residual_activation": args.residual_activation if args.tokenizer == "joint_residual_ae" else None,
+        "residual_dropout": args.residual_dropout if args.tokenizer == "joint_residual_ae" else None,
+        "initialization": "random_seeded_no_pretrained_stage1_checkpoint",
+    }
+
+
 def write_stage1_contract(
     args: argparse.Namespace,
     train_ds,
@@ -569,10 +618,12 @@ def write_stage1_contract(
         "data": {
             "train_manifest": str(args.human_manifest),
             "train_camera_manifest": str(args.camera_manifest),
+            "train_split": "train",
             "train_samples": len(train_ids),
             "train_sample_ids_sha256": ids_hash(train_ids),
             "eval_manifest": str(args.val_human_manifest),
             "eval_camera_manifest": str(args.val_camera_manifest),
+            "eval_split": "pure_test",
             "eval_samples": len(val_ids),
             "eval_sample_ids_sha256": ids_hash(val_ids),
         },
@@ -585,7 +636,8 @@ def write_stage1_contract(
             "camera_dim": args.camera_dim,
             "human_latent_dim": args.human_latent_dim,
             "camera_latent_dim": args.camera_latent_dim,
-            "latent_order": f"human{args.human_latent_dim}+camera{args.camera_latent_dim}",
+            "latent_order": stage1_model_contract(args)["native_latent_order"],
+            "architecture": stage1_model_contract(args),
             "padding_policy": "fixed_right_zero_pad_and_loss_mask" if args.fixed_max_frames else "dynamic_batch_max_and_loss_mask",
             "fixed_max_frames": args.fixed_max_frames,
         },
@@ -596,6 +648,11 @@ def write_stage1_contract(
             "optimizer_steps": ((len(train_ids) + args.batch_size - 1) // args.batch_size) * args.epochs,
             "sample_exposures": len(train_ids) * args.epochs,
             "lr": args.lr,
+        },
+        "eval": {
+            "seed": args.seed,
+            "batch_size": args.eval_batch_size or args.batch_size,
+            "sample_count": len(val_ids),
         },
         "loss": {
             "human_recon_weight": args.human_recon_weight,
@@ -649,6 +706,10 @@ def main() -> None:
     if args.drop_camera_z and args.camera_dim == CAMERA_FEATURE_DIM:
         args.camera_dim = CAMERA_FEATURE_DIM - 1
     train_ds, val_ds, val_split = make_datasets(args)
+    if args.expected_train_samples and len(train_ds) != args.expected_train_samples:
+        raise ValueError(
+            f"ordered train set has {len(train_ds)} samples, expected {args.expected_train_samples}"
+        )
     human_dim, camera_dim = dataset_dims(train_ds)
     if human_dim != args.human_dim:
         raise ValueError(f"dataset human dim {human_dim} does not match --human-dim {args.human_dim}")
@@ -677,7 +738,7 @@ def main() -> None:
     if val_ds is not None:
         val_loader = DataLoader(
             val_ds,
-            batch_size=args.batch_size,
+            batch_size=args.eval_batch_size or args.batch_size,
             shuffle=False,
             num_workers=args.num_workers,
             pin_memory=args.pin_memory,
@@ -706,11 +767,16 @@ def main() -> None:
         hfsq_base_mask_rate=args.hfsq_base_mask_rate,
         hfsq_r_rand_scale=args.hfsq_r_rand_scale,
         hfsq_w_scale_division=args.hfsq_w_scale_division,
+        residual_depth=args.residual_depth,
+        dilation_growth_rate=args.dilation_growth_rate,
+        residual_activation=args.residual_activation,
+        residual_dropout=args.residual_dropout,
         is_causal=args.is_causal,
     )
     configure_loss_space(model, args)
     apply_branch_loss_weights(model, args)
     configure_human_geometry_loss(model, args)
+    model.stage1_model_contract = stage1_model_contract(args)
     trainer = JointHumanCameraTokenizerTrainer(
         model,
         JointTrainerConfig(
@@ -758,7 +824,15 @@ def main() -> None:
         )
     if args.checkpoint:
         args.checkpoint.parent.mkdir(parents=True, exist_ok=True)
-        torch.save({"model": model.state_dict(), "args": vars(args), "tokenizer": args.tokenizer}, args.checkpoint)
+        torch.save(
+            {
+                "model": model.state_dict(),
+                "args": vars(args),
+                "tokenizer": args.tokenizer,
+                "stage1_model_contract": stage1_model_contract(args),
+            },
+            args.checkpoint,
+        )
     summary = {
         "preset": args.preset,
         "tokenizer": args.tokenizer,

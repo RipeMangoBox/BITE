@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 import torch
 import torch.nn.functional as F
@@ -61,6 +62,152 @@ def _make_vae_encoder(input_dim: int, hidden_dim: int, downsample: int, is_causa
         _temporal_conv1d(hidden_dim, hidden_dim, stride=downsample, is_causal=is_causal),
         nn.SiLU(),
     )
+
+
+def _residual_activation(name: str) -> nn.Module:
+    if name == "relu":
+        return nn.ReLU()
+    if name == "gelu":
+        return nn.GELU()
+    if name in {"silu", "swish"}:
+        return nn.SiLU()
+    raise ValueError(f"unsupported residual activation: {name}")
+
+
+class _ResidualConv1dBlock(nn.Module):
+    """Non-causal MARDM-style dilated residual block."""
+
+    def __init__(
+        self,
+        channels: int,
+        *,
+        dilation: int,
+        activation: str,
+        dropout: float,
+        is_causal: bool,
+    ) -> None:
+        super().__init__()
+        assert is_causal is False
+        self.activation1 = _residual_activation(activation)
+        self.activation2 = _residual_activation(activation)
+        self.conv1 = nn.Conv1d(channels, channels, kernel_size=3, padding=dilation, dilation=dilation)
+        self.conv2 = nn.Conv1d(channels, channels, kernel_size=1)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, value: torch.Tensor) -> torch.Tensor:
+        residual = value
+        value = self.conv1(self.activation1(value))
+        value = self.conv2(self.activation2(value))
+        return residual + self.dropout(value)
+
+
+def _residual_stack(
+    channels: int,
+    *,
+    depth: int,
+    dilation_growth_rate: int,
+    activation: str,
+    dropout: float,
+    is_causal: bool,
+) -> nn.Sequential:
+    blocks = [
+        _ResidualConv1dBlock(
+            channels,
+            dilation=dilation_growth_rate**index,
+            activation=activation,
+            dropout=dropout,
+            is_causal=is_causal,
+        )
+        for index in range(depth)
+    ]
+    return nn.Sequential(*reversed(blocks))
+
+
+def _downsample_stages(downsample: int) -> int:
+    if downsample <= 0 or downsample & (downsample - 1):
+        raise ValueError("AAMMARDM-style downsample must be a positive power of two")
+    return int(math.log2(downsample))
+
+
+class _ResidualEncoder(nn.Module):
+    def __init__(
+        self,
+        input_dim: int,
+        latent_dim: int,
+        width: int,
+        downsample: int,
+        depth: int,
+        dilation_growth_rate: int,
+        activation: str,
+        dropout: float,
+        is_causal: bool,
+    ) -> None:
+        super().__init__()
+        assert is_causal is False
+        self.in_conv = nn.Sequential(nn.Conv1d(input_dim, width, kernel_size=3, padding=1), _residual_activation(activation))
+        self.down_blocks = nn.Sequential(
+            *[
+                nn.Sequential(
+                    nn.Conv1d(width, width, kernel_size=4, stride=2, padding=1),
+                    _residual_stack(
+                        width,
+                        depth=depth,
+                        dilation_growth_rate=dilation_growth_rate,
+                        activation=activation,
+                        dropout=dropout,
+                        is_causal=is_causal,
+                    ),
+                )
+                for _ in range(_downsample_stages(downsample))
+            ]
+        )
+        self.bottleneck = nn.Conv1d(width, latent_dim, kernel_size=3, padding=1)
+
+    def forward(self, value: torch.Tensor) -> torch.Tensor:
+        return self.bottleneck(self.down_blocks(self.in_conv(value)))
+
+
+class _ResidualDecoder(nn.Module):
+    def __init__(
+        self,
+        latent_dim: int,
+        output_dim: int,
+        width: int,
+        downsample: int,
+        depth: int,
+        dilation_growth_rate: int,
+        activation: str,
+        dropout: float,
+        is_causal: bool,
+    ) -> None:
+        super().__init__()
+        assert is_causal is False
+        self.in_conv = nn.Sequential(nn.Conv1d(latent_dim, width, kernel_size=3, padding=1), nn.ReLU())
+        self.up_blocks = nn.Sequential(
+            *[
+                nn.Sequential(
+                    _residual_stack(
+                        width,
+                        depth=depth,
+                        dilation_growth_rate=dilation_growth_rate,
+                        activation=activation,
+                        dropout=dropout,
+                        is_causal=is_causal,
+                    ),
+                    nn.Upsample(scale_factor=2, mode="nearest"),
+                    nn.Conv1d(width, width, kernel_size=3, padding=1),
+                )
+                for _ in range(_downsample_stages(downsample))
+            ]
+        )
+        self.out_conv = nn.Sequential(
+            nn.Conv1d(width, width, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv1d(width, output_dim, kernel_size=3, padding=1),
+        )
+
+    def forward(self, value: torch.Tensor) -> torch.Tensor:
+        return self.out_conv(self.up_blocks(self.in_conv(value)))
 
 
 class _JointHumanCameraAE(nn.Module):
@@ -432,6 +579,105 @@ class JointHumanCameraAE(_JointHumanCameraAE):
             "total_loss": total,
             **losses,
         }
+
+    def tokenize(self, human: torch.Tensor, camera: torch.Tensor) -> torch.Tensor:
+        latent, _ = self.encode(human, camera)
+        return latent
+
+    def detokenize(self, tokens: torch.Tensor, target_len: int | None = None) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.decode(tokens, target_len=target_len)
+
+
+class AAMMARDMResidualJointHumanCameraAE(_JointHumanCameraAE):
+    """Projection-free AAMMARDM-style joint AE with branch-owning decoders."""
+
+    def __init__(
+        self,
+        human_dim: int,
+        camera_dim: int,
+        human_latent_dim: int = 128,
+        camera_latent_dim: int = 64,
+        hidden_dim: int = 192,
+        downsample: int = 4,
+        residual_depth: int = 2,
+        dilation_growth_rate: int = 3,
+        residual_activation: str = "relu",
+        residual_dropout: float = 0.2,
+        human_recon_weight: float = 1.0,
+        camera_recon_weight: float = 1.0,
+        velocity_weight: float = 1.0,
+        is_causal: bool = False,
+    ) -> None:
+        assert is_causal is False
+        super().__init__(
+            human_dim,
+            camera_dim,
+            human_latent_dim,
+            camera_latent_dim,
+            hidden_dim,
+            downsample,
+            commitment_weight=0.0,
+            human_recon_weight=human_recon_weight,
+            camera_recon_weight=camera_recon_weight,
+            velocity_weight=velocity_weight,
+            build_encoder=False,
+            is_causal=is_causal,
+        )
+        common = {
+            "width": hidden_dim,
+            "downsample": downsample,
+            "depth": residual_depth,
+            "dilation_growth_rate": dilation_growth_rate,
+            "activation": residual_activation,
+            "dropout": residual_dropout,
+            "is_causal": is_causal,
+        }
+        self.encoder = _ResidualEncoder(
+            self.human_dim + self.camera_dim,
+            self.latent_dim,
+            **common,
+        )
+        self.human_decoder = _ResidualDecoder(
+            self.human_latent_dim,
+            self.human_dim,
+            **common,
+        )
+        self.camera_decoder = _ResidualDecoder(
+            self.camera_latent_dim,
+            self.camera_dim,
+            **common,
+        )
+        self.residual_depth = int(residual_depth)
+        self.dilation_growth_rate = int(dilation_growth_rate)
+        self.residual_activation = str(residual_activation)
+        self.residual_dropout = float(residual_dropout)
+
+    def encode(self, human: torch.Tensor, camera: torch.Tensor) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+        self._check_inputs(human, camera)
+        value = torch.cat([human, camera], dim=-1).transpose(1, 2)
+        right_pad = (-human.shape[1]) % self.downsample
+        if right_pad:
+            value = F.pad(value, (0, right_pad))
+        return self.encoder(value).transpose(1, 2), {"right_pad_frames": human.new_tensor(right_pad)}
+
+    def compute_loss(
+        self,
+        human: torch.Tensor,
+        camera: torch.Tensor,
+        output: JointHumanCameraTokenizerOutput,
+        mask: torch.Tensor | None = None,
+        **_: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        losses = self._branch_reconstruction_losses(human, camera, output, mask)
+        total = (
+            losses["weighted_human_recon_loss"]
+            + losses["weighted_camera_recon_loss"]
+            + losses["weighted_velocity_loss"]
+            + losses["weighted_acceleration_loss"]
+            + losses["weighted_human_yaw_loss"]
+            + losses["weighted_human_root_loss"]
+        )
+        return {"total_loss": total, **losses}
 
     def tokenize(self, human: torch.Tensor, camera: torch.Tensor) -> torch.Tensor:
         latent, _ = self.encode(human, camera)
