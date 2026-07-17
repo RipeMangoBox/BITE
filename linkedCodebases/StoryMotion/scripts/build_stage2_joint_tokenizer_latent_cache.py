@@ -41,6 +41,12 @@ from storymotion.training.joint_data import (
     PairedPulpMotionHumanCameraDataset,
     collate_human_camera_batch,
 )
+from storymotion.training.human200 import (
+    HUMAN200_DIM,
+    HUMAN200_FEATURE_CONTRACT,
+    HUMAN200_LAYOUT,
+    load_human200_stats,
+)
 
 
 HUM_DIM = 128
@@ -149,6 +155,17 @@ def build_model(args: argparse.Namespace) -> torch.nn.Module:
     assert checkpoint_is_causal is False
     human_latent_dim = int(args.human_latent_dim or config["human_latent_dim"])
     camera_latent_dim = int(args.camera_latent_dim or config["camera_latent_dim"])
+    human200_stats = None
+    if args.feature_contract == HUMAN200_FEATURE_CONTRACT:
+        stats_path = getattr(args, "human200_stats", None)
+        if stats_path is None:
+            raise ValueError("v8.2 checkpoint loading requires --human200-stats")
+        human200_stats = load_human200_stats(
+            stats_path,
+            expected_train_manifest=getattr(args, "train_human_manifest", None),
+        )
+        if human_dim != HUMAN200_DIM:
+            raise ValueError(f"v8.2 requires human_dim={HUMAN200_DIM}, got {human_dim}")
 
     if args.feature_contract == DEFAULT_FEATURE_CONTRACT and tokenizer == DEFAULT_TOKENIZER_KIND:
         assert human_dim == DEFAULT_HUMAN_DIM
@@ -205,6 +222,32 @@ def build_model(args: argparse.Namespace) -> torch.nn.Module:
         }
         if mismatches:
             raise ValueError(f"embedded v8 Stage1 checkpoint contract mismatch: {mismatches}")
+        if args.feature_contract == HUMAN200_FEATURE_CONTRACT:
+            normalization = embedded_contract.get("normalization")
+            representation = embedded_contract.get("human_representation")
+            if not isinstance(normalization, dict) or human200_stats is None:
+                raise ValueError("v8.2 checkpoint is missing its train-only normalization contract")
+            expected_normalization = {
+                "sha256": human200_stats["sha256"],
+                "source_manifest_sha256": human200_stats["meta"]["source"]["manifest_sha256"],
+                "source_sample_ids_sha256": human200_stats["meta"]["source"]["sample_ids_sha256"],
+                "source_split": "train",
+            }
+            normalization_mismatches = {
+                key: (normalization.get(key), expected)
+                for key, expected in expected_normalization.items()
+                if normalization.get(key) != expected
+            }
+            if normalization_mismatches:
+                raise ValueError(f"v8.2 normalization contract mismatch: {normalization_mismatches}")
+            if not isinstance(representation, dict) or representation.get("layout") != HUMAN200_LAYOUT:
+                raise ValueError("v8.2 human representation layout mismatch")
+            expected_native_order = f"camera{camera_latent_dim}+human{human_latent_dim}"
+            if embedded_contract.get("native_latent_order") != expected_native_order:
+                raise ValueError(
+                    "v8.2 native latent order must match the joint AE camera-first split: "
+                    f"expected {expected_native_order!r}"
+                )
     state = (
         checkpoint.get("model")
         or checkpoint.get("model_state_dict")
@@ -213,6 +256,8 @@ def build_model(args: argparse.Namespace) -> torch.nn.Module:
     )
     model.load_state_dict(state)
     model.eval()
+    if human200_stats is not None:
+        model.human200_stats = human200_stats
     model.stage1_checkpoint_contract = {
         "feature_contract": checkpoint_contract,
         "is_causal": checkpoint_is_causal,
@@ -223,6 +268,8 @@ def build_model(args: argparse.Namespace) -> torch.nn.Module:
         "camera_latent_dim": camera_latent_dim,
         "native_latent_order": embedded_contract.get("native_latent_order", "camera64+human128"),
         "embedded_contract": embedded_contract,
+        "normalization": embedded_contract.get("normalization"),
+        "human_representation": embedded_contract.get("human_representation"),
     }
     return model
 
@@ -260,6 +307,10 @@ def save_split(
         drop_camera_z=args.drop_camera_z,
         feature_contract=args.feature_contract,
         pulp_root=args.pulp_root,
+        human200_stats_path=getattr(args, "human200_stats", None),
+        human200_expected_train_manifest=(
+            args.train_human_manifest if args.feature_contract == HUMAN200_FEATURE_CONTRACT else None
+        ),
     )
     sidecar = load_official_sidecar(official_cache) if args.sidecar_source != "direct" else None
     loader = DataLoader(
@@ -354,6 +405,8 @@ def save_split(
             "camera_latent_dim": int(model.camera_latent_dim),
             "human_latent_dim": int(model.human_latent_dim),
             "sidecar_meta": sidecar["meta"] if sidecar is not None else {},
+            "human200_normalization": model.stage1_checkpoint_contract.get("normalization"),
+            "human_representation": model.stage1_checkpoint_contract.get("human_representation"),
         },
     }
     if (
@@ -386,10 +439,12 @@ def build_parser() -> argparse.ArgumentParser:
             OFFICIAL_FEATURE_CONTRACT,
             RAW_OFFICIAL_FEATURE_CONTRACT,
             RAW_HUMAN_OFFICIAL_CAMERA_FEATURE_CONTRACT,
+            HUMAN200_FEATURE_CONTRACT,
         ],
         required=True,
     )
     parser.add_argument("--pulp-root", type=Path, default=ROOT / "linked/PulpMotion")
+    parser.add_argument("--human200-stats", type=Path)
     parser.add_argument("--train-human-manifest", type=Path, required=True)
     parser.add_argument("--train-camera-manifest", type=Path, required=True)
     parser.add_argument("--val-human-manifest", type=Path, required=True)

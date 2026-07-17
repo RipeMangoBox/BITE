@@ -377,33 +377,41 @@ class _JointHumanCameraAE(nn.Module):
         if mean is None or std is None:
             zero = human_recon.new_tensor(0.0)
             return zero, zero
-        if human.shape[-1] != 199:
-            raise ValueError("human root geometry loss requires Pulp human199 features")
-
         mean = mean.to(human)
         std = std.to(human)
         human_raw = human * std + mean
         recon_raw = human_recon * std + mean
-        target_yaw = torch.cumsum(human_raw[..., 3], dim=1)
-        recon_yaw = torch.cumsum(recon_raw[..., 3], dim=1)
-        yaw_loss = masked_mean(1.0 - torch.cos(recon_yaw - target_yaw), mask)
+        geometry_contract = getattr(self, "geometry_feature_contract", "human199_integrated_root_yaw")
+        if human.shape[-1] == 199 and geometry_contract == "human199_integrated_root_yaw":
+            target_yaw = torch.cumsum(human_raw[..., 3], dim=1)
+            recon_yaw = torch.cumsum(recon_raw[..., 3], dim=1)
 
-        def root_xy(features: torch.Tensor, yaw: torch.Tensor) -> torch.Tensor:
-            velocity = features[..., 1:3]
-            cosine = torch.cos(yaw)
-            sine = torch.sin(yaw)
-            world_velocity = torch.stack(
-                (
-                    cosine * velocity[..., 0] - sine * velocity[..., 1],
-                    sine * velocity[..., 0] + cosine * velocity[..., 1],
-                ),
-                dim=-1,
+            def root_xy(features: torch.Tensor, yaw: torch.Tensor) -> torch.Tensor:
+                velocity = features[..., 1:3]
+                cosine = torch.cos(yaw)
+                sine = torch.sin(yaw)
+                world_velocity = torch.stack(
+                    (
+                        cosine * velocity[..., 0] - sine * velocity[..., 1],
+                        sine * velocity[..., 0] + cosine * velocity[..., 1],
+                    ),
+                    dim=-1,
+                )
+                integrated = torch.cumsum(world_velocity[:, :-1], dim=1)
+                return torch.cat((torch.zeros_like(world_velocity[:, :1]), integrated), dim=1)
+
+            target_root = root_xy(human_raw, target_yaw)
+            recon_root = root_xy(recon_raw, recon_yaw)
+        elif human.shape[-1] == 200 and geometry_contract == "human200_direct_root_yaw":
+            target_yaw = torch.atan2(human_raw[..., 3], human_raw[..., 4])
+            recon_yaw = torch.atan2(recon_raw[..., 3], recon_raw[..., 4])
+            target_root = human_raw[..., 1:3]
+            recon_root = recon_raw[..., 1:3]
+        else:
+            raise ValueError(
+                f"unsupported human geometry contract {geometry_contract!r} for dim {human.shape[-1]}"
             )
-            integrated = torch.cumsum(world_velocity[:, :-1], dim=1)
-            return torch.cat((torch.zeros_like(world_velocity[:, :1]), integrated), dim=1)
-
-        target_root = root_xy(human_raw, target_yaw)
-        recon_root = root_xy(recon_raw, recon_yaw)
+        yaw_loss = masked_mean(1.0 - torch.cos(recon_yaw - target_yaw), mask)
         root_loss = masked_smooth_l1_loss(recon_root, target_root, mask)
         return yaw_loss, root_loss
 

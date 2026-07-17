@@ -34,10 +34,29 @@ from storymotion.training.joint_data import (
     RandomHumanCameraDataset,
     collate_human_camera_batch,
 )
+from storymotion.training.human200 import (
+    HUMAN200_DIM,
+    HUMAN200_FEATURE_CONTRACT,
+    HUMAN200_LAYOUT,
+    load_human200_stats,
+)
 from scripts.storymotion_run_layout import init_run, run_paths, update_manifest
 
 
 PRESETS = {
+    "storymotion_v8_2_joint_ae_human200_camera14": {
+        "tokenizer": "joint_ae",
+        "human_dim": HUMAN200_DIM,
+        "camera_dim": OFFICIAL_CAMERA_FEATURE_DIM,
+        "human_latent_dim": 128,
+        "camera_latent_dim": 64,
+        "hidden_dim": 256,
+        "downsample": 4,
+        "human_recon_weight": 1.0,
+        "camera_recon_weight": 1.0,
+        "velocity_weight": 1.0,
+        "feature_contract": HUMAN200_FEATURE_CONTRACT,
+    },
     "storymotion_v8_1b_residual_joint_ae_199_14": {
         "tokenizer": "joint_residual_ae",
         "human_dim": HUMAN_FEATURE_DIM,
@@ -259,6 +278,7 @@ def build_parser() -> argparse.ArgumentParser:
             OFFICIAL_FEATURE_CONTRACT,
             RAW_OFFICIAL_FEATURE_CONTRACT,
             RAW_HUMAN_OFFICIAL_CAMERA_FEATURE_CONTRACT,
+            HUMAN200_FEATURE_CONTRACT,
         ],
         default=LEGACY_FEATURE_CONTRACT,
     )
@@ -268,6 +288,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="For a raw human contract, compute the affected reconstruction/temporal losses after the fixed official affine normalization.",
     )
     parser.add_argument("--pulp-root", type=Path, default=REPO_ROOT / "linked/PulpMotion")
+    parser.add_argument("--human200-stats", type=Path, default=None)
     parser.add_argument("--synthetic", action="store_true")
     parser.add_argument("--num-samples", type=int, default=16)
     parser.add_argument("--seq-len", type=int, default=64)
@@ -439,6 +460,17 @@ def apply_branch_loss_weights(model: torch.nn.Module, args: argparse.Namespace) 
 def configure_human_geometry_loss(model: torch.nn.Module, args: argparse.Namespace) -> None:
     if args.human_yaw_weight < 0.0 or args.human_root_weight < 0.0:
         raise ValueError("human yaw/root loss weights must be non-negative")
+    if args.feature_contract == HUMAN200_FEATURE_CONTRACT:
+        if args.tokenizer != "joint_ae" or args.human_dim != HUMAN200_DIM:
+            raise ValueError("v8.2 human200 geometry requires the matched non-causal joint AE")
+        if args.human_yaw_weight != 0.001 or args.human_root_weight != 0.003:
+            raise ValueError("v8.2 must keep the matched v8.1 yaw/root weights 0.001/0.003")
+        stats = load_human200_stats(args.human200_stats, expected_train_manifest=args.human_manifest)
+        base_model = model.module if hasattr(model, "module") else model
+        base_model.geometry_human_mean = stats["mean"]
+        base_model.geometry_human_std = stats["std"]
+        base_model.geometry_feature_contract = "human200_direct_root_yaw"
+        return
     if args.human_yaw_weight == 0.0 and args.human_root_weight == 0.0:
         return
     if args.tokenizer not in {"joint_ae", "joint_residual_ae"} or args.feature_contract != OFFICIAL_FEATURE_CONTRACT or args.human_dim != 199:
@@ -447,6 +479,7 @@ def configure_human_geometry_loss(model: torch.nn.Module, args: argparse.Namespa
     base_model = model.module if hasattr(model, "module") else model
     base_model.geometry_human_mean = stats["human_mean"]
     base_model.geometry_human_std = stats["human_std"]
+    base_model.geometry_feature_contract = "human199_integrated_root_yaw"
 
 
 def configure_loss_space(model: torch.nn.Module, args: argparse.Namespace) -> None:
@@ -496,6 +529,23 @@ def seed_worker(worker_id: int) -> None:
         pass
 
 
+def configure_human200_provenance(args: argparse.Namespace) -> None:
+    if args.feature_contract != HUMAN200_FEATURE_CONTRACT:
+        if args.human200_stats is not None:
+            raise ValueError("--human200-stats is only valid with the v8.2 feature contract")
+        return
+    if args.human200_stats is None:
+        raise ValueError("--human200-stats is required for the v8.2 feature contract")
+    stats = load_human200_stats(args.human200_stats, expected_train_manifest=args.human_manifest)
+    source = stats["meta"]["source"]
+    args.human200_stats_resolved = str(stats["path"])
+    args.human200_stats_sha256 = stats["sha256"]
+    args.human200_stats_source_manifest_sha256 = source["manifest_sha256"]
+    args.human200_stats_source_sample_ids_sha256 = source["sample_ids_sha256"]
+    args.human200_stats_source_samples = int(source["samples"])
+    args.human200_stats_source_frames = int(source["frames"])
+
+
 def make_datasets(args: argparse.Namespace):
     if args.synthetic:
         dataset = RandomHumanCameraDataset(args.num_samples, args.seq_len, args.human_dim, args.camera_dim, seed=17)
@@ -515,6 +565,10 @@ def make_datasets(args: argparse.Namespace):
         drop_camera_z=args.drop_camera_z,
         feature_contract=args.feature_contract,
         pulp_root=args.pulp_root,
+        human200_stats_path=args.human200_stats,
+        human200_expected_train_manifest=(
+            args.human_manifest if args.feature_contract == HUMAN200_FEATURE_CONTRACT else None
+        ),
     )
     val_ds = None
     val_split = ""
@@ -529,6 +583,10 @@ def make_datasets(args: argparse.Namespace):
             drop_camera_z=args.drop_camera_z,
             feature_contract=args.feature_contract,
             pulp_root=args.pulp_root,
+            human200_stats_path=args.human200_stats,
+            human200_expected_train_manifest=(
+                args.human_manifest if args.feature_contract == HUMAN200_FEATURE_CONTRACT else None
+            ),
         )
         val_split = "test"
     return train_ds, val_ds, val_split
@@ -569,10 +627,10 @@ def sample_ids(dataset) -> list[str]:
 def stage1_model_contract(args: argparse.Namespace) -> dict[str, Any]:
     native_latent_order = (
         f"camera{args.camera_latent_dim}+human{args.human_latent_dim}"
-        if args.tokenizer == "joint_residual_ae"
+        if args.tokenizer == "joint_residual_ae" or args.feature_contract == HUMAN200_FEATURE_CONTRACT
         else f"human{args.human_latent_dim}+camera{args.camera_latent_dim}"
     )
-    return {
+    contract = {
         "tokenizer": args.tokenizer,
         "preset": args.preset,
         "feature_contract": args.feature_contract,
@@ -590,6 +648,22 @@ def stage1_model_contract(args: argparse.Namespace) -> dict[str, Any]:
         "residual_dropout": args.residual_dropout if args.tokenizer == "joint_residual_ae" else None,
         "initialization": "random_seeded_no_pretrained_stage1_checkpoint",
     }
+    if args.feature_contract == HUMAN200_FEATURE_CONTRACT:
+        contract["human_representation"] = {
+            "layout": HUMAN200_LAYOUT,
+            "owning_inverse": "human200_raw_to_human199_raw",
+            "root_yaw_policy": "direct_relative_root_xy_and_atan2_yaw_without_integration",
+        }
+        contract["normalization"] = {
+            "path": args.human200_stats_resolved,
+            "sha256": args.human200_stats_sha256,
+            "source_manifest_sha256": args.human200_stats_source_manifest_sha256,
+            "source_sample_ids_sha256": args.human200_stats_source_sample_ids_sha256,
+            "source_samples": args.human200_stats_source_samples,
+            "source_frames": args.human200_stats_source_frames,
+            "source_split": "train",
+        }
+    return contract
 
 
 def write_stage1_contract(
@@ -640,6 +714,14 @@ def write_stage1_contract(
             "architecture": stage1_model_contract(args),
             "padding_policy": "fixed_right_zero_pad_and_loss_mask" if args.fixed_max_frames else "dynamic_batch_max_and_loss_mask",
             "fixed_max_frames": args.fixed_max_frames,
+            **(
+                {
+                    "normalization": stage1_model_contract(args)["normalization"],
+                    "human_representation": stage1_model_contract(args)["human_representation"],
+                }
+                if args.feature_contract == HUMAN200_FEATURE_CONTRACT
+                else {}
+            ),
         },
         "train": {
             "seed": args.seed,
@@ -702,6 +784,7 @@ def main() -> None:
     args = apply_run_layout(apply_loss_config(apply_preset(parser.parse_args(), parser)))
     assert args.is_causal is False
     args.is_causal = False
+    configure_human200_provenance(args)
     seed_everything(args.seed)
     if args.drop_camera_z and args.camera_dim == CAMERA_FEATURE_DIM:
         args.camera_dim = CAMERA_FEATURE_DIM - 1

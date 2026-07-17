@@ -31,15 +31,22 @@ from scripts.render_stage1_joint_separate_3d_reconstructions import (  # noqa: E
     parse_model_spec,
 )
 from storymotion_official_bridge_smoke import add_pulp_import_paths, patch_numpy_aliases  # noqa: E402
-from storymotion.training.joint_data import OFFICIAL_FEATURE_CONTRACT  # noqa: E402
+from storymotion.training.joint_data import OFFICIAL_FEATURE_CONTRACT, _load_official_stats  # noqa: E402
+from storymotion.training.human200 import (  # noqa: E402
+    HUMAN200_DIM,
+    HUMAN200_FEATURE_CONTRACT,
+    human200_to_official_human199,
+    official_human199_to_human200,
+)
 
 
-LENGTH_BINS = ((1, 64), (65, 128), (129, 192), (193, 256), (257, None))
+LENGTH_BINS = ((1, 64), (65, 128), (129, 192), (193, None))
 METRICS = (
     "human_root_aligned_mpjpe",
     "human_global_mpjpe",
     "human_root_ade",
     "human_root_fde",
+    "human_integrated_yaw_geodesic",
     "camera_center_ade",
     "camera_center_fde",
     "camera_rotation_deg",
@@ -89,8 +96,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--human-manifest", type=Path, required=True)
     parser.add_argument("--camera-manifest", type=Path, required=True)
     parser.add_argument("--local-model", required=True, help="name:preset:checkpoint")
+    parser.add_argument("--human200-stats", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=0)
+    parser.add_argument("--expected-samples", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--workers", type=int, default=0)
     parser.add_argument("--device", default="cuda:0")
@@ -154,6 +163,9 @@ def reconstruct_fixed_length(
     fixed_max_frames: int,
     *,
     official: bool,
+    feature_contract: str = OFFICIAL_FEATURE_CONTRACT,
+    official_stats: dict[str, torch.Tensor] | None = None,
+    human200_stats: dict[str, Any] | None = None,
 ) -> dict[str, torch.Tensor]:
     if fixed_max_frames <= 0:
         raise ValueError("fixed_max_frames must be positive")
@@ -175,11 +187,55 @@ def reconstruct_fixed_length(
     if official:
         reconstructed = model.decode(model.encode(fixed_input))
         return {key: value[:, :fixed_max_frames] for key, value in reconstructed.items()}
+    if feature_contract == HUMAN200_FEATURE_CONTRACT:
+        if official_stats is None or human200_stats is None:
+            raise ValueError("v8.2 fixed-length reconstruction requires matched statistics")
+        human200 = torch.zeros(
+            (fixed_input["human"].shape[0], fixed_max_frames, HUMAN200_DIM),
+            device=fixed_input["human"].device,
+            dtype=fixed_input["human"].dtype,
+        )
+        for index in range(fixed_input["human"].shape[0]):
+            frames = int(fixed_mask[index].sum().item())
+            human200[index, :frames] = official_human199_to_human200(
+                fixed_input["human"][index, :frames],
+                official_stats["human_mean"],
+                official_stats["human_std"],
+                human200_stats,
+            )
+        fixed_input["human"] = human200
     output = model(fixed_input["human"], fixed_input["camera"])
+    human_recon = output.human_recon[:, :fixed_max_frames]
+    if feature_contract == HUMAN200_FEATURE_CONTRACT:
+        official_human = torch.zeros(
+            (human_recon.shape[0], fixed_max_frames, 199),
+            device=human_recon.device,
+            dtype=human_recon.dtype,
+        )
+        for index in range(human_recon.shape[0]):
+            frames = int(fixed_mask[index].sum().item())
+            official_human[index, :frames] = human200_to_official_human199(
+                human_recon[index, :frames],
+                human200_stats,
+                official_stats["human_mean"],
+                official_stats["human_std"],
+            )
+        human_recon = official_human
     return {
-        "human": output.human_recon[:, :fixed_max_frames],
+        "human": human_recon,
         "camera": output.camera_recon[:, :fixed_max_frames],
     }
+
+
+def integrated_yaw_from_official_human199(
+    human: torch.Tensor,
+    official_stats: dict[str, torch.Tensor],
+) -> torch.Tensor:
+    if human.ndim != 3 or human.shape[-1] != 199:
+        raise ValueError(f"expected normalized Pulp human199 [B,T,199], got {tuple(human.shape)}")
+    mean = official_stats["human_mean"].to(device=human.device, dtype=human.dtype)
+    std = official_stats["human_std"].to(device=human.device, dtype=human.dtype)
+    return torch.cumsum(human[..., 3] * std[3] + mean[3], dim=1)
 
 
 def geometry_row(
@@ -188,6 +244,8 @@ def geometry_row(
     frames: int,
     predicted: dict[str, Any],
     target: dict[str, Any],
+    predicted_yaw: torch.Tensor,
+    target_yaw: torch.Tensor,
     index: int,
 ) -> dict[str, Any]:
     pred_joints = human_joints(predicted["human"])[index, :frames].detach().float().cpu()
@@ -207,6 +265,8 @@ def geometry_row(
     relative_rotation = pred_camera[:, :3, :3].transpose(-1, -2) @ gt_camera[:, :3, :3]
     cosine = ((relative_rotation.diagonal(dim1=-2, dim2=-1).sum(-1) - 1.0) / 2.0).clamp(-1.0, 1.0)
     rotation_deg = torch.rad2deg(torch.acos(cosine))
+    yaw_delta = predicted_yaw[index, :frames] - target_yaw[index, :frames]
+    yaw_geodesic = torch.atan2(torch.sin(yaw_delta), torch.cos(yaw_delta)).abs()
 
     return {
         "source": source,
@@ -216,6 +276,7 @@ def geometry_row(
         "human_global_mpjpe": float(global_error.mean().item()),
         "human_root_ade": float(root_error.mean().item()),
         "human_root_fde": float(root_error[-1].item()),
+        "human_integrated_yaw_geodesic": float(torch.rad2deg(yaw_geodesic).mean().item()),
         "camera_center_ade": float(camera_error.mean().item()),
         "camera_center_fde": float(camera_error[-1].item()),
         "camera_rotation_deg": float(rotation_deg.mean().item()),
@@ -278,8 +339,21 @@ def main() -> None:
             sub = getattr(dataset, attr, None)
             if sub is not None and hasattr(sub, "sample_ids"):
                 sub.sample_ids = sample_ids
+    if args.expected_samples > 0 and len(dataset) != args.expected_samples:
+        raise ValueError(f"evaluation split has {len(dataset)} samples, expected {args.expected_samples}")
+    expected_ids = [str(value) for value in dataset.sample_ids]
+    if len(expected_ids) != len(set(expected_ids)):
+        raise ValueError("evaluation split sample IDs must be unique")
 
     local_spec = parse_model_spec(args.local_model)
+    run_config = load_checkpoint_run_config(local_spec.checkpoint)
+    if not run_config:
+        raise FileNotFoundError(f"missing run_config.json for {local_spec.checkpoint}")
+    local_feature_contract = str(run_config.get("feature_contract", ""))
+    if local_feature_contract not in {OFFICIAL_FEATURE_CONTRACT, HUMAN200_FEATURE_CONTRACT}:
+        raise ValueError(
+            "long-sequence geometry requires an official camera14 checkpoint with human199 or v8.2 human200"
+        )
     local_true_source = f"{local_spec.name}_true_length"
     local_fixed_source = f"{local_spec.name}_fixed_max"
     if args.official_checkpoint_override is not None and args.official_source_label == "pulp_official":
@@ -290,7 +364,7 @@ def main() -> None:
         raise ValueError("--official-source-label must contain only letters, digits, underscores, or hyphens")
     official_true_source = f"{args.official_source_label}_true_length"
     official_fixed_source = f"{args.official_source_label}_fixed_max"
-    local_model = build_model(local_spec, str(device)).eval()
+    local_model = build_model(local_spec, str(device), args.human200_stats).eval()
     if getattr(local_model, "is_causal", None) is not False:
         raise RuntimeError("long-sequence mainline diagnostic requires the non-causal local tokenizer")
     official_model = instantiate(cfg.model.autoencoder)
@@ -308,6 +382,8 @@ def main() -> None:
     official_model.to(device).eval()
     if not official_checkpoint.is_file():
         raise FileNotFoundError(f"missing official autoencoder checkpoint: {official_checkpoint}")
+    official_stats = _load_official_stats(args.pulp_root)
+    human200_stats = getattr(local_model, "human200_stats", None)
 
     human_rows = load_rows_by_id(args.human_manifest)
     camera_rows = load_rows_by_id(args.camera_manifest)
@@ -320,6 +396,7 @@ def main() -> None:
     )
     feature_dataset = getattr(dataset, "joint_dataset", None) or dataset
     rows: list[dict[str, Any]] = []
+    processed_ids: list[str] = []
     processed = 0
     started = time.time()
     with torch.inference_mode():
@@ -331,6 +408,7 @@ def main() -> None:
             x_input = dataset.get_feat(batch_device["x_raw"], padding_mask)
             raw_input = dataset.get_raw(x_input, intrinsics)
             sample_ids = [str(value) for value in batch["sample_id"]]
+            processed_ids.extend(sample_ids)
 
             local_human, local_camera, _ = reconstruct_batch(
                 local_model,
@@ -341,20 +419,23 @@ def main() -> None:
                 camera_rows,
                 args.camera_manifest,
                 device,
-                OFFICIAL_FEATURE_CONTRACT,
+                local_feature_contract,
                 x_input,
+                official_stats,
             )
             local_raw = feature_dataset.get_raw(
                 {"human": local_human, "camera": local_camera},
                 intrinsics,
             )
             oracle_raw: dict[str, dict[str, Any]] = {}
+            oracle_human_features: dict[str, torch.Tensor] = {}
             if args.human_channel_oracles:
                 if local_human.shape[-1] != 199 or x_input["human"].shape[-1] != 199:
                     raise RuntimeError("human channel oracle audit requires normalized Pulp human199 features")
                 for oracle_name, (start, end) in HUMAN199_CHANNEL_ORACLES.items():
                     oracle_human = local_human.clone()
                     oracle_human[..., start:end] = x_input["human"][..., start:end]
+                    oracle_human_features[oracle_name] = oracle_human
                     oracle_raw[oracle_name] = feature_dataset.get_raw(
                         {"human": oracle_human, "camera": local_camera},
                         intrinsics,
@@ -367,6 +448,9 @@ def main() -> None:
                 padding_mask,
                 args.fixed_max_frames,
                 official=False,
+                feature_contract=local_feature_contract,
+                official_stats=official_stats,
+                human200_stats=human200_stats,
             )
             local_fixed_raw = feature_dataset.get_raw(local_fixed_features, intrinsics)
             official_fixed_features = reconstruct_fixed_length(
@@ -378,14 +462,88 @@ def main() -> None:
             )
             official_fixed_raw = dataset.get_raw(official_fixed_features, intrinsics)
 
+            target_yaw = integrated_yaw_from_official_human199(x_input["human"], official_stats)
+            local_true_yaw = integrated_yaw_from_official_human199(local_human, official_stats)
+            local_fixed_yaw = integrated_yaw_from_official_human199(
+                local_fixed_features["human"], official_stats
+            )
+            official_true_yaw = integrated_yaw_from_official_human199(
+                official_features["human"], official_stats
+            )
+            official_fixed_yaw = integrated_yaw_from_official_human199(
+                official_fixed_features["human"], official_stats
+            )
+            oracle_yaw = {
+                name: integrated_yaw_from_official_human199(
+                    oracle_human_features[name],
+                    official_stats,
+                )
+                for name in HUMAN199_CHANNEL_ORACLES
+            } if args.human_channel_oracles else {}
+
             for index, sample_id in enumerate(sample_ids):
                 frames = int(padding_mask[index].sum().item())
-                rows.append(geometry_row(local_true_source, sample_id, frames, local_raw, raw_input, index))
+                rows.append(
+                    geometry_row(
+                        local_true_source,
+                        sample_id,
+                        frames,
+                        local_raw,
+                        raw_input,
+                        local_true_yaw,
+                        target_yaw,
+                        index,
+                    )
+                )
                 for oracle_name, oracle_value in oracle_raw.items():
-                    rows.append(geometry_row(oracle_name, sample_id, frames, oracle_value, raw_input, index))
-                rows.append(geometry_row(local_fixed_source, sample_id, frames, local_fixed_raw, raw_input, index))
-                rows.append(geometry_row(official_true_source, sample_id, frames, official_raw, raw_input, index))
-                rows.append(geometry_row(official_fixed_source, sample_id, frames, official_fixed_raw, raw_input, index))
+                    rows.append(
+                        geometry_row(
+                            oracle_name,
+                            sample_id,
+                            frames,
+                            oracle_value,
+                            raw_input,
+                            oracle_yaw[oracle_name],
+                            target_yaw,
+                            index,
+                        )
+                    )
+                rows.append(
+                    geometry_row(
+                        local_fixed_source,
+                        sample_id,
+                        frames,
+                        local_fixed_raw,
+                        raw_input,
+                        local_fixed_yaw,
+                        target_yaw,
+                        index,
+                    )
+                )
+                rows.append(
+                    geometry_row(
+                        official_true_source,
+                        sample_id,
+                        frames,
+                        official_raw,
+                        raw_input,
+                        official_true_yaw,
+                        target_yaw,
+                        index,
+                    )
+                )
+                rows.append(
+                    geometry_row(
+                        official_fixed_source,
+                        sample_id,
+                        frames,
+                        official_fixed_raw,
+                        raw_input,
+                        official_fixed_yaw,
+                        target_yaw,
+                        index,
+                    )
+                )
             processed += len(sample_ids)
             if args.progress_every > 0 and ((batch_index + 1) % args.progress_every == 0 or processed == len(dataset)):
                 elapsed = time.time() - started
@@ -402,6 +560,11 @@ def main() -> None:
                     ),
                     flush=True,
                 )
+
+    if processed_ids != expected_ids:
+        raise RuntimeError("evaluation loader did not preserve the complete ordered split")
+    if args.expected_samples > 0 and len(processed_ids) != args.expected_samples:
+        raise RuntimeError(f"processed {len(processed_ids)} samples, expected {args.expected_samples}")
 
     sources = (
         local_true_source,
@@ -448,14 +611,21 @@ def main() -> None:
                 "overall": overall,
                 "summary": summary,
             }
-    run_config = load_checkpoint_run_config(local_spec.checkpoint)
-    if not run_config:
-        raise FileNotFoundError(f"missing run_config.json for {local_spec.checkpoint}")
     payload = {
         "schema_version": 2,
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "purpose": "full valid-length Stage1 reconstruction geometry versus sequence length",
         "data": {"set_name": args.set_name, "split": args.split, "samples": processed},
+        "metric_units": {
+            "human_root_aligned_mpjpe": "meters",
+            "human_global_mpjpe": "meters",
+            "human_root_ade": "meters",
+            "human_root_fde": "meters",
+            "human_integrated_yaw_geodesic": "degrees",
+            "camera_center_ade": "meters",
+            "camera_center_fde": "meters",
+            "camera_rotation_deg": "degrees",
+        },
         "inference_policy": {
             "true_length": (
                 "Each sample is encoded and decoded once at its entire valid length; no crop, tiling, or "
@@ -492,6 +662,17 @@ def main() -> None:
                 "batch_size": run_config.get("batch_size"),
                 "epochs": run_config.get("epochs"),
             },
+            "human200_normalization": (
+                {
+                    "path": str(human200_stats["path"]),
+                    "sha256": human200_stats["sha256"],
+                    "source_manifest_sha256": human200_stats["meta"]["source"]["manifest_sha256"],
+                    "source_sample_ids_sha256": human200_stats["meta"]["source"]["sample_ids_sha256"],
+                    "source_split": human200_stats["meta"]["source"]["split"],
+                }
+                if human200_stats is not None
+                else None
+            ),
         },
         "official": {
             "source_label": args.official_source_label,
