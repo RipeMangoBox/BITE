@@ -1,6 +1,59 @@
-# StoryMotion Mirror — Local Artifact Index
+# StoryMotion
 
-Remote origin: `5090:/data/public/ripemangobox/Motion/StoryMotion/`
+StoryMotion keeps source code and generated experiment data in one project
+root. The source tree is mirrored in BITE under `linkedCodebases/StoryMotion`;
+large checkpoints, caches, evaluations, renders, and runtime logs remain on the
+GPU hosts.
+
+## Project Structure
+
+```text
+StoryMotion/
+  configs/       # Versioned experiment and baseline configuration
+  docs/          # Experiment contract and operational documentation
+  linked/        # External code/data links such as PulpMotion
+  scripts/       # Train, cache, evaluation, rendering, and migration entrypoints
+  storymotion/   # Importable model and data implementation
+  tests/         # Contract and regression tests
+
+  runs/          # Canonical generated artifacts; three functional first-level roots
+    train/
+      stage1/<run_id>/  # Checkpoints, events, driver state, contract, manifest
+      stage1/{manifests,stats}/  # Declared shared Stage1 inputs
+      stage2/<run_id>/  # Checkpoints, per-run cache, driver state, contract, manifest
+      stage2/shared/    # Explicitly shared Stage2 train-side assets
+    eval/
+      stage1/<run_id>/  # Metrics, records, decoded numerical diagnostics
+      stage2/<run_id>/
+      quality/          # Historical quality-only evidence without a run owner
+      semantic_keyframe_mvp/
+    vis/
+      stage1/<run_id>/  # Rendered media and render manifests
+      stage2/<run_id>/
+
+  logs/          # Live logs plus archived inactive logs
+  ops/           # Queues, launchers, registries, environment overlays, drivers
+  archive/       # Migration manifests and inactive operational snapshots
+```
+
+For a normal experiment, the same `run_id` links train, eval, and vis.
+`manifest.json` and `experiment_contract.json` live with the train artifacts
+and record paths relative to the common `runs` root. Historical visualization-
+only imports retain their source ID and do not imply that a matched train run
+exists. A render-oriented subtree stays intact in `vis`; do not separate its
+media files from the local render manifest.
+
+Older `runs/stage1`, `runs/stage2`, `runs/legacy`, and
+`runs/visualizations` paths are compatibility-only. New code must resolve paths
+through `scripts/storymotion_run_layout.py`. Temporary compatibility links may
+exist while an owning driver or historical reader is active, but they are not
+canonical result categories. Therefore a host in transition may temporarily
+show more than the three canonical first-level entries.
+
+The checked migration entrypoint is
+`scripts/migrate_storymotion_runs_three_root.py`. Run it independently on each
+host, protect every active `run_id`, and keep the emitted JSON manifest under
+`archive/migration-manifests`; never copy one host's artifacts over the other.
 
 ## Experiment Timeline
 
@@ -18,60 +71,13 @@ Remote origin: `5090:/data/public/ripemangobox/Motion/StoryMotion/`
 | Jun 14 | Stage2 | Marathon: independent dropout FT (146k steps), full eval OOM at batch=128 |
 | Jun 14 | Stage2 | **cfg=2.0/eta=1.0 full eval** (10549 samples, batch=64) — ✅ completed, 4 configs |
 
-## Directory Structure
+## Artifact Policy
 
-```
-stage1/                          # PulpMotion frozen tokenizer (Jun 10)
-  pulp_combinations/             # Latent combination analysis (CSV, JSON, MD)
-  reconstructions/               # Decode → skeleton/camera renders
-    camera/                      # 20 MP4 camera trajectory videos
-      gt/, concate/, camera_trajectory/
-    human/                       # 120 MP4 renders (fixed/orbiting/camera_traj)
-      gt/, concate/, vae/, vqvae/
-    summary.json
-
-stage2/                          # CondMDI branch-mask inpainting (Jun 11-14)
-  analysis/                      # Summary docs + eval scripts (14 files)
-    stage2_completed_summary_20260612.{json,md}
-    stage2_5090_analysis.md
-    trimodal_evaluation_plan.md
-    run_stage2_*.py              # 9 diagnostic eval scripts
-  sources/                       # PulpMotion reference configs + paper (5 files)
-  training_logs/                 # Training logs + cache metadata (mixed/pure splits)
-
-  metrics/                       # === All numerical results (JSON/JSONL/CSV) ===
-    official_full_10549/         # StoryMotion 6-job × 10549 full eval (cfg=1.0)
-    pulp_baseline/               # PulpMotion official baseline (10549 samples)
-    p0_diagnostics/              # CFG/eta/multi-step sweep results (1024-sample)
-    marathon/                    # 2026-06-14 marathon (training + partial full eval)
-    bilateral_cfg_matrix/        # Bilateral CFG grid eval (24 configs)
-    bilateral_cfg_test/          # Bilateral CFG smoke test
-    bridge_smoke/                # Official metric bridge integration test
-    gated_diagnostics/           # Gated diagnostic results
-    joint_decomposition/         # Joint mode per-sample decomposition
-    condition_reliance_mixed/    # Mixed split condition reliance gates
-    condition_reliance_pure_best/# Pure split best-model condition reliance
-    condition_reliance_pure_step/# Pure split step-condition reliance
-    multiseed_mixed/             # Multi-seed mixed eval
-    per_sample_stats/            # Per-sample statistics
-    posthoc_mixed/               # Post-hoc mixed eval
-    posthoc_pure/                # Post-hoc pure eval
-    outlier_audit/               # Full-val outlier audit
-    official_eval_early/         # Early official eval (pre-P0)
-    sampler_decode_smoke/        # Sampler decode smoke (JSON results only)
-    sampler_decode_stress/       # Sampler stress test (JSON results only)
-
-  renders/                       # === All visualization (PNG / MP4) ===
-    bilateral_cfg/               # 42 MP4 + 18 PNG bilateral CFG renders (7 configs)
-    decode_smoke/                # 3 PNG decoded skeleton smoke test
-    trimodal_latent/             # 5 PNG trimodal (human+camera) latent renders
-    sampler_smoke/               # 9 PNG sampler decode renders (3 checkpoints × 3 tasks)
-    sampler_stress/              # 10 PNG sampler stress renders (text/visible interventions)
-    outlier_audit_plots/         # 2 PNG diagnostic plots (loss CDF + zmax vs task)
-```
-
-## NOT in this mirror (on 5090 only)
-
-- Checkpoint files (`*.pt`, ~1.2 GB each): `branch_jh6ft`, `independent_dropout_ft`
-- Full cache file: `cache_mixed_full_nw0_20260611_2110/val.pt` (312 MB)
-- Training tensorboard logs
+- Generated checkpoints, caches, renders, logs, snapshots, and compatibility
+  links stay out of Git.
+- Align directory structure across hosts; never overwrite one host's artifact
+  merely because the other host has the same run name.
+- Move data by checked same-filesystem rename. Stop on every non-identical
+  destination collision.
+- Active run paths and delayed evaluator destinations remain frozen until the
+  owning driver exits.

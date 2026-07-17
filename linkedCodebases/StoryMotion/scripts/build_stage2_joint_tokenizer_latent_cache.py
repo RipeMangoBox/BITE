@@ -454,7 +454,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     parser.add_argument("--out-dir", type=Path)
     parser.add_argument("--runs-root", type=Path, default=ROOT / "runs")
-    parser.add_argument("--cache-id", help="Canonical Stage2 run id; derives the cache path under runs/stage2/<run-id>/cache.")
+    parser.add_argument("--cache-id", help="Canonical Stage2 run id; derives the cache path under runs/train/stage2/<run-id>/cache.")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--num-workers", type=int, default=4)

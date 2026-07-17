@@ -26,7 +26,7 @@ if str(ROOT) not in sys.path:
 
 from storymotion.stage2.processes import build_stage2_process
 from storymotion.experiment_invariants import assert_default_cache_meta, assert_non_causal_cache_meta
-from scripts.storymotion_run_layout import run_paths
+from scripts.storymotion_run_layout import init_run, run_paths, update_manifest
 
 for _name, _value in {
     "bool": bool,
@@ -2356,7 +2356,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--cache-dir", type=Path, default=ROOT / "runs/train/stage2/no_proj_pilot_20260610/cache_2048_gpu1")
     p.add_argument("--output-dir", type=Path, default=ROOT / "runs/train/stage2/condmdi_pulp_no_proj_20260611/gpu1_main")
     p.add_argument("--runs-root", type=Path, default=ROOT / "runs")
-    p.add_argument("--run-id", help="Canonical Stage2 run id; derives the train output path under runs/stage2/<run-id>/train.")
+    p.add_argument("--run-id", help="Canonical Stage2 run id; derives the train output path under runs/train/stage2/<run-id>.")
     p.add_argument("--device", default="cuda:0")
     p.add_argument("--seed", type=int, default=17)
     p.add_argument("--steps", type=int, default=50000)
@@ -2507,6 +2507,13 @@ def main() -> None:
     args = build_parser().parse_args()
     if args.run_id:
         paths = run_paths("stage2", args.run_id, args.runs_root)
+        if args.mode == "train" and not paths["root"].exists():
+            init_run(
+                "stage2",
+                args.run_id,
+                runs_root=args.runs_root,
+                description="StoryMotion Unified Stage2 training",
+            )
         args.run_root = paths["root"]
         args.output_dir = paths["train"]
     else:
@@ -2564,6 +2571,18 @@ def main() -> None:
         check(args)
     else:
         train(args)
+        if args.run_id:
+            update_manifest(
+                "stage2",
+                args.run_id,
+                runs_root=args.runs_root,
+                status="trained",
+                artifacts={
+                    "checkpoint": str((paths["train"] / "last.pt").relative_to(args.runs_root)),
+                    "train_log": str((paths["train"] / "train_log.jsonl").relative_to(args.runs_root)),
+                    "tensorboard": str((paths["train"] / "tensorboard").relative_to(args.runs_root)),
+                },
+            )
 
 
 if __name__ == "__main__":

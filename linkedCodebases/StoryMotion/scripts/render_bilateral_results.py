@@ -724,7 +724,7 @@ def main():
     p.add_argument('--ckpt', type=Path, default=ROOT / 'runs/train/stage2/pulp_official_full_mixed_20260611/gpu3_branchmean_jointheavy6_ft_b512_102688_20260612_2151/last.pt')
     p.add_argument('--cache-dir', type=Path, default=ROOT / 'runs/train/stage2/pulp_official_full_mixed_20260611/cache_mixed_full_nw0_20260611_2110')
     p.add_argument('--runs-root', type=Path, default=ROOT / 'runs')
-    p.add_argument('--vis-id', help='Canonical Stage2 run id; derives the vis path under runs/stage2/<run-id>/vis.')
+    p.add_argument('--vis-id', help='Canonical Stage2 run id; derives the vis path under runs/vis/stage2/<run-id>.')
     p.add_argument('--out-dir', type=Path, default=None)
     p.add_argument('--metrics-out-dir', type=Path, default=None)
     p.add_argument('--cfg-scale', type=float, default=2.0)

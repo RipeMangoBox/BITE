@@ -13,8 +13,12 @@ timestamp() {
 
 wait_for_endpoint() {
   local run_id="$1"
-  local contract="runs/stage1/${run_id}/experiment_contract.json"
-  local checkpoint="runs/stage1/${run_id}/train/checkpoints/${run_id}_last.pt"
+  local contract="runs/train/stage1/${run_id}/experiment_contract.json"
+  local checkpoint="runs/train/stage1/${run_id}/checkpoints/${run_id}_last.pt"
+  if [[ ! -e "$contract" && -e "runs/stage1/${run_id}/experiment_contract.json" ]]; then
+    contract="runs/stage1/${run_id}/experiment_contract.json"
+    checkpoint="runs/stage1/${run_id}/train/checkpoints/${run_id}_last.pt"
+  fi
 
   while true; do
     if [[ -f "$contract" && -f "$checkpoint" ]] && "$python_bin" -c \

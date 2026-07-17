@@ -901,8 +901,8 @@ def main() -> None:
             runs_root=args.runs_root,
             status="trained",
             artifacts={
-                "checkpoint": str(last_checkpoint.relative_to(args.run_root)),
-                "tensorboard": str(args.log_dir.relative_to(args.run_root)),
+                "checkpoint": str(last_checkpoint.relative_to(args.runs_root)),
+                "tensorboard": str(args.log_dir.relative_to(args.runs_root)),
             },
         )
     if args.checkpoint:

@@ -4,8 +4,16 @@ set -euo pipefail
 gpu="${1:-1}"
 run_id="${2:?usage: $0 GPU RUN_ID PRESET [CHECKPOINT]}"
 preset="${3:?usage: $0 GPU RUN_ID PRESET [CHECKPOINT]}"
-checkpoint="${4:-runs/stage1/${run_id}/train/checkpoints/${run_id}_last.pt}"
 python_bin="/home/ripemangobox/miniconda3/envs/director/bin/python"
+canonical_checkpoint="runs/train/stage1/${run_id}/checkpoints/${run_id}_last.pt"
+legacy_checkpoint="runs/stage1/${run_id}/train/checkpoints/${run_id}_last.pt"
+if [[ -f "$canonical_checkpoint" ]]; then
+  checkpoint="${4:-$canonical_checkpoint}"
+  eval_root="runs/eval/stage1/${run_id}"
+else
+  checkpoint="${4:-$legacy_checkpoint}"
+  eval_root="runs/stage1/${run_id}/eval"
+fi
 
 case "$preset" in
   pulpmotion_joint_ae_official_199_14_pulp192|storymotion_v8_1b_residual_joint_ae_199_14)
@@ -31,4 +39,4 @@ exec "$python_bin" scripts/eval_stage1_long_sequence_geometry.py \
   --set-name pure_ --split test --expected-samples 4053 \
   --batch-size 8 --workers 4 --fixed-max-frames 300 \
   --device cuda \
-  --output "runs/stage1/${run_id}/eval/pure4053_long_geometry.json"
+  --output "${eval_root}/pure4053_long_geometry.json"
