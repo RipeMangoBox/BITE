@@ -21,22 +21,25 @@ source_notes:
   - "[[2026-07-17_storymotion-v8-3-data-curation-plan]]"
   - "[[2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-17T17:35:00+08:00
+updated: 2026-07-17T18:25:00+08:00
 ---
 
 # StoryMotion v8.3 Data Curation Progress
 
 > [!warning] Not started
-> 截至 2026-07-17 17:35 CST，v8.3 状态为 `waiting_on_v8_2_endpoint`。v8.2 完整 endpoint 不可能在当日 22:00 前完成，因此“22:00 前完成则并行清洗”的启动条件不成立。本轮仅完成 [[2026-07-17_storymotion-v8-3-data-curation-plan|独立预注册计划]]，没有处理任何数据。
+> 截至 2026-07-17 18:25 CST，v8.3 状态为 `waiting_on_v8_2_endpoint`。v8.2 已在 4090 GPU1 启动，但完整 endpoint 预计到 2026-07-18 03:40–04:20 CST，无法在当日 22:00 前完成；因此“22:00 前完成则并行清洗”的启动条件不成立。本轮仅完成 [[2026-07-17_storymotion-v8-3-data-curation-plan|独立预注册计划]]，没有处理任何数据。
 
 ## 当前快照
 
 | 字段 | 值 |
 | --- | --- |
-| recorded at | `2026-07-17 17:35 CST` |
+| recorded at | `2026-07-17 18:25 CST` |
 | execution gate | `v8_2_full_endpoint` |
 | gate state | `closed` |
 | workflow state | `not_started / waiting_on_v8_2_endpoint` |
+| v8.2 live run | `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` |
+| v8.2 verified progress | `step 6,133 / 636,000`; pure-test step4k finite |
+| v8.2 endpoint ETA | `2026-07-18 03:40–04:20 CST` |
 | pairs scanned or scored | `0` |
 | pairs manually annotated | `0 / 300–500` |
 | pairs quarantined | `0` |
@@ -69,3 +72,4 @@ gate 打开后才按以下顺序执行：
 ## 进度日志
 
 - `2026-07-17 17:35 CST`：新建 v8.3 独立 plan/progress；记录 G0 closed，processed/annotated/quarantined/manifests/jobs 均为 `0`。未启动清洗。
+- `2026-07-17 18:25 CST`：v8.2 已完成 stats、checkpoint contract preflight 并在 GPU1 到 step6,133；实测 ETA 超过当日22:00。G0继续closed，所有数据与job计数仍为`0`。

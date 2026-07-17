@@ -31,7 +31,7 @@ source_papers:
   - "[[analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning]]"
   - "[[analysis/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval]]"
 created: 2026-07-17T16:25:00+0800
-updated: 2026-07-17T16:50:00+0800
+updated: 2026-07-17T18:25:00+0800
 ---
 
 # StoryMotion v8: Yaw-Stable Representation, Curated Pulp, and Non-AR Diffusion
@@ -98,6 +98,9 @@ artifact SHA256=`c9baf13591cda0cad58d6b0a5eacd14443c6fd4ef292d2cf92e2254d850752a
 
 ## 3. v8.1–v8.2：Stage1 treatment 顺序
 
+> [!important] 2026-07-17 execution override
+> 下述“先 A endpoint、再 B/8.2”的顺序仍是原始科学 gate，但用户已显式授权提前并行部署：v8.1A 与 v8.1B 共驻 4090 GPU0，v8.2 独占 GPU1。三条均保持相同 ordered `162,760 × 500 = 81.38M` budget；提前并行只节省墙钟时间，不能把 A/B 或 A/v8.2 写成原始 sequential single-variable attribution。最终结论仍只看各自 pure4053 owning-decoder geometry endpoint。
+
 ### 3.1 v8.1A：human199 yaw/root geometry supervision
 
 第一条 matched train 保持 v7.14 architecture、camera14、human199、latent `128+64`、non-causal、ordered IDs 和 budget，只增加 valid-mask-aware decoded geometry：
@@ -121,11 +124,11 @@ v8.1A promotion gate 在训练前固定为：
 
 可执行入口已加入现有 Stage1 trainer，默认 `human_yaw_weight=human_root_weight=0`，所以历史 recipe 不变。非零时只接受 `joint_ae + normalized human199 + is_causal=false`，并把两项权重写入 `run_config.json` 与 `experiment_contract.json`。mask/gradient 单元测试已通过。
 
-真实 Pulp 的 8 个随机 batch、每批 8 条、最长 250 帧的 loss-scale audit 给出：base gradient norm median=`0.11544`，未加权 yaw/root gradient norm median=`4.33958/3.88529`；raw weight=`1` 会压倒主 loss。finite optimizer-step smoke 因此暂用 `yaw=0.001`、`root=0.003`，对应 median gradient ratio 约 `3.8%/10.1%`。该 smoke 已通过：base/weighted-yaw/weighted-root/total loss=`0.455165/0.000938/0.000151/0.456254`，pre-clip grad norm=`0.10911`，step后参数全部finite，且`is_causal=false`。这是 smoke-only 初值，不是 final recipe；长训前仍需观察 early-step gradient ratio、decoded yaw/root 与 camera regression 后冻结权重。
+真实 Pulp 的 8 个随机 batch、每批 8 条、最长 250 帧的 loss-scale audit 给出：base gradient norm median=`0.11544`，未加权 yaw/root gradient norm median=`4.33958/3.88529`；raw weight=`1` 会压倒主 loss。finite optimizer-step smoke 因此使用 `yaw=0.001`、`root=0.003`，对应 median gradient ratio 约 `3.8%/10.1%`。该 smoke 已通过：base/weighted-yaw/weighted-root/total loss=`0.455165/0.000938/0.000151/0.456254`，pre-clip grad norm=`0.10911`，step后参数全部finite，且`is_causal=false`。这组权重随后被显式冻结为 final recipe；`v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` 已于 17:29 CST 启动。截至 18:25，step=`54,441/636,000`、近 5k 吞吐=`15.55 step/s`、train total=`0.01751`，step54k pure-test total=`0.02645`，均 finite。预计训练与 queued pure4053 geometry 在 2026-07-18 04:45–05:20 CST 闭合。
 
 ### 3.2 v8.1B：matched residual AE
 
-只有 v8.1A 的 loss 已稳定但容量不足时，才把 encoder/decoder 换成 non-causal AAMMARDM-style residual convolution，并复用完全相同的 geometry loss、IDs、budget 与 gate。已有 epoch320 不复用。v8.1A 与 v8.1B 若同时改 loss/architecture，就只能按两因素 system comparison 解释。
+原始 gate 只有在 v8.1A loss 稳定但容量不足时才启动本项；用户已覆盖该算力顺序并要求同步训练。实现为 projection-free、non-causal AAMMARDM-style residual encoder/branch-owning decoder，width=`192`、depth=`2`、dilation growth=`3`、downsample=`4`，从 seed17 随机初始化；已有 epoch320 不复用。`v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` 于 17:43 CST 与 A 共驻 GPU0。截至 18:25，step=`29,268/636,000`、近 5k 吞吐=`12.14 step/s`、train total=`0.03486`，step28k pure-test total=`0.07109`，均 finite；预计 endpoint 与 queued geometry 在 2026-07-18 08:15–09:15 CST 闭合。A/B 同时改变 geometry loss 与 architecture，只能按两因素 system comparison 解释。
 
 ### 3.3 v8.2：non-integrative human200
 
@@ -137,6 +140,8 @@ root_z 1 + root_xy_relative_to_first_frame 2 + yaw_sin_cos 2
 ```
 
 owning decoder 直接读取 absolute-relative root XY 与 yaw，不再对 yaw/root velocity 积分。camera14 暂不改，因为 v7.14 Stage1 Cam-ADE 只有约 `41.8 mm`；Stage2 camera 的米级误差先由 Stage2 channel oracle 定位。human200 是新 representation control，必须新建 train-only normalization、Stage1 checkpoint、owning decoder、cache 与 Unified Stage2，不能兼容加载 v7.14 cache。
+
+用户已授权提前实现并占用 GPU1。`v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` 于 18:19 CST 启动；train-only frame-weighted population stats 覆盖 ordered `162,760` IDs、`19,336,840` frames，SHA256=`70623ea927300b107fc49c9f4d4a67a30b45f8565f6bf4e0c27a406296f95011`。checkpoint 内嵌 `camera64+human128` native order、human200 owning inverse、stats/source hashes 与 `is_causal=false`，step0 cache-loader contract preflight 已通过。截至 18:25，step=`6,133/636,000`、近 5k 吞吐=`18.81 step/s`、train total=`0.05389`，step4k pure-test total=`0.11265`，均 finite；预计 endpoint 与 queued pure4053 geometry 在 2026-07-18 03:40–04:20 CST 闭合。
 
 ## 4. 架构检索：哪篇作为 non-AR pure diffusion 起点
 
@@ -179,6 +184,8 @@ owning decoder 直接读取 absolute-relative root XY 与 yaw，不再对 yaw/ro
 
 先人工标注约 `300–500` 个分层 pair，覆盖 posture、direction、body-part、temporal order、locomotion 与否定关系，再校准 scorer。只在多模型一致且超过校准阈值时自动 quarantine；模型分歧进入人工队列。最终保存 raw、physical quarantine、semantic-pair quarantine、clean 四份 immutable manifests，记录 ordered IDs、caption ID、reason、model/checkpoint hash、score、threshold 和 parent-manifest hash。
 
+独立执行契约见 [[2026-07-17_storymotion-v8-3-data-curation-plan]]，零进度与 gate 记录见 [[2026-07-17_storymotion-v8-3-data-curation-progress]]。由于 v8.2 的完整 endpoint 预计在 2026-07-18 凌晨，而不是 2026-07-17 22:00 前完成，清洗 gate 保持 closed：processed/annotated/quarantined/materialized manifests/launched jobs 全部为 `0`。
+
 ### 5.3 已核验的错配样本
 
 `2019_vcdDRblTOmM_00038_001_a` 的 htext 是：
@@ -193,10 +200,10 @@ GT 共 35 帧，左右膝平均弯曲约 `85.17°/81.82°`，root Z 约 `0.849 m
 | --- | --- | --- | --- | --- |
 | P0 | v8.0 / `v8_0_representation_oracle_audit_20260717` | 哪个 human199 root channel 导致长度退化 | pure4053 diagnostic | 已完成；yaw 是主因 |
 | P0 | v8.0 / `v8_0_pulp_repro_deep_ae_screen_20260717` | 现成 self-trained deep AE 能否直接替代 | pure4053 screen；训练 exposure 不匹配 | 已完成，No-Go；不接 Stage2 |
-| P0 | v8.1A / `yaw_integral_loss` | 同一 AE/layer 上 geometry loss 是否修复 yaw | final 为 `162,760 × 500` | 已实现并通过真实 batch finite-step smoke；待冻结权重后进行 matched train |
-| P1 | v8.1B / `residual_ae_yaw_loss` | v8.1A 通过训练稳定性但容量不足时，residual AE 是否增益 | 同 IDs、budget、loss | conditional；不复用 epoch320 |
-| P1 | v8.2 / `human200_absolute_root_yaw` | integration-free layout 是否必要 | 只在 v8.1 endpoint fail 时启动 | conditional；新 decoder/cache |
-| P1 | v8.3 / `clean_manifest_ablation` | curated pairs 是否改善 semantic/physical quality | 同一 promoted representation/backbone | 待建 manifest；raw vs clean 单变量 |
+| P0 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | 同一 AE/layer 上 geometry loss 是否修复 yaw | `162,760 × 500` | GPU0 training；step54,441 finite；endpoint ETA 07-18 04:45–05:20 |
+| P1 | v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | matched residual AE system 是否增益 | 同 IDs、budget、loss；不复用 epoch320 | 用户授权提前与A共驻GPU0；step29,268 finite；ETA 07-18 08:15–09:15 |
+| P1 | v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | integration-free layout 是否必要 | 同 IDs/budget；新 stats/decoder/cache | 用户授权提前占GPU1；step6,133 finite；ETA 07-18 03:40–04:20 |
+| P1 | v8.3 / `clean_manifest_ablation` | curated pairs 是否改善 semantic/physical quality | 同一 promoted representation/backbone | plan/progress已预注册；22:00 gate closed；全部进度计数为0 |
 | P1 | v8.4-A / `motion_mamba_ldm` | non-AR pure latent diffusion 是否改善生成 | promoted representation、raw manifest first | Stage1 gate 后实现 |
 | P2 | v8.4-B / `transphase_control` | phase alignment 是否改善 long composition | 同 cache、matched exposure | v8.4-A 后；加 aperiodic control |
 

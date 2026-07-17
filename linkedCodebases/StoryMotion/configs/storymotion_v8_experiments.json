@@ -68,7 +68,7 @@
       "id": "v8.1-A",
       "priority": "P0",
       "kind": "stage1_train",
-      "status": "finite_optimizer_step_smoke_passed_final_weight_not_frozen",
+      "status": "training_matched_endpoint",
       "question": "Does valid-mask-aware integrated yaw/root supervision fix the long-sequence geometry while preserving camera reconstruction?",
       "fixed_fields": [
         "v7.14 non-causal architecture",
@@ -96,6 +96,10 @@
           "human_yaw_weight": 0.001,
           "human_root_weight": 0.003
         },
+        "frozen_final_weights": {
+          "human_yaw_weight": 0.001,
+          "human_root_weight": 0.003
+        },
         "optimizer_step_smoke": {
           "status": "passed",
           "batch_size": 8,
@@ -107,25 +111,68 @@
           "preclip_grad_norm": 0.10911,
           "parameters_finite_after_step": true
         },
-        "warning": "These weights are for a finite optimizer-step smoke, not the final 81.38M-exposure recipe."
+        "warning": "The same values began as smoke weights and were explicitly frozen before the matched 81.38M-exposure run; the endpoint geometry gate, not early loss, decides promotion."
       },
-      "execution": "loss-scale and gradient-ratio smoke first; freeze one recipe before the 162,760 x 500 final run"
+      "execution": {
+        "run_id": "v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717",
+        "host": "4090",
+        "gpu": 0,
+        "started_at_cst": "2026-07-17 17:29",
+        "train_samples": 162760,
+        "epochs": 500,
+        "optimizer_steps": 636000,
+        "sample_exposures": 81380000,
+        "latest_verified": {
+          "recorded_at_cst": "2026-07-17 18:25",
+          "step": 54441,
+          "recent_steps_per_sec": 15.55,
+          "train_total_loss": 0.017507,
+          "test_step": 54000,
+          "test_total_loss": 0.026452,
+          "finite": true
+        },
+        "endpoint_eta_cst": "2026-07-18 04:45-05:20",
+        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+      }
     },
     {
       "id": "v8.1-B",
       "priority": "P1",
       "kind": "stage1_train",
-      "status": "conditional",
+      "status": "training_matched_endpoint_user_authorized_early",
       "depends_on": "v8.1-A stable but capacity-limited",
+      "execution_override": "The user explicitly authorized running v8.1-B concurrently with v8.1-A on GPU0. Treat A/B as a two-factor system comparison, not the original conditional single-variable gate.",
       "question": "Does a non-causal AAMMARDM-style residual encoder/decoder help under the same geometry loss and matched budget?",
-      "forbidden_checkpoint": "pulp_repro_epoch320"
+      "forbidden_checkpoint": "pulp_repro_epoch320",
+      "execution": {
+        "run_id": "v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717",
+        "host": "4090",
+        "gpu": 0,
+        "started_at_cst": "2026-07-17 17:43",
+        "train_samples": 162760,
+        "epochs": 500,
+        "optimizer_steps": 636000,
+        "sample_exposures": 81380000,
+        "latest_verified": {
+          "recorded_at_cst": "2026-07-17 18:25",
+          "step": 29268,
+          "recent_steps_per_sec": 12.14,
+          "train_total_loss": 0.034856,
+          "test_step": 28000,
+          "test_total_loss": 0.07109,
+          "finite": true
+        },
+        "endpoint_eta_cst": "2026-07-18 08:15-09:15",
+        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+      }
     },
     {
       "id": "v8.2",
       "priority": "P1",
       "kind": "representation_train",
-      "status": "conditional",
+      "status": "training_matched_endpoint_user_authorized_early",
       "depends_on": "v8.1 matched endpoint fails the yaw/length gate",
+      "execution_override": "The user explicitly authorized implementing and launching v8.2 on GPU1 before v8.1 endpoints. It is an early representation-system comparison and cannot be used to claim the original sequential gate was followed.",
       "human_feature_contract": "human200 = root_z1 + root_xy_relative2 + yaw_sincos2 + pose6d132 + local_joints63",
       "requirements": [
         "new train-only statistics",
@@ -133,13 +180,39 @@
         "new owning decoder",
         "new Stage2 cache",
         "no v7.14 checkpoint or cache compatibility claim"
-      ]
+      ],
+      "execution": {
+        "run_id": "v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717",
+        "host": "4090",
+        "gpu": 1,
+        "started_at_cst": "2026-07-17 18:19",
+        "train_samples": 162760,
+        "epochs": 500,
+        "optimizer_steps": 636000,
+        "sample_exposures": 81380000,
+        "normalization_sha256": "70623ea927300b107fc49c9f4d4a67a30b45f8565f6bf4e0c27a406296f95011",
+        "normalization_source_samples": 162760,
+        "normalization_source_frames": 19336840,
+        "native_latent_order": "camera64+human128",
+        "latest_verified": {
+          "recorded_at_cst": "2026-07-17 18:25",
+          "step": 6133,
+          "recent_steps_per_sec": 18.81,
+          "train_total_loss": 0.053893,
+          "test_step": 4000,
+          "test_total_loss": 0.112649,
+          "checkpoint_contract_preflight": "passed",
+          "finite": true
+        },
+        "endpoint_eta_cst": "2026-07-18 03:40-04:20",
+        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+      }
     },
     {
       "id": "v8.3",
       "priority": "P1",
       "kind": "data_manifest_ablation",
-      "status": "planned",
+      "status": "preregistered_waiting_on_v8_2_endpoint",
       "question": "Does calibrated physical and pair-level semantic quarantine improve quality under a fixed representation and backbone?",
       "manifest_layers": [
         "raw",
@@ -147,6 +220,14 @@
         "semantic_pair_quarantine",
         "clean"
       ],
+      "plan": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-3-data-curation-plan.md",
+      "progress": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-3-data-curation-progress.md",
+      "execution_gate": {
+        "condition": "v8.2 full 81.38M endpoint completed before 2026-07-17 22:00 CST",
+        "state": "closed",
+        "reason": "The measured endpoint ETA is after 22:00; no curation data or scorer job has started.",
+        "processed_pairs": 0
+      },
       "semantic_scorers": [
         "TMR global",
         "LaMP motion-aware",
