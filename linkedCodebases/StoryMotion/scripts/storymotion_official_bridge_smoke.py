@@ -124,6 +124,18 @@ def load_stage2(
 ):
     run_dir = run_dir.resolve()
     meta = json.loads((run_dir / "meta.json").read_text(encoding="utf-8"))
+    if meta.get("model_family") == "ccd_pulp_latent_completion":
+        module_path = Path(meta["adapter"]["module_path"]).resolve()
+        if not module_path.is_file():
+            raise FileNotFoundError(f"CCD-Pulp adapter module is missing: {module_path}")
+        adapter = load_module("storymotion_ccd_pulp_latent_eval", module_path)
+        return adapter.load_for_storymotion_eval(
+            run_dir,
+            meta,
+            train_mod,
+            device,
+            checkpoint_path=checkpoint_path,
+        )
     args = meta.get("args", {})
     cond_mask_prob = float(args.get("cond_mask_prob", 0.1))
     cond_mask_prob_cam = float(args.get("cond_mask_prob_cam", 0.0))

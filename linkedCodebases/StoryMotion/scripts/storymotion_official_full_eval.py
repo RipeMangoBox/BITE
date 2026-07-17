@@ -19,6 +19,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.storymotion_run_layout import run_paths
+from storymotion.per_sample_quality import (
+    paired_geometry_batch,
+    rank_joint_quality_records,
+    score_joint_quality_batch,
+    summarize_paired_geometry,
+)
 
 from storymotion_official_bridge_smoke import (
     batch_from_sample_ids,
@@ -873,6 +879,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--cache-dir", type=Path, required=True)
     p.add_argument("--cache-file", default="val.pt")
     p.add_argument(
+        "--official-pulp-ae-control",
+        action="store_true",
+        help="Evaluate an explicit frozen official Pulp AE representation control with its owning decoder.",
+    )
+    p.add_argument(
         "--znorm-stats-path",
         type=Path,
         help="Use explicit train latent z-normalization stats for cache-only eval sources.",
@@ -888,6 +899,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--eval-id", help="Canonical Stage2 run id; derives the eval JSON path when --output is omitted.")
     p.add_argument("--output", type=Path)
     p.add_argument("--records", type=Path)
+    p.add_argument(
+        "--per-sample-quality-output",
+        type=Path,
+        help="Optional joint-only JSON with decomposable per-sample scores and three Top-K rankings.",
+    )
+    p.add_argument("--per-sample-quality-top-k", type=int, default=5)
     p.add_argument("--task", choices=["camera", "human", "joint", "human_text"], required=True)
     p.add_argument("--device", default="cuda:0")
     p.add_argument("--split", default="test")
@@ -1064,6 +1081,8 @@ def main() -> None:
             znorm_stats, znorm_record = None, {"enabled": False}
     task_routing = str(run_info.get("task_routing", "symmetric"))
     metric_task_name = "human" if args.task == "human_text" else args.task
+    if args.per_sample_quality_output is not None and metric_task_name != "joint":
+        raise ValueError("--per-sample-quality-output is only valid with --task joint")
     compose_joint = args.task == "joint" and args.joint_compose_camera_run_dir is not None
     compose_camera_checkpoint = args.joint_compose_camera_checkpoint
     h2c_model = h2c_mod = h2c_run_info = h2c_diffusion = None
@@ -1100,11 +1119,14 @@ def main() -> None:
     cache = train_mod.PulpLatentCache(args.cache_dir / args.cache_file, znorm_stats=znorm_stats)
     cache_path = args.cache_dir / args.cache_file
     cache_meta = load_cache_meta(cache_path)
+    if args.official_pulp_ae_control:
+        cache_meta = train_mod.canonicalize_official_pulp_cache_meta(cache_meta)
     cache_meta["sample_ids_sha256"] = train_mod.sha256_sample_ids(
         [str(value) for value in cache.sample_id]
     )
     train_mod.assert_non_causal_cache_meta(cache_meta)
-    train_mod.assert_default_cache_meta(cache_meta)
+    if not args.official_pulp_ae_control:
+        train_mod.assert_default_cache_meta(cache_meta)
     owning_decoder, owning_decoder_record = resolve_owning_decoder(
         story_root, cache_meta, autoencoder, device
     )
@@ -1185,6 +1207,8 @@ def main() -> None:
     start_time = time.time()
     processed = 0
     metric_batch_index = 0
+    quality_records: list[dict[str, Any]] = []
+    geometry_records: list[dict[str, Any]] = []
     first_batch_summary: dict[str, Any] | None = None
     with records_path.open("a", encoding="utf-8") as records_handle, torch.no_grad():
         for batch_index, batch in enumerate(loader):
@@ -1309,6 +1333,18 @@ def main() -> None:
                     )
                 outputs = {"raw_input": chunk_raw_input, "raw_output": chunk_raw_output, "x_output": chunk_x_output}
                 official_outputs = official_outputs_for_task(outputs, metric_task_name)
+                geometry_records.extend(
+                    paired_geometry_batch(outputs, chunk_pulp_batch, chunk_sample_ids)
+                )
+                if args.per_sample_quality_output is not None:
+                    quality_records.extend(
+                        score_joint_quality_batch(
+                            callback,
+                            outputs,
+                            chunk_pulp_batch,
+                            chunk_sample_ids,
+                        )
+                    )
                 callback.on_test_batch_end(None, module, official_outputs, chunk_pulp_batch, metric_batch_index)
                 metric_batch_index += 1
                 if first_batch_summary is None:
@@ -1362,6 +1398,36 @@ def main() -> None:
 
     callback.on_test_epoch_end(None, module)
     metrics = metric_values(module.eval_metrics)
+    quality_artifact = None
+    if args.per_sample_quality_output is not None:
+        quality_artifact = rank_joint_quality_records(
+            quality_records,
+            top_k=args.per_sample_quality_top_k,
+        )
+        quality_artifact.update(
+            {
+                "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "run": {
+                    "checkpoint": run_info.get("checkpoint"),
+                    "checkpoint_sha256": run_info.get("checkpoint_sha256"),
+                    "checkpoint_step": run_info.get("step"),
+                    "run_dir": run_info.get("run_dir"),
+                },
+                "eval": {
+                    "split": args.split,
+                    "set_name": args.set_name,
+                    "seed": args.seed,
+                    "sample_range": [args.start, end],
+                    "sampler": sampler,
+                },
+                "records": quality_records,
+            }
+        )
+        args.per_sample_quality_output.parent.mkdir(parents=True, exist_ok=True)
+        args.per_sample_quality_output.write_text(
+            json.dumps(jsonable(quality_artifact), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     payload = {
         "mode": (
             "pulpmotion_raw_gt_reference_with_official_callbacks"
@@ -1507,7 +1573,17 @@ def main() -> None:
         },
         "metric_keys": sorted(metrics),
         "metrics": metrics,
+        "paired_geometry": summarize_paired_geometry(geometry_records, metric_task_name),
         "records_path": str(records_path),
+        "per_sample_quality": (
+            None
+            if args.per_sample_quality_output is None
+            else {
+                "path": str(args.per_sample_quality_output),
+                "samples": len(quality_records),
+                "top_k": args.per_sample_quality_top_k,
+            }
+        ),
         "first_batch_summary": first_batch_summary,
         "elapsed_sec": time.time() - start_time,
     }

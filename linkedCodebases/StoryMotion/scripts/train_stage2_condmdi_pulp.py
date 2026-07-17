@@ -1672,7 +1672,40 @@ def checkpoint_state(
     return state
 
 
-def assert_cache_contract(dataset: PulpLatentCache, *, require_default: bool) -> None:
+def canonicalize_official_pulp_cache_meta(meta: dict[str, Any]) -> dict[str, Any]:
+    checkpoint = meta.get("pulp_checkpoint")
+    if not checkpoint:
+        raise ValueError("official Pulp AE control cache is missing pulp_checkpoint")
+    if meta.get("feature_contract") != "pulpmotion_official_normalized_human199_joint_camera14":
+        raise ValueError("official Pulp AE control cache has the wrong feature contract")
+    if meta.get("latent_order") != "concat([z_hum,z_cam])":
+        raise ValueError("official Pulp AE control cache has the wrong Stage2 latent order")
+    canonical = dict(meta)
+    canonical.update(
+        {
+            "tokenizer_checkpoint": str(checkpoint),
+            "tokenizer_preset": "pulp_official_aemmardm",
+            "tokenizer_is_causal": False,
+            "human_feature_dim": 199,
+            "camera_feature_dim": 14,
+            "human_latent_dim": HUM_DIM,
+            "camera_latent_dim": CAM_DIM,
+            "representation_control": "frozen_pulp_official_ae",
+        }
+    )
+    return canonical
+
+
+def assert_cache_contract(
+    dataset: PulpLatentCache,
+    *,
+    require_default: bool,
+    official_pulp_ae_control: bool,
+) -> None:
+    if official_pulp_ae_control:
+        dataset.meta = canonicalize_official_pulp_cache_meta(dataset.meta)
+        assert_non_causal_cache_meta(dataset.meta)
+        return
     assert_non_causal_cache_meta(dataset.meta)
     if require_default:
         assert_default_cache_meta(dataset.meta)
@@ -1684,8 +1717,16 @@ def build_loaders(
 ) -> tuple[DataLoader, DataLoader, DataLoader, dict[str, int], dict[str, Any]]:
     train_ds = PulpLatentCache(args.cache_dir / "train.pt", znorm_stats=znorm_stats)
     heldout_ds = PulpLatentCache(args.cache_dir / "val.pt", znorm_stats=znorm_stats)
-    assert_cache_contract(train_ds, require_default=args.require_default_tokenizer_contract)
-    assert_cache_contract(heldout_ds, require_default=args.require_default_tokenizer_contract)
+    assert_cache_contract(
+        train_ds,
+        require_default=args.require_default_tokenizer_contract,
+        official_pulp_ae_control=args.official_pulp_ae_control,
+    )
+    assert_cache_contract(
+        heldout_ds,
+        require_default=args.require_default_tokenizer_contract,
+        official_pulp_ae_control=args.official_pulp_ae_control,
+    )
     if train_ds.meta.get("tokenizer_checkpoint") != heldout_ds.meta.get("tokenizer_checkpoint"):
         raise RuntimeError("train/val caches were built from different tokenizer checkpoints")
     train_sample_ids = [str(value) for value in train_ds.sample_id]
@@ -1719,6 +1760,8 @@ def build_loaders(
         "tokenizer_preset": train_ds.meta.get("tokenizer_preset"),
         "feature_contract": train_ds.meta.get("feature_contract"),
         "latent_order": train_ds.meta.get("latent_order"),
+        "representation_control": train_ds.meta.get("representation_control"),
+        "pulp_checkpoint": train_ds.meta.get("pulp_checkpoint"),
     }
     return train_loader, eval_loader, test_loader, sizes, cache_audit
 
@@ -2075,7 +2118,11 @@ def check(args: argparse.Namespace) -> None:
     geo_tokenizer = build_geo_tokenizer(args, device)
     geo_downsample = int(args.geo_downsample)
     ds = PulpLatentCache(args.cache_dir / "train.pt", znorm_stats=znorm_stats)
-    assert_cache_contract(ds, require_default=args.require_default_tokenizer_contract)
+    assert_cache_contract(
+        ds,
+        require_default=args.require_default_tokenizer_contract,
+        official_pulp_ae_control=args.official_pulp_ae_control,
+    )
     batch = next(iter(DataLoader(ds, batch_size=min(args.batch_size, 8), shuffle=False, num_workers=0)))
     z = batch["z"].to(device)
     text = batch["text"].to(device)
@@ -2384,6 +2431,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_false",
         dest="require_default_tokenizer_contract",
         help="Permit a representation control while still requiring a non-causal tokenizer.",
+    )
+    p.add_argument(
+        "--official-pulp-ae-control",
+        action="store_true",
+        help="Use a frozen official Pulp AEMMARDM cache as an explicit non-causal representation control.",
     )
     p.add_argument(
         "--joint-human-camera-input-mode",

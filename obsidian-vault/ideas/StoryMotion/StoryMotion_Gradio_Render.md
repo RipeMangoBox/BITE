@@ -10,8 +10,9 @@ aliases:
   - StoryMotion-Gradio-Render
 source_notes:
   - "[[2026-07-01_storymotion-v6.2-metric-data]]"
+  - "[[2026-07-17_storymotion-stage1-length-condmdi-causal-priority]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-07-16T10:50:00+0800
+updated: 2026-07-17T14:57:00+0800
 ---
 
 ## 0. 当前裁决
@@ -38,8 +39,10 @@ updated: 2026-07-16T10:50:00+0800
 | Stage2 v7.34 prompt-global Unified-3 | `runs/stage2/<v7_34_run>/vis/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | Balanced and `3:2:5` × `camera`, `human`, `joint` | per task PNG、world-skeleton MP4、camera-projection MP4、concat MP4 | complete; each run 136 render assets，其中 32 个 single camera-projection MP4；unified audit on 4090 port `7864` |
 | Stage2 v7.36 matched P0 | `runs/stage2/<v7_36_run>/vis/p0_matched_20260715/<schedule>/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | A parallel/cascade、B symmetric parallel、C no-joint completion/cascade | task PNG、world-skeleton MP4、camera-projection MP4、concat MP4；caption + checkpoint provenance | complete；400 MP4 全部可解码；evidence desk on 4090 port `7865` |
 | Stage2 v7.38 L0 clean 105k | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_joint_strict_20260715/<schedule>/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | same checkpoint directed parallel / human-first cascade | strict `human_first` routing、owning decoder、joint trajectory PNG、world-skeleton MP4、camera-projection MP4、concat MP4 | complete；96 MP4、16 PNG；`L0 schedules` tab on 4090 port `7865` |
-| Stage2 L0 vs Pulp official | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_pulp_official_20260715/render_summary.json` | same 8 fixed pure samples | GT、v7.14 Stage1 identity、L0 parallel、L0 Direct H、Pulp released DiT-xy no-Aux/Aux、HumanML3D fixed-camera reference | same renderer 的 world-skeleton/camera-projection MP4 与 trajectory PNG；Pulp checkpoint/repo/protocol provenance；HumanML3D 明确为非配对 | complete；主对比 tab on 4090 port `7865` |
+| Stage2 L0 vs Pulp official | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_pulp_official_20260715/render_summary.json` | same 8 fixed pure samples | GT、v7.14 Stage1 identity、L0 parallel、L0 Direct H、Pulp released DiT-xy no-Aux/Aux | same renderer 的 world-skeleton/camera-projection MP4 与 trajectory PNG；Pulp checkpoint/repo/protocol provenance | complete；已从该 tab 移除全部 HumanML3D 内容；4090 port `7865` |
+| Stage2 L0 joint geometry Top-5 `2 × 3` | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_joint_top5_20260716/` | pure4053 paired-GT geometry；human-only、camera-only、joint 各 5 条，共 15 个无重叠 IDs | 第一行 StoryMotion GT/recon/gen；第二行 joint specialist gen、Pulp recon、Pulp Aux gen | H-MPJPE、Cam-ADE、human/camera text、display-only TMR/CLaTr/in-frame；aggregate 表含 L0、specialist、Pulp no-Aux/Aux | complete；specialist/Pulp MP4 decode `120/120` 与 `150/150`；`Joint Top-5 · 2×3` tab on 4090 port `7865` |
 | Stage2 L0 task slices | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_direct_tasks_strict_20260715/completion/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | same L0 step105k human-text-only、camera-from-GT-H、joint parallel/cascade | H/C strict single world/projection/concat MP4 与 trajectory PNG；Direct H projection 的 GT camera 仅作外部显示 | complete；80 MP4、16 PNG；`L0 task slices` tab on 4090 port `7865` |
+| Completion peer registry | `configs/completion_vis_registry.json` | same 8 fixed pure samples | separate `Human completion` / `Camera completion` tabs；L0 ready，specialist/baseline placeholders | human 固定 world camera；camera 对 GT human projection；每页同步播放、paired human/camera text 与逐列 asset 状态 | active；ready assets `missing=0`；4090 port `7865` |
 | Stage2 L0 single-step gate | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/l0_single_step_gate_20260715/render_summary.json` | same 8 fixed pure samples | `human`、`camera`、`joint` × raw GT / `t=999,799,599,399,199` | teacher-forced one-step `pred_x0` 的 world/projection MP4 与 geometry PNG | complete；288 MP4、120 PNG；仅作局部诊断，raw-loss gate 已取消（无效） |
 | HumanML3D human-only adapter | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/humanml3d_fixed_camera_20260715/render_summary.json` | 8 HumanML3D test clips | canonical 263D inverse RIC、Pulp199 joints-level adapter、fixed camera | 每样例 MP4/首帧 PNG/NPZ；与 L0 样例仅作非配对语义近邻展示 | complete；8/8 decode；camera conditioning disabled |
 | Screen projection containment | `runs/visualizations/archived/screen_projection_containment_20260625/*/manifest.json` | legacy diagnostic | `clean_best`, `clean_last`, `screen_best` | per-sample camera projection / camera view videos | archived; exclude from registry |
@@ -164,9 +167,11 @@ Gradio registry 禁止递归纳入 `runs/visualizations/archived/`。截至 2026
 | 1 | Stage1 camera projection skeleton mp4 | 目前只有 `npz`，不便 Gradio 直接播放 | 每个 Stage1 sample / variant 输出 `{variant}_camera_projection_skeleton.mp4` |
 | 2 | Stage1 global skeleton canonical row | `fixed_camera` 与 `orbiting_camera` 不等价于 Stage2 global row | 输出 `{variant}_global_skeleton_camera.mp4` |
 | 3 | Stage1 SMPL camera projection / global mp4 | 与 Stage2 四行 grid 对齐 | 如果 Stage1 renderer 能稳定加载 mesh，则补齐；否则明确标 missing |
-| 4 | Director-C camera completion single assets | corrected Director-C train-only-dev fixed-budget 长训进行中，endpoint、formal official camera callback 与 render 尚未完成；旧 `et_root_only`/`et_replay` 错标 JSON、records、logs/marker 已于 2026-07-16 删除 | 等 fixed endpoint 与 formal pure row 完成后，再加入带 checkpoint/sample hash 的单样本列；prelaunch unmatched N20 smoke 不得展示为 baseline，已删除旧列不得从缓存恢复 |
-| 5 | MotionLab-MFT human completion single assets | representation-matched 长训已启动，但 endpoint、official human callback 与 render 尚未完成 | 等 fixed endpoint 与 official pure row 完成后，再加入带 checkpoint/sample hash 的 human completion 列 |
-| 6 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | done in `v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709`; remaining work is human last-frame inspection |
+| 4 | Director-C camera completion single assets | corrected Director-C fixed endpoint 与 formal pure4053 已完成并通过；`Camera completion` 已有显式 placeholder | 只从 endpoint SHA `ad2756…e823` 与同一 fixed-8 IDs 生成 GT-human projection，再填 registry；prelaunch smoke 不得展示 |
+| 5 | v7.42 H/C specialist single assets | formal 已完成，但当前无 single assets；两个 completion tab 已分别预留列 | 使用各自 fixed endpoint 与同一 fixed-8 IDs；H 用 fixed camera，C 用 GT human |
+| 6 | MotionLab-MFT / MoMask-Pulp human single assets | MotionLab formal/geometry已完成但world-root未胜L0；MoMask三阶段fixed endpoint已完成但formal adapter未闭合；`Human completion` 已有两个独立 placeholder | MotionLab可按fixed endpoint生成诊断资产；MoMask等formal闭合后再补，不以未评测endpoint补格 |
+| 7 | CCD-Pulp camera single assets | fixed endpoint 与 formal pure4053 已完成；`Camera completion` 仍为显式 placeholder | 对同一 fixed-8 GT human 渲染 camera 后再填列；记录 adapter/checkpoint/sample hash |
+| 8 | Pulp official Stage1 recon visual | v6.3 要验证 official ckpt 是否可复现，需要 qualitative upper bound | done in `v7_13_pulp_ae_official_selftrained_stage1_bigtitle_20260709`; remaining work is human last-frame inspection |
 
 ## 6. 实现检查
 
@@ -462,3 +467,109 @@ loss 的单变量归因。
 - 服务运行于 4090 `127.0.0.1:7865`。Mac 转发：
   `ssh -N -L 7865:127.0.0.1:7865 4090`，浏览器打开
   `http://127.0.0.1:7865`。
+
+## 17. 2026-07-16 completion peer tabs
+
+### 17.1 Display contract
+
+- `Human completion` 与 `Camera completion` 现在是独立 tab，不再依赖一个 target
+  radio 混合解释。
+- human 页的 ready 两列为 GT 与 L0 Direct H，均读取固定 world-skeleton view；
+  camera text 仍显示为 paired-sample context，但 Direct H 是 human-text-only，不读取
+  camera latent 或 camera text。
+- camera 页的 ready 两列为 GT camera + GT human 与 L0 Direct C；Direct C 的 renderer
+  明确令 `render_joints = gt_joints`，因此生成 camera 始终作用于 GT human，而不是
+  同时生成的人体。
+- 两页均显示 `sample_id`、valid frames、human text 与 camera text，并提供
+  `▶ 同步播放当前组`。同步脚本只控制当前可见 tab 的 video elements，统一归零后播放。
+
+### 17.2 Baseline placeholders
+
+`configs/completion_vis_registry.json` 是 completion 页的唯一列注册表。当前每页五列：
+
+- human：GT、L0 Direct H 已填；v7.42 human specialist、MotionLab-MFT、MoMask-Pulp
+  保持显式 placeholder；
+- camera：GT、L0 Direct C 已填；v7.42 camera specialist、Director-C、CCD-Pulp
+  保持显式 placeholder。
+
+不存在的 asset 返回空视频格并在状态表写明原因，不影响同页已有列。baseline 到 fixed
+endpoint 后只需把同一 fixed-8 sample 的 `path_template` 填入 registry；不得用 smoke、
+半程 checkpoint 或不同 sample 顶替。
+
+### 17.3 Validation and service
+
+- `--validate-only`：4 runs、11 summaries、8 samples、2 completion modes、1,064
+  required ready files、`missing=0`。
+- 两个 completion callback 均实测返回 paired human/camera text 与两条 ready media；
+  human 路径解析到 `gt_skeleton.mp4` / `human_skeleton.mp4`，camera 路径解析到
+  `gt_camera_projection.mp4` / `camera_camera_projection.mp4`。这些文件属于此前已完成
+  80/80 decode 的 L0 direct-task asset set，本次没有重新编码视频。
+- 该次 completion-only build smoke 得到 298 components 与九个 tab；旧 statistical
+  Top-5 版本曾为 326 components，当前 geometry-specialist 版本见 18.3。
+
+## 18. 2026-07-17 L0 joint geometry Top-5 `2 × 3`
+
+### 18.1 Ranking contract
+
+排序来源是 L0 `joint_parallel` 的同一 pure4053 formal sampler：checkpoint
+`ab474d…f35`、DDIM50、CFG1、`eta=0`、seed17、human-first routing 与
+`c_to_h_blocked`。新跑的 31 个 aggregate metrics 与原 L0 formal 逐项完全一致，最大绝对差
+为 `0.0`；experiment-contract audit 通过。
+
+旧 TMR/CLaTr/in-frame 排名无法代表单样本几何质量，已降级且不再由 Gradio 读取。当前逐样本口径为：
+
+- human-only：`reverse_percentile(root-aligned H-MPJPE)`；
+- camera-only：`reverse_percentile(camera-center ADE)`；
+- joint：上述两个 reverse percentile 的等权均值。
+
+H-MPJPE 逐帧去除 human root 后比较生成与 paired GT joints；Cam-ADE 比较生成与 paired GT
+camera centers。TMR、CLaTr 与 in-frame 仍显示，但不参与选择；集合级 FID/coverage/density同样
+不参与。未过滤短序列，页面显式显示 valid frames。该选择服务于几何对齐检查，不等价于自然度、
+文本一致性或无偏总体质量估计。
+
+### 18.2 Top-5 samples
+
+| rank | human-only ID | H-MPJPE | camera-only ID | Cam-ADE | joint ID | H-MPJPE / Cam-ADE |
+| ---: | --- | ---: | --- | ---: | --- | ---: |
+| 1 | `2015_fSu5W0BtXG8_00006_001_a` | 0.0345 | `2017_PXmtu0Kd0ms_00008_000_a` | 0.0842 | `2015_F0KcFyR2uAc_00009_000_a` | 0.0556 / 0.3231 |
+| 2 | `2015_S58poUaNwiw_00051_000_a` | 0.0391 | `2011_v-0Z_0SUtJw_00031_000_a` | 0.0928 | `2014_LJAUOJDM88o_00005_000_a` | 0.0754 / 0.2608 |
+| 3 | `2018_MYkSUEjYLc0_00006_000_a` | 0.0412 | `2015_7okueIbuBDE_00028_002_b` | 0.1186 | `2012_NRjWEE0hmjQ_00023_002_a` | 0.0581 / 0.3438 |
+| 4 | `2014_R2zNRrOXbPY_00010_001_a` | 0.0459 | `2011_tetwGGL997s_00033_001_a` | 0.1381 | `2011_2O-CC3IVPVg_00033_000_a` | 0.0632 / 0.3513 |
+| 5 | `2014_R6-LDKl3FOs_00014_000_a` | 0.0479 | `2017_yk5d161ytXE_00027_000_a` | 0.1456 | `2011_BFUVGfsVzhQ_00023_000_a` | 0.0816 / 0.2811 |
+
+三组共 15 个 unique IDs。human-only 不约束 camera，camera-only 不约束 human；joint 才同时要求
+两项几何误差位于低端。因排名由 L0 自身选样，页面上的 L0/specialist 逐样本胜负不得外推为总体
+方法比较；总体结论仍使用 pure4053 formal。
+
+### 18.3 Visual contract and artifacts
+
+每个选择项固定六格。此次只替换旧第二行第一格的重复 GT；第二、三格继续保留 Pulp reconstruction/generation：
+
+| row | column 1 | column 2 | column 3 |
+| --- | --- | --- | --- |
+| StoryMotion | raw paired GT | corrected v7.14 joint-AE owning recon | L0 directed joint parallel |
+| specialist / Pulp | v7.42 exposure-matched joint specialist parallel | Pulp official owning reconstruction | Pulp official Aux generation |
+
+每格同时提供 world-skeleton 与 camera-projection MP4；页面显示 human text、camera text、TMR、
+CLaTr、in-frame、H-MPJPE 与 Cam-ADE，并提供 `▶ 同步播放当前组`。第二行第一格必须使用 joint
+specialist；H/C direct specialist 的 observation contract不同，不能替代 joint-mode同任务对照。页面 aggregate 表同时显示 v7.38 L0、v7.42 joint specialist、Pulp no-Aux 与 Pulp Aux 的 official pure4053 metrics；Pulp row 是 native-system baseline，不是单变量消融。
+
+- geometry ranking：`.../v738_l0_joint_top5_20260716/per_sample_geometry_quality.json`，schema `2`，SHA256=`d26c2fe9040296ae076170515b5105b4850dcae698dbe6959825ff4dac437dc7`；
+- aggregate replay：`.../v738_l0_joint_top5_20260716/full_quality_eval.json`，SHA256=`162751ac43fd8946d890cbb0dc9fd53e31719e75410ee4823349cadc5a3b0f15`；
+- specialist comparison summary：`.../v738_l0_joint_top5_20260716/comparison_geometry_specialist/render_summary.json`，SHA256=`a5107469c182644d57f4b4cf5b83b093e7d29de3d6f013a2d2800ca7ffd76a9c`。
+- Pulp comparison summary：`.../v738_l0_joint_top5_20260716/comparison_geometry_pulp/render_summary.json`，SHA256=`b1662c1325d26b7a5712eeca64c7eaee65c51b970addc1cc267351efca0b2b17`。
+- 旧 statistical ranking保留作 provenance，但页面不再读取；geometry specialist 与 geometry Pulp summaries 的 15 个 IDs/order 已严格匹配。
+
+媒体完整性使用 `imageio-ffmpeg` bundled binary做实际 decode；主机未安装系统
+`ffmpeg`/`ffprobe`，不能把 command-not-found 误写为 codec 失败。
+
+最终验收：15 个 unique samples、三组各 5 条且 ranking IDs 与 samples 完全一致；specialist set 的
+120 个 MP4 已解码 `120/120`，新增 Pulp set 的 150 个 MP4 已解码 `150/150`、失败 `0`。`--validate-only`
+扫描 4 runs、11 summaries、8 个 fixed samples、2 个 completion modes、15 个 Top-5
+samples 与 1,245 个 required files，`missing=0`。30 个 Top-5 callback views（15 选择 ×
+2 视图）均返回六个存在的媒体路径；Gradio build 为 313 components，HTTP `/config`
+返回十个 tab并包含 `Joint Top-5 · 2×3`。配置中的四处 `HumanML3D` 文本全部只属于
+独立 HumanML3D tab；其他页面和 callback不再返回相关内容。服务 PID `1379105` 已重载于 4090
+`127.0.0.1:7865`；转发命令保持不变。
+
+浏览器层再用 headless Chromium 经 SSH tunnel 等待 `networkidle` 后打开 Top tab：10 个 tab 均可发现，六个目标 label 全部 visible，visible video count=`6`，page errors=`0`、console errors=`0`。实际截图确认第二行视觉顺序为 joint specialist gen、Pulp recon、Pulp Aux gen，aggregate 表同时含 Pulp no-Aux/Aux。
