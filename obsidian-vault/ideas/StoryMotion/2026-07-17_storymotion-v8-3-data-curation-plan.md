@@ -1,6 +1,14 @@
 ---
 title: "StoryMotion v8.3 Data Curation Preregistration"
-status: preregistered_waiting_on_v8_2_endpoint
+status: preregistered_blocked_no_promoted_representation
+workflow_state: not_started
+gate: promoted_representation_selection
+gate_state: closed
+processed_pairs: 0
+annotated_pairs: 0
+quarantined_pairs: 0
+materialized_manifests: 0
+launched_jobs: 0
 hypothesis: |
   在冻结同一 Stage1 representation、owning decoder 与 Unified Stage2 backbone 后，仅用可追溯的物理异常和 caption-motion pair 级语义错配 quarantine 替换 raw train manifest，可能改善生成动作的物理与文本一致性；该假设必须通过 raw-vs-clean 单变量实验验证，不能与 representation 或 generator 改动合并归因。
 tags:
@@ -13,15 +21,31 @@ aliases:
   - StoryMotion-v8.3-Curation-Plan
 source_notes:
   - "[[2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion]]"
-  - "[[2026-07-17_storymotion-v8-3-data-curation-progress]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-17T17:35:00+08:00
+updated: 2026-07-18T15:20:00+08:00
 ---
 
 # StoryMotion v8.3 Data Curation Preregistration
 
 > [!warning] 当前执行状态
-> 本文只预注册 v8.3；数据清洗尚未启动。2026-07-17 的调度条件是“v8.2 完整 endpoint 能在 22:00 前完成时才并行启动 v8.3”，当前已确认该条件不成立。因此不得扫描、打分、标注、quarantine、物化 manifest 或启动 raw-vs-clean 训练。实时计数见 [[2026-07-17_storymotion-v8-3-data-curation-progress]]。
+> 本文是 v8.3 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 保持 `closed`。尚未扫描、打分、标注、quarantine、物化 manifest 或启动 raw-vs-clean 训练。
+
+## 0. 当前执行状态
+
+| 字段 | 值 |
+| --- | --- |
+| recorded at | `2026-07-18 15:20 CST` |
+| execution gate | `promoted_representation_selection` |
+| gate state | `closed` |
+| workflow state | `not_started / blocked_no_promoted_representation` |
+| processed or scored pairs | `0` |
+| manually annotated pairs | `0 / 300–500` |
+| quarantined pairs | `0` |
+| materialized manifests | `0 / 4` |
+| scorer jobs launched | `0` |
+| GPU jobs launched | `0` |
+
+这些 `0` 表示从未开始，不表示扫描后未发现问题。v8.1A 的 amended non-promotion screen 不构成 v8.3 的 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
 
 ## 1. 问题、数据边界与因果边界
 
@@ -39,7 +63,7 @@ v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部�
 
 按顺序满足以下 gate 后才能前进：
 
-1. **G0 — v8.2 endpoint**：v8.2 完整 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，并完成 representation 选择记录。2026-07-17 22:00 前该 gate 不会打开，本轮不得启动 v8.3。
+1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得启动 v8.3。
 2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。
 3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。
 4. **G3 — calibration**：完成 `300–500` 个分层 pair 的人工标签，冻结 reason-code、physical rule 和 semantic threshold 版本。
@@ -92,6 +116,8 @@ v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部�
 - `MARDM-67` 是 evaluator/protocol，不是独立 retrieval scorer，不进入 ensemble vote。
 - 只有 TMR 与 LaMP 对同一 pair 方向一致、各自超过人工校准的高精度阈值，且没有人工 veto 时，才允许自动进入 `semantic_pair_quarantine`。模型分歧、只过一个阈值或细粒度关系不确定的样本进入人工队列。
 - 语义 reason code 至少覆盖 posture、direction、body-part、temporal order、locomotion、negation 与 global mismatch。错误 caption 只隔离该 pair；同一 motion 的其他 caption 默认保留。
+
+已核验的 pair-level 例子保留为 calibration evidence，而非已执行的 quarantine：`2019_vcdDRblTOmM_00038_001_a` 的 human caption 描述站立并轻微转头；其 GT 仅 `35` 帧，左右膝平均弯曲约 `85.17°/81.82°`，root Z 约 `0.849 m`、root XY displacement 约 `0.056 m`，与持续坐姿/深屈膝一致。gate 打开后，它应作为 semantic review 的明确候选；在此之前不得生成 quarantine record 或改动 manifest。
 
 ## 6. `300–500` pair 人工校准
 

@@ -10,21 +10,25 @@ aliases:
   - StoryMotion-History
 source_notes:
   - "[[version]]"
-  - "[[2026-07-12_storymotion-valid-metric-ledger]]"
-  - "[[2026-07-09_storymotion-metric-computation-io]]"
-  - "[[2026-07-13_storymotion-runs-layout-rootcause-plan]]"
-  - "[[2026-07-16_storymotion-v739-v741-core-experiment-decision]]"
+  - "[[StoryMotion-valid-metric-ledger]]"
+  - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-17_storymotion-stage1-length-condmdi-causal-priority]]"
-  - "[[2026-07-17_storymotion-fixed300-offline-ar-motionstreamer-v746-deployment]]"
   - "[[2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion]]"
+  - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+0800
-updated: 2026-07-17T18:25:00+0800
+updated: 2026-07-18T15:20:00+08:00
 ---
 
 # StoryMotion Version History
 
 > [!abstract] 读表规则
 > 本页把相似目的的版本片段合并；所有数值指标只使用 `pure_`。mixed 只在数据契约描述中出现，不在本页作为性能数字。当前决策只看 [[version]]，本页用于 provenance、可靠性和 bug 范围追踪。
+
+## 0. 2026-07-18 文档边界收敛
+
+- v8.3 的 `plan` 与 `progress` 合并为 [[2026-07-17_storymotion-v8-3-data-curation-plan]]；该页同时记录 gate 与所有进度计数，旧 progress 页不再保留。
+- 已闭合的 fixed-300/offline AR/MotionStreamer/v7.46 deployment snapshot、Stage1 length/CondMDI forensic note 和 StoryMotion++ proposal 分别迁入 `archived/operations`、`archived/evidence`、`archived/proposals`。
+- 当前 owner、增量路由与归档规则冻结在根目录 `AGENTS.md`；本页只记录这次边界变更，不复制任何 metrics 或 live queue。
 
 ## 1. Version table
 
@@ -60,9 +64,12 @@ updated: 2026-07-17T18:25:00+0800
 | v7.45：offline masked-iterative Direct H | 在 v7.14 latent上隔离 generation-native human operator | frozen v7.14 non-causal joint AE；只训练 human128 target | T5-large multi-token text、cross-attention、cosine-ratio masks、bidirectional clean-token context；`240k × 64 = 15.36M` | production-batch finite/memory check；human-only train与owning-decoder pure4053 formal | 训练/formal已完成。相对v7.38，FDTMR/TMR/HCov与root-aligned MPJPE改善，但global MPJPE=`1249.1 vs 863.1 mm`、最长bin=`2412.7 vs 1294.3 mm`；geometry promotion未通过，不扩展camera/joint。不能复用official MoLingo checkpoint，也不具备streaming claim |
 | v7.38：三模式geometry re-audit | 补齐旧distribution/semantic formal缺失的decoded geometry | frozen v7.14 non-causal joint AE、owning decoder、同一pure4053 ordered IDs | L0 step105k；Direct H/Direct C/joint；DDIM50、CFG1、seed17 | human root-aligned/global MPJPE与root ADE/FDE；camera Cam-ADE/FDE/rotation；长度bins | 三项各4,053 records并复现旧主指标。Direct H root/global=`250/863 mm`；Direct C Cam-ADE=`1.51 m`；joint human root/global=`253/842 mm`、Cam-ADE=`2.91 m`。证明旧分布指标不能替代几何；一对多边界下不设事后hard threshold |
 | v7.46：frozen official AE × same Unified | 单变量隔离 local-vs-official representation generatability | frozen Pulp official non-causal AEMMARDM；matched `162760/4053` cache与owning official decoder | 与 L0 同 width416 asymmetric Unified、task probs、full-cov、两阶段 LR与 `105k × 512` budget | 10k N64 structural gate；通过后同 optimizer续到30k/105k并跑pure4053 H/C/joint | 只完成step10k screen并标记screen_stopped，未到105k。stop来自H/C未产出Out而gate按缺失失败；post-stop pure4053已完成，H/C/joint相关coverage均过20%，joint Out=22.34%。不得写成105k formal或representation失败 |
-| v7.47：corrected frozen official AE × same Unified | 修复v7.46任务适用gate后，重新执行representation isolation | 与v7.46相同的frozen official AE、matched `162760/4053` cache与owning official decoder | width416 asymmetric Unified、task probs、full-cov、两阶段LR与 `105k × 512`；从step0启动，不继承v7.46 | human gate只查TMR coverage、camera只查CLaTr coverage、joint查双coverage与Out；通过后自动30k/105k/pure4053 | corrected 10k gate已通过并继续105k：H/C/joint relevant coverage=`81.41%/100%/84.36%+82.95%`，joint Out=`14.36%`；gate SHA=`5bb7b041…6c8`。这只证明结构可学，正式representation裁决仍等105k pure4053 |
+| v7.47：corrected frozen official AE × same Unified | 修复v7.46任务适用gate后，重新执行representation isolation | 与v7.46相同的frozen official AE、matched `162760/4053` cache与owning official decoder | width416 asymmetric Unified、task probs、full-cov、两阶段LR与 `105k × 512`；从step0启动，不继承v7.46 | human gate只查TMR coverage、camera只查CLaTr coverage、joint查双coverage与Out；通过后自动30k/105k/pure4053 | corrected 10k gate已通过，105k 四 profile execution 也已完成。runner 回传四 JSON/records SHA，但 chroot overlay 未导出 raw artifacts；formal audit 与 representation裁决保持 pending，不能把 execution 写成评测通过 |
 | v8.0：yaw/root representation attribution | 在不训练新模型时定位v7.14长序列几何误差的责任通道，并筛查现成本地Pulp deep AE | v7.14 non-causal human199+camera14 owning decoder；GT channel oracles；另有unmatched AAMMARDM epoch320 screen | 不进入Stage2；pure4053整段true-length | GT root-height、root-XY velocity、yaw velocity、all-root、local-joint与nonroot replacement；同口径deep-AE override | GT yaw使overall root/global从`80.73/212.74`降到`11.96/28.00 mm`，193+从`132.22/429.43`降到`8.68/38.99 mm`；local-joint无改善。epoch320 deep AE为`286.82/953.45 mm`，No-Go。支持v8.1 yaw/root geometry loss，不证明新representation训练必然成功 |
-| v8.1–v8.4：candidate family | 依次验证yaw-aware Stage1、conditional absolute-root layout、clean data与non-AR pure diffusion；用户后续授权v8.1A/B与v8.2提前并行部署 | v8.1A/B保留human199/non-causal并冻结yaw/root=`0.001/0.003`；v8.2使用human200 direct root/yaw与独立train-only stats；三条均为`162760 × 500` | A/B共驻4090 GPU0，v8.2独占GPU1；只允许通过geometry gate的representation建立正式v8 Stage2 cache；Motion Mamba-style DDPM先于TransPhase control | 三条Stage1均已启动且finite，pure4053 endpoint geometry自动排队；v8.3 plan/progress已建但22:00 gate closed、进度全0 | 截至2026-07-17 18:25仍无endpoint性能结果，不是mainline。提前并行是system comparison，不恢复原始sequential单变量归因；v7.14/v7.38继续作为当前实现/formal主线 |
+| v8.1A：human199 geometry loss | 在 v7.14-equivalent architecture 上验证 yaw/root supervision | human199 + camera14、non-causal、同 IDs/budget；冻结 `yaw/root=0.001/0.003` | 未建 promotion cache；只允许 diagnostic-only cache | `636k / 81.38M` Stage1 endpoint 与 pure4053 | human geometry 广泛改善；camera mild regression；原始 gate 未过，amended screen 仅允许 non-promotion diagnostic |
+| v8.1B：residual AE | 测试 residual capacity 与 geometry loss 的 system effect | non-causal residual AE、同 IDs/budget/loss；与 A 同期训练 | 未建 cache 或 Unified | `636k / 81.38M` Stage1 endpoint 与 pure4053 | human 改善，但 camera short-bin severe regression；不进入 Stage2 预算 |
+| v8.2：human200 layout | 测试不积分的 root/yaw feature layout | human200、独立 train-only stats/owning inverse/cache contract；camera14 不变 | 未建 cache 或 Unified | `636k / 81.38M` Stage1 endpoint 与 pure4053 | human 改善，但 camera center-translation 四 bin 退化；不进入 Stage2 预算 |
+| v8.3：curation preregistration | 建立可逆 pair-level data curation contract | raw/quarantine/clean immutable manifests；固定 future promoted representation/backbone | 尚未创建任何 remote curation artifact | plan 已建；processed/annotated/quarantined/manifests/jobs 全为 `0` | 三条 v8 endpoint 无 prospective promotion，gate 保持 closed；进度不再维护第二页 |
 | MotionStreamer-Pulp：standalone native baseline | 建立独立 causal Direct-H system baseline，不改变 StoryMotion invariants | MotionStreamer causal TAE × Pulp normalized human199；随机64 crop；短序列补零并mask；`162760 × 500` | own causal latent/decoder；Stage2 adapter预注册但本轮不训练 | bs128、精确 `81.38M` sample exposures；持续 loss 与 full-sequence short/long MPJPE | Stage1已完成636k/81.38M与pure4053：overall root/global=`79.94/281.52 mm`，193+为`96.53/414.17 mm`；仍是native-system Stage1 evidence，不是StoryMotion causal ablation |
 | Director-C：corrected camera peer | 建立合法的 `fixed human motion + camera text → camera` native-system baseline，并替代旧错标/泄漏 Director 证据 | Director native direct 9D rot6d+translation trajectory；不使用 StoryMotion tokenizer | train-only normalization、fixed-budget endpoint、seed17、15,299,440 exposures；pure4053 使用 official Pulp camera callback | 94 epochs endpoint、N64 screen、4,053-sample formal、runtime-role/records/geometry strict audit | 训练与 formal 均完成；FDCLaTr `32.4365`、CLaTr `52.6617`、CCov `81.49%`、F1 `0.6884`。同 pure IDs 与 evaluator使其可作 native peer；human condition、representation、objective 与 sampler不同，不能作单变量消融 |
 | CCD-Pulp：representation-matched camera peer | 从 Director 正式 baseline 中选择独立 previous-SOTA CCD，补第二 camera peer，同时避免把 Director-A/B 自身消融当作外部方法 | corrected v7.14 non-causal latent 与 owning decoder；CCD 四层 Transformer、linear DDPM1000、epsilon objective；task port 显式输入 complete GT-H latent + camera text，只预测 camera latent | seed17、batch256、fixed `60k = 15.36M` exposures、train-only full-cov；formal DDIM50/CFG2/eta0/pure4053 | clean Git/archive、production-batch smoke、N64 bridge、fixed endpoint 与 `4,053` formal 均完成 | FDCLaTr `101.03`、CLaTr `33.095`、CCov `59.91%`、F1 `0.442`；L0 四项主指标均占优。checkpoint=`8014b1…03da`；formal/records/contract hashes 已入 canonical ledger；缺 decoder SHA 的首次 run 保持不可晋级 |
@@ -115,8 +122,8 @@ updated: 2026-07-17T18:25:00+0800
 
 ## 4. Evidence boundary
 
-- Stage1 aggregate 与 Stage2 formal metric：只引用 [[2026-07-12_storymotion-valid-metric-ledger]]。
-- metric key、official callback 与 geometry debug 定义：只引用 [[2026-07-09_storymotion-metric-computation-io]]。
+- Stage1 aggregate 与 Stage2 formal metric：只引用 [[StoryMotion-valid-metric-ledger]]。
+- metric key、official callback 与 geometry debug 定义：只引用 [[StoryMotion-metric-computation-io]]。
 - 当前优先级与 loss/geometry 结论：只引用 [[version]]。
 - 旧 roadmap、v7.14、loss 和 v7.17 执行材料在 `archived/evidence/`，用于追溯，不重新产生第二套 priority。
 

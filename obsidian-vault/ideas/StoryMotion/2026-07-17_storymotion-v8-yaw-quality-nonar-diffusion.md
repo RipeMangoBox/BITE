@@ -19,7 +19,7 @@ source_notes:
   - "[[history]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[2026-07-17_storymotion-stage1-length-condmdi-causal-priority]]"
-  - "[[2026-07-17_storymotion-fixed300-offline-ar-motionstreamer-v746-deployment]]"
+  - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 source_papers:
   - "[[analysis/NEURIPS_2025/TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_Generation]]"
   - "[[analysis/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation]]"
@@ -31,7 +31,7 @@ source_papers:
   - "[[analysis/arxiv_2026/Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning]]"
   - "[[analysis/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval]]"
 created: 2026-07-17T16:25:00+0800
-updated: 2026-07-17T18:25:00+0800
+updated: 2026-07-18T14:44:45+08:00
 ---
 
 # StoryMotion v8: Yaw-Stable Representation, Curated Pulp, and Non-AR Diffusion
@@ -98,8 +98,8 @@ artifact SHA256=`c9baf13591cda0cad58d6b0a5eacd14443c6fd4ef292d2cf92e2254d850752a
 
 ## 3. v8.1–v8.2：Stage1 treatment 顺序
 
-> [!important] 2026-07-17 execution override
-> 下述“先 A endpoint、再 B/8.2”的顺序仍是原始科学 gate，但用户已显式授权提前并行部署：v8.1A 与 v8.1B 共驻 4090 GPU0，v8.2 独占 GPU1。三条均保持相同 ordered `162,760 × 500 = 81.38M` budget；提前并行只节省墙钟时间，不能把 A/B 或 A/v8.2 写成原始 sequential single-variable attribution。最终结论仍只看各自 pure4053 owning-decoder geometry endpoint。
+> [!important] 解释边界
+> 2026-07-17 用户授权 v8.1A、v8.1B 与 v8.2 提前并行。三条均保持 `162,760 × 500 = 81.38M` exposure budget，但 A/B 或 A/v8.2 不是原始 sequential 单变量归因；它们是带已知改动集合的 system comparison。训练进度、ETA 与 worker 日志不再保存在本文。
 
 ### 3.1 v8.1A：human199 yaw/root geometry supervision
 
@@ -124,11 +124,11 @@ v8.1A promotion gate 在训练前固定为：
 
 可执行入口已加入现有 Stage1 trainer，默认 `human_yaw_weight=human_root_weight=0`，所以历史 recipe 不变。非零时只接受 `joint_ae + normalized human199 + is_causal=false`，并把两项权重写入 `run_config.json` 与 `experiment_contract.json`。mask/gradient 单元测试已通过。
 
-真实 Pulp 的 8 个随机 batch、每批 8 条、最长 250 帧的 loss-scale audit 给出：base gradient norm median=`0.11544`，未加权 yaw/root gradient norm median=`4.33958/3.88529`；raw weight=`1` 会压倒主 loss。finite optimizer-step smoke 因此使用 `yaw=0.001`、`root=0.003`，对应 median gradient ratio 约 `3.8%/10.1%`。该 smoke 已通过：base/weighted-yaw/weighted-root/total loss=`0.455165/0.000938/0.000151/0.456254`，pre-clip grad norm=`0.10911`，step后参数全部finite，且`is_causal=false`。这组权重随后被显式冻结为 final recipe；`v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` 已于 17:29 CST 启动。截至 18:25，step=`54,441/636,000`、近 5k 吞吐=`15.55 step/s`、train total=`0.01751`，step54k pure-test total=`0.02645`，均 finite。预计训练与 queued pure4053 geometry 在 2026-07-18 04:45–05:20 CST 闭合。
+真实 Pulp 的 loss-scale audit 显示 raw weight=`1` 会压倒主损失；因此冻结 `yaw=0.001`、`root=0.003`，对应中位梯度比例约 `3.8%/10.1%`。finite optimizer-step smoke、mask/gradient unit tests 与 `is_causal=false` 断言均通过。训练日志和完整 endpoint 数值分别由 run artifact 与 [[StoryMotion-valid-metric-ledger#18.1.1 v8 endpoint：与 corrected v7.14 的完整同脚本比较]] 持有。
 
 ### 3.2 v8.1B：matched residual AE
 
-原始 gate 只有在 v8.1A loss 稳定但容量不足时才启动本项；用户已覆盖该算力顺序并要求同步训练。实现为 projection-free、non-causal AAMMARDM-style residual encoder/branch-owning decoder，width=`192`、depth=`2`、dilation growth=`3`、downsample=`4`，从 seed17 随机初始化；已有 epoch320 不复用。`v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` 于 17:43 CST 与 A 共驻 GPU0。截至 18:25，step=`29,268/636,000`、近 5k 吞吐=`12.14 step/s`、train total=`0.03486`，step28k pure-test total=`0.07109`，均 finite；预计 endpoint 与 queued geometry 在 2026-07-18 08:15–09:15 CST 闭合。A/B 同时改变 geometry loss 与 architecture，只能按两因素 system comparison 解释。
+原始 gate 只有在 v8.1A loss 稳定但容量不足时才启动本项；用户覆盖该算力顺序并要求同步训练。实现为 projection-free、non-causal AAMMARDM-style residual encoder/branch-owning decoder，width=`192`、depth=`2`、dilation growth=`3`、downsample=`4`，从 seed17 随机初始化；已有 epoch320 不复用。A/B 同时改变 geometry loss 与 architecture，只能按两因素 system comparison 解释。
 
 ### 3.3 v8.2：non-integrative human200
 
@@ -141,7 +141,44 @@ root_z 1 + root_xy_relative_to_first_frame 2 + yaw_sin_cos 2
 
 owning decoder 直接读取 absolute-relative root XY 与 yaw，不再对 yaw/root velocity 积分。camera14 暂不改，因为 v7.14 Stage1 Cam-ADE 只有约 `41.8 mm`；Stage2 camera 的米级误差先由 Stage2 channel oracle 定位。human200 是新 representation control，必须新建 train-only normalization、Stage1 checkpoint、owning decoder、cache 与 Unified Stage2，不能兼容加载 v7.14 cache。
 
-用户已授权提前实现并占用 GPU1。`v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` 于 18:19 CST 启动；train-only frame-weighted population stats 覆盖 ordered `162,760` IDs、`19,336,840` frames，SHA256=`70623ea927300b107fc49c9f4d4a67a30b45f8565f6bf4e0c27a406296f95011`。checkpoint 内嵌 `camera64+human128` native order、human200 owning inverse、stats/source hashes 与 `is_causal=false`，step0 cache-loader contract preflight 已通过。截至 18:25，step=`6,133/636,000`、近 5k 吞吐=`18.81 step/s`、train total=`0.05389`，step4k pure-test total=`0.11265`，均 finite；预计 endpoint 与 queued pure4053 geometry 在 2026-07-18 03:40–04:20 CST 闭合。
+human200 的 train-only frame-weighted population stats 覆盖 ordered `162,760` IDs、`19,336,840` frames，SHA256=`70623ea927300b107fc49c9f4d4a67a30b45f8565f6bf4e0c27a406296f95011`。checkpoint 内嵌 `camera64+human128` native order、human200 owning inverse、stats/source hashes 与 `is_causal=false`；因此它必须拥有独立 cache/contract，不能兼容加载 v7.14 cache。
+
+### 3.4 2026-07-18 endpoint、amended screen 与 camera 根因边界
+
+三条训练都已完成 `636,000` steps / `81.38M` exposures，并完成 true-length pure4053 endpoint。完整总指标、四个时序 bin、artifact SHA256 与 paired-bootstrap 区间见 [[StoryMotion-valid-metric-ledger#18.1.1 v8 endpoint：与 corrected v7.14 的完整同脚本比较]]。三者对 v7.14 的 human geometry 都是大幅改善：v8.1A 的 overall RA/global 是 `24.700/71.180 mm`，v8.1B 是 `28.245/76.655 mm`，v8.2 是 `12.999/68.706 mm`，相对 v7.14 的 `80.731/212.735 mm`，每条的 paired bootstrap CI 均不跨零。
+
+原先的 absolute gate 是训练前的预注册定义，不能事后改写成“已通过”。但它把一个明确以 human yaw/root 为目标的 treatment，要求同时命中固定的 camera 绝对值和极小 global-slope 上限；v8.1A 的 global slope 是 `+31.103 mm per 100f`，虽未达到 `≤20`，却比 v7.14 的 `+145.300` 降低 `78.6%`。为评估用户提出的“总体显著优化可容忍轻微退化”，账本新增了 amended screen：human core 至少两项改善 `20%` 且 paired CI 支持，long-bin global 不得变差，camera 只容忍有限的 ADE/FDE/rotation 退化。它是 endpoint 后的辅助决策规则，不是 retroactive preregistration。
+
+裁决如下：
+
+1. `v8.1A` 通过 amended non-promotion screen。camera 的 `+14.2%` ADE、`+8.8%` FDE 与 `+0.098°` rotation 在容忍边界内，但并不等价于 camera 无损。
+2. `v8.1B` 不通过。它相对 A 在短段 `1–64` 的 camera ADE/FDE/rotation 为 `58.691/75.239 mm/1.637°`，明显高于 A 的 `48.971/55.828 mm/0.955°`；反而在长段 camera error 下降，且 camera slope 为负。这把问题定位到 residual architecture 或 shared-branch optimization 的短序列/boundary reconstruction，而不是 root/yaw 的长程积分累积。现有 evidence 还不能把责任精确归到某一层或某一个 loss 项。
+3. `v8.2` 不通过。camera14 的 feature width、loss weight 与 non-causal contract 没有改变，但其 center ADE 在四个 bin 均高于 v7.14，而 rotation overall 从 `0.619°` 改善至 `0.569°`，long-bin rotation 也更低；Cam-ADE slope 为 `−0.872 mm per 100f`。因此这是 shared human200 representation、normalization 或 joint-optimization 引起的 camera translation trade-off，不是 rotation 或 temporal integration 失败。区分 shared-gradient scale、joint layout 与 owning-decoder interaction 需要单变量 ablation。
+
+所需的下一条诊断保持 non-promotion：固定 v8.1A 的 human treatment，单独检查 camera branch/decoder 的 short-bin reconstruction 与 loss-gradient scale；对于 human200，固定 camera14 后分别替换 human layout、stats 与 joint optimization。受控表征—Stage2 probe 的顺序、停止规则与 cache 禁令见 [[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]；它不改变任何 v8 candidate 的 promotion 状态。
+
+#### v8.1C — camera14 decoded-center auxiliary pre-screen
+
+`camera14` 不是纯逐帧 camera pose：其 `[11:14]` 是 normalized c2w translation velocity。Pulp `traj+char+proj` decoder 对第 `1:` 帧反归一化后累加该 velocity，并加上 **第 0 帧** reconstructed human root 和 relative-distance `[2:5]` 作为原点。因此现有 camera feature reconstruction / temporal-diff loss 能约束 velocity 及其差分，却没有直接约束最终累计 camera center；而第 0 帧 velocity 在原有 feature loss 中被置零、却仍会进入 decoder 的累计路径。
+
+最小可归因 treatment 是保持 v8.1A 的 human199、camera14、joint-AE、non-causal、`yaw/root=0.001/0.003` 与所有数据/optimizer 边界，仅附加：
+
+```text
+camera_center = cumsum(decoded_camera_velocity)
+              + decoded_relative_distance[t=0]
+              + decoded_human_root[t=0]
+L_camera_center = SmoothL1(camera_center_pred, camera_center_gt)
+```
+
+执行顺序与停表规则：
+
+1. **C0 gradient calibration**：同 ordered train IDs、seed17、8 个真实 batch、`B=8`、最大 `250` frames；以 raw camera-center loss 的中位梯度，选择只占 v8.1A base-plus-human-aux gradient `5%` 的 weight。保存 manifest/hash、每 batch ID hash、原始 loss 与梯度中位数。没有此 artifact 不启动训练。
+2. **C1 10K-class structural screen**：仅在 C0 finite、mask/unit test 通过后，在 4090 GPU1 从随机初始化训练 `8` epochs，即 `10,176 × 128` exposures；这是现有 epoch-bounded trainer 的最近精确预算，不能写成恰好 `10,000`。输出 Stage1 true-length pure4053 geometry，特别报告 camera center ADE/FDE/rotation 的四个长度 bin、human yaw/root 和 first-velocity offset。若 camera center 没有相对 v8.1A 改善、human core 退化超过 amended screen 容忍，或出现任何 contract/cache/decoder 不一致，停止。
+3. **C2 matched endpoint only if C1 is directionally positive**：从零重训完整 `636K / 81.38M` Stage1 endpoint，不能把 C1 checkpoint、optimizer 或 screen result 当作 promotion evidence。C2 仍只是 v8 candidate；它通过 Stage1 gate前不建 Unified cache，更不进入 30K/105K。
+
+截至 `2026-07-18T14:32:35+08:00`，C0 已成功完成，artifact 为 `runs/stage1/v8_1c_camera14_center_aux_seed17_4090g1_20260718/calibration.json`，SHA256=`901e3c2fe4ce41fb51f7174a823f9dccd4e99d3ec817217682de5ee2ba561544`。8 个真实 batch 的 base/v8.1A/raw-center gradient median 分别为 `0.114611/0.119016/1.463273`，故冻结 `camera_center_weight=0.00406677828128799`。C1 已从随机初始化启动为 `v8_1c_joint_ae_yaw001_root003_cctr004067_screen10k_seed17_4090g1_20260718`；本页只记录其为 running，未有 Stage1 endpoint、C2 或 promotion 结论。
+
+这条诊断回答“camera14 的积分路径是否是 camera 退化的可修复责任通道”，不证明人类 yaw auxiliary 是 camera 回归的唯一原因。shared joint encoder 的梯度竞争、camera relative-distance branch 和 v8.2 的 human layout/stats 仍是并列解释；v8.1B 与 v8.2 不因 C1 而获得 Stage2 预算。
 
 ## 4. 架构检索：哪篇作为 non-AR pure diffusion 起点
 
@@ -156,63 +193,32 @@ owning decoder 直接读取 absolute-relative root XY 与 yaw，不再对 yaw/ro
 | InfiniDreamer / ICCV 2025 | overlapping segment score distillation、geometry constraints、任意长 inference | training-free refinement，慢且依赖已有短 motion model | 可选 inference control，不是 Stage2 backbone |
 | MARDM / CVPR 2025；MoLingo / CVPR 2026 | 强生成与 masked/continuous latent modeling | masked autoregressive；MoLingo 还依赖 causal SAE | 与 v8 strict non-AR 路线不符，排除 |
 
-因此实现顺序是：Stage1 gate → Motion Mamba-style non-AR DDPM baseline → 同 representation/cache 下引入 TransPhase 的 adjacent-phase alignment。若用户把“必须 2025+”设为硬约束，则直接选择 TransPhase，但必须增加 aperiodic bypass/phase-confidence control，且不能把 transition improvement 当成 within-clip root 修复。
+因此 **promotion-bearing v8.4** 的实现顺序仍是：Stage1 gate → Motion Mamba-style non-AR DDPM baseline → 同 representation/cache 下引入 TransPhase 的 adjacent-phase alignment。若用户把“必须 2025+”设为硬约束，则直接选择 TransPhase，但必须增加 aperiodic bypass/phase-confidence control，且不能把 transition improvement 当成 within-clip root 修复。v8.1A 的 non-promotion generatability ladder 不替代这条顺序，也不使用 v8.4 backbone。
 
-## 5. 数据清洗
+## 5. v8.3 数据清洗轴
 
-### 5.1 物理清洗
+v8.3 的完整 preregistration、当前 gate、所有零/非零进度、四层 immutable manifest、scorer checkpoint 禁令和 pair-level 例子只由 [[2026-07-17_storymotion-v8-3-data-curation-plan]] 维护。当前状态是 `not_started / blocked_no_promoted_representation`：三条 v8 Stage1 endpoint 都未通过原始 promotion gate，故 processed、annotated、quarantined、materialized manifests 与 launched jobs 均为 `0`。本页不再维护第二份清洗规则或 progress。
 
-物理清洗先产生 quarantine manifest，不直接删除：
+## 6. v8.0+ 版本矩阵与因果顺序
 
-- world-root speed、acceleration、jerk 与 yaw rate/acceleration；
-- foot contact 时的 world foot sliding、地面穿透与悬空；
-- bone-length drift、joint angular velocity/acceleration；若 mesh 可得，再加 body self/environment penetration；
-- 按 capture source、duration 和动作类别做 median/MAD robust threshold，避免把跑、跳、旋转等合法高速动作当异常；
-- 高置信硬错误进入 `physical_quarantine`，边界样本进入人工审核，保留 reason code、原始值和阈值版本。
-
-“快速漂移”必须区分真实 locomotion 与 capture/root corruption。只有短时 root jerk、脚接触冲突、语义不支持的高速平移等多证据一致时，才升级为高置信物理异常。
-
-### 5.2 语义清洗
-
-语义清洗以 caption-motion pair 为单位，不默认删除 motion sample：
-
-1. TMR 提供 global alignment；
-2. LaMP 提供 motion-aware text/motion embedding 与已公开 retrieval code/checkpoint；
-3. PST 提供 joint/segment/global fine-grained mismatch，但当前未登记可复现 checkpoint，首版只保留接口位；
-4. MoCHA 用于把不可由动作恢复的风格/场景信息 canonicalize，再同时比较 original/canonical caption；
-5. `MARDM-67` 是 evaluator/protocol，不是第四个 retrieval scorer，不进入 ensemble vote。
-
-先人工标注约 `300–500` 个分层 pair，覆盖 posture、direction、body-part、temporal order、locomotion 与否定关系，再校准 scorer。只在多模型一致且超过校准阈值时自动 quarantine；模型分歧进入人工队列。最终保存 raw、physical quarantine、semantic-pair quarantine、clean 四份 immutable manifests，记录 ordered IDs、caption ID、reason、model/checkpoint hash、score、threshold 和 parent-manifest hash。
-
-独立执行契约见 [[2026-07-17_storymotion-v8-3-data-curation-plan]]，零进度与 gate 记录见 [[2026-07-17_storymotion-v8-3-data-curation-progress]]。由于 v8.2 的完整 endpoint 预计在 2026-07-18 凌晨，而不是 2026-07-17 22:00 前完成，清洗 gate 保持 closed：processed/annotated/quarantined/materialized manifests/launched jobs 全部为 `0`。
-
-### 5.3 已核验的错配样本
-
-`2019_vcdDRblTOmM_00038_001_a` 的 htext 是：
-
-> Human: A person stands still and turns their head slightly to the right.
-
-GT 共 35 帧，左右膝平均弯曲约 `85.17°/81.82°`，root Z 约 `0.849 m`，root XY displacement 只有 `0.056 m`；几何与持续坐姿/深屈膝一致，不是站立。该 pair 进入 semantic quarantine；motion 若有其他正确 caption 仍保留。
-
-## 6. v8 实验矩阵与因果顺序
-
-| priority | version / run | 单一问题 | 数据 / budget | 状态与下一步 |
+| version / run | 目标 | 核心实验与固定边界 | 结果 / 结论 | 唯一允许的下一步 |
 | --- | --- | --- | --- | --- |
-| P0 | v8.0 / `v8_0_representation_oracle_audit_20260717` | 哪个 human199 root channel 导致长度退化 | pure4053 diagnostic | 已完成；yaw 是主因 |
-| P0 | v8.0 / `v8_0_pulp_repro_deep_ae_screen_20260717` | 现成 self-trained deep AE 能否直接替代 | pure4053 screen；训练 exposure 不匹配 | 已完成，No-Go；不接 Stage2 |
-| P0 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | 同一 AE/layer 上 geometry loss 是否修复 yaw | `162,760 × 500` | GPU0 training；step54,441 finite；endpoint ETA 07-18 04:45–05:20 |
-| P1 | v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | matched residual AE system 是否增益 | 同 IDs、budget、loss；不复用 epoch320 | 用户授权提前与A共驻GPU0；step29,268 finite；ETA 07-18 08:15–09:15 |
-| P1 | v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | integration-free layout 是否必要 | 同 IDs/budget；新 stats/decoder/cache | 用户授权提前占GPU1；step6,133 finite；ETA 07-18 03:40–04:20 |
-| P1 | v8.3 / `clean_manifest_ablation` | curated pairs 是否改善 semantic/physical quality | 同一 promoted representation/backbone | plan/progress已预注册；22:00 gate closed；全部进度计数为0 |
-| P1 | v8.4-A / `motion_mamba_ldm` | non-AR pure latent diffusion 是否改善生成 | promoted representation、raw manifest first | Stage1 gate 后实现 |
-| P2 | v8.4-B / `transphase_control` | phase alignment 是否改善 long composition | 同 cache、matched exposure | v8.4-A 后；加 aperiodic control |
+| v8.0 / `v8_0_representation_oracle_audit_20260717` | 定位 human199 长时误差的责任通道 | v7.14 owning decoder；pure4053；仅替换声明的 GT root/yaw/local-joint channel | GT yaw 将 long root/global 由 `132.22/429.43` 降至 `8.68/38.99 mm`；heading 是第一责任通道，不等于可训练收益 | 用 matched yaw/root supervision 测试，而非直接改 Stage2 |
+| v8.0 / `v8_0_pulp_repro_deep_ae_screen_20260717` | 筛查现成深层 AE 是否可直接替代 | epoch320 不匹配 exposure/data/loss；true-length pure4053 screen | overall root/global=`286.82/953.45 mm`，No-Go；否定该 checkpoint，不否定架构家族 | 不接 cache 或 Stage2 |
+| v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | 在同 human199 AE 上修复累计 yaw/root | v7.14 architecture、camera14、non-causal、同 IDs/budget；只加 decoded geometry loss | human geometry 广泛改善；camera 为有限退化。原始 gate 未过，amended non-promotion screen 通过 | 只可进入受控 non-promotion generatability ladder；不得建 promotion cache |
+| v8.1C / `v8_1c_joint_ae_yaw001_root003_cctr004067_screen10k_seed17_4090g1_20260718` | 判断 camera14 velocity-integral path 是否能修复 camera center 而不牺牲 v8.1A human gain | 固定 v8.1A，唯一加 decoded c2w center SmoothL1；C0 8-batch calibration 后以 `0.00406677828128799` 训练 C1 `10,176` steps | C0 complete；C1 running；任何 C1/C2 都是 non-promotion Stage1 diagnostic | C1 正向后才允许完整 636K Stage1；绝不直接进 Stage2 |
+| v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | 测试 residual capacity 是否带来额外收益 | non-causal residual AE；同 IDs/budget/loss；与 A 同时改变 loss/architecture | human 改善，但 camera ADE/FDE/rotation severe regression，短段边界最明显 | 先做 camera branch/gradient root-cause diagnostic；不做 30K/105K Unified |
+| v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | 测试非积分 human200 layout | human200、独立 train-only stats/owning inverse/cache；camera14 不变 | human 改善；camera center translation 四 bin 均退化，rotation 改善；为 shared layout/stats/joint-opt trade-off 假设 | 先拆分 layout、stats、joint optimization；不做 30K/105K Unified |
+| v8.3 / `clean_manifest_ablation` | 测试 pair-level curation 是否改善 Stage2 prior | 固定已 promoted representation/backbone；只改变 immutable train manifest | 未启动；无 promoted representation，全部计数为 `0` | 等 prospective promotion 后按 curation contract 开 gate |
+| v8.4-A / `motion_mamba_ldm` | 测试最小 non-AR latent DDPM backbone | 同 representation/cache 的 raw-manifest first control | 尚未开始；不是 v8.1A 的表征 probe 替代品 | 仅在 representation promotion 后实施 |
+| v8.4-B / `transphase_control` | 测试 phase alignment 对长组合的增益 | 与 v8.4-A 同 cache/exposure，另加 aperiodic bypass/phase-confidence control | 尚未开始 | 在 v8.4-A 后作为 matched control |
 
-Stage2 必须在 human generation、camera completion、joint parallel 上同时报告已有 distribution/semantic metrics 与 decoded geometry。自由生成的一对一 MPJPE/Cam-ADE 是 mandatory diagnostic，不单独作为质量 hard gate；物理指标、blind render 与 text-motion retrieval 一起形成 promotion。另做 Stage2 GT-channel oracle，区分 generated yaw/root 与 pose/channel 对 v7.38 global `863 mm` 的贡献，再决定是否动 camera representation。
+任何 Stage2 diagnostic 都必须在 human generation、camera completion、joint parallel 与 human-first cascade 报告任务适用的 distribution/semantic 指标、decoded geometry 与四个时长 bin。自由生成的一对一 MPJPE/Cam-ADE 是 mandatory diagnostic，不单独构成质量 hard gate；物理、blind render 与 text-motion retrieval 共同决定 promotion。v8.1A 的控制性 Stage2 ladder、GT-channel/oracle 分解和停止规则只见 [[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]。
 
 ## 7. 当前允许的结论
 
 1. StoryMotion 当前确有 human geometry 问题，但 Stage1 长序列问题已从宽泛的“local tokenizer 差”收窄为“累计 heading supervision 不足”。
-2. Stage1 camera reconstruction 当前不是主风险；Stage2 Direct C/joint 的米级 Cam-ADE 表明 camera 问题主要由生成/条件路径引入。
+2. v7.14 的 Stage1 camera reconstruction 不是主风险，但 v8 endpoint 显示 shared joint tokenizer 的 human treatment 会带来 camera trade-off；这不是 Stage2 Direct C/joint 米级误差的充分解释，camera representation 与 joint optimization 必须分开诊断。
 3. 数据错配真实存在，但没有证据表明它解释了 v7.14 Stage1 reconstruction；cleaning 主要面向 Stage2 semantic/physical prior。
 4. 新 Stage2 architecture 不能替代 Stage1 gate。MotionLab 已给出实际反例：语义改善不自动带来 world-root geometry 改善。
 5. v8 是有 gate 的实验族，不是新名字覆盖旧主线。
