@@ -884,6 +884,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Evaluate an explicit frozen official Pulp AE representation control with its owning decoder.",
     )
     p.add_argument(
+        "--allow-nondefault-tokenizer-contract",
+        action="store_true",
+        help=(
+            "Permit an explicitly declared non-default, non-causal tokenizer cache; "
+            "the cache checkpoint and owning-decoder checks remain required."
+        ),
+    )
+    p.add_argument(
         "--znorm-stats-path",
         type=Path,
         help="Use explicit train latent z-normalization stats for cache-only eval sources.",
@@ -1125,7 +1133,7 @@ def main() -> None:
         [str(value) for value in cache.sample_id]
     )
     train_mod.assert_non_causal_cache_meta(cache_meta)
-    if not args.official_pulp_ae_control:
+    if not args.official_pulp_ae_control and not args.allow_nondefault_tokenizer_contract:
         train_mod.assert_default_cache_meta(cache_meta)
     owning_decoder, owning_decoder_record = resolve_owning_decoder(
         story_root, cache_meta, autoencoder, device
