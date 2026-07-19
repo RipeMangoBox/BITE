@@ -10,8 +10,8 @@ tags:
 aliases:
   - StoryMotion-Metric-IO
 source_notes:
-  - "[[version]]"
-  - "[[history]]"
+  - "[[current]]"
+  - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[archived/evidence/2026-07-11_storymotion-v7.14-corrected-results]]"
   - "[[archived/evidence/2026-07-12_storymotion-v7.17-decoder-cache-contract-execution]]"

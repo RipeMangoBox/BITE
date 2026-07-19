@@ -1,5 +1,5 @@
 ---
-title: "StoryMotion v8.3 Data Curation Preregistration"
+title: "StoryMotion v8.2333 Data Curation Preregistration"
 status: preregistered_blocked_no_promoted_representation
 workflow_state: not_started
 gate: promoted_representation_selection
@@ -18,17 +18,18 @@ tags:
   - preregistration
   - status/waiting
 aliases:
+  - StoryMotion-v8.2333-Curation-Plan
   - StoryMotion-v8.3-Curation-Plan
 source_notes:
-  - "[[2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion]]"
+  - "[[current]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-18T15:20:00+08:00
+updated: 2026-07-19T13:55:00+08:00
 ---
 
-# StoryMotion v8.3 Data Curation Preregistration
+# StoryMotion v8.2333 Data Curation Preregistration
 
 > [!warning] 当前执行状态
-> 本文是 v8.3 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 保持 `closed`。尚未扫描、打分、标注、quarantine、物化 manifest 或启动 raw-vs-clean 训练。
+> 本文是 v8.2333 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 保持 `closed`。尚未扫描、打分、标注、quarantine、物化 manifest 或启动 raw-vs-clean 训练。
 
 ## 0. 当前执行状态
 
@@ -45,7 +46,7 @@ updated: 2026-07-18T15:20:00+08:00
 | scorer jobs launched | `0` |
 | GPU jobs launched | `0` |
 
-这些 `0` 表示从未开始，不表示扫描后未发现问题。v8.1A 的 amended non-promotion screen 不构成 v8.3 的 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
+这些 `0` 表示从未开始，不表示扫描后未发现问题。v8.1A 的 amended non-promotion screen 不构成 v8.2333 的 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
 
 ## 1. 问题、数据边界与因果边界
 
@@ -55,7 +56,7 @@ updated: 2026-07-18T15:20:00+08:00
 - **人工预算**：目标 `400` 个分层 pair，允许范围 `300–500`；少于 `300` 不冻结阈值，超过 `500` 需另行授权。
 - **输出目标**：四层 immutable manifest、校准标签与 scorer/threshold provenance、manifest lineage/audit，以及后续 matched raw-vs-clean Stage2 run contracts。
 
-v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部分，也不是新的 Stage2 backbone。首个可归因实验固定已经选定的 Stage1 checkpoint、owning decoder、latent cache contract 和 Unified Stage2 实现，只改变 train manifest。不得同时更换 human feature layout、Stage1 checkpoint family、denoiser、task routing、sampler 或评测集。
+v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一部分，也不是新的 Stage2 backbone。首个可归因实验固定已经选定的 Stage1 checkpoint、owning decoder、latent cache contract 和 Unified Stage2 实现，只改变 train manifest。不得同时更换 human feature layout、Stage1 checkpoint family、denoiser、task routing、sampler 或评测集。
 
 数据清洗主要检验 Stage2 prior，不回溯解释 v7.14/v8.2 的 Stage1 reconstruction。若将来要检验 clean data 对 Stage1 的作用，必须另建 Stage1 raw-vs-clean run family；不得与本计划的 Stage2 结果合并成一个“clean system”结论。
 
@@ -63,7 +64,7 @@ v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部�
 
 按顺序满足以下 gate 后才能前进：
 
-1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得启动 v8.3。
+1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得启动 v8.2333。
 2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。
 3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。
 4. **G3 — calibration**：完成 `300–500` 个分层 pair 的人工标签，冻结 reason-code、physical rule 和 semantic threshold 版本。
@@ -150,7 +151,7 @@ v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部�
 
 两条 run 必须共享同一 Stage1 checkpoint/owning decoder hash、representation、train-only latent normalization protocol、Unified Stage2 code/backbone、任务概率、seed、optimizer、learning-rate schedule、batch size、总 sample exposures、CFG/sampler、eval ordered IDs 与 decode batch size。clean 数据量较小时用 deterministic resampling 匹配总 exposures，并额外报告 unique pair coverage、重复率和每类 exposure；不得靠少训换取表面优势。两条 cache 的内容 hash 因 manifest 不同而应不同，但 tokenizer checkpoint 和 cache builder revision 必须相同。
 
-正式 eval 使用同一冻结 eval manifest，不把 clean eval 替换成更容易的子集。人工校准 holdout 可作为单独 diagnostic，但不能替代 formal eval。human、camera、joint parallel 与 human-first cascade 均按相同实现/checkpoint 报告：
+正式 eval 使用同一冻结 eval manifest，不把 clean eval 替换成更容易的子集。人工校准 holdout 可作为单独 diagnostic，但不能替代 formal eval。正式标准只报告 Direct-H、Direct-C 与 joint parallel；cascade 不参与评估或 gate：
 
 - human：FDTMR、TMR、HCov，以及 root-aligned/global MPJPE、root ADE/FDE、integrated-yaw error；
 - camera：FDCLaTr、CLaTr、CCov、caption F1，以及 Cam-ADE/Cam-FDE/rotation；
@@ -158,6 +159,48 @@ v8.3 是独立的 **data-curation axis**，不是 v8.2 representation 的一部�
 - no-reference physical：foot contact/skating、acceleration/jerk、bone consistency、root speed/path distributions，并做同 IDs 的 blind render review。
 
 自由生成的 paired MPJPE/Cam-ADE 是 mandatory diagnostic，不单独视为 one-to-many 质量 hard gate。所有 mixed-version 表必须含非空 `version / run` 列。seed-17 matched screen 只能决定是否继续；promotion 至少要用预注册的额外 matched seeds 复核，不能把单 seed screen 写成数据清洗因果定论。
+
+### 7.1 Full-data pretrain → clean-data adaptation / SFT
+
+**可行，但 Stage1 与 Stage2 的作用不同，不能共用一个 “SFT” 结论。** StoryMotion Stage1 joint AE 不消费 caption，因此 caption 修正不可能直接改善 Stage1；Stage1 上能做的是基于物理 clean motion manifest 的低学习率 continuation。真正利用 pair-level caption 清洗的是 Stage2 text-conditioned generator。[[analysis/arxiv_2026/OpenT2M_No_frill_Motion_Generation_with_Open_source_Large_scale_High_quality_Data|OpenT2M]] 支持“大规模数据预训练后在高质量目标数据上微调”的总体可行性；[[analysis/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval|MoCHA]] 则说明 caption 去噪可以降低监督/梯度方差，但也提示应保留 raw language view 作为后续抗遗忘 control。这些论文支持设计动机，不替代 StoryMotion 自身 matched ablation。
+
+推荐顺序为：
+
+```text
+full Stage1 joint AE
+  ├─ freeze endpoint → build owning cache → full Stage2 pretrain
+  │                                      ├─ matched raw continuation
+  │                                      └─ matched clean-pair SFT
+  └─ optional physical-clean Stage1 continuation
+       → 重新过 Human + Camera + root/yaw/physical gate
+       → 新 owning decoder + 新 cache + 独立 Stage2 matched family
+```
+
+这里的 Stage1 clean continuation 是独立 representation axis，不能在同一个 run 中同时改 Stage1 与 Stage2 manifest。若它产生新 checkpoint，所有下游 cache、inverse stats 与 owning decoder 都必须重建并重新 hash；旧 Stage2 checkpoint 不能直接跨 representation 续训后声称是 clean-data 收益。
+
+#### Stage1：只允许 physical-clean continuation
+
+- base 始终是完整 `162,760` ordered train IDs 上训练完成的 full-data Stage1；不从 clean subset 随机初始化。
+- clean 输入只能来自 motion-level 物理证据。semantic pair quarantine 不参与 Stage1 sampling，也不能因为一条 caption 错误而降低同一 motion 的 AE exposure。
+- 因果对照必须从同一个 full-data checkpoint 分叉：`raw-continuation` 与 `physical-clean-continuation` 使用相同新增 sample exposures、初始模型权重、optimizer 初始化策略、学习率、batch、RNG/seed 和停止点。建议两臂都重建同配置的低学习率 optimizer，避免一臂继承 momentum、另一臂重置。
+- 目标是降低 contact skating、penetration、root/yaw spike、camera center/rotation jitter 等重建异常，同时保持 v8.1A 的 Human 优势。它可能改善 decoder/representation 的物理局部性，但不能预设会改善 Stage2 generatability；必须重新通过 Stage1 Human、Camera、root/yaw 与 physical gate。
+
+#### Stage2：full-data pretrain 后做 clean-pair SFT
+
+- 这是 caption 清洗的首选阶段。冻结同一 Stage1 checkpoint、owning decoder、cache protocol 与 full-data Stage2 parent checkpoint，再从该 parent 分叉 `raw-continuation` 和 `clean-pair-SFT`；两臂使用相同额外 exposures、optimizer reset/resume 规则、低学习率 schedule、task probabilities、batch、seed 和 endpoint。
+- primary treatment 使用 union clean manifest，先回答“总体清洗是否有效”。若通过，再用 physical-only 与 semantic-only quarantine removal 做归因；不能一开始把物理清洗、caption 重写、loss 与 pipeline 一起变化。
+- clean-only SFT 是最清晰的因果主臂。若它改善 clean slice 却损伤 raw-language/general coverage，再新建 `clean + raw replay` follow-up；该 follow-up 检验抗遗忘机制，不得回写成 clean-only 的结果。clean 数据量较小时继续按 deterministic resampling 匹配 exposures，并报告重复率与 unique coverage。
+- 预期可改善 caption-body-part/direction/temporal-order 对齐、Direct-C camera-text conditioning、TMR/CLaTr/caption F1，以及由高置信物理坏样本诱发的 jerk/skating/Out。它不能修复 owning decoder 的高敏方向、Stage1 camera manifold、缺失动作覆盖或 evaluator 偏差；当前 D4/C4 representation 诊断仍须先独立闭合。
+
+#### 最小验收产物
+
+1. immutable full/physical-clean/semantic-clean/union-clean manifests、parent lineage、reason codes、counts 与 SHA256；
+2. full-data parent checkpoint、raw-continuation control 与 clean-adaptation checkpoint，各自模型/optimizer/scheduler/RNG/exposure contract；
+3. Stage1 continuation 的 owning-decoder reconstruction + physical gate；若被选中，新的 cache/stats/decoder hashes；
+4. Stage2 的 Direct-H、Direct-C、joint parallel matched formal eval，以及 raw-eval、clean holdout、physical stress slice 三类结果；cascade 不参与；
+5. 逐 seed、aggregate、unique coverage/repeat rate、blind render 和 rollback decision。只有 clean adaptation 相对 **matched raw continuation** 改善，而非仅相对较早的 full parent checkpoint 改善，才算 SFT 证据。
+
+当前执行结论仍是 `blocked_no_promoted_representation`：可以继续完善 manifest/scorer contract，但不得把本方案与正在闭合的 D4/C4 representation 任务混训，也不据此提前启动 GPU SFT。
 
 ## 8. 验收与 rollback
 
@@ -185,7 +228,7 @@ rollback 不删除任何文件：将 active data pointer 恢复到 locked raw SH
 数据产物留在远端 generated run space，不进入 Git：
 
 ```text
-/data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_3_data_curation_20260717/
+/data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_2333_data_curation_20260717/
   contract/curation_contract.json
   manifests/raw.jsonl
   manifests/raw.meta.json
@@ -210,8 +253,8 @@ rollback 不删除任何文件：将 active data pointer 恢复到 locked raw SH
 raw/clean Stage2 训练仍使用标准 run boundary：
 
 ```text
-/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_3_raw_manifest_unified_SEED_DATE/
-/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_3_clean_manifest_unified_SEED_DATE/
+/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_2333_raw_manifest_unified_SEED_DATE/
+/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_2333_clean_manifest_unified_SEED_DATE/
 ```
 
 `SEED`、`DATE`、最终 fixed representation/backbone 和精确 run IDs 在 G0/G5 打开时写入各自 `experiment_contract.json`；当前不得用占位符创建假 run 或假 artifact。

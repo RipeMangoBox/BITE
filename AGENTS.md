@@ -47,9 +47,10 @@ codebase:
    column with a non-empty value in every row. If a matched comparison is not
    available, state the differing fields and restrict the conclusion.
 5. Human completion in the asymmetric Unified-3 model is human-text-only.
-   Camera completion consumes human latent plus camera text. Joint generation
-   must compare parallel and human-first cascade schedules from the same
-   unified implementation/checkpoint whenever attribution requires it.
+   Camera completion consumes human latent plus camera text. Active evaluation
+   and promotion gates report Direct-H, Direct-C, and joint parallel. Cascade
+   is optional historical/root-cause attribution only, never a required score
+   or gate; if invoked, it must use the same unified checkpoint as parallel.
 6. A specialist result is valid only as a task-sliced diagnostic of the same
    branch implementation used by Unified-3, or when its weights are explicitly
    transferred and verified. Do not train unrelated specialists as a gate for
@@ -73,12 +74,11 @@ StoryMotion note.
 
 | Canonical target | Sole responsibility | Do not put here |
 | --- | --- | --- |
-| `obsidian-vault/ideas/StoryMotion/version.md` | Current mainline, active decision, blockers, and links to the evidence owner | Per-step progress, stale ETA, full metric tables, historical narrative |
+| `obsidian-vault/ideas/StoryMotion/current.md` | Current mainline, active decision, v8 hypothesis/gates, blockers, and links to the evidence owner | Per-step progress, stale ETA, full metric tables, historical narrative |
 | `obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md` | Audited numeric results, mixed-version comparison tables, artifact/checkpoint/record hashes, and uncertainty | Unaudited runner messages, speculative root causes, deployment diary |
-| `obsidian-vault/ideas/StoryMotion/history.md` | Append-only finalized milestones, invalidations, bug provenance, and archival decisions | Live priority, queue state, or a duplicate current-version matrix |
+| `obsidian-vault/ideas/StoryMotion/version_family.md` | Version-family names, causal questions, unique interventions, completed Stage/steps, finalized milestones, invalidations, and bug provenance | Live priority, queue state, or a duplicate current-version matrix |
 | `obsidian-vault/ideas/StoryMotion/StoryMotion-metric-computation-io.md` | Metric definitions, evaluator/decoder semantics, and I/O contracts | Run-specific outcome tables or policy decisions |
-| `obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion.md` | v8 family hypothesis, Stage1 decision history, preregistered gates, v8.0+ version matrix, and candidate-level conclusions | Raw training progress, a second curation specification, or a second Stage2 ladder |
-| `obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-3-data-curation-plan.md` | The complete v8.3 curation contract, gate state, zero/nonzero counters, manifest lineage, and curation-only decisions | A separate progress page or representation/backbone conclusions |
+| `obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-2333-data-curation-plan.md` | The complete v8.2333 curation contract, gate state, zero/nonzero counters, manifest lineage, and curation-only decisions | A separate progress page or representation/backbone conclusions |
 | `obsidian-vault/ideas/StoryMotion/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder.md` | Representation-generatability diagnostics, Stage2 screen/continue/stop gates, and the current non-promotion experiment order | Formal result tables after an eval closes |
 
 Route incremental information in this order:
@@ -88,17 +88,17 @@ Route incremental information in this order:
    the owning plan page.
 2. During a run, write progress, ETA, worker output, and checkpoints only to
    the run manifest/logs under `runs/`. Do not make date-stamped vault progress
-   notes or update `version.md` for a finite loss/step count.
+   notes or update `current.md` for a finite loss/step count.
 3. At a screen, retain the auditable raw artifact in `runs/`, update just the
    owning plan's decision row, and label the result `screen` rather than formal
    evidence.
 4. After a formal audit, add the exact result once to the metric ledger, then
-   update `version.md` with a short current decision and `history.md` with a
+   update `current.md` with a short current decision and `version_family.md` with a
    finalized event. Mixed-version tables must have a non-empty `version / run`
    value on every row.
 5. When a plan is superseded or a deployment snapshot closes, move it (do not
    copy it) to `obsidian-vault/ideas/StoryMotion/archived/<axis>/`, update
-   inbound links, and record the archive decision in `history.md`. Preserve
+   inbound links, and record the archive decision in `version_family.md`. Preserve
    evidence and hashes; never replace a retired page with a second live
    narrative or delete artifacts merely to simplify the vault.
 
