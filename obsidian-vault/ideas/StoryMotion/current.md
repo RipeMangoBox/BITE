@@ -29,13 +29,13 @@ source_papers:
   - "[[analysis/NEURIPS_2025/TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_Generation]]"
   - "[[analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T20:55:00+08:00
+updated: 2026-07-19T21:55:00+08:00
 ---
 
 # StoryMotion Current
 
 > [!abstract] 当前裁决
-> corrected v7.14 camera14 joint AE 仍是 **Stage1 implementation mainline**，v7.38 L0 clean `105K` 仍是唯一 **Stage2 formal mainline**。v8.1C C3-25 seed17 是当前最有希望的 Stage1 candidate：fresh `636K / 81.38M` 与 pure4053 audit 只剩 Human global slope `26.302 > 20 mm/100f` 未过原始 gate。C5-B multi-horizon two-seed short 已因 seed23 未复现 target 而停止。用户于 `2026-07-19` 明确授权的独立 Stage2 `0→105K` 已通过 exact cache/contract/non-causal/train-only full-cov audit 并开始单进程训练；`30K` 固化 checkpoint 后会在不中断训练的情况下完成 Direct-H、Direct-C 与 joint parallel 全量评估。该 run 全程 `diagnostic_only=true`、`promotion_eligible=false`；它回答 C3 latent 的可生成性与长预算成熟度，不提前替换 v7.14/v7.38。
+> corrected v7.14 camera14 joint AE 仍是 **Stage1 implementation mainline**，v7.38 L0 clean `105K` 仍是唯一 **Stage2 formal mainline**。v8.1C C3-25 seed17 是当前最有希望的 Stage1 candidate：fresh `636K / 81.38M` 与 pure4053 audit 只剩 Human global slope `26.302 > 20 mm/100f` 未过原始 gate。C5-B multi-horizon two-seed short 已因 seed23 未复现 target 而停止。用户于 `2026-07-19` 明确授权的独立 Stage2 `0→105K` 已通过 exact cache/contract/non-causal/train-only full-cov audit；D1 未发现 dead-channel 或 branch-marginal collapse，单进程继续训练。`30K` 固化 checkpoint 后会在不中断训练的情况下完成 Direct-H、Direct-C 与 joint parallel 全量评估。该 run 全程 `diagnostic_only=true`、`promotion_eligible=false`；它回答 C3 latent 的可生成性与长预算成熟度，不提前替换 v7.14/v7.38。
 
 > [!warning] 最容易混淆的命名
 > 仓库中没有独立的 “v8.1D” 或 “v8.1H” 完整版本。`D4/D4.2/D4.3` 是 v8.1A `30K` checkpoint 的 Stage2 只读诊断；`C4-H` 是 v8.1C 内部的 Stage1 Human-horizon short arm。完整命名、dose 和 step 对照只见 [[version_family#v8.1 命名解码与执行状态]]。
@@ -52,7 +52,7 @@ updated: 2026-07-19T20:55:00+08:00
 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | Stage1 `636K` | yaw/root geometry supervision 能否修复 Human 长程误差 | Human 显著改善，Camera mild regression；原始 Stage1 gate 未过 | 保留为 v8.1C parent 与 Stage2 generatability control |
 | v8.1A / `v8_1a_diag_unified3_30k_seed17_4090g0_20260718` | Stage2 `30K` | v8.1A latent 是否更易生成 | Direct-H 有 signal；Direct-C 与 joint parallel Camera broad regression；正式停止 | 不续 `105K`；只保留已闭合 D4 family 归因 |
 | v8.1C C3-25 / `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | Stage1 `636K` | 低 dose Camera-center loss 能否兼顾 Human 与 Camera | 当前最佳 Stage1 candidate；除 global slope 外原始 gate 全过 | 保持非晋级；作为下列用户授权 Stage2 诊断的 exact parent |
-| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage2 `0→105K` | C3-25 latent 在同 Unified 与长预算下能否生成 | exact cache/contract audit passed、continuous training active；`30K/105K` formal eval pending | 4090 GPU0 单进程连续训练；30K checkpoint 不重启、不作为 quality stop；不得产生 promotion claim |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage2 `0→105K` | C3-25 latent 在同 Unified 与长预算下能否生成 | exact cache/contract 与 D1 audit passed、continuous training active；`30K/105K` formal eval pending | 4090 GPU0 单进程连续训练；30K checkpoint 不重启、不作为 quality stop；不得产生 promotion claim |
 | v8.1C C3-25 / `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | Stage1 `636K` | C3-25 signal 是否跨 seed | Human 与 Camera translation signal 重现；slope 与 rotation 未全过 | 只作 robustness evidence，不替代 seed17 selected arm |
 | v8.1C C3-50 / `v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719` | Stage1 `636K` | 更高 center dose 的完整预算代价是什么 | Camera translation 更好，但 Human overall 与 long horizon 全面变差 | dose-response 已关闭；不再增大 center dose |
 | v8.1C C5-B / two-seed matched short family | Stage1 calibration + fresh `10,176` screens | four-anchor multi-horizon 是否修复 C3-25 的 Human horizon blocker | seed17 dose1.0 过 gate，但 seed23 两项 target 未复现；two-seed screen fail | 正式关闭；不启动 full、cache 或 Stage2 |
@@ -113,8 +113,8 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 
 1. C3-25 seed17 exact cache、non-causal、ordered IDs、owning-decoder、train-only full-cov normalization 与 file-hash audit 已通过；4090 GPU0 正从零单进程训练 Stage2 `105K`，LR 在 step `30001` 从 `1e-4` 变为 `3e-5`，不重启 optimizer。
 2. 保存 immutable `step_30000.pt`，主训练继续；4090 GPU1 顺序执行 pure4053 Direct-H、Direct-C 与 joint parallel DDIM50 全量评估。30K 结果用于诊断和同 step 比较，不自动停止用户授权的 `105K`。
-3. C5-B calibration、seed17 selection 与 seed23 confirmation 已全部闭合；two-seed gate fail，不再占用 GPU，也不启动 C5 full/cache/Stage2。5090 GPU1 始终只作短测，现已释放。
-4. C3 的这次 Stage2 诊断不授权 v8.2333 curation、v8.4 backbone，也不产生 promotion-bearing cache；除 C3 30K/105K milestone eval 外，当前没有已授权的后续 GPU task。
+3. C3 D1 full-train/frozen-eval cache geometry 已闭合，只排除了明显 cache health failure；MoMask-Pulp native Direct-H formal baseline 也已闭合并仅按 C-tier 解释。二者都不改写 C3 gate。
+4. C3 的这次 Stage2 诊断不授权 v8.2333 curation、v8.4 backbone，也不产生 promotion-bearing cache；除 C3 30K/105K milestone eval 外，当前没有已授权的后续长训分支。
 
 ## 6. 文档与证据路由
 

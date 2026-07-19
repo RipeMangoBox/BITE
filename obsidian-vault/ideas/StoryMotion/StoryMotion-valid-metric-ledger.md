@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-19T20:55:00+08:00
+updated: 2026-07-19T21:55:00+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -27,7 +27,7 @@ updated: 2026-07-19T20:55:00+08:00
 > 本页只拥有已经审计的数值、比较边界和 artifact hashes。Stage1 reconstruction、Stage2 generation、30K diagnostic screen 与 105K formal evidence 分区记录；除明确标为 diagnostic 的 N64/short rows 外，正式表均为 official pure 4,053。当前裁决见 [[current]]，版本名称与完成 step 见 [[version_family]]，指标定义见 [[StoryMotion-metric-computation-io]]。
 
 > [!important] C3-25 当前证据边界
-> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 此后按用户授权建立了独立、审计通过的 diagnostic-only Stage2 cache，并启动 continuous `0→105K` run；当前尚无 C3 的 Stage2 `30K/105K` 正式结果，因此本页不提前填分。seed23 仍只有 Stage1。下文已有的 Stage2 30K 数值仍只属于父候选 v8.1A。
+> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 此后按用户授权建立了独立、审计通过的 diagnostic-only Stage2 cache，并启动 continuous `0→105K` run；D1 cache geometry 已闭合，但当前尚无 C3 的 Stage2 `30K/105K` 正式生成结果，因此本页不提前填分。seed23 仍只有 Stage1。下文已有的 Stage2 30K 数值仍只属于父候选 v8.1A。
 
 ## 1. 如何读表
 
@@ -52,6 +52,7 @@ updated: 2026-07-19T20:55:00+08:00
 | v7.14 / joint AE official r2 | Stage1 636K | reconstruction | 4,053 | current implementation mainline |
 | v7.38 L0 / clean 105K | Stage2 105K | Direct-H、Direct-C、parallel | 4,053 | current formal mainline |
 | v7.47 / official-AE Unified 105K | Stage2 105K | Direct-H、Direct-C、parallel | 4,053 | S-tier system control |
+| MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | Direct-H | 4,053 | C-tier native-system baseline |
 | PulpMotion / official DiT-xy step92950 | Stage2 native endpoint | joint | 4,053 | C-tier native-system baseline |
 | v7.36 A30 vs v8.1A G3 | Stage2 30K | Direct-H、Direct-C、parallel | 4,053 | matched generatability screen，不与 105K 排名混合 |
 
@@ -206,7 +207,7 @@ Human completion contract：human text → H。GT 是 identity reference；观�
 | v7.42 / same-impl Human specialist | Stage2 task-exposure matched | A | 328.620 | 13.438 | 42.22% | — | — | formal |
 | v7.45 / MoLingo human | Stage2 240K human-only | B | 149.163 | 17.729 | 49.86% | 242.502 / 1,249.134 mm | 1,164.249 / 2,007.279 mm | semantic signal；geometry no-promotion |
 | MotionLab-MFT / v7.14 latent | Stage2 30K human-only | B | 156.350 | 18.172 | 59.19% | 250.782 / 951.380 mm | 857.640 / 1,436.396 mm | formal system peer |
-| MoMask-Pulp / native | Stage2 native training complete | C | — | — | — | — | — | VQ/Mask/Residual complete；formal adapter/eval pending |
+| MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | C | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 mm | 998.888 / 1,610.472 mm | formal native baseline；representation/decoder/objective/sampler differ |
 
 ### 3.3 Direct-C fair system table
 
@@ -253,18 +254,22 @@ Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 | 1–64 | 1,805 | v7.47 / official-AE Unified | Stage2 105K S | 212.067 / 638.744 | 554.517 / 958.293 |
 | 1–64 | 1,805 | v7.45 / MoLingo human | Stage2 B | 251.390 / 842.422 | — |
 | 1–64 | 1,805 | MotionLab-MFT / v7.14 latent | Stage2 B | 260.438 / 752.649 | — |
+| 1–64 | 1,805 | MoMask-Pulp / native seed17 | Stage2 C | 324.008 / 852.930 | 674.854 / 1,083.558 |
 | 65–128 | 1,411 | v7.38 L0 / clean | Stage2 105K mainline | 249.884 / 895.589 | — |
 | 65–128 | 1,411 | v7.47 / official-AE Unified | Stage2 105K S | 188.249 / 851.014 | 792.751 / 1,407.208 |
 | 65–128 | 1,411 | v7.45 / MoLingo human | Stage2 B | 235.229 / 1,310.340 | — |
 | 65–128 | 1,411 | MotionLab-MFT / v7.14 latent | Stage2 B | 241.908 / 991.529 | — |
+| 65–128 | 1,411 | MoMask-Pulp / native seed17 | Stage2 C | 311.172 / 1,248.485 | 1,092.817 / 1,796.358 |
 | 129–192 | 456 | v7.38 L0 / clean | Stage2 105K mainline | 234.630 / 1,135.359 | — |
 | 129–192 | 456 | v7.47 / official-AE Unified | Stage2 105K S | 166.025 / 1,062.929 | 1,017.026 / 1,843.047 |
 | 129–192 | 456 | v7.45 / MoLingo human | Stage2 B | 221.093 / 1,697.425 | — |
 | 129–192 | 456 | MotionLab-MFT / v7.14 latent | Stage2 B | 231.113 / 1,242.231 | — |
+| 129–192 | 456 | MoMask-Pulp / native seed17 | Stage2 C | 294.303 / 1,469.573 | 1,333.195 / 2,193.523 |
 | 193+ | 381 | v7.38 L0 / clean | Stage2 105K mainline | 255.706 / 1,294.288 | — |
 | 193+ | 381 | v7.47 / official-AE Unified | Stage2 105K S | 185.344 / 1,142.850 | 1,099.478 / 1,883.859 |
 | 193+ | 381 | v7.45 / MoLingo human | Stage2 B | 252.949 / 2,412.741 | — |
 | 193+ | 381 | MotionLab-MFT / v7.14 latent | Stage2 B | 261.443 / 1,396.085 | — |
+| 193+ | 381 | MoMask-Pulp / native seed17 | Stage2 C | 323.113 / 1,921.798 | 1,786.035 / 2,720.502 |
 
 #### Direct-C and joint parallel
 
@@ -343,7 +348,33 @@ G3 status：stop_30k_broad_camera_regression。v8.1A 不续 105K；该结果也�
 | 193+ | 381 | v7.36 A30 | Stage2 30K parallel | 0.267 / 1.279 | 3.727 / 3.939 | 83.363 |
 | 193+ | 381 | v8.1A G3 | Stage2 30K parallel | 0.268 / 1.308 | 3.114 / 3.370 | 68.826 |
 
-## 5. D4 family：Stage2 30K frozen diagnostics
+## 5. Read-only diagnostics
+
+### 5.0 C3 D1 cache geometry
+
+D1 使用 exact C3 train/eval cache 与 train-only full-cov stats；train split 估计统计，eval split 只作冻结报告。effective rank 为坐标系内诊断，不是生成质量分数。
+
+| version / run | split | samples | raw H / C effective rank | normalized H / C effective rank | dead H / C channels | raw H-C corr mean / max | normalized H-C corr mean / max |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 D1 / continuous diagnostic | train | 162,760 | 45.074 / 9.719 | 128.000 / 64.000 | 0 / 0 | 0.0657 / 0.3525 | 0.0504 / 0.2923 |
+| v8.1C C3-25 D1 / continuous diagnostic | eval frozen report | 4,053 | 47.423 / 11.512 | 113.786 / 55.721 | 0 / 0 | 0.0629 / 0.3593 | 0.0563 / 0.3170 |
+
+valid length 相同的 train/eval 行放在一起，length 递增：
+
+| valid length | split | n | raw H / C effective rank | normalized H / C effective rank | raw / normalized mean \|H-C corr\| |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 1–64 | train | 39,634 | 41.466 / 9.406 | 111.132 / 60.072 | 0.0771 / 0.0566 |
+| 1–64 | eval | 1,805 | 45.414 / 12.406 | 94.760 / 47.267 | 0.0708 / 0.0639 |
+| 65–128 | train | 62,141 | 42.262 / 9.746 | 125.009 / 63.470 | 0.0681 / 0.0515 |
+| 65–128 | eval | 1,411 | 45.369 / 11.148 | 109.588 / 55.160 | 0.0646 / 0.0588 |
+| 129–192 | train | 34,518 | 44.262 / 9.512 | 124.311 / 63.403 | 0.0654 / 0.0522 |
+| 129–192 | eval | 456 | 42.966 / 9.932 | 113.117 / 58.378 | 0.0650 / 0.0583 |
+| 193+ | train | 26,467 | 41.982 / 9.161 | 117.133 / 61.001 | 0.0682 / 0.0563 |
+| 193+ | eval | 381 | 40.072 / 9.435 | 106.546 / 56.015 | 0.0750 / 0.0678 |
+
+最窄结论：没有 dead-channel 或 branch-marginal collapse；raw Camera latent 的有效秩明显低于 Human，train-only whitening 按定义恢复 marginal scale，但 H-C 依赖仍存在。该结果只排除明显 cache health failure，不预测 `30K/105K` 生成质量。
+
+### D4 family：v8.1A Stage2 30K frozen diagnostics
 
 D4/D4.2/D4.3 都是 v8.1A G3 的 N64 read-only diagnostics；t=50/500/950 是 diffusion timestep，不是训练 step。它们不训练、不写 cache、不授权 105K。
 
@@ -410,13 +441,15 @@ Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a286
 | v7.36 A30 / matched control | Stage2 30K | 7dcf3b1911af144ea9ef2b30017dd07472d62f655fd04c1dc9263581e3382c0b | v7.14 decoder 91248bf4…7ce1；cache f7a00a48…a5983 / 6f13816c…9b25 | matched comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K stopped | becc2c11051bfd7857acb0602f61c755cd664969f34acef1f0232711feee5bb8 | v8.1A decoder ac47c219…151f；cache 3b55223d…bd22 / 1050748f…541d | contract c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59 |
 | v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；no metric row yet | pending 30K/105K immutable checkpoints | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | contract 2351a6f0…877；audit eb28815a…1fb；diagnostic-only |
+| MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d4268…8664；Mask 03787132…ff3c；Residual 89faab30…e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f9…8901；result 3a133b83…af70；records 6545ab1a…ed8；audit 71bd4b1d…3232 |
 
 v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。v7.47 training script 与 L0 historical training script SHA256 分别为 71a9a2a3b700d4f0a699fda5f28bf8da72f563c20871e1c1cfb5d4d4cae0ac08 / f207c840fa363afc13e308047ddbe3900683f048366c10e9c135b49a2da886c8，因此 strict representation isolation 未建立。
 
-### 6.3 D4 artifacts
+### 6.3 Diagnostic artifacts
 
 | version / run | diagnostic | artifact / comparison SHA256 |
 | --- | --- | --- |
+| v8.1C C3-25 D1 / continuous diagnostic | full train estimate + frozen eval cache geometry | artifact 2f5a64315d8cca23d3d432bb872bec55ba72fdb775ace37b26019c78c05002b1；script 98121fae2392aa0909b5847ac46c917d4f91751bc325cc42c3ffcfe51f593d50 |
 | v8.1A D4 vs v7.36 D4 | raw residual propagation | candidate 142614050c5d94ae8e0e680327129a7893d64afcd0cc3ff0070aaf3b1a02274f；baseline d22a13b9c0974c7610f7142c3b73ac6876ed5fb368ca0cb8ee8808550519469a；comparison 13f9715b446a33d32181a231b2a4eb7bd17eddcb2044b8c2228cda8cd4e20727 |
 | v8.1A D4.2 vs v7.36 D4.2 | Camera-text reliance | candidate 134195504286677d0a77c0da6ee7e8a897008525337a908b91506a301dedc795；baseline e8064825521865a74081c79f40b8d5481c72df1969521fd762eb27177ddf4148；comparison 8d98765900ee9f9683e84b3e2de309b66ae92733de41ce49490d9b149f5baed9 |
 | v8.1A D4.3 r3 vs v7.36 r3 | decoder direction sensitivity | candidate 58b6f62c6004e2ef24f94bd831790058e0e799e29650f1622a0a44e9eee19d7f；baseline 370e30d190deb63e66e675defc26265c103fe1c62a860a982e577597ad8e5c07；comparison ff0df9c541f351827ae234700b25cf5f9f355ec369b0c9f7c8525de0ab7ef7ae |
@@ -429,6 +462,8 @@ v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f841
     runs/stage1/v8_1c_center25pct_full636k_seed23_5090g0_20260719/
     runs/stage1/v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719/
     runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/
+    runs/train/stage2/v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719/
+    runs/eval/stage2/v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719/
     runs/stage2/v7_47_official_ae_unified_matched_seed17_5090g0_20260717/eval/official_pure4053/
     runs/legacy/eval/stage2/v7_36_p0a_asym_unified3_joint30k_seed17_4090g0_20260714/
     runs/legacy/eval/stage2/v8_1a_diag_unified3_30k_seed17_4090g0_20260718/

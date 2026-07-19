@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T20:55:00+08:00
+updated: 2026-07-19T21:55:00+08:00
 ---
 
 # StoryMotion Version Family
@@ -47,7 +47,7 @@ updated: 2026-07-19T20:55:00+08:00
 | C3-25 short | v8.1C / Stage1 short | 降低 center dose 后能否形成 Pareto | C1 weight 的 `25%`，即 `0.0010166945703219975` | fresh `10,176` steps | 通过；按预注册成为 selected full arm |
 | C3-50 short | v8.1C / Stage1 short | 同一 dose-response 的较高臂 | C1 weight 的 `50%`，即 `0.002033389140643995` | fresh `10,176` steps | 通过；因两臂均过而不被选为主臂 |
 | C3-25 seed17 full | C3-25 / Stage1 full | selected treatment 的同 seed完整预算结果 | fresh seed17；不复用 short/aborted state | fresh `636K / 81.38M` + pure4053 | 完成；当前最佳 Stage1 candidate，只剩 global slope blocker；是下列 Stage2 diagnostic 的 exact parent |
-| C3-25 seed17 Unified | C3-25 seed17 / Stage2 diagnostic | 新 latent 是否可生成，以及 `30K→105K` 是否只是训练成熟度问题 | exact parent/decoder/cache/full-cov stats；同一进程 `0→105K`，30K 固化但不重启 | `105K` train 已部署；30K/105K 各做 Direct-H、Direct-C、joint parallel pure4053 | cache/contract audit 已过、训练已启动；原始 Stage1 gate 不变，永久 non-promotion |
+| C3-25 seed17 Unified | C3-25 seed17 / Stage2 diagnostic | 新 latent 是否可生成，以及 `30K→105K` 是否只是训练成熟度问题 | exact parent/decoder/cache/full-cov stats；同一进程 `0→105K`，30K 固化但不重启 | `105K` train 已部署；30K/105K 各做 Direct-H、Direct-C、joint parallel pure4053 | D0/D1 已闭合、训练 active；原始 Stage1 gate 不变，永久 non-promotion |
 | C3-25 seed23 full | C3-25 / Stage1 robustness | 低 dose signal 是否跨 seed | fresh seed23；不存在 seed23 full A baseline | fresh `636K / 81.38M` + pure4053 | 完成；signal 重现但 slope/rotation 未全过；**无 Stage2** |
 | C3-50 seed17 full | C3-50 / Stage1 exploratory | 完整预算 dose-response | 用户后授权的 exploratory full；不改变 C3-25 selected 规则 | fresh `636K / 81.38M` + pure4053 | Camera 更好、Human long horizon 更差；non-promotion |
 | C4 calibration | C3-25 / Stage1 calibration | 分开 Camera rotation 与 Human horizon 责任轴 | 8-batch unit-gradient norm/cosine；两个 arm 各取 parent gradient `1.25%` | **无训练** | 得到 C4-R/C4-H weights；只证明尺度与方向可区分 |
@@ -86,7 +86,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v8.1C C3-25 seed23 | completed `636K` | not run | not run | not run |
 
 > [!important] C3-25 的直接答案
-> C3-25 seed17 已构建并审计自己的 Stage2 cache，`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 已作为用户授权的 continuous non-promotion diagnostic 启动；`30K` checkpoint/eval 与 `105K` endpoint/eval 仍待该 run 自己完成。任何 `v8_1a_diag_unified3_30k_*` 仍只属于父候选 v8.1A，不能改名或继承给 C3-25。
+> C3-25 seed17 已构建并审计自己的 Stage2 cache，D1 排除了 dead-channel 与 branch-marginal collapse；`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 正作为 continuous non-promotion diagnostic 训练。`30K` checkpoint/eval 与 `105K` endpoint/eval 仍待该 run 自己完成。任何 `v8_1a_diag_unified3_30k_*` 仍只属于父候选 v8.1A，不能改名或继承给 C3-25。
 
 ## v8.0+ 家族地图
 
@@ -130,6 +130,8 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-19：** C5-B seed17 matched screen 完成；dose0.5 未过 target，dose1.0 通过两项 target 与八项 guards，按预注册只进入 seed23 confirmation，仍不授权 full。
 - **2026-07-19：** C5-B seed23 matched confirmation 完成；八项 guards 全过但两个 target 都未复现，two-seed screen 按预注册停止，不启动 full/cache/Stage2。
 - **2026-07-19：** 用户授权 C3-25 seed17 独立 Stage2 continuous `0→105K` diagnostic；exact cache、train-only full-cov normalization 与 run contract 审计通过，30K/105K active three-profile eval 由里程碑监督器执行且不在 30K 重启训练。
+- **2026-07-19：** C3-25 Stage2 D1 完成 full train estimate 与 frozen pure4053 eval cache audit；未发现 dead-channel 或 branch-marginal collapse，raw Camera latent 仍呈低有效秩。该结果只关闭 cache health 风险，不产生生成质量结论。
+- **2026-07-19：** MoMask-Pulp native VQ/Mask/Residual endpoint 的 Direct-H pure4053 formal eval 与独立 audit 闭合；只作为 C-tier native-system baseline，不解释为 StoryMotion representation ablation。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
 - **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
 
@@ -143,11 +145,12 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v7.34 checkpoint contract 缺相邻 `run_config.json` | 首次 eval 在采样前 hard fail | 补齐 exact contract 后重跑；无无效 metrics |
 | historical composed joint 可能让 cascade 两次 pass 使用不同 checkpoint 文件 | attribution provenance 不闭合 | same-run composition 强制同一 checkpoint SHA |
 | 旧 E.T./Director artifacts 实际加载 StoryMotion checkpoint，部分还 test-as-validation | external baseline 错标 | 删除无效对象；只保 corrected Director-C |
-| MoMask 首次从 HDD 随机读取小文件，随后又误用 `30K×512` 预算 | deployment 与预算均不可晋级 | packed-cache fresh run；VQ/Mask/Residual 已完成，formal eval仍待实现 |
+| MoMask 首次从 HDD 随机读取小文件，随后又误用 `30K×512` 预算 | deployment 与预算均不可晋级 | packed-cache fresh run 从零完成 VQ159K、Mask240K、Residual240K；native Direct-H formal eval 已闭合 |
 | CCD-Pulp 首次长训缺 owning-decoder SHA | contract 不完整 | 旧 run 标 invalid；corrected run 从 step0 重启 |
 | v7.46 把 H/C 不适用的 Out 缺失当失败 | `10K` 后错误停止 | v7.47 从 step0 完整重训；v7.46 只作 bug provenance |
 | C3 首次双臂共享 4090 HDD | 两臂只到 step `214`，无模型结论 | aborted state 禁止 resume；fresh fast-tier runs 从零重启 |
 | D4.3 v8.1A stats 的 pre-resume serialization 已不存在 | 无法做旧 bytes tensor-by-tensor 追溯 | r3 显式记录 expected/current/source-cache hashes；永久 diagnostic-only |
+| C3 trainer 加载既有 full-cov stats 后会无条件重存，改变 serialization bytes | active contract 的 stats file hash 会漂移，但本次前后统计 tensor exact equal | 保留漂移副本 `7decc3dd…42af`；从 exact train cache 与原 `created_at` 重建并恢复 contracted `0c97d247…3400`，重新 audit 通过；active run 结束前不改 tracked trainer code |
 
 ## Evidence boundary
 
