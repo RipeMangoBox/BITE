@@ -29,7 +29,10 @@ evaluating, comparing, or documenting a StoryMotion experiment.
    a prose-only mapping is insufficient for new or edited mixed-version rows.
 7. Modify Unified-3 directly. Human/camera specialist callbacks are diagnostics
    of the same unified checkpoint and branch code, not unrelated precursor
-   models. Parallel/cascade attribution uses the same unified checkpoint.
+   models. Active evaluation and promotion gates report Direct-H, Direct-C, and
+   joint parallel. Cascade is optional historical/root-cause attribution only,
+   never a required score or gate; if invoked, it uses the same unified
+   checkpoint as parallel.
 8. v8 candidates remain controls until they pass the preregistered Stage1
    root/yaw geometry gate. For human199, root-aligned MPJPE removes translation
    but retains heading error; never relabel it as local-pose quality without a
@@ -49,6 +52,53 @@ Stage2 branch-independence experiment.
 
 camera9 separate VAE is a control, not the default. camera14 separate results
 must never be presented as camera14 joint results.
+
+## Per-Host Stage1 Data Read Policy
+
+On hosts `4090` and `5090`, the immutable Pulp source is
+`/data/public/ripemangobox/Motion/datasets/pulpmotion-data` on that host's
+`/data` HDD. On host `3090`, the local immutable copy is provisioned at
+`/home/ripemangobox/Coding/Github/Motion/.storymotion-data/pulpmotion-data` and
+is exposed after verification as
+`/home/ripemangobox/Coding/Github/Motion/datasets/pulpmotion-data`.
+`linked/pulpmotion-data` is only a workspace symlink. The presence of a partial
+rsync tree is not a completion marker: host `3090` must not train or evaluate
+from it until the full copy, ordered identities, file counts, and hashes have
+been verified and the logical path has been atomically cut over.
+
+Random-small-file Stage1 training must not read `smpl_rifke`, `traj`, or
+`intrinsics` from a rotational disk. Use the same-host fast paths below:
+
+- host `4090`: `/home/ripemangobox/storymotion_data_cache/pulpmotion_stage1_io_20260718`
+  on the system NVMe;
+- host `5090`: `/home/ripemangobox/storymotion_data_cache/pulpmotion_stage1_io_20260719`
+  on the system SATA SSD. Despite legacy `nvme` text in some run or manifest
+  names, this host is not NVMe-backed.
+- host `3090`: the verified full local dataset at
+  `/home/ripemangobox/Coding/Github/Motion/.storymotion-data/pulpmotion-data`
+  on the system NVMe; no second Stage1 replica is required.
+
+All three path families in one Stage1 manifest must resolve to the same fast
+tier. A hybrid manifest or silent HDD fallback is forbidden. Before launch,
+verify the target filesystem with `findmnt -T`, verify `180527` files in each
+of `smpl_rifke`, `traj`, and `intrinsics`, preserve ordered sample IDs and
+manifest hashes, and run a finite loader-throughput preflight. Rebuild a
+missing replica only from that host's own immutable Pulp source; never edit the
+source and never make one server depend on a cross-server copy.
+
+This rule is specific to Stage1 random-small-file reads. Do not blindly move
+Stage2 contiguous `.pt` caches or other sequential artifacts to `/home`;
+select their storage tier from measured access behavior and record the exact
+cache hashes in the run contract.
+
+The `3090` workspace is
+`/home/ripemangobox/Coding/Github/Motion/StoryMotion`. Replicate only the exact
+checkpoint, owning decoder, cache, and normalization stats required by an
+authorized local train/eval contract, using resumable rsync followed by hash
+verification. Do not bulk-copy historical `runs/`, render outputs, or rendering
+adaptation assets; add them later only for a concrete need. Once provisioned,
+local execution must not depend on a live `4090` or `5090` mount or network
+read.
 
 ## Change Discipline
 

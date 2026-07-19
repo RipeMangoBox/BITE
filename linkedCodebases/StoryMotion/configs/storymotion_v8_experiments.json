@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "storymotion-v8-candidate",
   "status": "active_candidate_not_mainline",
-  "decision_note": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-yaw-quality-nonar-diffusion.md",
+  "decision_note": "obsidian-vault/ideas/StoryMotion/current.md",
   "invariants": {
     "mainline_until_promotion": {
       "stage1": "v7.14 corrected camera14 joint AE",
@@ -68,7 +68,7 @@
       "id": "v8.1-A",
       "priority": "P0",
       "kind": "stage1_train",
-      "status": "training_matched_endpoint",
+      "status": "completed_stage1_full_stage2_30k_stopped_no_105k",
       "question": "Does valid-mask-aware integrated yaw/root supervision fix the long-sequence geometry while preserving camera reconstruction?",
       "fixed_fields": [
         "v7.14 non-causal architecture",
@@ -122,24 +122,14 @@
         "epochs": 500,
         "optimizer_steps": 636000,
         "sample_exposures": 81380000,
-        "latest_verified": {
-          "recorded_at_cst": "2026-07-17 18:25",
-          "step": 54441,
-          "recent_steps_per_sec": 15.55,
-          "train_total_loss": 0.017507,
-          "test_step": 54000,
-          "test_total_loss": 0.026452,
-          "finite": true
-        },
-        "endpoint_eta_cst": "2026-07-18 04:45-05:20",
-        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+        "endpoint_state": "completed_and_audited"
       }
     },
     {
       "id": "v8.1-B",
       "priority": "P1",
       "kind": "stage1_train",
-      "status": "training_matched_endpoint_user_authorized_early",
+      "status": "completed_stage1_full_no_stage2",
       "depends_on": "v8.1-A stable but capacity-limited",
       "execution_override": "The user explicitly authorized running v8.1-B concurrently with v8.1-A on GPU0. Treat A/B as a two-factor system comparison, not the original conditional single-variable gate.",
       "question": "Does a non-causal AAMMARDM-style residual encoder/decoder help under the same geometry loss and matched budget?",
@@ -153,24 +143,14 @@
         "epochs": 500,
         "optimizer_steps": 636000,
         "sample_exposures": 81380000,
-        "latest_verified": {
-          "recorded_at_cst": "2026-07-17 18:25",
-          "step": 29268,
-          "recent_steps_per_sec": 12.14,
-          "train_total_loss": 0.034856,
-          "test_step": 28000,
-          "test_total_loss": 0.07109,
-          "finite": true
-        },
-        "endpoint_eta_cst": "2026-07-18 08:15-09:15",
-        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+        "endpoint_state": "completed_and_audited"
       }
     },
     {
       "id": "v8.2",
       "priority": "P1",
       "kind": "representation_train",
-      "status": "training_matched_endpoint_user_authorized_early",
+      "status": "completed_stage1_full_no_stage2",
       "depends_on": "v8.1 matched endpoint fails the yaw/length gate",
       "execution_override": "The user explicitly authorized implementing and launching v8.2 on GPU1 before v8.1 endpoints. It is an early representation-system comparison and cannot be used to claim the original sequential gate was followed.",
       "human_feature_contract": "human200 = root_z1 + root_xy_relative2 + yaw_sincos2 + pose6d132 + local_joints63",
@@ -194,27 +174,14 @@
         "normalization_source_samples": 162760,
         "normalization_source_frames": 19336840,
         "native_latent_order": "camera64+human128",
-        "latest_verified": {
-          "recorded_at_cst": "2026-07-17 18:25",
-          "step": 6133,
-          "recent_steps_per_sec": 18.81,
-          "train_total_loss": 0.053893,
-          "test_step": 4000,
-          "test_total_loss": 0.112649,
-          "checkpoint_contract_preflight": "passed",
-          "geometry_runtime_smoke_samples": 2,
-          "geometry_runtime_smoke_sha256": "55d8a6f7c4107ed0f8d9efd0ec37143ab04f86e907aedca02432babbca65a91a",
-          "finite": true
-        },
-        "endpoint_eta_cst": "2026-07-18 03:40-04:20",
-        "posttrain_eval": "queued_on_gpu1_pure4053_geometry"
+        "endpoint_state": "completed_and_audited"
       }
     },
     {
-      "id": "v8.3",
+      "id": "v8.2333",
       "priority": "P1",
       "kind": "data_manifest_ablation",
-      "status": "preregistered_waiting_on_v8_2_endpoint",
+      "status": "preregistered_not_started_blocked_no_promoted_representation",
       "question": "Does calibrated physical and pair-level semantic quarantine improve quality under a fixed representation and backbone?",
       "manifest_layers": [
         "raw",
@@ -222,12 +189,11 @@
         "semantic_pair_quarantine",
         "clean"
       ],
-      "plan": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-3-data-curation-plan.md",
-      "progress": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-3-data-curation-progress.md",
+      "plan": "obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-2333-data-curation-plan.md",
       "execution_gate": {
-        "condition": "v8.2 full 81.38M endpoint completed before 2026-07-17 22:00 CST",
+        "condition": "A representation passes a prospective Stage1 promotion gate and is explicitly selected",
         "state": "closed",
-        "reason": "The measured endpoint ETA is after 22:00; no curation data or scorer job has started.",
+        "reason": "No v8 representation has passed the prospective promotion gate; no curation data or scorer job has started.",
         "processed_pairs": 0
       },
       "semantic_scorers": [

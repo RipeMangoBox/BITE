@@ -320,6 +320,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--camera-acceleration-weight", type=float, default=0.0)
     parser.add_argument("--human-yaw-weight", type=float, default=0.0)
     parser.add_argument("--human-root-weight", type=float, default=0.0)
+    parser.add_argument("--camera-center-weight", type=float, default=0.0)
+    parser.add_argument("--camera-rotation-weight", type=float, default=0.0)
+    parser.add_argument("--human-horizon-weight", type=float, default=0.0)
+    parser.add_argument("--human-multi-horizon-weight", type=float, default=0.0)
     parser.set_defaults(is_causal=False)
     parser.add_argument("--non-causal", dest="is_causal", action="store_false", help="Use symmetric temporal conv padding.")
     parser.add_argument("--ema-decay", type=float, default=0.99)
@@ -406,6 +410,10 @@ def apply_loss_config(args: argparse.Namespace) -> argparse.Namespace:
         "camera_acceleration_weight",
         "human_yaw_weight",
         "human_root_weight",
+        "camera_center_weight",
+        "camera_rotation_weight",
+        "human_horizon_weight",
+        "human_multi_horizon_weight",
         "kl_weight",
         "commitment_weight",
     }
@@ -455,23 +463,48 @@ def apply_branch_loss_weights(model: torch.nn.Module, args: argparse.Namespace) 
     base_model.camera_acceleration_weight = float(args.camera_acceleration_weight)
     base_model.human_yaw_weight = float(args.human_yaw_weight)
     base_model.human_root_weight = float(args.human_root_weight)
+    base_model.camera_center_weight = float(args.camera_center_weight)
+    base_model.camera_rotation_weight = float(args.camera_rotation_weight)
+    base_model.human_horizon_weight = float(args.human_horizon_weight)
+    base_model.human_multi_horizon_weight = float(args.human_multi_horizon_weight)
 
 
 def configure_human_geometry_loss(model: torch.nn.Module, args: argparse.Namespace) -> None:
-    if args.human_yaw_weight < 0.0 or args.human_root_weight < 0.0:
-        raise ValueError("human yaw/root loss weights must be non-negative")
+    geometry_weights = (
+        args.human_yaw_weight,
+        args.human_root_weight,
+        args.camera_center_weight,
+        args.camera_rotation_weight,
+        args.human_horizon_weight,
+        args.human_multi_horizon_weight,
+    )
+    if any(weight < 0.0 for weight in geometry_weights):
+        raise ValueError("Stage1 geometry loss weights must be non-negative")
+    if args.human_horizon_weight != 0.0 and args.human_yaw_weight == 0.0 and args.human_root_weight == 0.0:
+        raise ValueError("human-horizon loss requires a nonzero human yaw or root parent weight")
+    if args.human_multi_horizon_weight != 0.0 and args.human_yaw_weight == 0.0 and args.human_root_weight == 0.0:
+        raise ValueError("human-multi-horizon loss requires a nonzero human yaw or root parent weight")
+    if args.human_horizon_weight != 0.0 and args.human_multi_horizon_weight != 0.0:
+        raise ValueError("last-valid and multi-horizon Human auxiliaries are mutually exclusive")
     if args.feature_contract == HUMAN200_FEATURE_CONTRACT:
         if args.tokenizer != "joint_ae" or args.human_dim != HUMAN200_DIM:
             raise ValueError("v8.2 human200 geometry requires the matched non-causal joint AE")
         if args.human_yaw_weight != 0.001 or args.human_root_weight != 0.003:
             raise ValueError("v8.2 must keep the matched v8.1 yaw/root weights 0.001/0.003")
+        if (
+            args.camera_center_weight != 0.0
+            or args.camera_rotation_weight != 0.0
+            or args.human_horizon_weight != 0.0
+            or args.human_multi_horizon_weight != 0.0
+        ):
+            raise ValueError("camera center/rotation and Human horizon supervision are not part of the v8.2 contract")
         stats = load_human200_stats(args.human200_stats, expected_train_manifest=args.human_manifest)
         base_model = model.module if hasattr(model, "module") else model
         base_model.geometry_human_mean = stats["mean"]
         base_model.geometry_human_std = stats["std"]
         base_model.geometry_feature_contract = "human200_direct_root_yaw"
         return
-    if args.human_yaw_weight == 0.0 and args.human_root_weight == 0.0:
+    if all(weight == 0.0 for weight in geometry_weights):
         return
     if args.tokenizer not in {"joint_ae", "joint_residual_ae"} or args.feature_contract != OFFICIAL_FEATURE_CONTRACT or args.human_dim != 199:
         raise ValueError("human yaw/root loss is restricted to a v8.1 normalized-human199 joint AE")
@@ -480,6 +513,11 @@ def configure_human_geometry_loss(model: torch.nn.Module, args: argparse.Namespa
     base_model.geometry_human_mean = stats["human_mean"]
     base_model.geometry_human_std = stats["human_std"]
     base_model.geometry_feature_contract = "human199_integrated_root_yaw"
+    if args.camera_center_weight != 0.0:
+        base_model.geometry_camera_velocity_mean = stats["velocity_mean"]
+        base_model.geometry_camera_velocity_std = stats["velocity_std"]
+        base_model.geometry_camera_distance_mean = stats["distance_mean"]
+        base_model.geometry_camera_distance_std = stats["distance_std"]
 
 
 def configure_loss_space(model: torch.nn.Module, args: argparse.Namespace) -> None:
@@ -745,6 +783,10 @@ def write_stage1_contract(
             "camera_acceleration_weight": args.camera_acceleration_weight,
             "human_yaw_weight": args.human_yaw_weight,
             "human_root_weight": args.human_root_weight,
+            "camera_center_weight": args.camera_center_weight,
+            "camera_rotation_weight": args.camera_rotation_weight,
+            "human_horizon_weight": args.human_horizon_weight,
+            "human_multi_horizon_weight": args.human_multi_horizon_weight,
         },
         "checkpoint": {
             "path": str(checkpoint),
@@ -940,6 +982,10 @@ def main() -> None:
         "camera_acceleration_weight": args.camera_acceleration_weight,
         "human_yaw_weight": args.human_yaw_weight,
         "human_root_weight": args.human_root_weight,
+        "camera_center_weight": args.camera_center_weight,
+        "camera_rotation_weight": args.camera_rotation_weight,
+        "human_horizon_weight": args.human_horizon_weight,
+        "human_multi_horizon_weight": args.human_multi_horizon_weight,
         "is_causal": args.is_causal,
         "fixed_max_frames": args.fixed_max_frames,
         "padding_policy": "fixed_right_zero_pad_and_loss_mask" if args.fixed_max_frames else "dynamic_batch_max_and_loss_mask",

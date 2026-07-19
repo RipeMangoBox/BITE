@@ -1,0 +1,11 @@
+stage1_model:
+  is_causal: false
+stage1_loss:
+  human_yaw_weight: 0.001
+  human_root_weight: 0.003
+  camera_center_weight: 0.002033389140643995
+calibration:
+  status: c3_screen_passed_exploratory_nonpromotion
+  raw_camera_center_gradient_fraction: 0.025
+  source_screen: v8_1c_center50pct_screen10176_seed17_4090g1_20260719
+  source_geometry_sha256: 0ef4c4a2bb3cdba0831caf39a1847e04ccd9ea4608f5d5b15327ef24d9ff444c

@@ -251,6 +251,10 @@ class _JointHumanCameraAE(nn.Module):
         self.camera_acceleration_weight = 0.0
         self.human_yaw_weight = 0.0
         self.human_root_weight = 0.0
+        self.camera_center_weight = 0.0
+        self.camera_rotation_weight = 0.0
+        self.human_horizon_weight = 0.0
+        self.human_multi_horizon_weight = 0.0
         if build_encoder:
             self.encoder = _make_encoder(self.human_dim + self.camera_dim, self.latent_dim, hidden_dim, downsample, self.is_causal)
         self.human_decoder = _make_decoder(self.human_latent_dim, hidden_dim, self.human_dim, downsample, self.is_causal)
@@ -335,6 +339,34 @@ class _JointHumanCameraAE(nn.Module):
         human_acceleration_loss = temporal_accel_loss(loss_human_recon, loss_human, mask)
         camera_acceleration_loss = temporal_accel_loss(loss_camera_recon, loss_camera, mask)
         human_yaw_loss, human_root_loss = self._human_root_geometry_losses(human, output.human_recon, mask)
+        camera_center_loss = self._camera_center_geometry_loss(human, camera, output.human_recon, output.camera_recon, mask)
+        zero = output.human_recon.new_tensor(0.0)
+        if self.camera_rotation_weight != 0.0:
+            camera_rotation_loss = self._camera_rotation_geometry_loss(camera, output.camera_recon, mask)
+        else:
+            camera_rotation_loss = zero
+        if self.human_horizon_weight != 0.0:
+            human_horizon_yaw_loss, human_horizon_root_loss = self._human_horizon_geometry_losses(
+                human, output.human_recon, mask
+            )
+        else:
+            human_horizon_yaw_loss = zero
+            human_horizon_root_loss = zero
+        human_horizon_loss = (
+            self.human_yaw_weight * human_horizon_yaw_loss
+            + self.human_root_weight * human_horizon_root_loss
+        )
+        if self.human_multi_horizon_weight != 0.0:
+            human_multi_horizon_yaw_loss, human_multi_horizon_root_loss = (
+                self._human_multi_horizon_geometry_losses(human, output.human_recon, mask)
+            )
+        else:
+            human_multi_horizon_yaw_loss = zero
+            human_multi_horizon_root_loss = zero
+        human_multi_horizon_loss = (
+            self.human_yaw_weight * human_multi_horizon_yaw_loss
+            + self.human_root_weight * human_multi_horizon_root_loss
+        )
         weighted_human_recon_loss = self.human_recon_weight * human_recon_loss
         weighted_camera_recon_loss = self.camera_recon_weight * camera_recon_loss
         weighted_human_velocity_loss = self.human_velocity_weight * human_velocity_loss
@@ -343,6 +375,12 @@ class _JointHumanCameraAE(nn.Module):
         weighted_camera_acceleration_loss = self.camera_acceleration_weight * camera_acceleration_loss
         weighted_human_yaw_loss = self.human_yaw_weight * human_yaw_loss
         weighted_human_root_loss = self.human_root_weight * human_root_loss
+        weighted_camera_center_loss = self.camera_center_weight * camera_center_loss
+        weighted_camera_rotation_loss = self.camera_rotation_weight * camera_rotation_loss
+        weighted_human_horizon_loss = self.human_horizon_weight * human_horizon_loss
+        weighted_human_multi_horizon_loss = (
+            self.human_multi_horizon_weight * human_multi_horizon_loss
+        )
         weighted_velocity_loss = weighted_human_velocity_loss + weighted_camera_velocity_loss
         weighted_acceleration_loss = weighted_human_acceleration_loss + weighted_camera_acceleration_loss
         return {
@@ -362,9 +400,54 @@ class _JointHumanCameraAE(nn.Module):
             "weighted_acceleration_loss": weighted_acceleration_loss,
             "human_yaw_loss": human_yaw_loss,
             "human_root_loss": human_root_loss,
+            "camera_center_loss": camera_center_loss,
+            "camera_rotation_loss": camera_rotation_loss,
+            "human_horizon_yaw_loss": human_horizon_yaw_loss,
+            "human_horizon_root_loss": human_horizon_root_loss,
+            "human_horizon_loss": human_horizon_loss,
+            "human_multi_horizon_yaw_loss": human_multi_horizon_yaw_loss,
+            "human_multi_horizon_root_loss": human_multi_horizon_root_loss,
+            "human_multi_horizon_loss": human_multi_horizon_loss,
             "weighted_human_yaw_loss": weighted_human_yaw_loss,
             "weighted_human_root_loss": weighted_human_root_loss,
+            "weighted_camera_center_loss": weighted_camera_center_loss,
+            "weighted_camera_rotation_loss": weighted_camera_rotation_loss,
+            "weighted_human_horizon_loss": weighted_human_horizon_loss,
+            "weighted_human_multi_horizon_loss": weighted_human_multi_horizon_loss,
         }
+
+    def _decoded_human_yaw_root(self, human: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor] | None:
+        mean = getattr(self, "geometry_human_mean", None)
+        std = getattr(self, "geometry_human_std", None)
+        if mean is None or std is None:
+            return None
+        mean = mean.to(human)
+        std = std.to(human)
+        human_raw = human * std + mean
+        geometry_contract = getattr(self, "geometry_feature_contract", "human199_integrated_root_yaw")
+        if human.shape[-1] == 199 and geometry_contract == "human199_integrated_root_yaw":
+            yaw = torch.cumsum(human_raw[..., 3], dim=1)
+            velocity = human_raw[..., 1:3]
+            cosine = torch.cos(yaw)
+            sine = torch.sin(yaw)
+            world_velocity = torch.stack(
+                (
+                    cosine * velocity[..., 0] - sine * velocity[..., 1],
+                    sine * velocity[..., 0] + cosine * velocity[..., 1],
+                ),
+                dim=-1,
+            )
+            integrated = torch.cumsum(world_velocity[:, :-1], dim=1)
+            root_xy = torch.cat((torch.zeros_like(world_velocity[:, :1]), integrated), dim=1)
+            root = torch.cat((root_xy, human_raw[..., 0:1]), dim=-1)
+            return yaw, root
+        if human.shape[-1] == 200 and geometry_contract == "human200_direct_root_yaw":
+            yaw = torch.atan2(human_raw[..., 3], human_raw[..., 4])
+            root = torch.cat((human_raw[..., 1:3], human_raw[..., 0:1]), dim=-1)
+            return yaw, root
+        raise ValueError(
+            f"unsupported human geometry contract {geometry_contract!r} for dim {human.shape[-1]}"
+        )
 
     def _human_root_geometry_losses(
         self,
@@ -372,48 +455,159 @@ class _JointHumanCameraAE(nn.Module):
         human_recon: torch.Tensor,
         mask: torch.Tensor | None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        mean = getattr(self, "geometry_human_mean", None)
-        std = getattr(self, "geometry_human_std", None)
-        if mean is None or std is None:
+        target = self._decoded_human_yaw_root(human)
+        recon = self._decoded_human_yaw_root(human_recon)
+        if target is None or recon is None:
             zero = human_recon.new_tensor(0.0)
             return zero, zero
-        mean = mean.to(human)
-        std = std.to(human)
-        human_raw = human * std + mean
-        recon_raw = human_recon * std + mean
-        geometry_contract = getattr(self, "geometry_feature_contract", "human199_integrated_root_yaw")
-        if human.shape[-1] == 199 and geometry_contract == "human199_integrated_root_yaw":
-            target_yaw = torch.cumsum(human_raw[..., 3], dim=1)
-            recon_yaw = torch.cumsum(recon_raw[..., 3], dim=1)
-
-            def root_xy(features: torch.Tensor, yaw: torch.Tensor) -> torch.Tensor:
-                velocity = features[..., 1:3]
-                cosine = torch.cos(yaw)
-                sine = torch.sin(yaw)
-                world_velocity = torch.stack(
-                    (
-                        cosine * velocity[..., 0] - sine * velocity[..., 1],
-                        sine * velocity[..., 0] + cosine * velocity[..., 1],
-                    ),
-                    dim=-1,
-                )
-                integrated = torch.cumsum(world_velocity[:, :-1], dim=1)
-                return torch.cat((torch.zeros_like(world_velocity[:, :1]), integrated), dim=1)
-
-            target_root = root_xy(human_raw, target_yaw)
-            recon_root = root_xy(recon_raw, recon_yaw)
-        elif human.shape[-1] == 200 and geometry_contract == "human200_direct_root_yaw":
-            target_yaw = torch.atan2(human_raw[..., 3], human_raw[..., 4])
-            recon_yaw = torch.atan2(recon_raw[..., 3], recon_raw[..., 4])
-            target_root = human_raw[..., 1:3]
-            recon_root = recon_raw[..., 1:3]
-        else:
-            raise ValueError(
-                f"unsupported human geometry contract {geometry_contract!r} for dim {human.shape[-1]}"
-            )
+        target_yaw, target_root = target
+        recon_yaw, recon_root = recon
         yaw_loss = masked_mean(1.0 - torch.cos(recon_yaw - target_yaw), mask)
         root_loss = masked_smooth_l1_loss(recon_root, target_root, mask)
         return yaw_loss, root_loss
+
+    def _camera_center_geometry_loss(
+        self,
+        human: torch.Tensor,
+        camera: torch.Tensor,
+        human_recon: torch.Tensor,
+        camera_recon: torch.Tensor,
+        mask: torch.Tensor | None,
+    ) -> torch.Tensor:
+        velocity_mean = getattr(self, "geometry_camera_velocity_mean", None)
+        velocity_std = getattr(self, "geometry_camera_velocity_std", None)
+        distance_mean = getattr(self, "geometry_camera_distance_mean", None)
+        distance_std = getattr(self, "geometry_camera_distance_std", None)
+        target_human = self._decoded_human_yaw_root(human)
+        recon_human = self._decoded_human_yaw_root(human_recon)
+        if (
+            velocity_mean is None
+            or velocity_std is None
+            or distance_mean is None
+            or distance_std is None
+            or target_human is None
+            or recon_human is None
+        ):
+            return camera_recon.new_tensor(0.0)
+        if camera.shape[-1] != 14 or camera_recon.shape[-1] != 14:
+            raise ValueError("camera center geometry loss requires the official 14D camera contract")
+        velocity_mean = velocity_mean.to(camera)
+        velocity_std = velocity_std.to(camera)
+        distance_mean = distance_mean.to(camera)
+        distance_std = distance_std.to(camera)
+
+        def center(camera_features: torch.Tensor, human_root: torch.Tensor) -> torch.Tensor:
+            velocity = camera_features[..., 11:14].clone()
+            velocity[:, 1:] = velocity[:, 1:] * velocity_std + velocity_mean
+            relative = camera_features[..., 2:5] * distance_std + distance_mean
+            return torch.cumsum(velocity, dim=1) + relative[:, :1] + human_root[:, :1]
+
+        _, target_root = target_human
+        _, recon_root = recon_human
+        return masked_smooth_l1_loss(center(camera_recon, recon_root), center(camera, target_root), mask)
+
+    @staticmethod
+    def _rotation_6d_to_matrix(rotation_6d: torch.Tensor) -> torch.Tensor:
+        first = F.normalize(rotation_6d[..., :3], dim=-1, eps=1.0e-4)
+        second = rotation_6d[..., 3:6]
+        second = second - (first * second).sum(dim=-1, keepdim=True) * first
+        second = F.normalize(second, dim=-1, eps=1.0e-4)
+        third = torch.cross(first, second, dim=-1)
+        return torch.stack((first, second, third), dim=-1)
+
+    def _camera_rotation_geometry_loss(
+        self,
+        camera: torch.Tensor,
+        camera_recon: torch.Tensor,
+        mask: torch.Tensor | None,
+    ) -> torch.Tensor:
+        if camera.shape[-1] != 14 or camera_recon.shape[-1] != 14:
+            raise ValueError("camera rotation geometry loss requires the official 14D camera contract")
+        target = self._rotation_6d_to_matrix(camera[..., 5:11])
+        recon = self._rotation_6d_to_matrix(camera_recon[..., 5:11])
+        relative = target.transpose(-1, -2) @ recon
+        cosine = ((relative.diagonal(dim1=-2, dim2=-1).sum(dim=-1) - 1.0) * 0.5).clamp(-1.0, 1.0)
+        sine = 0.5 * torch.linalg.vector_norm(
+            torch.stack(
+                (
+                    relative[..., 2, 1] - relative[..., 1, 2],
+                    relative[..., 0, 2] - relative[..., 2, 0],
+                    relative[..., 1, 0] - relative[..., 0, 1],
+                ),
+                dim=-1,
+            ),
+            dim=-1,
+        )
+        return masked_mean(torch.atan2(sine, cosine), mask)
+
+    def _human_horizon_geometry_losses(
+        self,
+        human: torch.Tensor,
+        human_recon: torch.Tensor,
+        mask: torch.Tensor | None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        target = self._decoded_human_yaw_root(human)
+        recon = self._decoded_human_yaw_root(human_recon)
+        if target is None or recon is None:
+            zero = human_recon.new_tensor(0.0)
+            return zero, zero
+        target_yaw, target_root = target
+        recon_yaw, recon_root = recon
+        if mask is None:
+            indices = torch.full(
+                (human.shape[0],), human.shape[1] - 1, dtype=torch.long, device=human.device
+            )
+            valid_samples = torch.ones(human.shape[0], dtype=torch.bool, device=human.device)
+        else:
+            valid_mask = mask.to(device=human.device, dtype=torch.bool)
+            positions = torch.arange(human.shape[1], device=human.device).expand_as(valid_mask)
+            indices = torch.where(valid_mask, positions, -1).max(dim=1).values
+            valid_samples = indices >= 0
+        if not bool(valid_samples.any()):
+            zero = human_recon.new_tensor(0.0)
+            return zero, zero
+        batch = torch.arange(human.shape[0], device=human.device)[valid_samples]
+        indices = indices[valid_samples]
+        yaw_loss = (1.0 - torch.cos(recon_yaw[batch, indices] - target_yaw[batch, indices])).mean()
+        root_loss = F.smooth_l1_loss(recon_root[batch, indices], target_root[batch, indices])
+        return yaw_loss, root_loss
+
+    def _human_multi_horizon_geometry_losses(
+        self,
+        human: torch.Tensor,
+        human_recon: torch.Tensor,
+        mask: torch.Tensor | None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        target = self._decoded_human_yaw_root(human)
+        recon = self._decoded_human_yaw_root(human_recon)
+        if target is None or recon is None:
+            zero = human_recon.new_tensor(0.0)
+            return zero, zero
+        target_yaw, target_root = target
+        recon_yaw, recon_root = recon
+        if mask is None:
+            valid_mask = torch.ones(human.shape[:2], dtype=torch.bool, device=human.device)
+        else:
+            valid_mask = mask.to(device=human.device, dtype=torch.bool)
+        fractions = human.new_tensor((0.25, 0.50, 0.75, 1.00))
+        yaw_values = []
+        root_values = []
+        for sample_index in range(human.shape[0]):
+            positions = torch.nonzero(valid_mask[sample_index], as_tuple=False).flatten()
+            if positions.numel() == 0:
+                continue
+            offsets = torch.floor((positions.numel() - 1) * fractions).long()
+            indices = positions[offsets]
+            yaw_values.append(
+                (1.0 - torch.cos(recon_yaw[sample_index, indices] - target_yaw[sample_index, indices])).mean()
+            )
+            root_values.append(
+                F.smooth_l1_loss(recon_root[sample_index, indices], target_root[sample_index, indices])
+            )
+        if not yaw_values:
+            zero = human_recon.new_tensor(0.0)
+            return zero, zero
+        return torch.stack(yaw_values).mean(), torch.stack(root_values).mean()
 
     def compute_loss(
         self,
@@ -433,6 +627,10 @@ class _JointHumanCameraAE(nn.Module):
             + losses["weighted_acceleration_loss"]
             + losses["weighted_human_yaw_loss"]
             + losses["weighted_human_root_loss"]
+            + losses["weighted_camera_center_loss"]
+            + losses["weighted_camera_rotation_loss"]
+            + losses["weighted_human_horizon_loss"]
+            + losses["weighted_human_multi_horizon_loss"]
             + weighted_commitment_loss
         )
         return {
@@ -518,6 +716,10 @@ class JointHumanCameraVAE(_JointHumanCameraAE):
             + losses["weighted_acceleration_loss"]
             + losses["weighted_human_yaw_loss"]
             + losses["weighted_human_root_loss"]
+            + losses["weighted_camera_center_loss"]
+            + losses["weighted_camera_rotation_loss"]
+            + losses["weighted_human_horizon_loss"]
+            + losses["weighted_human_multi_horizon_loss"]
             + weighted_kl_loss
         )
         return {
@@ -582,6 +784,10 @@ class JointHumanCameraAE(_JointHumanCameraAE):
             + losses["weighted_acceleration_loss"]
             + losses["weighted_human_yaw_loss"]
             + losses["weighted_human_root_loss"]
+            + losses["weighted_camera_center_loss"]
+            + losses["weighted_camera_rotation_loss"]
+            + losses["weighted_human_horizon_loss"]
+            + losses["weighted_human_multi_horizon_loss"]
         )
         return {
             "total_loss": total,
@@ -684,6 +890,10 @@ class AAMMARDMResidualJointHumanCameraAE(_JointHumanCameraAE):
             + losses["weighted_acceleration_loss"]
             + losses["weighted_human_yaw_loss"]
             + losses["weighted_human_root_loss"]
+            + losses["weighted_camera_center_loss"]
+            + losses["weighted_camera_rotation_loss"]
+            + losses["weighted_human_horizon_loss"]
+            + losses["weighted_human_multi_horizon_loss"]
         )
         return {"total_loss": total, **losses}
 

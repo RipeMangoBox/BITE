@@ -75,7 +75,18 @@ the checkpoint contract and cache metadata; a command-line label is not proof.
 Cache train/validation files must be built from their declared manifests and
 must not be reused after changing tokenizer checkpoint, feature contract,
 causal flag, latent order, or sample IDs. The contract stores the cache hashes;
-the evaluator artifact stores or references the same metadata.
+the evaluator artifact stores or references the same metadata. The audit also
+compares the cache metadata's tokenizer checkpoint path with the declared
+parent Stage1 checkpoint; matching dimensions or a default preset alone are
+not sufficient cache provenance.
+
+A same-shape candidate tokenizer that is used only for a Stage2 diagnostic
+must add a `representation` object with `diagnostic_only: true`,
+`promotion_eligible: false`, and a non-empty `purpose`. It remains a control
+until its own promotion rule is met; it must never be relabeled as the
+mainline merely because its cache passes structural checks. Its cache must
+repeat `diagnostic_only: true`, `promotion_eligible: false`, and the same
+non-empty diagnostic purpose; the cache builder rejects an incomplete marker.
 
 For a curated-data control, the manifest is immutable and additionally records
 its parent-manifest SHA, caption/pair identity, quarantine reason, scorer and
@@ -95,7 +106,7 @@ sizes are positive integers. Additional fields are allowed.
   "version": "v7.x",
   "run_id": "descriptive_run_id",
   "tasks": ["human", "camera", "joint"],
-  "generation_modes": ["completion", "parallel", "cascade"],
+  "generation_modes": ["completion", "parallel"],
   "data": {
     "train_manifest": "path",
     "train_split": "split",
@@ -132,6 +143,12 @@ sizes are positive integers. Additional fields are allowed.
   }
 }
 ```
+
+For active StoryMotion evaluations, `completion` covers Direct-H and Direct-C,
+and `parallel` covers joint generation. `cascade` is not a required evaluation
+or promotion mode. A run may add it only for an explicitly declared historical
+or root-cause attribution question; such a diagnostic remains non-gating and
+must use the same Unified checkpoint as the parallel path.
 
 For Stage1, replace `parent_stage1` and `cache` with `model` and `checkpoint`:
 
