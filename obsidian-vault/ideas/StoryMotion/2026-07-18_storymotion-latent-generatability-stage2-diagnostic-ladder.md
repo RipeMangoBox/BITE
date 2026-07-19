@@ -32,13 +32,13 @@ source_papers:
   - "[[analysis/ICLR_2026/Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based_Diffusion]]"
   - "[[analysis/IEEE_TIP_2024/Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Motion_Prediction]]"
 created: 2026-07-18T14:44:45+08:00
-updated: 2026-07-19T16:39:00+08:00
+updated: 2026-07-19T19:34:10+08:00
 ---
 
 # StoryMotion Latent Generatability and Stage2 Diagnostic Ladder
 
 > [!abstract] 先行裁决
-> 不应无条件并行启动 v8.1A、v8.1B、v8.2 三条 `105K` Unified。v8.1A 是唯一进入过受控 Stage2 ladder 的候选：它保留 human199/camera14 与 v7.14 架构，只增加 geometry loss，且仅通过 amended non-promotion screen；其 G3 `30K` 已因 Direct-C 与 joint parallel camera 的 broad regression 停止，未进入 `105K`。历史 cascade 同样失败，但自 `2026-07-19` 起不再作为 active evaluation 或 gate。Stage1 C3-25 目前只剩 Human global slope blocker；C4-H old last-valid short screen 已 fail，C5-A read-only audit 则支持 multi-horizon surrogate 进入“可预注册 short screen”状态，但没有授权校准或训练。pure4053 已参与该候选选择，最终 promotion 需要新的 sealed audit set。v8.1B 和 v8.2 已有 severe Stage1 camera regression，它们的 `30K/105K` Unified 目前不会给出干净归因。所有 v8 cache/run 均为 `diagnostic_only`，不得成为 promotion-bearing cache。
+> 不应无条件并行启动 v8.1A、v8.1B、v8.2 三条 `105K` Unified。v8.1A 的 G3 `30K` 已因 Direct-C 与 joint parallel Camera broad regression 停止。Stage1 C3-25 seed17 目前只剩 Human global slope blocker，是当前最有希望的 v8 Stage1 candidate；用户于 `2026-07-19` 明确授权它以独立 exact cache 单进程训练 Stage2 `0→105K`，在 immutable `30K` checkpoint 上并行完成 Direct-H、Direct-C 与 joint parallel full eval，训练不因 30K quality screen 自动停止。该授权是 exposure/generatability diagnostic override，不改写 Stage1 gate；pure4053 已参与候选选择，最终 promotion 仍需新的 sealed audit set。所有 v8 cache/run 均为 `diagnostic_only`，不得成为 promotion-bearing cache。
 
 ## 1. 判断对象与术语边界
 
@@ -141,6 +141,16 @@ G3 对未来 candidate 必须在同一 pure4053 ordered IDs 上完成 active 三
 ### G4 — 105K continuation and formal comparison
 
 本 gate 是条件规则，不是当前队列。若某个未来 candidate 通过 G3，必须从同一 `30K` checkpoint 和 optimizer/RNG state 续训至 `105K`，不得重启、换 best checkpoint 或改 cache，再以完整 active three-profile protocol 与 v7.38 L0 的 `105K` formal 比较。v8.1A 已在 G3 失败并写入 `stop_30k_broad_camera_regression`，因此它没有 G4、不得续训。即使未来 candidate 的 G4 表现良好，它仍是 non-promotion diagnostic：原始 Stage1 promotion gate 没有被重写，不能据此替换 v7.14/v7.38 或启动 v8.2333。
+
+#### C3-25 seed17 用户授权的连续 `105K` 诊断
+
+`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 是上述默认 G3→G4 quality gate 的显式协议修订，而不是给 v8.1A 续命。预注册问题是：C3-25 的 Stage1 Pareto 改善能否转化为 Stage2 generatability，以及其 `30K→105K` 轨迹是否显示“训练成熟度不足”还是稳定的 Camera/Joint failure。
+
+- exact parent 固定为 C3-25 seed17 fresh `636K` endpoint；不得继承 v8.1A cache、normalization、checkpoint 或结果。
+- Unified implementation、human-first routing、seed `17`、batch `512`、task probabilities `1:1:1:0`、full-cov train-only normalization、DDIM50/CFG1/eta0 与 v8.1A matched diagnostic 保持一致。
+- 单进程从 step `0` 连续到 `105K`；step `30001` 起 LR 从 `1e-4` 降至 `3e-5`。保存 `1K/5K/10K/30K/105K` immutable checkpoints，不在 `30K` 重启 optimizer。
+- `step_30000.pt` 单独计算 SHA256 并以冻结 contract snapshot 做 pure4053 Direct-H、Direct-C、joint parallel full eval；cascade 不运行。主训练同时继续，30K quality 结论不自动杀死 `105K`。
+- 唯一自动停止条件是 operational failure、non-finite state、contract/hash/identity/non-causal audit failure。无论 30K 或 105K 结果如何，该 run 都保持 `diagnostic_only=true`、`promotion_eligible=false`。
 
 ## 6. Stage1 camera 根因：比再训三条 Unified 更优先的短测
 
@@ -265,7 +275,17 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 | Stage1 C5-A objective alignment | `v8_1c_c5a_objective_alignment_seed17_4090g0_20260719` | completed read-only and formally audited；all/`193+` primary alignment and both Camera-gradient guards pass；same-set/different-order attempt was retained and fixed only by explicit sample-ID mapping | candidate supported only for future screen preregistration；no dose frozen、no training authorized；pure4053 stays development-only and a sealed audit set is required for promotion |
 | six-way recon vis | `v8_1_sixway_recon_20260718` | complete; eight ordered IDs rendered as GT/Pulp/v7.14/v8.1A/v8.1B/v8.2 and served by the separate Stage1 Gradio | visual evidence is diagnostic, not a promotion endpoint |
 
-这里的 **fresh screen** 指短预算、从零开始的诊断 run：使用新 run ID，不加载旧 model、optimizer、scheduler、scaler 或 RNG state；model 权重由声明的 seed 重新初始化，optimizer 的 moment 等状态为空而不是“随机初始化”。RNG 是 Python、NumPy、PyTorch CPU/CUDA 以及 DataLoader worker 等伪随机数发生器的状态，控制权重初始化、shuffle、dropout、diffusion noise 或 augmentation 等实际使用的随机过程。matched 两臂固定同一 seed、数据、架构、optimizer、batch、训练步数与 evaluator，使初始化和随机流尽量对齐，唯一 intervention 是声明的 camera-center weight；CUDA/worker 调度仍不承诺 bit-exact determinism。
+### 6.2 C5-B fresh-init multi-horizon dose 与两 seed short gate
+
+用户于 `2026-07-19` 授权其余短任务照常执行。C5-B 只处理 Stage1 Human multi-horizon objective，不与上面的 C3 Stage2 `105K` 混成一个 intervention：
+
+1. 先在 5090 GPU1 用 seed `17/23` 分别 fresh 初始化，同一 train-distribution 前 `8×8` ordered samples、fixed max `250`、无 checkpoint/optimizer，计算 unit four-anchor multi-horizon shared-encoder gradient。每个 seed 独立标到 C3-25 parent gradient的 `1.25%`；在读取结果前冻结 base weight 为两条 recommendation 的几何均值。若 max/min `>2` 或任一非 finite/zero，停止，不训练。
+2. 第一轮在同一 5090 host、seed17、fresh `10,176` steps 上比较 C3-25 control、`0.5×` base 与 `1.0×` base。三者固定相同 IDs、架构、optimizer、batch、C3 Camera-center/yaw/root weights 与 evaluator，唯一差异是 `human_multi_horizon_weight`；不得加载 C4-H/C5-A state。
+3. 每个 dose 相对 control 必须同时满足：fixed-max Human global slope 改善 `≥5%`、`193+` Human global MPJPE 改善 `≥2%`，且 overall Human RA/global/root ADE/FDE/yaw 与 Camera ADE/FDE/rotation 八项各自回退 `≤2%`。两 dose 都过则选 `0.5×`，只过一个则选该 dose，都不过则停止。
+4. selected dose 再以 seed23 做一组 fresh control/treatment matched `10,176`-step confirmation，使用同一 gate。只有 seed17/23 都过才允许讨论 full；本轮 pure4053 仍是 development screen，未冻结 sealed audit，因此即使双过也不自动启动 full、cache 或 Stage2。
+5. 资源顺序：校准与 seed17 `0.5×` 使用 5090 GPU1 且总占用控制在 `2h` 内；5090 GPU0 顺序执行 seed17 control/`1.0×`；4090 GPU1 可承担不改变 gate 的复核短臂，但必须在 C3 `30K` full eval 前让卡。所有 finite step/ETA 只写 run logs。
+
+这里的 **fresh screen** 指短预算、从零开始的诊断 run：使用新 run ID，不加载旧 model、optimizer、scheduler、scaler 或 RNG state；model 权重由声明的 seed 重新初始化，optimizer 的 moment 等状态为空而不是“随机初始化”。RNG 是 Python、NumPy、PyTorch CPU/CUDA 以及 DataLoader worker 等伪随机数发生器的状态，控制权重初始化、shuffle、dropout、diffusion noise 或 augmentation 等实际使用的随机过程。matched 两臂固定同一 seed、数据、架构、optimizer、batch、训练步数与 evaluator，使初始化和随机流尽量对齐，唯一 intervention 是该 arm 声明的 auxiliary weight；CUDA/worker 调度仍不承诺 bit-exact determinism。
 
 因此 fresh same-seed screen 的目的，是排除 warm-start 与旧 optimizer state 污染并回答 treatment 的短预算方向，不是单独证明跨 seed 稳定性；独立 seed 重复才提供 robustness evidence。C3-25/C3-50 中的 `25%/50%` 也不是训练进度或数据比例，而是相对 C1 校准权重的 loss dose：`0.0010166945703219975/0.002033389140643995`，分别约占 C0 raw-center 梯度的 `1.25%/2.5%`。两臂都完整训练 `8 epochs / 10,176 steps`。A10 只是 v8.1A 的 matched `10K`-class Stage1 comparator 名称，不是完整 v8.1A endpoint 的别名，更不是 Stage2。
 
@@ -275,8 +295,8 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 2. v8.1A 的 G3 已闭合并停止；不能用新筛选 checkpoint 或更长训练重开 G4。
 3. C3 fresh 25%/50% screens 已在 4090 本机 NVMe 双 loader 下闭合且都过 gate，证明旧 step-214 问题只是 I/O deployment failure。seed23/seed17 C3-25 full 与 seed17 C3-50 exploratory 也都完成；C3-50 的额外 translation 收益伴随全面 Human horizon 回退，因此不改变 selected C3-25。任何 screen/aborted checkpoint 都不得恢复。
 4. D4/D4.2/D4.3 已共同闭合：camera text 被使用，但 v8.1A 的低噪实际 residual 更集中命中 owning decoder 的高增益方向。C4 shared-encoder calibration、C4-H fresh short screen 与 C5-A read-only alignment也已闭合；C4-H 未命中 slope/long-bin target，而 C5-A 只支持 multi-horizon 进入 future-screen preregistration。它不冻结 dose、不授权训练，且 pure4053 已成为 development set。
-5. 当前所有新执行暂停，先与用户确认一个成组计划：fresh-init train-distribution dose calibration、至少两个 matched training seeds、同一冻结 short gate，以及训练前定义的 sealed final audit set。确认后才并行占用 4090 双卡与 5090 GPU0；不得只启动或单独监看一条实验。
-6. 任何 Stage2 新训练仍需等待 Stage1 gate，顺序固定为 Direct-C camera-sensitive objective → joint-condition fusion → inference。单纯增加 exposure/steps、condition-path 重写、D6/H2C 与 cascade 不再参与当前优先级。
-7. v8.1B/v8.2 只做 D1/D2 与 Stage1 camera root-cause short test；它们不进入 `30K/105K` Unified。
+5. 用户已授权 C3-25 seed17 的连续 Stage2 `105K` 非晋级诊断；4090 GPU0 专用于该长训，30K full eval 使用 immutable checkpoint 且不阻断主训练。
+6. 其余短任务照常成组推进：先做 C5 fresh-init train-distribution dose calibration，再做 matched fresh shorts；5090 GPU1 单项不得超过 `2h`，4090 GPU1/5090 GPU0 可承担其余短臂，但必须为 30K full eval 让出 4090 GPU1。
+7. 除这条用户显式授权的 C3 diagnostic override 外，新的 Stage2 candidate 仍需等待 Stage1 gate；顺序固定为 Direct-C camera-sensitive objective → joint-condition fusion → inference。D6/H2C 与 cascade 不再参与 active priority；v8.1B/v8.2 不进入 `30K/105K` Unified。
 
 新 run 的 mutable state 只写入 remote run contract/log/manifest；G2/G3 的结论更新本页的一行 decision，formal audited metrics 只进入 [[StoryMotion-valid-metric-ledger]]，当前状态只摘要到 [[current]]，最终事件只追加到 [[version_family]]。该路由由仓库根 `AGENTS.md` 约束。

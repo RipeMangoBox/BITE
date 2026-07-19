@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-19T18:30:00+08:00
+updated: 2026-07-19T20:16:00+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -27,7 +27,7 @@ updated: 2026-07-19T18:30:00+08:00
 > 本页只拥有已经审计的数值、比较边界和 artifact hashes。Stage1 reconstruction、Stage2 generation、30K diagnostic screen 与 105K formal evidence 分区记录；除明确标为 diagnostic 的 N64/short rows 外，正式表均为 official pure 4,053。当前裁决见 [[current]]，版本名称与完成 step 见 [[version_family]]，指标定义见 [[StoryMotion-metric-computation-io]]。
 
 > [!important] C3-25 当前证据边界
-> v8.1C C3-25 seed17/seed23 都只完成 Stage1 636K 与 pure4053 reconstruction audit。它们没有 Stage2 cache、没有 Stage2 30K train/eval，也没有 105K。下文 Stage2 30K 的 v8 row 只属于父候选 v8.1A。
+> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 此后按用户授权建立了独立、审计通过的 diagnostic-only Stage2 cache，并启动 continuous `0→105K` run；当前尚无 C3 的 Stage2 `30K/105K` 正式结果，因此本页不提前填分。seed23 仍只有 Stage1。下文已有的 Stage2 30K 数值仍只属于父候选 v8.1A。
 
 ## 1. 如何读表
 
@@ -82,7 +82,7 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | v7.14 / joint AE official r2 | Stage1 636K | mainline | 80.731 / 212.735 | 169.640 / 415.430 | 21.640 | 41.760 / 51.500 | 0.619 | +29.020 / +145.300 | implementation mainline |
 | v8.1A / yaw001-root003 seed17 | Stage1 636K | candidate | 24.700 / 71.180 | 60.188 / 150.914 | 5.113 | 47.693 / 56.039 | 0.717 | +2.888 / +31.103 | global slope fail；no promotion |
 | v8.1C C2 / center100 seed17 | Stage1 636K | treatment | 25.927 / 74.406 | 62.688 / 158.011 | 5.360 | 31.956 / 41.183 | 0.859 | +4.641 / +38.799 | global slope + rotation fail |
-| v8.1C C3-25 / seed17 selected | Stage1 636K | candidate | 24.570 / 69.243 | 58.252 / 148.365 | 4.947 | 39.486 / 48.270 | 0.705 | +1.148 / +26.302 | only global slope fail；no Stage2 |
+| v8.1C C3-25 / seed17 selected | Stage1 636K | candidate | 24.570 / 69.243 | 58.252 / 148.365 | 4.947 | 39.486 / 48.270 | 0.705 | +1.148 / +26.302 | only global slope fail；exact non-promotion Stage2 diagnostic parent |
 | v8.1C C3-25 / seed23 robustness | Stage1 636K | robustness | 24.699 / 70.804 | 59.797 / 142.732 | 4.957 | 39.053 / 46.705 | 0.776 | +0.444 / +27.594 | global slope + rotation fail；no Stage2 |
 | v8.1C C3-50 / seed17 exploratory | Stage1 636K | diagnostic | 25.593 / 73.166 | 61.678 / 154.323 | 5.194 | 36.412 / 45.116 | 0.718 | +3.079 / +36.214 | Human horizon worse；no Stage2 |
 | v8.1B / residual AE seed17 | Stage1 636K | architecture control | 28.245 / 76.655 | 62.513 / 186.141 | 6.311 | 50.705 / 65.467 | 1.170 | −8.070 / −1.124 | Camera severe regression；no Stage2 |
@@ -156,6 +156,7 @@ Dose 是 auxiliary loss 的 shared-encoder gradient target，不是数据比例�
 | C0 / gradient calibration | Stage1 read-only | Camera-center unit gradient | C1 weight 0.00406677828128799 = raw-center target 5% | only freezes C1 scale |
 | C4 / gradient calibration | Stage1 read-only | rotation vs horizon | cosine −0.00624；C4-R weight 0.00008010673098572695；C4-H weight 0.018266197084257824 | C4-R not run；C4-H short only |
 | C5-A / pure4053 alignment | Stage1 read-only | last-valid vs four-anchor multi-horizon | global-MPJPE Spearman all 0.67580→0.77947；193+ 0.70027→0.75837 | only supports a future preregistration；no training |
+| C5-B / fresh calibration seed17/23 | Stage1 read-only train-distribution | four-anchor multi-horizon unit gradient vs C3 parent | recommendations 0.04087558783454605 / 0.041733939559882145；max/min 1.020999；frozen base 0.041302533967803944 | freezes dose0.5=0.020651266983901972 and dose1.0=0.041302533967803944 for matched shorts only |
 
 C5-A 的 trained-endpoint estimated weight 0.008456624012361412 不是 fresh-init training dose。pure4053 已参与候选选择，后续 promotion 必须另冻结 sealed audit set。
 
@@ -376,9 +377,10 @@ D4/D4.2/D4.3 都是 v8.1A G3 的 N64 read-only diagnostics；t=50/500/950 是 di
 | v7.14 / joint AE official r2 | Stage1 mainline | 91248bf440a4a5493a0f8b4994d6d36479fcaa221d331f6995a91ed1af8e7ce1 | abac845f8eac2b3c6da9beeabc02d26058e17b2007fa93d60dda54e7c3ee5248 | evaluator a52aba4d6260aeefac4e5891fbe510322bf6eaf12ce98e3d0bda16ffbc8ddf5e |
 | v8.1A / yaw001-root003 seed17 | Stage1 full | ac47c2191c44d6368a5468510975cefcf0efd1338b03ace50266830c344151f1 | same-script evaluator above | owning checkpoint verified |
 | v8.1C C2 / center100 seed17 | Stage1 full no-promotion | f16fb879eb7feebbebba10d24c6039cfec4fbc7812492fadedd9cb5c9c73530e | 0f4cddf17fd15a4b73afeff17c2b489702f237928b099d9d699340eba2f31d96 | contract 904ae14866b0a62fed37cc0b09de5f6bf9d177f81cfcfea760fb96247bdcdac8 |
-| v8.1C C3-25 / seed17 selected | Stage1 full no-Stage2 | d0abb3268b14c19aada48fd2b9242fbbb03e9d808959539cac47f33448e4788a | 8b0ab3ba82f85192adeb066d99ce6a07f0fe645b2e916300c96e16b4aad43f4d | contract 80fbf5743aab7517acbfe9bcff6cde4311ce9257cd477e7af5baa658c2de6e73；audit 75d2daf8cd39d91affae8181cfb1365efb3a52bfbc85f50a1cdc6b7d90cf9b15 |
+| v8.1C C3-25 / seed17 selected | Stage1 full；exact Stage2 diagnostic parent | d0abb3268b14c19aada48fd2b9242fbbb03e9d808959539cac47f33448e4788a | 8b0ab3ba82f85192adeb066d99ce6a07f0fe645b2e916300c96e16b4aad43f4d | contract 80fbf5743aab7517acbfe9bcff6cde4311ce9257cd477e7af5baa658c2de6e73；audit 75d2daf8cd39d91affae8181cfb1365efb3a52bfbc85f50a1cdc6b7d90cf9b15 |
 | v8.1C C3-25 / seed23 robustness | Stage1 full no-Stage2 | c73027b8f4c114c1c2ba54994c576592cb3f223dd7117fac7188dba9a7b0d3ad | 8e5a44cb586eeba1cbaeca82ee2b731badfa4dab4f15c40f11ccb7140f3a1b34 | contract 32ce7f8d1a91c75afe821659a2235d3ed05f8878380b79a7c7dd44a4e20bb4c1 |
 | v8.1C C3-50 / seed17 exploratory | Stage1 full no-Stage2 | 4c9b51778104aef3e85f2664086a22802988a9a23833181026c6facdab608d98 | c0bb55bb244011ebffad5911d9ba43a7b4ba1b28bcc031a6df58e0f2158f89fc | contract 98a5aa0c00c14b30bb23c6a4ac1fe80a4397216f408f3ef3d48196c92edca8c3 |
+| v8.1C C5-B / fresh calibration seed17/23 | Stage1 read-only；doses frozen | no checkpoint | seed17 c5755cf277da27fb62bba9518239af2a55eb9156acd994b196d1e665860832d5；seed23 561b1c4f43f59a06012b1585c49a58729d02d0a3382db5fc86e6d434137cf0c7；frozen doses 9042aa679a97c41b75fd9b2eb8b7854f141bc55c5df8a5bc4d0a153f3d6ab720 | contract c735a9c4aa7c7bcc8a56924bf2266d93333244d5f1f232b8114930e18b3b32c0 |
 
 Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a28640143b87b6322292c51dc9 / a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。
 
@@ -390,6 +392,7 @@ Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a286
 | v7.47 / official-AE Unified | Stage2 105K S-control | b8c06913a5efdbaa0c178e452998352033174614aa0a60ad96920fe14a8acbb2 | decoder e0ff0a66129d77eb27a18d0034b23f692aaec3ef53afd540097d8d9544a73e52；train/eval cache 1924c632…d1e8 / c642f7c7…d1d3 | contract 37d61e28076735979731e47712500cee016365a4e9e2eb7753d93a10416dee51 |
 | v7.36 A30 / matched control | Stage2 30K | 7dcf3b1911af144ea9ef2b30017dd07472d62f655fd04c1dc9263581e3382c0b | v7.14 decoder 91248bf4…7ce1；cache f7a00a48…a5983 / 6f13816c…9b25 | matched comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K stopped | becc2c11051bfd7857acb0602f61c755cd664969f34acef1f0232711feee5bb8 | v8.1A decoder ac47c219…151f；cache 3b55223d…bd22 / 1050748f…541d | contract c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59 |
+| v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；no metric row yet | pending 30K/105K immutable checkpoints | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | contract 2351a6f0…877；audit eb28815a…1fb；diagnostic-only |
 
 v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。v7.47 training script 与 L0 historical training script SHA256 分别为 71a9a2a3b700d4f0a699fda5f28bf8da72f563c20871e1c1cfb5d4d4cae0ac08 / f207c840fa363afc13e308047ddbe3900683f048366c10e9c135b49a2da886c8，因此 strict representation isolation 未建立。
 

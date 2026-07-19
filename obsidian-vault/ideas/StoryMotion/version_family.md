@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T18:00:00+08:00
+updated: 2026-07-19T20:16:00+08:00
 ---
 
 # StoryMotion Version Family
@@ -46,14 +46,15 @@ updated: 2026-07-19T18:00:00+08:00
 | C2 | v8.1C / Stage1 full | C1 高 dose 能否扩展到完整预算 | 与 v8.1A 唯一差异为 center weight=`0.00406677828128799` | fresh `636K / 81.38M` | Camera translation 改善；rotation 与 Human global slope fail；无 cache/Stage2 |
 | C3-25 short | v8.1C / Stage1 short | 降低 center dose 后能否形成 Pareto | C1 weight 的 `25%`，即 `0.0010166945703219975` | fresh `10,176` steps | 通过；按预注册成为 selected full arm |
 | C3-50 short | v8.1C / Stage1 short | 同一 dose-response 的较高臂 | C1 weight 的 `50%`，即 `0.002033389140643995` | fresh `10,176` steps | 通过；因两臂均过而不被选为主臂 |
-| C3-25 seed17 full | C3-25 / Stage1 full | selected treatment 的同 seed完整预算结果 | fresh seed17；不复用 short/aborted state | fresh `636K / 81.38M` + pure4053 | 完成；当前最佳 Stage1 candidate，只剩 global slope blocker；**无 Stage2** |
+| C3-25 seed17 full | C3-25 / Stage1 full | selected treatment 的同 seed完整预算结果 | fresh seed17；不复用 short/aborted state | fresh `636K / 81.38M` + pure4053 | 完成；当前最佳 Stage1 candidate，只剩 global slope blocker；是下列 Stage2 diagnostic 的 exact parent |
+| C3-25 seed17 Unified | C3-25 seed17 / Stage2 diagnostic | 新 latent 是否可生成，以及 `30K→105K` 是否只是训练成熟度问题 | exact parent/decoder/cache/full-cov stats；同一进程 `0→105K`，30K 固化但不重启 | `105K` train 已部署；30K/105K 各做 Direct-H、Direct-C、joint parallel pure4053 | cache/contract audit 已过、训练已启动；原始 Stage1 gate 不变，永久 non-promotion |
 | C3-25 seed23 full | C3-25 / Stage1 robustness | 低 dose signal 是否跨 seed | fresh seed23；不存在 seed23 full A baseline | fresh `636K / 81.38M` + pure4053 | 完成；signal 重现但 slope/rotation 未全过；**无 Stage2** |
 | C3-50 seed17 full | C3-50 / Stage1 exploratory | 完整预算 dose-response | 用户后授权的 exploratory full；不改变 C3-25 selected 规则 | fresh `636K / 81.38M` + pure4053 | Camera 更好、Human long horizon 更差；non-promotion |
 | C4 calibration | C3-25 / Stage1 calibration | 分开 Camera rotation 与 Human horizon 责任轴 | 8-batch unit-gradient norm/cosine；两个 arm 各取 parent gradient `1.25%` | **无训练** | 得到 C4-R/C4-H weights；只证明尺度与方向可区分 |
 | C4-R | C3-25 / Stage1 arm | 修复 Camera rotation | 只加 decoded SO(3) auxiliary | **未训练** | selected C3-25 rotation 已过门，因此 blocked |
 | C4-H | C3-25 / Stage1 short | 降低 Human global slope/long-bin error | 只加 last-valid Human yaw/root horizon auxiliary | fresh `10,176` steps | guards 过但两个 target 反向；gate fail，无 full |
 | C5-A | C3-25 / Stage1 diagnostic | old last-valid surrogate 是否错配 formal evaluator | 比较 last-valid 与 four-anchor multi-horizon 的 per-sample alignment/gradient | **无训练**；read-only pure4053 | alignment pass；只允许另写 short-screen 预注册 |
-| C5-B / C5 training | C5-A follow-up / Stage1 | fresh-init 剂量与两 seed trainability | 尚未冻结的 fresh calibration 和 matched screens | **未开始** | 当前暂停；没有 deploy、checkpoint 或 train/eval 结果 |
+| C5-B calibration | C5-A follow-up / Stage1 calibration | fresh initialization 下 multi-horizon 的可训练 dose 是多少 | seed17/23 各用前 `8×8` train samples、fixed-max 250；各自标到 C3 parent gradient `1.25%` 后取几何均值 | **无训练** | 完成；cross-seed ratio `1.021≤2`，冻结 base=`0.041302533967803944`、dose0.5=`0.020651266983901972`、dose1.0=`0.041302533967803944` |
 
 ### Dose 到底代表什么
 
@@ -67,6 +68,8 @@ updated: 2026-07-19T18:00:00+08:00
 
 所有 C3 short 都完整训练 `10,176` optimizer steps；所有 C3 full 都从零训练 `636,000` optimizer steps。`25%/50%` 不能写成只用了 `25%/50%` 数据或只完成相同比例训练。
 
+C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** 的 loss dose；它与 C3 的 Camera-center `25%/50%` 不是同一 auxiliary，也不是数据或进度比例。C5-B short 同样必须完整训练 `10,176` optimizer steps，唯一 intervention 是 `human_multi_horizon_weight`。
+
 ## Stage2 完成度速查
 
 | family / run | Stage1 | Stage2 `10K` | Stage2 `30K` train/eval | Stage2 `105K` train/eval |
@@ -77,10 +80,11 @@ updated: 2026-07-19T18:00:00+08:00
 | v8.1A | completed `636K` | completed within G ladder | **completed and audited** | **not run；stopped at 30K** |
 | v8.1B | completed `636K` | not run | not run | not run |
 | v8.2 | completed `636K` | not run | not run | not run |
-| v8.1C C3-25 seed17/23 | completed `636K` | not run | **not run** | **not run** |
+| v8.1C C3-25 seed17 | completed `636K` | included in continuous run | pending immutable checkpoint/eval | pending continuous endpoint/eval |
+| v8.1C C3-25 seed23 | completed `636K` | not run | not run | not run |
 
 > [!important] C3-25 的直接答案
-> C3-25 没有构建 Stage2 cache，没有 `30K` Stage2 checkpoint/eval，也没有 `105K`。任何 `v8_1a_diag_unified3_30k_*` 都属于父候选 v8.1A，不能改名或继承给 C3-25。
+> C3-25 seed17 已构建并审计自己的 Stage2 cache，`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 已作为用户授权的 continuous non-promotion diagnostic 启动；`30K` checkpoint/eval 与 `105K` endpoint/eval 仍待该 run 自己完成。任何 `v8_1a_diag_unified3_30k_*` 仍只属于父候选 v8.1A，不能改名或继承给 C3-25。
 
 ## v8.0+ 家族地图
 
@@ -89,7 +93,7 @@ updated: 2026-07-19T18:00:00+08:00
 | v8.0 | Stage1 read-only attribution | 定位 human199 长程误差责任通道 | GT-yaw oracle 完成；existing deep-AE screen No-Go |
 | v8.1A | Stage1 geometry loss + Stage2 generatability | 修复 yaw/root 并检查 latent 是否可生成 | Stage1 full、Stage2 `30K` 与 D4 family 完成；无 `105K` |
 | v8.1B | Stage1 architecture | residual AE capacity/control | Stage1 full 完成；无 Stage2 |
-| v8.1C | Stage1 Camera-center/Human-horizon treatment | 在 v8.1A 上形成 Human/Camera Pareto | C0–C5-A 已闭合；C3-25 selected，仍未 promotion |
+| v8.1C | Stage1 Camera-center/Human-horizon treatment + Stage2 diagnostic override | 在 v8.1A 上形成 Human/Camera Pareto，并诊断 C3 latent generatability | C3-25 selected；seed17 exact Stage2 `0→105K` 已部署但不具 promotion 资格 |
 | v8.2 | Stage1 feature layout | human200 non-integrative root/yaw | Stage1 full 完成；无 Stage2 |
 | v8.2333 | data curation | reversible physical/semantic pair quarantine | preregistered、not started、全部计数 `0` |
 | v8.4-A | Stage2 backbone | Motion Mamba-style non-AR latent DDPM | blocked on representation promotion |
@@ -120,6 +124,8 @@ updated: 2026-07-19T18:00:00+08:00
 - **2026-07-19：** C3-25/50 fresh short 均完成；按预注册选择较低 dose C3-25。
 - **2026-07-19：** C3-25 seed17/seed23 与 exploratory C3-50 full 均完成 Stage1 audit；C3-25 seed17 把 blocker 收窄为 global slope。
 - **2026-07-19：** C4-H short fail；C5-A read-only alignment pass，但未授权 C5 training。
+- **2026-07-19：** C5-B fresh seed17/23 train-distribution calibration 完成；两条 recommendation 的 max/min=`1.021`，稳定性 guard 通过并冻结 `0.5×/1.0×` short doses。该事件只授权预注册 short，不授权 full。
+- **2026-07-19：** 用户授权 C3-25 seed17 独立 Stage2 continuous `0→105K` diagnostic；exact cache、train-only full-cov normalization 与 run contract 审计通过，30K/105K active three-profile eval 由里程碑监督器执行且不在 30K 重启训练。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
 - **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
 
