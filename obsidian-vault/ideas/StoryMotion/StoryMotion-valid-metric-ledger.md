@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-19T20:16:00+08:00
+updated: 2026-07-19T20:55:00+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -150,6 +150,18 @@ Dose 是 auxiliary loss 的 shared-encoder gradient target，不是数据比例�
 | v8.1C C3-25 / selected short | Stage1 10,176 | 0.0010166945703219975 | 1.25% | 785.469 / 1,081.209 mm | 540.647 mm / 7.421° | pass；selected full arm |
 | v8.1C C3-50 / exploratory short | Stage1 10,176 | 0.002033389140643995 | 2.5% | 783.117 / 1,056.305 mm | 518.521 mm / 7.441° | pass；higher-dose control |
 | v8.1C C4-H / horizon short | Stage1 10,176 | C3-25 fixed | center 1.25% + horizon 1.25% | 788.762 / 1,094.129 mm | 540.427 mm / 7.424° | target fail；no full |
+
+#### C5-B fresh multi-horizon matched screen
+
+下表使用同一 pure4053 fixed-max source；`target Δ` 为相对同 seed control 的改善，guard 为 overall Human RA/global/root ADE/FDE/yaw 与 Camera ADE/FDE/rotation 中最大回退。seed17 只有 dose1.0 同时通过两个 target 与八项 guard；该 dose 在 seed23 上八项 guard 仍全过，但两个 target 都未达门槛。因此 two-seed screen fail，C5-B 停止且不授权 full。
+
+| seed | version / run | Stage / budget | multi-horizon weight | global slope ↓ | slope target Δ | `193+` global ↓ | long target Δ | max guard regression | decision |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 17 | C3-25 control / `v8_1c_c3_25_matched_screen10176_seed17_5090g0_20260719` | Stage1 10,176 | 0 | 272.350 mm/100f | reference | 1,098.976 mm | reference | reference | matched comparator |
+| 17 | C5-B dose0.5 / `v8_1c_c5b_mh_dose050_screen10176_seed17_5090g1_20260719` | Stage1 10,176 | 0.020651266983901972 | 269.141 mm/100f | +1.178% | 1,110.845 mm | −1.080% | +1.199% | fail both targets |
+| 17 | C5-B dose1.0 / `v8_1c_c5b_mh_dose100_screen10176_seed17_5090g0_20260719` | Stage1 10,176 | 0.041302533967803944 | 251.348 mm/100f | +7.711% | 1,060.993 mm | +3.456% | +0.669% | pass；selected for seed23 confirmation |
+| 23 | C3-25 control / `v8_1c_c3_25_matched_screen10176_seed23_4090g1_20260719` | Stage1 10,176 | 0 | 263.239 mm/100f | reference | 1,093.450 mm | reference | reference | matched comparator |
+| 23 | C5-B dose1.0 / `v8_1c_c5b_mh_dose100_screen10176_seed23_4090g1_20260719` | Stage1 10,176 | 0.041302533967803944 | 264.770 mm/100f | −0.582% | 1,083.929 mm | +0.871% | +0.818% | fail both targets；stop |
 
 | version / run | Stage / type | diagnostic | key audited result | authorization |
 | --- | --- | --- | --- | --- |
@@ -381,6 +393,11 @@ D4/D4.2/D4.3 都是 v8.1A G3 的 N64 read-only diagnostics；t=50/500/950 是 di
 | v8.1C C3-25 / seed23 robustness | Stage1 full no-Stage2 | c73027b8f4c114c1c2ba54994c576592cb3f223dd7117fac7188dba9a7b0d3ad | 8e5a44cb586eeba1cbaeca82ee2b731badfa4dab4f15c40f11ccb7140f3a1b34 | contract 32ce7f8d1a91c75afe821659a2235d3ed05f8878380b79a7c7dd44a4e20bb4c1 |
 | v8.1C C3-50 / seed17 exploratory | Stage1 full no-Stage2 | 4c9b51778104aef3e85f2664086a22802988a9a23833181026c6facdab608d98 | c0bb55bb244011ebffad5911d9ba43a7b4ba1b28bcc031a6df58e0f2158f89fc | contract 98a5aa0c00c14b30bb23c6a4ac1fe80a4397216f408f3ef3d48196c92edca8c3 |
 | v8.1C C5-B / fresh calibration seed17/23 | Stage1 read-only；doses frozen | no checkpoint | seed17 c5755cf277da27fb62bba9518239af2a55eb9156acd994b196d1e665860832d5；seed23 561b1c4f43f59a06012b1585c49a58729d02d0a3382db5fc86e6d434137cf0c7；frozen doses 9042aa679a97c41b75fd9b2eb8b7854f141bc55c5df8a5bc4d0a153f3d6ab720 | contract c735a9c4aa7c7bcc8a56924bf2266d93333244d5f1f232b8114930e18b3b32c0 |
+| v8.1C C5-B / seed17 control | Stage1 `10,176` matched comparator | 49b4e71ea0225ad299dbfd2b9c8590c372deaab1b8ae03044a0c5d7138f825fa | c74393c248b016237ba183ff904e83a23ef962191b4b7dfa90e47f643200d043 | contract 523f187c3baa687b93c5292e86bb043ce2194225f5a4a3595853aac351e3051b；shared gate 0260192649bd0eaaa179fb5d39fa8d62a42f4db7744e2d28bd9974aed7b6b766 |
+| v8.1C C5-B / seed17 dose0.5 | Stage1 `10,176` target fail | eba485badc38c762bb55bb639dc1e83b675daa3d3b1f4483ad573c55832298f3 | b8291f8675c13972cfd859cd7f5eb5b186bb9acbb20ff8a739d4b483a7567a54 | contract 0e6cf69d6be78e47c86abd229b9bc8a7ac5272c48b5a4dddf3733923066623b1；shared gate 0260192649bd0eaaa179fb5d39fa8d62a42f4db7744e2d28bd9974aed7b6b766 |
+| v8.1C C5-B / seed17 dose1.0 | Stage1 `10,176` selected for confirmation | ad6e32dbf4865db68b205c0aadcf3e640641d063e37d2b8a77a93405d825a05b | e765454a74c4c25d867cef602fab42a8f20b3b01a2f161a51fdf6ab300471edc | contract e9a430428c22efd804e41691454f8a7df7123529d1d18c3421272f462ed8092a；shared gate 0260192649bd0eaaa179fb5d39fa8d62a42f4db7744e2d28bd9974aed7b6b766 |
+| v8.1C C5-B / seed23 control | Stage1 `10,176` matched comparator | f15ada53e469f43ad209531edde505083b7b3881538f2aee2cb16ccf5fa5a984 | 00a7eb840b42dee68caf16b81c3af881c766a6f7f4a4e3a155dcaca8f225535f | contract 32a5c5fa5d1d0eccdcb5ccc7e87448491afd9f904721ff26c1b44244114a2d23；shared gate 6bed0bc8957c691f7f448165d30fe5703ebf35ee7bb515eec90b7e818a43ce88 |
+| v8.1C C5-B / seed23 dose1.0 | Stage1 `10,176` confirmation fail | e1cb80a10420ad0ffd703da1060a93630bd7afb9252c18c72783da27cdef36d6 | 189996bfcf5d3fa85a4d13b4c2586546baa2a0b9005939b86075565dae091c42 | contract d1731adeeae99dbf1edb56628067f83f845d5689869be556d3011ef0f023ec21；shared gate 6bed0bc8957c691f7f448165d30fe5703ebf35ee7bb515eec90b7e818a43ce88 |
 
 Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a28640143b87b6322292c51dc9 / a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。
 

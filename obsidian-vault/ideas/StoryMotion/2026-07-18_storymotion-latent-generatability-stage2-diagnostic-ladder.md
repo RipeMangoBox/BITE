@@ -32,7 +32,7 @@ source_papers:
   - "[[analysis/ICLR_2026/Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based_Diffusion]]"
   - "[[analysis/IEEE_TIP_2024/Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Motion_Prediction]]"
 created: 2026-07-18T14:44:45+08:00
-updated: 2026-07-19T19:34:10+08:00
+updated: 2026-07-19T20:55:00+08:00
 ---
 
 # StoryMotion Latent Generatability and Stage2 Diagnostic Ladder
@@ -84,7 +84,8 @@ updated: 2026-07-19T19:34:10+08:00
 | version / run | 进入的阶段 | 理由 | 当前禁止事项 |
 | --- | --- | --- | --- |
 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` → `v8_1a_diag_unified3_30k_seed17_4090g0_20260718` | G3 `30K` 已闭合；不进入 G4 | 同 v7.14 human199/camera14 架构，仅 geometry loss；Direct-H 出现 signal，但 Direct-C 与 parallel/cascade camera 都是 broad regression | `105K` continuation、promotion cache、mainline rename、把单 seed 写为 promotion |
-| v8.1C-C5-A / `v8_1c_c5a_objective_alignment_seed17_4090g0_20260719` | Stage1 read-only alignment 已闭合；future screen 尚未预注册 | multi-horizon 对 formal global/yaw/root-ADE 的 per-sample alignment 优于 old last-valid，且 Camera-gradient guards 通过 | 直接沿用 trained-endpoint weight、启动 C5-B/screen/full、复用 C4-H state、把 pure4053 当最终 promotion test |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage1 selected candidate；Stage2 continuous `0→105K` diagnostic active | Stage1 只剩 global slope blocker；用户授权 exact parent/cache 的长预算 generatability diagnostic | promotion claim、用 v8.1A 30K artifact 代替 C3、30K quality-stop、cascade gate |
+| v8.1C C5-B / two-seed matched short family | Stage1 short ladder 已闭合；不进入 full | C5-A 支持的 surrogate 在 seed17 有 signal，但 seed23 未通过同一两个 target | full/cache/Stage2、复用 short state、继续扩 dose、把 pure4053 当最终 promotion test |
 | v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | D0 → D1/D2 与 Stage1 camera root-cause | residual/optimization 与 geometry loss纠缠，且 short-bin camera severe regression | `30K/105K` Unified；它只会混合已知 Stage1 camera failure 与 Stage2 效果 |
 | v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | D0 → D1/D2 与 layout/stats/joint-opt root-cause | camera14 不变却出现各 bin center-translation regression，须先拆解 shared trade-off | `30K/105K` Unified；把 human200 改善误称为全系统收益 |
 | v7.14 / v7.36 / v7.38 controls | D0–D4 control | v7.36 是 exact 30K parent，v7.38 L0 是 exact 105K mainline | 用 `105K` L0 直接淘汰一个 `30K` candidate |
@@ -252,7 +253,7 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 
 预先固定的解释规则：若 `rms_iid` 与 `spectrum_phase` 都接近 `actual_delta` 的 camera collapse，**误差量级已足够**解释 H2C failure；若 `rms_iid` 明显好而 `spectrum_phase` 仍坏，temporal spectrum/support 是充分风险因素；若两个 matched control 都明显好而仅 `actual_delta` 坏，则 real generated residual 的方向、cross-channel structure 或 text-conditioned support shift 才是主要剩余解释。若 `gt` 也失败、任一 arm 的 identity/sampler/decoder audit 失败，或 human first-pass 不是同一 deterministic latent，D6 无效且不据此继续任何训练。该 N64 screen 仅决定是否值得做 H2C training-exposure ablation；它不能比较 v7.47 与 L0、不能授权 Stage2 continuation，也不能解释为 v8 promotion evidence。
 
-### 6.1 当前 v8.1A execution snapshot
+### 6.1 当前 v8 execution snapshot
 
 | stage | run / artifact | status | boundary |
 | --- | --- | --- | --- |
@@ -268,11 +269,15 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 | Stage1 camera C3 first deployment | `v8_1c_center25pct_screen10176_seed17_4090g1_20260718` + `v8_1c_center50pct_screen10176_seed17_4090g0_20260718` | both aborted at optimizer step `214` after about `520 s` (`0.412 step/s`) because two random-small-file loaders contended on one 4090 HDD; no endpoint or eval exists | partial weights/optimizer state are invalid; any retry needs new run IDs, fresh initialization and a prevalidated per-host local-data I/O plan |
 | Stage1 camera C3 fresh screens | `v8_1c_center25pct_screen10176_seed17_4090g0_20260719` + `v8_1c_center50pct_screen10176_seed17_4090g1_20260719` | both completed pure4053 and passed contract/non-causal/decoder/gate audit on 4090 local NVMe | predeclared selection chooses the smaller 25% dose; screen weights remain non-promotion and cannot be resumed |
 | Stage1 camera C3 seed23 robustness full | `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | completed `636K / 81.38M` and pure4053 owning-decoder audit; Human held and Camera translation improved, but global-slope/rotation gate failed | full robustness evidence only; no promotion cache or Stage2; 5090 path text `nvme` is legacy naming over a SATA SSD replica |
-| Stage1 camera C3 selected full | `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | completed fresh `636K / 81.38M` and pure4053 owning-decoder audit；Human/Camera Pareto holds，rotation=`0.705°` passes，only global slope=`26.302 mm/100f` misses the original gate | no cache/Unified/Stage2；selected-arm repair narrows to C4-H，not C4-R |
+| Stage1 camera C3 selected full | `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | completed fresh `636K / 81.38M` and pure4053 owning-decoder audit；Human/Camera Pareto holds，rotation=`0.705°` passes，only global slope=`26.302 mm/100f` misses the original gate | exact diagnostic-only Stage2 cache/run has since been authorized；the failed original Stage1 gate still forbids promotion |
+| Stage2 C3 continuous diagnostic | `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | exact parent/decoder/cache/train-only full-cov stats、non-causal contract 与 hash audit 均通过；单一进程 `0→105K` 已部署，30K/105K 各固化 checkpoint 并执行 active three-profile eval | user-authorized generatability/exposure diagnostic only；30K 不重启或 quality-stop 主训练，任何结果都不追溯改写 Stage1 gate |
 | Stage1 camera C3-50 exploratory full | `v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719` | completed fresh `636K / 81.38M` and pure4053 audit；more Camera translation improvement but all Human overall metrics and long-bin/slope regress versus C3-25 | dose-response attribution only；confirms higher center dose harms Human horizon and cannot replace selected C3-25 |
 | Stage1 C4 gradient calibration | `v8_1c_c4_gradient_calibration_seed17_5090g0_20260719` | completed read-only on 8 real seed17-ordered batches；rotation and horizon are near-orthogonal in the shared encoder；independent `1.25%` doses frozen | quality-neutral scale evidence only；selected endpoint triggers C4-H after C3-50 attribution closes，while C4-R remains blocked because selected rotation already passes |
 | Stage1 C4-H screen | `v8_1c_c4h_horizon_screen10176_seed17_4090g0_20260719` | completed fresh `8 epochs / 10,176 steps` and audited；all Pareto guards pass，but both required slope/`193+` targets fail | non-promotion screen closed；no resume and no 5090 fresh full；C5-A read-only follow-up has since closed |
-| Stage1 C5-A objective alignment | `v8_1c_c5a_objective_alignment_seed17_4090g0_20260719` | completed read-only and formally audited；all/`193+` primary alignment and both Camera-gradient guards pass；same-set/different-order attempt was retained and fixed only by explicit sample-ID mapping | candidate supported only for future screen preregistration；no dose frozen、no training authorized；pure4053 stays development-only and a sealed audit set is required for promotion |
+| Stage1 C5-A objective alignment | `v8_1c_c5a_objective_alignment_seed17_4090g0_20260719` | completed read-only and formally audited；all/`193+` primary alignment and both Camera-gradient guards pass；same-set/different-order attempt was retained and fixed only by explicit sample-ID mapping | only justified the separately preregistered C5-B calibration/screen；C5-A itself froze no dose or trained state |
+| Stage1 C5-B calibration | `v8_1c_c5b_fresh_gradient_calibration_seed17_23_5090g1_20260719` | seed17/23 fresh train-distribution calibration completed；cross-seed ratio=`1.021≤2`，base=`0.041302533967803944` and `0.5×/1.0×` doses frozen before training | scale evidence only；authorized the preregistered short screens, not full/cache/Stage2 |
+| Stage1 C5-B seed17 screen | matched control + dose0.5 + dose1.0 fresh `10,176` runs | control and both treatments completed pure4053；only dose1.0 passed both Human slope/`193+` targets and all eight guards | only dose1.0 advances to fresh seed23 short confirmation；still no full or promotion action |
+| Stage1 C5-B seed23 confirmation | matched control + dose1.0 fresh `10,176` runs | both completed pure4053；all eight guards pass but neither Human slope nor `193+` target reaches its threshold | `stop_seed23_confirmation_failed`；two-seed screen closed，无 full/cache/Stage2 |
 | six-way recon vis | `v8_1_sixway_recon_20260718` | complete; eight ordered IDs rendered as GT/Pulp/v7.14/v8.1A/v8.1B/v8.2 and served by the separate Stage1 Gradio | visual evidence is diagnostic, not a promotion endpoint |
 
 ### 6.2 C5-B fresh-init multi-horizon dose 与两 seed short gate
@@ -285,6 +290,9 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 4. selected dose 再以 seed23 做一组 fresh control/treatment matched `10,176`-step confirmation，使用同一 gate。只有 seed17/23 都过才允许讨论 full；本轮 pure4053 仍是 development screen，未冻结 sealed audit，因此即使双过也不自动启动 full、cache 或 Stage2。
 5. 资源顺序：校准与 seed17 `0.5×` 使用 5090 GPU1 且总占用控制在 `2h` 内；5090 GPU0 顺序执行 seed17 control/`1.0×`；4090 GPU1 可承担不改变 gate 的复核短臂，但必须在 C3 `30K` full eval 前让卡。所有 finite step/ETA 只写 run logs。
 
+> [!info] 已闭合的 screen 决策
+> fresh calibration 已通过稳定性 guard。seed17 matched screen 中 dose0.5 未过两个 target，dose1.0 同时通过两个 target 与八项 guard；seed23 confirmation 的八项 guard 仍全过，但两个 target 都未达到门槛。因此 two-seed screen fail 并停止，精确数值与 hashes 只见 [[StoryMotion-valid-metric-ledger#C5-B fresh multi-horizon matched screen]]。
+
 这里的 **fresh screen** 指短预算、从零开始的诊断 run：使用新 run ID，不加载旧 model、optimizer、scheduler、scaler 或 RNG state；model 权重由声明的 seed 重新初始化，optimizer 的 moment 等状态为空而不是“随机初始化”。RNG 是 Python、NumPy、PyTorch CPU/CUDA 以及 DataLoader worker 等伪随机数发生器的状态，控制权重初始化、shuffle、dropout、diffusion noise 或 augmentation 等实际使用的随机过程。matched 两臂固定同一 seed、数据、架构、optimizer、batch、训练步数与 evaluator，使初始化和随机流尽量对齐，唯一 intervention 是该 arm 声明的 auxiliary weight；CUDA/worker 调度仍不承诺 bit-exact determinism。
 
 因此 fresh same-seed screen 的目的，是排除 warm-start 与旧 optimizer state 污染并回答 treatment 的短预算方向，不是单独证明跨 seed 稳定性；独立 seed 重复才提供 robustness evidence。C3-25/C3-50 中的 `25%/50%` 也不是训练进度或数据比例，而是相对 C1 校准权重的 loss dose：`0.0010166945703219975/0.002033389140643995`，分别约占 C0 raw-center 梯度的 `1.25%/2.5%`。两臂都完整训练 `8 epochs / 10,176 steps`。A10 只是 v8.1A 的 matched `10K`-class Stage1 comparator 名称，不是完整 v8.1A endpoint 的别名，更不是 Stage2。
@@ -294,9 +302,9 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 1. v7.47 formal 与 D5 已闭合；保留 audited system-control/historical attribution evidence。cascade 已退出 active standard，D6 标记为 `retired_not_run`，不进入当前队列。
 2. v8.1A 的 G3 已闭合并停止；不能用新筛选 checkpoint 或更长训练重开 G4。
 3. C3 fresh 25%/50% screens 已在 4090 本机 NVMe 双 loader 下闭合且都过 gate，证明旧 step-214 问题只是 I/O deployment failure。seed23/seed17 C3-25 full 与 seed17 C3-50 exploratory 也都完成；C3-50 的额外 translation 收益伴随全面 Human horizon 回退，因此不改变 selected C3-25。任何 screen/aborted checkpoint 都不得恢复。
-4. D4/D4.2/D4.3 已共同闭合：camera text 被使用，但 v8.1A 的低噪实际 residual 更集中命中 owning decoder 的高增益方向。C4 shared-encoder calibration、C4-H fresh short screen 与 C5-A read-only alignment也已闭合；C4-H 未命中 slope/long-bin target，而 C5-A 只支持 multi-horizon 进入 future-screen preregistration。它不冻结 dose、不授权训练，且 pure4053 已成为 development set。
+4. D4/D4.2/D4.3 已共同闭合：camera text 被使用，但 v8.1A 的低噪实际 residual 更集中命中 owning decoder 的高增益方向。C4 calibration/C4-H、C5-A 与 C5-B 均已闭合；C5-B seed23 未复现 seed17 target，two-seed screen 停止。pure4053 仍是 development set。
 5. 用户已授权 C3-25 seed17 的连续 Stage2 `105K` 非晋级诊断；4090 GPU0 专用于该长训，30K full eval 使用 immutable checkpoint 且不阻断主训练。
-6. 其余短任务照常成组推进：先做 C5 fresh-init train-distribution dose calibration，再做 matched fresh shorts；5090 GPU1 单项不得超过 `2h`，4090 GPU1/5090 GPU0 可承担其余短臂，但必须为 30K full eval 让出 4090 GPU1。
+6. C5-B calibration、seed17 matched selection 与 seed23 confirmation 已全部闭合；预注册 gate fail，不扩展其他 dose/full。5090 GPU1 已按短测边界使用并释放；4090 GPU1 释放给 C3 30K full eval。
 7. 除这条用户显式授权的 C3 diagnostic override 外，新的 Stage2 candidate 仍需等待 Stage1 gate；顺序固定为 Direct-C camera-sensitive objective → joint-condition fusion → inference。D6/H2C 与 cascade 不再参与 active priority；v8.1B/v8.2 不进入 `30K/105K` Unified。
 
 新 run 的 mutable state 只写入 remote run contract/log/manifest；G2/G3 的结论更新本页的一行 decision，formal audited metrics 只进入 [[StoryMotion-valid-metric-ledger]]，当前状态只摘要到 [[current]]，最终事件只追加到 [[version_family]]。该路由由仓库根 `AGENTS.md` 约束。

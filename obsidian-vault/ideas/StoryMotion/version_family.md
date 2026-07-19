@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T20:16:00+08:00
+updated: 2026-07-19T20:55:00+08:00
 ---
 
 # StoryMotion Version Family
@@ -55,6 +55,8 @@ updated: 2026-07-19T20:16:00+08:00
 | C4-H | C3-25 / Stage1 short | 降低 Human global slope/long-bin error | 只加 last-valid Human yaw/root horizon auxiliary | fresh `10,176` steps | guards 过但两个 target 反向；gate fail，无 full |
 | C5-A | C3-25 / Stage1 diagnostic | old last-valid surrogate 是否错配 formal evaluator | 比较 last-valid 与 four-anchor multi-horizon 的 per-sample alignment/gradient | **无训练**；read-only pure4053 | alignment pass；只允许另写 short-screen 预注册 |
 | C5-B calibration | C5-A follow-up / Stage1 calibration | fresh initialization 下 multi-horizon 的可训练 dose 是多少 | seed17/23 各用前 `8×8` train samples、fixed-max 250；各自标到 C3 parent gradient `1.25%` 后取几何均值 | **无训练** | 完成；cross-seed ratio `1.021≤2`，冻结 base=`0.041302533967803944`、dose0.5=`0.020651266983901972`、dose1.0=`0.041302533967803944` |
+| C5-B seed17 screen | C5-B / Stage1 short | multi-horizon 是否改善 global slope 与 `193+`，同时守住八项 Pareto guards | 同 seed/IDs/架构/预算比较 control、dose0.5、dose1.0；唯一 intervention 是冻结 weight | 三条 fresh `10,176` + pure4053 | dose0.5 fail；dose1.0 两项 target 与 guards 全过，只授权 seed23 short confirmation |
+| C5-B seed23 confirmation | seed17 selected dose / Stage1 short | seed17 的 multi-horizon signal 是否跨 seed | 同 seed23/IDs/架构/预算比较 fresh control 与 dose1.0；唯一 intervention 仍是冻结 weight | 两条 fresh `10,176` + pure4053 | guards 全过但两个 target 都 fail；two-seed screen 停止，无 full |
 
 ### Dose 到底代表什么
 
@@ -93,7 +95,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v8.0 | Stage1 read-only attribution | 定位 human199 长程误差责任通道 | GT-yaw oracle 完成；existing deep-AE screen No-Go |
 | v8.1A | Stage1 geometry loss + Stage2 generatability | 修复 yaw/root 并检查 latent 是否可生成 | Stage1 full、Stage2 `30K` 与 D4 family 完成；无 `105K` |
 | v8.1B | Stage1 architecture | residual AE capacity/control | Stage1 full 完成；无 Stage2 |
-| v8.1C | Stage1 Camera-center/Human-horizon treatment + Stage2 diagnostic override | 在 v8.1A 上形成 Human/Camera Pareto，并诊断 C3 latent generatability | C3-25 selected；seed17 exact Stage2 `0→105K` 已部署但不具 promotion 资格 |
+| v8.1C | Stage1 Camera-center/Human-horizon treatment + Stage2 diagnostic override | 在 v8.1A 上形成 Human/Camera Pareto，并诊断 C3 latent generatability | C3-25 selected；C5-B two-seed short fail；seed17 exact Stage2 `0→105K` 已部署但不具 promotion 资格 |
 | v8.2 | Stage1 feature layout | human200 non-integrative root/yaw | Stage1 full 完成；无 Stage2 |
 | v8.2333 | data curation | reversible physical/semantic pair quarantine | preregistered、not started、全部计数 `0` |
 | v8.4-A | Stage2 backbone | Motion Mamba-style non-AR latent DDPM | blocked on representation promotion |
@@ -125,6 +127,8 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-19：** C3-25 seed17/seed23 与 exploratory C3-50 full 均完成 Stage1 audit；C3-25 seed17 把 blocker 收窄为 global slope。
 - **2026-07-19：** C4-H short fail；C5-A read-only alignment pass，但未授权 C5 training。
 - **2026-07-19：** C5-B fresh seed17/23 train-distribution calibration 完成；两条 recommendation 的 max/min=`1.021`，稳定性 guard 通过并冻结 `0.5×/1.0×` short doses。该事件只授权预注册 short，不授权 full。
+- **2026-07-19：** C5-B seed17 matched screen 完成；dose0.5 未过 target，dose1.0 通过两项 target 与八项 guards，按预注册只进入 seed23 confirmation，仍不授权 full。
+- **2026-07-19：** C5-B seed23 matched confirmation 完成；八项 guards 全过但两个 target 都未复现，two-seed screen 按预注册停止，不启动 full/cache/Stage2。
 - **2026-07-19：** 用户授权 C3-25 seed17 独立 Stage2 continuous `0→105K` diagnostic；exact cache、train-only full-cov normalization 与 run contract 审计通过，30K/105K active three-profile eval 由里程碑监督器执行且不在 30K 重启训练。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
 - **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
