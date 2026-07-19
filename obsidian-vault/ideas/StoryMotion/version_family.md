@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T21:55:00+08:00
+updated: 2026-07-19T22:10:00+08:00
 ---
 
 # StoryMotion Version Family
@@ -131,7 +131,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-19：** C5-B seed23 matched confirmation 完成；八项 guards 全过但两个 target 都未复现，two-seed screen 按预注册停止，不启动 full/cache/Stage2。
 - **2026-07-19：** 用户授权 C3-25 seed17 独立 Stage2 continuous `0→105K` diagnostic；exact cache、train-only full-cov normalization 与 run contract 审计通过，30K/105K active three-profile eval 由里程碑监督器执行且不在 30K 重启训练。
 - **2026-07-19：** C3-25 Stage2 D1 完成 full train estimate 与 frozen pure4053 eval cache audit；未发现 dead-channel 或 branch-marginal collapse，raw Camera latent 仍呈低有效秩。该结果只关闭 cache health 风险，不产生生成质量结论。
-- **2026-07-19：** MoMask-Pulp native VQ/Mask/Residual endpoint 的 Direct-H pure4053 formal eval 与独立 audit 闭合；只作为 C-tier native-system baseline，不解释为 StoryMotion representation ablation。
+- **2026-07-19：** MoMask-Pulp native VQ/Mask/Residual endpoint 的 Direct-H pure4053 formal eval 与独立 audit 闭合；第二次 full replay 的 4,053 条 records byte-exact。它只作为 C-tier native-system baseline，不解释为 StoryMotion representation ablation。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
 - **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
 

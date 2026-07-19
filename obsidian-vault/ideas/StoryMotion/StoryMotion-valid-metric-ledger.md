@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-19T21:55:00+08:00
+updated: 2026-07-19T22:10:00+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -207,7 +207,7 @@ Human completion contract：human text → H。GT 是 identity reference；观�
 | v7.42 / same-impl Human specialist | Stage2 task-exposure matched | A | 328.620 | 13.438 | 42.22% | — | — | formal |
 | v7.45 / MoLingo human | Stage2 240K human-only | B | 149.163 | 17.729 | 49.86% | 242.502 / 1,249.134 mm | 1,164.249 / 2,007.279 mm | semantic signal；geometry no-promotion |
 | MotionLab-MFT / v7.14 latent | Stage2 30K human-only | B | 156.350 | 18.172 | 59.19% | 250.782 / 951.380 mm | 857.640 / 1,436.396 mm | formal system peer |
-| MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | C | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 mm | 998.888 / 1,610.472 mm | formal native baseline；representation/decoder/objective/sampler differ |
+| MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | C | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 mm | 998.888 / 1,610.472 mm | formal native baseline；full replay byte-exact；system boundaries differ |
 
 ### 3.3 Direct-C fair system table
 
@@ -441,7 +441,7 @@ Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a286
 | v7.36 A30 / matched control | Stage2 30K | 7dcf3b1911af144ea9ef2b30017dd07472d62f655fd04c1dc9263581e3382c0b | v7.14 decoder 91248bf4…7ce1；cache f7a00a48…a5983 / 6f13816c…9b25 | matched comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K stopped | becc2c11051bfd7857acb0602f61c755cd664969f34acef1f0232711feee5bb8 | v8.1A decoder ac47c219…151f；cache 3b55223d…bd22 / 1050748f…541d | contract c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59 |
 | v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；no metric row yet | pending 30K/105K immutable checkpoints | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | contract 2351a6f0…877；audit eb28815a…1fb；diagnostic-only |
-| MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d4268…8664；Mask 03787132…ff3c；Residual 89faab30…e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f9…8901；result 3a133b83…af70；records 6545ab1a…ed8；audit 71bd4b1d…3232 |
+| MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d4268…8664；Mask 03787132…ff3c；Residual 89faab30…e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f9…8901；result 3a133b83…af70；records 6545ab1a…ed8；formal audit 71bd4b1d…3232；full replay audit 0d7d549e…8c2e |
 
 v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。v7.47 training script 与 L0 historical training script SHA256 分别为 71a9a2a3b700d4f0a699fda5f28bf8da72f563c20871e1c1cfb5d4d4cae0ac08 / f207c840fa363afc13e308047ddbe3900683f048366c10e9c135b49a2da886c8，因此 strict representation isolation 未建立。
 
