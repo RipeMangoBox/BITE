@@ -22,6 +22,7 @@ source_notes:
   - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[StoryMotion-metric-computation-io]]"
+  - "[[StoryMotion-iclr-reliability]]"
   - "[[2026-07-17_storymotion-v8-2333-data-curation-plan]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 source_papers:
@@ -29,13 +30,13 @@ source_papers:
   - "[[analysis/NEURIPS_2025/TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_Generation]]"
   - "[[analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-19T21:55:00+08:00
+updated: 2026-07-21T14:00:00+08:00
 ---
 
 # StoryMotion Current
 
 > [!abstract] 当前裁决
-> corrected v7.14 camera14 joint AE 仍是 **Stage1 implementation mainline**，v7.38 L0 clean `105K` 仍是唯一 **Stage2 formal mainline**。v8.1C C3-25 seed17 是当前最有希望的 Stage1 candidate：fresh `636K / 81.38M` 与 pure4053 audit 只剩 Human global slope `26.302 > 20 mm/100f` 未过原始 gate。C5-B multi-horizon two-seed short 已因 seed23 未复现 target 而停止。用户于 `2026-07-19` 明确授权的独立 Stage2 `0→105K` 已通过 exact cache/contract/non-causal/train-only full-cov audit；D1 未发现 dead-channel 或 branch-marginal collapse，单进程继续训练。`30K` 固化 checkpoint 后会在不中断训练的情况下完成 Direct-H、Direct-C 与 joint parallel 全量评估。该 run 全程 `diagnostic_only=true`、`promotion_eligible=false`；它回答 C3 latent 的可生成性与长预算成熟度，不提前替换 v7.14/v7.38。
+> corrected v7.14 camera14 joint AE 仍是 **Stage1 implementation mainline**，v7.38 L0 clean `105K` 仍是名义 **Stage2 formal mainline**。v8.1C C3-25 seed17 是当前最有希望的 Stage1 candidate：fresh `636K / 81.38M` 与 pure4053 audit 只剩 Human global slope `26.302 > 20 mm/100f` 未过原始 gate。C5-B multi-horizon two-seed short 已因 seed23 未复现 target 而停止。**C3-25 Stage2 seed17 `105K` formal eval 已闭合**：Direct-H TMR `14.389` 与 FTD `222.12` 均击败 v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` 与 FCD `25.09` 均击败 v7.38 L0（`55.64 / 33.29`）；joint parallel 无 broad regression。Stage2 seed23 已写出三路 `105K` result/records，但 eval bundle 尚未见 contract/profile audit，当前只能标记 `result_written_audit_pending`，不能作为 formal multi-seed 复现。两条 run 均不触发主线替换或晋级。v8.2333 仍只允许只读 score/distribution，阈值、quarantine、clean manifest 与训练未开放。
 
 > [!warning] 最容易混淆的命名
 > 仓库中没有独立的 “v8.1D” 或 “v8.1H” 完整版本。`D4/D4.2/D4.3` 是 v8.1A `30K` checkpoint 的 Stage2 只读诊断；`C4-H` 是 v8.1C 内部的 Stage1 Human-horizon short arm。完整命名、dose 和 step 对照只见 [[version_family#v8.1 命名解码与执行状态]]。
@@ -52,13 +53,14 @@ updated: 2026-07-19T21:55:00+08:00
 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` | Stage1 `636K` | yaw/root geometry supervision 能否修复 Human 长程误差 | Human 显著改善，Camera mild regression；原始 Stage1 gate 未过 | 保留为 v8.1C parent 与 Stage2 generatability control |
 | v8.1A / `v8_1a_diag_unified3_30k_seed17_4090g0_20260718` | Stage2 `30K` | v8.1A latent 是否更易生成 | Direct-H 有 signal；Direct-C 与 joint parallel Camera broad regression；正式停止 | 不续 `105K`；只保留已闭合 D4 family 归因 |
 | v8.1C C3-25 / `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | Stage1 `636K` | 低 dose Camera-center loss 能否兼顾 Human 与 Camera | 当前最佳 Stage1 candidate；除 global slope 外原始 gate 全过 | 保持非晋级；作为下列用户授权 Stage2 诊断的 exact parent |
-| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage2 `0→105K` | C3-25 latent 在同 Unified 与长预算下能否生成 | exact cache/contract 与 D1 audit passed、continuous training active；`30K/105K` formal eval pending | 4090 GPU0 单进程连续训练；30K checkpoint 不重启、不作为 quality stop；不得产生 promotion claim |
-| v8.1C C3-25 / `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | Stage1 `636K` | C3-25 signal 是否跨 seed | Human 与 Camera translation signal 重现；slope 与 rotation 未全过 | 只作 robustness evidence，不替代 seed17 selected arm |
-| v8.1C C3-50 / `v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719` | Stage1 `636K` | 更高 center dose 的完整预算代价是什么 | Camera translation 更好，但 Human overall 与 long horizon 全面变差 | dose-response 已关闭；不再增大 center dose |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage2 `0→105K` | C3-25 latent 在同 Unified 与长预算下能否生成 | exact cache/contract、D1 与 `30K` active three-profile formal audit passed；**`105K` formal eval 闭合**：Direct-H TMR `14.389` / FTD `222.12` **击败 v7.38**（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` **击败 v7.38**（`55.64 / 33.29`）；joint parallel 无 broad regression | 4090 GPU0 全部完成。全程 `promotion_eligible=false`；physical/render audit 待用户授权；multi-seed repeat 为低优先级 |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_seed23_105k_4090g1_20260720` | Stage2 `0→105K` | seed17 Stage1 representation 下的 Unified-3 signal 是否跨 Stage2 seed | Human、Camera、joint parallel `105K` result/records 已写出；未见对应 contract audit/profile audit | 保持 `result_written_audit_pending`；先补 provenance/audit，禁止进入 ledger、version milestone 或 multi-seed claim |
+| v8.1C C3-25 / `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | Stage1 `636K` | C3-25 signal 是否跨 seed | Human RA `24.70` / global `70.80` / slope `27.59 mm/100f`；Camera ADE `39.05` 与 translation signal 重现；rotation `0.776° > 0.75` fail；slope fail | 只作 robustness evidence，不替代 seed17 selected arm |
+| v8.1C C3-50 / `v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719` | Stage1 `636K` | 更高 center dose 的完整预算代价是什么 | Camera ADE `36.41` 更好，但 Human overall `73.17` / long `193+` global `138.49` 与 slope `36.21` 全面变差 | dose-response 已闭合；不再增大 center dose |
 | v8.1C C5-B / two-seed matched short family | Stage1 calibration + fresh `10,176` screens | four-anchor multi-horizon 是否修复 C3-25 的 Human horizon blocker | seed17 dose1.0 过 gate，但 seed23 两项 target 未复现；two-seed screen fail | 正式关闭；不启动 full、cache 或 Stage2 |
 | v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | Stage1 `636K` only | residual AE 是否增加有效容量 | Human 改善，Camera short-bin severe regression；无 Stage2 | 不建 Unified；仅作 architecture control |
 | v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | Stage1 `636K` only | non-integrative human200 是否解决 root/yaw 累积 | Human 改善，Camera center translation 退化；无 Stage2 | 不建 Unified；仅作 representation control |
-| v8.2333 / `clean_manifest_ablation` | future data axis | pair-level curation 是否改善 prior | preregistered、not started；所有计数为 `0` | 等 prospective representation promotion 后再开 gate |
+| v8.2333 / `clean_manifest_ablation` | future data axis | pair-level curation 是否改善 prior | G1 raw lock 与 physical distribution complete；TMR Human-pair singleton distribution active；G0 closed、LaMP missing、thresholds unset、quarantine `0` | 只允许继续只读 score/distribution；不得阈值冻结、clean manifest、cache 或训练 |
 | v8.4-A/B | future Stage2 backbone | non-AR backbone 是否改善生成 | not started | 只在 representation promotion 后做 matched backbone axis |
 
 ## 2. 不可变边界
@@ -109,12 +111,16 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 
 这个证据不支持“只要多训到 `105K`”“condition 没接上”或“总曝光不足”。`105K` authorization 已明确关闭。
 
-## 5. 下一轮执行顺序
+## 5. 核心 TODO
 
-1. C3-25 seed17 exact cache、non-causal、ordered IDs、owning-decoder、train-only full-cov normalization 与 file-hash audit 已通过；4090 GPU0 正从零单进程训练 Stage2 `105K`，LR 在 step `30001` 从 `1e-4` 变为 `3e-5`，不重启 optimizer。
-2. 保存 immutable `step_30000.pt`，主训练继续；4090 GPU1 顺序执行 pure4053 Direct-H、Direct-C 与 joint parallel DDIM50 全量评估。30K 结果用于诊断和同 step 比较，不自动停止用户授权的 `105K`。
-3. C3 D1 full-train/frozen-eval cache geometry 已闭合，只排除了明显 cache health failure；MoMask-Pulp native Direct-H formal baseline 也已闭合并仅按 C-tier 解释。二者都不改写 C3 gate。
-4. C3 的这次 Stage2 诊断不授权 v8.2333 curation、v8.4 backbone，也不产生 promotion-bearing cache；除 C3 30K/105K milestone eval 外，当前没有已授权的后续长训分支。
+完整 contribution/claim 边界见 [[StoryMotion-iclr-reliability]]。当前只保留会改变主结论的任务：
+
+1. **P0 — 审计现有 Stage2 seed23 `105K`。** 三路 result/records 已写出，但在 exact checkpoint、cache、ordered IDs、sampler、contract 与 profile audit 闭合前，不称 formal repeat；若边界不匹配则重做，不能补标签。
+2. **P0 — 补 C3-25 decoded/no-reference evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；缺失值不是 pass。
+3. **P0 — 完成 blind render 与 sealed audit。** Gradio 的 matched L0、Top-5 与 single-step 只作 development evidence；最终结论需要随机/失败切片、blind review，以及训练前冻结的新 audit IDs/hash。
+4. **P1 — 处理 Stage1 Human global-slope blocker。** 只允许 prospective、two-seed、单变量 intervention；不得后验改写 `≤20 mm/100f` gate，也不得用 Stage2 signal 代替 Stage1 promotion。
+5. **P1 — 补 condition reliance 与 fair baseline matrix。** Direct-H 验证无 camera leakage；Direct-C 做 Human/text shuffle-zero-noise；joint 做 branch intervention。native baselines 保持 system boundary，不冒充 matched ablation。
+6. **P2 — 延后独立轴。** temporal inpaint/inbetweening、v8.2333 curation 与 v8.4 backbone 在各自 preregistered gate 前不进入核心贡献或当前长训队列。
 
 ## 6. 文档与证据路由
 

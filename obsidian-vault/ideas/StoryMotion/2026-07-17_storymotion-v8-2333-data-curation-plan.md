@@ -1,14 +1,14 @@
 ---
 title: "StoryMotion v8.2333 Data Curation Preregistration"
-status: preregistered_blocked_no_promoted_representation
-workflow_state: not_started
+status: read_only_scoring_active_blocked_no_promoted_representation
+workflow_state: read_only_distribution_scoring_in_progress
 gate: promoted_representation_selection
 gate_state: closed
-processed_pairs: 0
+processed_pairs: 326144
 annotated_pairs: 0
 quarantined_pairs: 0
-materialized_manifests: 0
-launched_jobs: 0
+materialized_manifests: 1
+launched_jobs: 2
 hypothesis: |
   在冻结同一 Stage1 representation、owning decoder 与 Unified Stage2 backbone 后，仅用可追溯的物理异常和 caption-motion pair 级语义错配 quarantine 替换 raw train manifest，可能改善生成动作的物理与文本一致性；该假设必须通过 raw-vs-clean 单变量实验验证，不能与 representation 或 generator 改动合并归因。
 tags:
@@ -23,30 +23,48 @@ aliases:
 source_notes:
   - "[[current]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-19T13:55:00+08:00
+updated: 2026-07-20T01:55:00+08:00
 ---
 
 # StoryMotion v8.2333 Data Curation Preregistration
 
 > [!warning] 当前执行状态
-> 本文是 v8.2333 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 保持 `closed`。尚未扫描、打分、标注、quarantine、物化 manifest 或启动 raw-vs-clean 训练。
+> 本文是 v8.2333 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 仍为 `closed`。用户于 `2026-07-20` 单独授权提前完成 G1 raw lock，以及语义/物理两路只读分布打分；这不开放阈值冻结、人工裁决、quarantine、clean manifest、cache 或 raw-vs-clean 训练。
 
 ## 0. 当前执行状态
 
 | 字段 | 值 |
 | --- | --- |
-| recorded at | `2026-07-18 15:20 CST` |
+| recorded at | `2026-07-20 01:55 CST` |
 | execution gate | `promoted_representation_selection` |
 | gate state | `closed` |
-| workflow state | `not_started / blocked_no_promoted_representation` |
-| processed or scored pairs | `0` |
+| workflow state | `read_only_distribution_scoring_in_progress / decision_gates_blocked` |
+| processed or scored pairs | physical：`162,760` motions / `326,144` pairs complete；TMR：Human-role full distribution running |
 | manually annotated pairs | `0 / 300–500` |
 | quarantined pairs | `0` |
-| materialized manifests | `0 / 4` |
-| scorer jobs launched | `0` |
-| GPU jobs launched | `0` |
+| materialized manifests | `1 / 4`，仅 immutable `raw` |
+| scorer jobs launched | `2`，physical 与 TMR 分开 |
+| GPU jobs launched | `1`，5090 GPU0 TMR read-only scoring |
 
-这些 `0` 表示从未开始，不表示扫描后未发现问题。v8.1A 的 amended non-promotion screen 不构成 v8.2333 的 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
+`annotated/quarantined=0` 表示这些动作尚未获授权，不表示扫描后没有异常。v8.1A 或 C3-25 的 amended non-promotion screen 都不构成 v8.2333 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
+
+### 0.1 Read-only evidence snapshot
+
+| evidence | scope / count | artifact boundary | decision state |
+| --- | --- | --- | --- |
+| G1 role-aware raw lock | `162,760` motions；Human captions `162,760`；Camera captions `163,384`；unique pairs `326,144`；missing/empty `0` | raw SHA256 `49d53029c42ad6ee275172fd9d3e5d56e98f1142ae9daf5dcc0988faa2a9c458`；meta `39c2ac4404e55433fb28a6a8c83c0d0494e188897079c7fea2d6e87ec63b420c`；ordered motion/pair `a0981b6c…1dc9` / `182839ab…8eb4` | G1 passed；parent immutable |
+| physical distribution v2 | `162,760` motions、`326,144` pair coverage；Human 与 Camera 各按自己的 valid length 计算 | scores `ffd3f6639cd50d8992388e0d6092d5bd6ec77060932ce21c9ae2f9c43db09b76`；summary `87d5b1aed481016550c2b311a9c891292af33480871d7d9ffbfa81e8b3a861c9` | complete；thresholds `null`；actions `0` |
+| Human semantic distribution / TMR v4 | 目标 `162,760` Human-caption pairs；Camera-caption 不冒充 TMR applicable pair | singleton scorer `526b7807…e99c`；v4 preflight `01b76cbf…f519`；64-sample replay `6aad2f3a…0e2e`；5090 GPU0 从零 full scoring active | fixed microbatch `1`，replay 最大差 `0.0`；threshold `null`；LaMP missing，故 G2 overall blocked、automatic semantic quarantine disabled |
+
+physical v2 另发现 `1 / 162,760` 条 Human/Camera valid-length mismatch，最大绝对差 `13` 帧；它只保留为 input audit finding，不在阈值冻结前自动 quarantine。当前可计算项是 Human root/yaw/joint/bone/foot distribution 与 Camera center/rotation dynamics；declared-contact、calibrated ground、mesh 与 environment 输入缺失的规则明确为 disabled，optional floating 也未启用。
+
+TMR v1 的 B=1/8 审计发现同样本 score 最大差 `0.511034`；根因是 Pulp `match_skeletons` 用 batch-global 腿长最大值推导 skeleton scale。该进程已停止，partial 以 SHA256=`e16dc9f…4190` 只读保留并标记 invalid；fixed-padding-only v2 仍复现同一偏差，未启动 full。v3 不改 Pulp 源码，只在 scorer 内改为 per-sample skeleton scale，真实耦合降至 FP32 batch-shape 数值差 `1.5259e-5`；但它先在 `1e-5` 下失败、再放宽到 `1e-4`，不满足预检先于结果的要求，故在 `4,656` 条时停止并以 SHA256=`6fb98ab4…4bd3` 标记 invalid。v4 固定 semantic microbatch 为 `1`；64 样本正序/逆序 replay 三项分数最大差均为 `0.0`，通过后才从零重启 full distribution。
+
+raw lock 时的 contract SHA256=`5e962c829dc6b6cf56c4f36e7ced1a617d3bdf01559dad84cf4c26385153a4ea`；后续只读评分 contract SHA256=`8d8034ea53e3b2ccdf1dd792265a549074813b782de8ca698884f49777e4d704`。两者由 append-only amendment r1（SHA256=`98bb4ae617d95f65decb8550bffa5eac2646c8e8c50f8d9d49d1cc4ef850e7eb`）串联；TMR per-sample scale 由 amendment r2（SHA256=`fc774e040ecb7b8c8e816f48ec1fcd1cdfe8fc324fce1a03c701e1587c097435`）追加，singleton contract 再由 amendment r3（SHA256=`bc04b3f3aaba0b6c8b93cb475d86b7bbaf940d665f1314fbf09c7317b1b177da`）追加。physical v1 failure、physical v2 success 与 TMR v1/v2/v3 invalidation 都保留，没有改写历史状态。
+
+远端 evidence root：
+
+    /data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_2333_data_curation_20260717/
 
 ## 1. 问题、数据边界与因果边界
 
@@ -64,9 +82,11 @@ v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一�
 
 按顺序满足以下 gate 后才能前进：
 
-1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得启动 v8.2333。
-2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。
-3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。
+`2026-07-20` protocol amendment：用户只授权在 G0 关闭时提前执行 G1 与 G2 的只读 availability/distribution 部分，以便观察数据分布并准备阈值校准。该 amendment 不允许跨到 G3–G5，也不能把 score artifact 命名为 quarantine 或 clean endpoint。
+
+1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得冻结阈值、标注/quarantine、物化 clean manifest、构建 cache 或训练；唯一例外是上面的只读 G1/G2 amendment。
+2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。**状态：passed。**
+3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。**状态：partial；TMR singleton scorer verified/running，LaMP missing，automatic semantic quarantine disabled。**
 4. **G3 — calibration**：完成 `300–500` 个分层 pair 的人工标签，冻结 reason-code、physical rule 和 semantic threshold 版本。
 5. **G4 — manifest audit**：四层 manifest 通过 membership、order、hash、lineage、scope 和 set-equation 检查。
 6. **G5 — ablation contract**：raw 与 clean 两个 Stage2 run 的所有非数据字段逐项相等后，才能训练。
@@ -96,12 +116,12 @@ v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一�
 
 ## 4. 物理规则
 
-所有运动量只在 valid frames、统一单位和 owning geometry decode 下计算。首版候选规则为：
+所有运动量只在 valid frames、统一单位和 owning geometry decode 下计算。先统计数据分布，然后筛选，避免阈值不合理。首版候选规则为：
 
 - world-root speed、acceleration、jerk；
 - yaw rate 与 yaw acceleration；
 - declared foot contact 下的 world foot sliding；
-- 地面穿透与持续悬空；
+- 地面穿透与持续悬空；【非强制，有些视频动捕是坐着或者在走楼梯，所以可能在空中】
 - bone-length drift；
 - joint angular velocity/acceleration；
 - mesh 可得时的 body self-penetration，以及 environment geometry 可得时的 environment penetration。输入不可得时必须标记该 rule 为 disabled，不能把“未计算”当作通过。
@@ -112,15 +132,14 @@ v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一�
 
 ## 5. 语义 pair 清洗与 checkpoint 禁令
 
+先数据集整体计算，然后计算每个 sample 的数值（大 batch 并行，如果 batchsize 不影响结果）
 - 首版自动语义判定只允许 **TMR global alignment + LaMP motion-aware alignment**。二者必须同时有可复现代码、精确 checkpoint 和 SHA256；任一 checkpoint 缺失时，TMR+LaMP 自动 semantic quarantine 整体禁用，只能保留人工审核队列。
-- PST 的 joint/segment/global 接口可以预留，但当前没有已登记的可复现 checkpoint，因此状态固定为 `disabled_missing_checkpoint`。不得随机初始化、借用不匹配权重或把论文数值当本地 score。获得并核验 checkpoint 后也必须新建 threshold revision，不能加入已冻结 vote。
-- `MARDM-67` 是 evaluator/protocol，不是独立 retrieval scorer，不进入 ensemble vote。
 - 只有 TMR 与 LaMP 对同一 pair 方向一致、各自超过人工校准的高精度阈值，且没有人工 veto 时，才允许自动进入 `semantic_pair_quarantine`。模型分歧、只过一个阈值或细粒度关系不确定的样本进入人工队列。
 - 语义 reason code 至少覆盖 posture、direction、body-part、temporal order、locomotion、negation 与 global mismatch。错误 caption 只隔离该 pair；同一 motion 的其他 caption 默认保留。
 
 已核验的 pair-level 例子保留为 calibration evidence，而非已执行的 quarantine：`2019_vcdDRblTOmM_00038_001_a` 的 human caption 描述站立并轻微转头；其 GT 仅 `35` 帧，左右膝平均弯曲约 `85.17°/81.82°`，root Z 约 `0.849 m`、root XY displacement 约 `0.056 m`，与持续坐姿/深屈膝一致。gate 打开后，它应作为 semantic review 的明确候选；在此之前不得生成 quarantine record 或改动 manifest。
 
-## 6. `300–500` pair 人工校准
+## 6. `300–500` pair 人工校准【待自动化执行后处理】
 
 ### 6.1 批次声明
 
@@ -230,6 +249,8 @@ rollback 不删除任何文件：将 active data pointer 恢复到 locked raw SH
 ```text
 /data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_2333_data_curation_20260717/
   contract/curation_contract.json
+  contract/curation_execution_amendment_20260720_r1.json
+  contract/curation_execution_amendment_20260720_r2.json
   manifests/raw.jsonl
   manifests/raw.meta.json
   manifests/physical_quarantine.jsonl

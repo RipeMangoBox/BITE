@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-19T22:10:00+08:00
+updated: 2026-07-20T19:30:00+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -27,7 +27,7 @@ updated: 2026-07-19T22:10:00+08:00
 > 本页只拥有已经审计的数值、比较边界和 artifact hashes。Stage1 reconstruction、Stage2 generation、30K diagnostic screen 与 105K formal evidence 分区记录；除明确标为 diagnostic 的 N64/short rows 外，正式表均为 official pure 4,053。当前裁决见 [[current]]，版本名称与完成 step 见 [[version_family]]，指标定义见 [[StoryMotion-metric-computation-io]]。
 
 > [!important] C3-25 当前证据边界
-> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 此后按用户授权建立了独立、审计通过的 diagnostic-only Stage2 cache，并启动 continuous `0→105K` run；D1 cache geometry 已闭合，但当前尚无 C3 的 Stage2 `30K/105K` 正式生成结果，因此本页不提前填分。seed23 仍只有 Stage1。下文已有的 Stage2 30K 数值仍只属于父候选 v8.1A。
+> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 的 diagnostic-only Stage2 continuous `0→105K` run **已全部完成**：`30K` 与 `105K` 两处 immutable checkpoint 均完成 Direct-H、Direct-C、joint parallel 三项 formal audit。**`105K` Direct-H TMR `14.389` / FTD `222.12` 均击败 v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` 均击败 v7.38 L0（`55.64 / 33.29`）；joint parallel 无 broad regression。** 但整个 family 仍因 Stage1 prospective global-slope gate fail 而 `promotion_eligible=false`，不触发主线替换。seed23 仍只有 Stage1。
 
 ## 1. 如何读表
 
@@ -55,8 +55,10 @@ updated: 2026-07-19T22:10:00+08:00
 | MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | Direct-H | 4,053 | C-tier native-system baseline |
 | PulpMotion / official DiT-xy step92950 | Stage2 native endpoint | joint | 4,053 | C-tier native-system baseline |
 | v7.36 A30 vs v8.1A G3 | Stage2 30K | Direct-H、Direct-C、parallel | 4,053 | matched generatability screen，不与 105K 排名混合 |
+| v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | Direct-H、Direct-C、parallel | 4,053 | formal diagnostic screen；不改变 Stage1 non-promotion |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | Direct-H、Direct-C、parallel | 4,053 | diagnostic-only 105K generatability evidence；不产生 promotion claim |
 
-全表 formal ordered-ID SHA256：a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。
+除下述 PulpMotion native rows 外，全表 formal ordered-ID SHA256 为 a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。PulpMotion 两条 official DiT-xy rows 使用相同 4,053 identity set，但保留 native order `16d73df1916048dc44d407191bea9d3589113b55e22281b1acd574b16b9a8196`；因此它们是 C-tier system rows，不是 order-matched ablation。
 
 ## 2. Stage1 reconstruction
 
@@ -208,6 +210,7 @@ Human completion contract：human text → H。GT 是 identity reference；观�
 | v7.45 / MoLingo human | Stage2 240K human-only | B | 149.163 | 17.729 | 49.86% | 242.502 / 1,249.134 mm | 1,164.249 / 2,007.279 mm | semantic signal；geometry no-promotion |
 | MotionLab-MFT / v7.14 latent | Stage2 30K human-only | B | 156.350 | 18.172 | 59.19% | 250.782 / 951.380 mm | 857.640 / 1,436.396 mm | formal system peer |
 | MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | C | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 mm | 998.888 / 1,610.472 mm | formal native baseline；full replay byte-exact；system boundaries differ |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | 222.120 | 14.389 | 52.75% | — / — mm | — / — mm | diagnostic-only 105K evidence；TMR/FTD/coverage 均击败 v7.38 L0 mainline；Direct-H decoded geometry pending |
 
 ### 3.3 Direct-C fair system table
 
@@ -219,8 +222,9 @@ Camera completion contract：observed/GT H + camera text → C。
 | v7.38 L0 / clean | Stage2 105K | mainline | GT-H latent | 33.290 | 55.640 | 73.23% | 0.715 | 1.512 / 1.606 m | 32.926° | formal |
 | v7.47 / official-AE Unified | Stage2 105K | S | GT-H in official basis | 17.876 | 60.158 | 83.69% | 0.774 | 0.152 / 0.256 m | 2.084° | formal；strict isolation not established |
 | v7.42 / same-impl Camera specialist | Stage2 task-exposure matched | A | GT-H latent | 33.060 | 58.334 | 76.63% | 0.750 | — | — | formal |
-| Director-C / native | Stage2 15.299M exposures | C | GT pelvis trajectory | 32.440 | 52.662 | 81.49% | 0.688 | — | — | formal native-system peer |
-| CCD-Pulp / v7.14 latent | Stage2 60K × 256 | B | GT-H latent | 101.030 | 33.095 | 59.91% | 0.442 | — | — | formal；L0 dominates primary metrics |
+| Director-C / native | Stage2 15.299M exposures | C | GT pelvis trajectory | 32.437 | 52.662 | 81.49% | 0.688 | — | — | semantic/distribution formal；decoded geometry re-eval required |
+| CCD-Pulp / v7.14 latent | Stage2 60K × 256 | B | GT-H latent | 101.027 | 33.095 | 59.91% | 0.442 | — | — | semantic/distribution formal；decoded geometry re-eval required |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | GT-H latent | 25.091 | 59.539 | 75.03% | 0.764 | — / — m | —° | diagnostic-only 105K evidence；FCD/CLaTr/F1 均击败 v7.38 L0 mainline；Direct-C decoded geometry pending |
 
 ### 3.4 Joint parallel fair system table
 
@@ -232,8 +236,9 @@ Active joint profile 是 directed parallel。PulpMotion rows 使用 released AE 
 | v7.38 L0 / clean | Stage2 105K | mainline | 282.370 / 14.420 / 48.98% | 58.960 / 47.129 / 65.68% / 0.569 | 21.69% | 252.670 / 842.297 mm | 2.912 / 3.026 m / 72.928° | formal mainline |
 | v7.47 / official-AE Unified | Stage2 105K | S | 205.336 / 17.303 / 37.75% | 156.755 / 24.563 / 47.00% / 0.239 | 7.96% | 199.053 / 890.543 mm | 2.960 / 3.063 m / 69.212° | Human signal；Camera broad regression |
 | v7.42 / same-impl joint specialist | Stage2 task-exposure matched | A | 300.470 / 12.605 / 45.03% | 66.810 / 45.029 / 63.76% / 0.570 | 19.33% | — | — | formal |
-| PulpMotion / official DiT-xy no-Aux step92950 | Stage2 native endpoint | C | 375.010 / 20.532 / 14.90% | 94.840 / 35.691 / 48.33% / 0.491 | 39.54% | — | — | formal native baseline |
-| PulpMotion / official DiT-xy Aux step92950 | Stage2 native endpoint | C | 414.800 / 21.657 / 13.82% | 93.270 / 37.777 / 44.81% / 0.513 | 28.47% | — | — | formal native baseline |
+| PulpMotion / official DiT-xy no-Aux step92950 | Stage2 native endpoint | C | 375.015 / 20.532 / 14.90% | 94.842 / 35.691 / 48.33% / 0.491 | 39.54% | — | — | semantic/distribution formal；native order；decoded geometry re-eval required |
+| PulpMotion / official DiT-xy Aux step92950 | Stage2 native endpoint | C | 414.796 / 21.657 / 13.82% | 93.269 / 37.777 / 44.81% / 0.513 | 28.47% | — | — | semantic/distribution formal；native order；decoded geometry re-eval required |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | 227.189 / 13.691 / 53.27% | 70.580 / 46.720 / 60.57% / 0.599 | 18.35% | — / — mm | — / — m / —° | diagnostic-only 105K evidence；joint parallel no broad regression；decoded geometry pending |
 
 Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 
@@ -252,24 +257,28 @@ Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 | --- | ---: | --- | --- | ---: | ---: |
 | 1–64 | 1,805 | v7.38 L0 / clean | Stage2 105K mainline | 253.586 / 677.934 | — |
 | 1–64 | 1,805 | v7.47 / official-AE Unified | Stage2 105K S | 212.067 / 638.744 | 554.517 / 958.293 |
-| 1–64 | 1,805 | v7.45 / MoLingo human | Stage2 B | 251.390 / 842.422 | — |
-| 1–64 | 1,805 | MotionLab-MFT / v7.14 latent | Stage2 B | 260.438 / 752.649 | — |
+| 1–64 | 1,805 | v7.45 / MoLingo human | Stage2 B | 251.390 / 842.422 | 741.395 / 1,257.738 |
+| 1–64 | 1,805 | MotionLab-MFT / v7.14 latent | Stage2 B | 260.438 / 752.649 | 644.684 / 1,058.347 |
 | 1–64 | 1,805 | MoMask-Pulp / native seed17 | Stage2 C | 324.008 / 852.930 | 674.854 / 1,083.558 |
+| 1–64 | 1,805 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 245.048 / 659.947 | 557.421 / 906.060 |
 | 65–128 | 1,411 | v7.38 L0 / clean | Stage2 105K mainline | 249.884 / 895.589 | — |
 | 65–128 | 1,411 | v7.47 / official-AE Unified | Stage2 105K S | 188.249 / 851.014 | 792.751 / 1,407.208 |
-| 65–128 | 1,411 | v7.45 / MoLingo human | Stage2 B | 235.229 / 1,310.340 | — |
-| 65–128 | 1,411 | MotionLab-MFT / v7.14 latent | Stage2 B | 241.908 / 991.529 | — |
+| 65–128 | 1,411 | v7.45 / MoLingo human | Stage2 B | 235.229 / 1,310.340 | 1,233.567 / 2,109.151 |
+| 65–128 | 1,411 | MotionLab-MFT / v7.14 latent | Stage2 B | 241.908 / 991.529 | 907.651 / 1,525.572 |
 | 65–128 | 1,411 | MoMask-Pulp / native seed17 | Stage2 C | 311.172 / 1,248.485 | 1,092.817 / 1,796.358 |
+| 65–128 | 1,411 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 238.500 / 873.600 | 786.500 / 1,328.500 |
 | 129–192 | 456 | v7.38 L0 / clean | Stage2 105K mainline | 234.630 / 1,135.359 | — |
 | 129–192 | 456 | v7.47 / official-AE Unified | Stage2 105K S | 166.025 / 1,062.929 | 1,017.026 / 1,843.047 |
-| 129–192 | 456 | v7.45 / MoLingo human | Stage2 B | 221.093 / 1,697.425 | — |
-| 129–192 | 456 | MotionLab-MFT / v7.14 latent | Stage2 B | 231.113 / 1,242.231 | — |
+| 129–192 | 456 | v7.45 / MoLingo human | Stage2 B | 221.093 / 1,697.425 | 1,636.947 / 2,885.096 |
+| 129–192 | 456 | MotionLab-MFT / v7.14 latent | Stage2 B | 231.113 / 1,242.231 | 1,164.639 / 2,032.365 |
 | 129–192 | 456 | MoMask-Pulp / native seed17 | Stage2 C | 294.303 / 1,469.573 | 1,333.195 / 2,193.523 |
+| 129–192 | 456 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 227.500 / 1,119.100 | 1,044.200 / 1,847.700 |
 | 193+ | 381 | v7.38 L0 / clean | Stage2 105K mainline | 255.706 / 1,294.288 | — |
 | 193+ | 381 | v7.47 / official-AE Unified | Stage2 105K S | 185.344 / 1,142.850 | 1,099.478 / 1,883.859 |
-| 193+ | 381 | v7.45 / MoLingo human | Stage2 B | 252.949 / 2,412.741 | — |
-| 193+ | 381 | MotionLab-MFT / v7.14 latent | Stage2 B | 261.443 / 1,396.085 | — |
+| 193+ | 381 | v7.45 / MoLingo human | Stage2 B | 252.949 / 2,412.741 | 2,345.070 / 4,130.365 |
+| 193+ | 381 | MotionLab-MFT / v7.14 latent | Stage2 B | 261.443 / 1,396.085 | 1,313.889 / 2,183.871 |
 | 193+ | 381 | MoMask-Pulp / native seed17 | Stage2 C | 323.113 / 1,921.798 | 1,786.035 / 2,720.502 |
+| 193+ | 381 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 252.400 / 1,293.300 | 1,216.000 / 2,144.600 |
 
 #### Direct-C and joint parallel
 
@@ -294,9 +303,52 @@ Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 | 193+ | 381 | v7.38 L0 / clean | Stage2 105K parallel | — | 3.311 / 3.566 | 70.458 |
 | 193+ | 381 | v7.47 / official-AE Unified | Stage2 105K parallel | 0.187 / 1.317 m | 3.533 / 3.765 | 69.583 |
 
+### 3.6 Baseline secondary metrics and completeness audit
+
+以下仍是同一 official pure4053 evaluator artifact 的字段，不是第二次评测。主表已拥有 FDTMR/FDCLaTr、TMR/CLaTr、coverage、caption F1 与 decoded geometry；这里补齐 retrieval、PRDC、MM distance、caption precision/recall 和 projection residual fields。
+
+| version / run | Stage / tier | H R1 / R2 / R3 ↑ | H precision / recall ↑ | H density ↑ | H MM distance ↓ |
+| --- | --- | ---: | ---: | ---: | ---: |
+| v7.45 / MoLingo human | Stage2 B | 0.105 / 0.183 / 0.242 | 0.620 / 0.720 | 0.436 | 49.438 |
+| MotionLab-MFT / v7.14 latent | Stage2 B | 0.411 / 0.621 / 0.747 | 0.731 / 0.651 | 0.606 | 49.475 |
+| MoMask-Pulp / native seed17 | Stage2 C | 0.224 / 0.346 / 0.445 | 0.548 / 0.729 | 0.367 | 46.914 |
+| v8.1C C3-25 / seed17 step105000 | Stage2 diagnostic | 0.229 / 0.383 / 0.493 | 0.709 / 0.576 | 0.540 | 50.575 |
+
+| version / run | Stage / tier | C R1 / R2 / R3 ↑ | C precision / recall ↑ | C density ↑ | C MM distance ↓ | caption precision / recall ↑ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Director-C / native | Stage2 C | 0.128 / 0.229 / 0.310 | 0.900 / 0.570 | 1.051 | 24.206 | 0.753 / 0.647 |
+| CCD-Pulp / v7.14 latent | Stage2 B | 0.222 / 0.365 / 0.473 | 0.829 / 0.393 | 0.867 | 29.522 | 0.562 / 0.370 |
+| v8.1C C3-25 / seed17 step105000 | Stage2 diagnostic | 0.372 / 0.592 / 0.717 | 0.877 / 0.575 | 0.899 | 22.615 | 0.817 / 0.719 |
+
+| version / run | Stage / tier | H R1 / R2 / R3 ↑ | H precision / recall / density ↑ | H MM distance ↓ | C R1 / R2 / R3 ↑ | C precision / recall / density ↑ | C MM distance ↓ | caption precision / recall ↑ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| PulpMotion / official DiT-xy no-Aux step92950 | Stage2 C | 0.035 / 0.071 / 0.103 | 0.210 / 0.607 / 0.100 | 48.705 | 0.041 / 0.079 / 0.116 | 0.674 / 0.443 / 0.513 | 28.947 | 0.575 / 0.436 |
+| PulpMotion / official DiT-xy Aux step92950 | Stage2 C | 0.038 / 0.075 / 0.105 | 0.216 / 0.616 / 0.095 | 48.404 | 0.048 / 0.085 / 0.123 | 0.644 / 0.475 / 0.475 | 28.422 | 0.588 / 0.465 |
+
+| version / run | Stage / tier | r-FPD ↓ | projection precision / recall / density / coverage | g-FPD / error |
+| --- | --- | ---: | ---: | ---: |
+| PulpMotion / official DiT-xy no-Aux step92950 | Stage2 C | 7.404 | 0 / 0 / 0 / 0 | 0 / 0 |
+| PulpMotion / official DiT-xy Aux step92950 | Stage2 C | 5.893 | 0 / 0 / 0 / 0 | 0 / 0 |
+
+projection 中的 `0` 是 native evaluator artifact 实际发出的字段，不是本页补值；它不能替代 decoded geometry，也不能解释为物理误差为零。
+
+适配与完整性审计的最窄结论如下：
+
+| version / run | adapter audit | identity / decoder boundary | metric completeness | required next action |
+| --- | --- | --- | --- | --- |
+| MoMask-Pulp / native seed17 | pass：Pulp human199 official normalization；valid-length tail masked；RVQ、MaskTransformer、ResidualTransformer 与 owning VQ decoder 均 non-causal | train `a0981b…1dc9`；eval `a0d762…6b93`；native decoder | emitted TMR + paired Human geometry complete；integrated-yaw 与 no-reference physical 尚未生成 | 不重训；只有需要新增 yaw/physical 维度时重评 |
+| v7.45 / MoLingo human | pass：corrected v7.14 latent/decoder；offline bidirectional masked RF；不作 streaming claim | 64 条 batch records 内含 4,053 unique IDs，聚合顺序 SHA 为 `a0d762…6b93` | emitted TMR + paired Human geometry complete；integrated-yaw 与 no-reference physical 缺失 | 不重训；新增 evaluator 维度时重评 |
+| MotionLab-MFT / v7.14 latent | pass：corrected v7.14 human latent slice 与 owning decoder；human text-only | 4,053 records；顺序 SHA `a0d762…6b93` | emitted TMR + paired Human geometry complete；integrated-yaw 与 no-reference physical 缺失 | 不重训；新增 evaluator 维度时重评 |
+| Director-C / native | pass：Pulp camera caption、GT pelvis trajectory、train-only standardization、native direct 9D C2W output | pure4053 canonical order；no tokenizer/decoder | CLaTr/caption/PRDC complete；Cam-ADE/FDE/rotation 缺失 | 不重训；只需 decoded-camera re-eval |
+| CCD-Pulp / v7.14 latent | pass：GT-H latent + camera text；v7.14 cache/decoder hash 与 non-causal contract 已绑定 | pure4053 canonical order；owning decoder `91248bf4…7ce1` | CLaTr/caption/PRDC complete；Cam-ADE/FDE/rotation 缺失 | 不重训；只需 owning-decoder geometry re-eval |
+| PulpMotion / official DiT-xy step92950 | native-system boundary valid；released AE 与 sampler 保持原样 | same 4,053 set；native order `16d73d…8196` | H/C semantics、PRDC 与 projection fields complete；decoded H/C geometry、integrated-yaw 与 no-reference physical 缺失 | 不重训；只需 native owning-decoder re-eval |
+| MotionStreamer-Pulp / 500ep seed17 | pass within the standalone native-system exception：causal tokenizer、owning decoder 与 representation 均只属于 MotionStreamer；不消费 StoryMotion cache/checkpoint | native Stage1 artifact；不得与 StoryMotion Stage1/Stage2 causal boundary混用 | 已审计 RA/global overall + length bins；root/yaw/Camera 与 Stage2 formal generation artifact 缺失 | 不重训；如需完整 system row，按 native decoder 新做 formal re-eval |
+
+这里的“完整”只指 artifact 已经发出的字段。按当前 experiment contract，缺失的 decoded geometry、integrated-yaw 或 no-reference physical 不能被 `—` 解释为通过；在这些维度补齐前，Director-C、CCD-Pulp、PulpMotion 与 MotionStreamer 的 system artifact 仍不完整。
+
 ## 4. Stage2 30K matched generatability screen
 
-v7.36 A30 与 v8.1A G3 共享 Unified-3 implementation、optimizer、batch、task probabilities、seed17、pure4053、DDIM50、CFG1、eta0 与 evaluator。必然不同的 Stage1 checkpoint、owning decoder、cache 和 train-only stats 被显式绑定，因此它回答 representation-system generatability，不是 Stage1 promotion。
+v7.36 A30、v8.1A G3 与 v8.1C C3-25 共享 Unified-3 implementation、optimizer、batch、task probabilities、seed17、pure4053、DDIM50、CFG1、eta0 与 evaluator。必然不同的 Stage1 checkpoint、owning decoder、cache 和 train-only stats 被显式绑定，因此它回答 representation-system generatability，不是 Stage1 promotion。C3-25 的三项 formal audit 均通过，但其 Stage1 global-slope gate 已失败，所以该行永久保持 diagnostic-only。
 
 ### 4.1 Primary metrics plus overall geometry
 
@@ -304,49 +356,84 @@ v7.36 A30 与 v8.1A G3 共享 Unified-3 implementation、optimizer、batch、tas
 | --- | --- | ---: | ---: | ---: | --- |
 | v7.36 A30 / matched control | Stage2 30K | 399.729 / 11.391 / 33.11% | 0.260 / 0.924 m | 0.826 / 1.348 m | comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K | 272.434 / 11.841 / 47.99% | 0.268 / 0.884 m | 0.781 / 1.299 m | Human signal |
+| v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | 359.176 / 11.526 / 39.28% | 0.254 / 0.860 m | 0.764 / 1.271 m | passes Direct-H comparison；continue 105K |
 
 | version / run | Stage / budget | Direct-C FDCLaTr / CLaTr / CCov / F1 | Cam-ADE / FDE ↓ | rotation ↓ | decision |
 | --- | --- | ---: | ---: | ---: | --- |
 | v7.36 A30 / matched control | Stage2 30K | 114.568 / 35.067 / 61.56% / 0.463 | 1.994 / 2.147 m | 44.847° | comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K | 178.234 / 25.219 / 46.51% / 0.254 | 2.022 / 2.145 m | 46.974° | broad Camera regression |
+| v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | 96.166 / 36.846 / 62.97% / 0.480 | 1.982 / 2.105 m | 45.046° | passes Direct-C comparison；no decoder-aware short |
 
 | version / run | Stage / budget | parallel H FDTMR / TMR / HCov | parallel C FDCLaTr / CLaTr / CCov / F1 | Out ↓ | H RA / global ↓ | Cam-ADE / FDE / rotation ↓ | decision |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | v7.36 A30 / matched control | Stage2 30K | 348.889 / 12.450 / 39.18% | 110.360 / 29.933 / 58.97% / 0.366 | 31.93% | 0.267 / 0.894 m | 3.243 / 3.342 m / 81.092° | comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K | 245.886 / 12.439 / 50.41% | 195.453 / 21.856 / 44.88% / 0.223 | 34.59% | 0.269 / 0.877 m | 2.797 / 2.920 m / 72.151° | Camera semantic/distribution regression |
+| v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | 336.130 / 12.439 / 41.82% | 90.664 / 31.617 / 58.60% / 0.367 | 20.03% | 0.259 / 0.845 m | 3.226 / 3.325 m / 77.008° | passes joint comparison；continue 105K |
 
-G3 status：stop_30k_broad_camera_regression。v8.1A 不续 105K；该结果也不能转移给 C3-25。
+G3 status：stop_30k_broad_camera_regression，v8.1A 不续 105K。C3-25 status：pass_30k_active_profiles_continue_105k；Direct-C 没有 broad regression，因此按预注册 D4.3 分支不启动 decoder-aware auxiliary short。两者都不改变各自 Stage1 promotion 状态。
 
 ### 4.2 Geometry by valid length
 
 同一 valid length 放在一起并递增；距离为 m。
 
-| valid length | n | version / run | Stage / profile | H RA / global ↓ | Cam-ADE / FDE ↓ | rotation ↓ |
-| --- | ---: | --- | --- | ---: | ---: | ---: |
-| 1–64 | 1,805 | v7.36 A30 | Stage2 30K Direct-H | 0.266 / 0.726 | — | — |
-| 1–64 | 1,805 | v8.1A G3 | Stage2 30K Direct-H | 0.275 / 0.698 | — | — |
-| 1–64 | 1,805 | v7.36 A30 | Stage2 30K Direct-C | — | 1.995 / 2.084 | 47.937 |
-| 1–64 | 1,805 | v8.1A G3 | Stage2 30K Direct-C | — | 1.994 / 2.048 | 49.231 |
-| 1–64 | 1,805 | v7.36 A30 | Stage2 30K parallel | 0.276 / 0.711 | 3.115 / 3.179 | 80.874 |
-| 1–64 | 1,805 | v8.1A G3 | Stage2 30K parallel | 0.276 / 0.697 | 2.652 / 2.720 | 71.199 |
-| 65–128 | 1,411 | v7.36 A30 | Stage2 30K Direct-H | 0.257 / 0.965 | — | — |
-| 65–128 | 1,411 | v8.1A G3 | Stage2 30K Direct-H | 0.264 / 0.926 | — | — |
-| 65–128 | 1,411 | v7.36 A30 | Stage2 30K Direct-C | — | 1.950 / 2.113 | 42.608 |
-| 65–128 | 1,411 | v8.1A G3 | Stage2 30K Direct-C | — | 2.029 / 2.161 | 46.317 |
-| 65–128 | 1,411 | v7.36 A30 | Stage2 30K parallel | 0.261 / 0.935 | 3.217 / 3.320 | 80.361 |
-| 65–128 | 1,411 | v8.1A G3 | Stage2 30K parallel | 0.265 / 0.907 | 2.839 / 2.976 | 73.252 |
-| 129–192 | 456 | v7.36 A30 | Stage2 30K Direct-H | 0.244 / 1.219 | — | — |
-| 129–192 | 456 | v8.1A G3 | Stage2 30K Direct-H | 0.252 / 1.123 | — | — |
-| 129–192 | 456 | v7.36 A30 | Stage2 30K Direct-C | — | 1.989 / 2.234 | 42.647 |
-| 129–192 | 456 | v8.1A G3 | Stage2 30K Direct-C | — | 2.028 / 2.220 | 45.477 |
-| 129–192 | 456 | v7.36 A30 | Stage2 30K parallel | 0.248 / 1.175 | 3.431 / 3.551 | 82.321 |
-| 129–192 | 456 | v8.1A G3 | Stage2 30K parallel | 0.250 / 1.133 | 2.976 / 3.159 | 75.284 |
-| 193+ | 381 | v7.36 A30 | Stage2 30K Direct-H | 0.261 / 1.353 | — | — |
-| 193+ | 381 | v8.1A G3 | Stage2 30K Direct-H | 0.269 / 1.319 | — | — |
-| 193+ | 381 | v7.36 A30 | Stage2 30K Direct-C | — | 2.153 / 2.463 | 41.128 |
-| 193+ | 381 | v8.1A G3 | Stage2 30K Direct-C | — | 2.121 / 2.454 | 40.509 |
-| 193+ | 381 | v7.36 A30 | Stage2 30K parallel | 0.267 / 1.279 | 3.727 / 3.939 | 83.363 |
-| 193+ | 381 | v8.1A G3 | Stage2 30K parallel | 0.268 / 1.308 | 3.114 / 3.370 | 68.826 |
+| valid length | n | version / run | Stage / profile | H RA / global ↓ | H root ADE / FDE ↓ | Cam-ADE / FDE ↓ | rotation ↓ |
+| --- | ---: | --- | --- | ---: | ---: | ---: | ---: |
+| 1–64 | 1,805 | v7.36 A30 | Stage2 30K Direct-H | 0.266 / 0.726 | 0.616 / 0.985 | — | — |
+| 1–64 | 1,805 | v8.1A G3 | Stage2 30K Direct-H | 0.275 / 0.698 | 0.581 / 0.936 | — | — |
+| 1–64 | 1,805 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-H | 0.261 / 0.682 | 0.572 / 0.924 | — | — |
+| 1–64 | 1,805 | v7.36 A30 | Stage2 30K Direct-C | — | — | 1.995 / 2.084 | 47.937 |
+| 1–64 | 1,805 | v8.1A G3 | Stage2 30K Direct-C | — | — | 1.994 / 2.048 | 49.231 |
+| 1–64 | 1,805 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-C | — | — | 1.970 / 2.048 | 46.403 |
+| 1–64 | 1,805 | v7.36 A30 | Stage2 30K parallel | 0.276 / 0.711 | 0.593 / 0.948 | 3.115 / 3.179 | 80.874 |
+| 1–64 | 1,805 | v8.1A G3 | Stage2 30K parallel | 0.276 / 0.697 | 0.577 / 0.928 | 2.652 / 2.720 | 71.199 |
+| 1–64 | 1,805 | v8.1C C3-25 / seed17 step30000 | Stage2 30K parallel | 0.267 / 0.679 | 0.563 / 0.894 | 3.102 / 3.157 | 75.862 |
+| 65–128 | 1,411 | v7.36 A30 | Stage2 30K Direct-H | 0.257 / 0.965 | 0.873 / 1.441 | — | — |
+| 65–128 | 1,411 | v8.1A G3 | Stage2 30K Direct-H | 0.264 / 0.926 | 0.830 / 1.376 | — | — |
+| 65–128 | 1,411 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-H | 0.250 / 0.902 | 0.811 / 1.345 | — | — |
+| 65–128 | 1,411 | v7.36 A30 | Stage2 30K Direct-C | — | — | 1.950 / 2.113 | 42.608 |
+| 65–128 | 1,411 | v8.1A G3 | Stage2 30K Direct-C | — | — | 2.029 / 2.161 | 46.317 |
+| 65–128 | 1,411 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-C | — | — | 1.989 / 2.113 | 44.753 |
+| 65–128 | 1,411 | v7.36 A30 | Stage2 30K parallel | 0.261 / 0.935 | 0.840 / 1.409 | 3.217 / 3.320 | 80.361 |
+| 65–128 | 1,411 | v8.1A G3 | Stage2 30K parallel | 0.265 / 0.907 | 0.810 / 1.362 | 2.839 / 2.976 | 73.252 |
+| 65–128 | 1,411 | v8.1C C3-25 / seed17 step30000 | Stage2 30K parallel | 0.254 / 0.893 | 0.798 / 1.328 | 3.264 / 3.370 | 77.688 |
+| 129–192 | 456 | v7.36 A30 | Stage2 30K Direct-H | 0.244 / 1.219 | 1.137 / 1.912 | — | — |
+| 129–192 | 456 | v8.1A G3 | Stage2 30K Direct-H | 0.252 / 1.123 | 1.041 / 1.830 | — | — |
+| 129–192 | 456 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-H | 0.236 / 1.119 | 1.043 / 1.821 | — | — |
+| 129–192 | 456 | v7.36 A30 | Stage2 30K Direct-C | — | — | 1.989 / 2.234 | 42.647 |
+| 129–192 | 456 | v8.1A G3 | Stage2 30K Direct-C | — | — | 2.028 / 2.220 | 45.477 |
+| 129–192 | 456 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-C | — | — | 1.935 / 2.096 | 43.473 |
+| 129–192 | 456 | v7.36 A30 | Stage2 30K parallel | 0.248 / 1.175 | 1.093 / 1.887 | 3.431 / 3.551 | 82.321 |
+| 129–192 | 456 | v8.1A G3 | Stage2 30K parallel | 0.250 / 1.133 | 1.048 / 1.833 | 2.976 / 3.159 | 75.284 |
+| 129–192 | 456 | v8.1C C3-25 / seed17 step30000 | Stage2 30K parallel | 0.239 / 1.088 | 1.006 / 1.765 | 3.377 / 3.520 | 79.161 |
+| 193+ | 381 | v7.36 A30 | Stage2 30K Direct-H | 0.261 / 1.353 | 1.273 / 2.047 | — | — |
+| 193+ | 381 | v8.1A G3 | Stage2 30K Direct-H | 0.269 / 1.319 | 1.237 / 2.093 | — | — |
+| 193+ | 381 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-H | 0.258 / 1.244 | 1.165 / 1.987 | — | — |
+| 193+ | 381 | v7.36 A30 | Stage2 30K Direct-C | — | — | 2.153 / 2.463 | 41.128 |
+| 193+ | 381 | v8.1A G3 | Stage2 30K Direct-C | — | — | 2.121 / 2.454 | 40.509 |
+| 193+ | 381 | v8.1C C3-25 / seed17 step30000 | Stage2 30K Direct-C | — | — | 2.062 / 2.358 | 41.592 |
+| 193+ | 381 | v7.36 A30 | Stage2 30K parallel | 0.267 / 1.279 | 1.199 / 2.014 | 3.727 / 3.939 | 83.363 |
+| 193+ | 381 | v8.1A G3 | Stage2 30K parallel | 0.268 / 1.308 | 1.230 / 2.067 | 3.114 / 3.370 | 68.826 |
+| 193+ | 381 | v8.1C C3-25 / seed17 step30000 | Stage2 30K parallel | 0.259 / 1.169 | 1.083 / 1.852 | 3.485 / 3.718 | 77.342 |
+
+### 4.3 C3-25 step30000 secondary metrics
+
+以下字段与第 4.1–4.2 节来自同一批 pure4053 formal artifacts；这里只补齐 retrieval、PRDC、MM distance、caption precision/recall 与 projection fields。v7.36 的 secondary fields 没有在本轮重提取，因此不能把缺少 matched row 写成改善。
+
+| version / run | profile | H R1 / R2 / R3 ↑ | H precision / recall / density ↑ | H MM distance ↓ |
+| --- | --- | ---: | ---: | ---: |
+| v8.1C C3-25 / seed17 step30000 | Direct-H | 0.196 / 0.333 / 0.433 | 0.596 / 0.523 / 0.419 | 51.267 |
+| v8.1C C3-25 / seed17 step30000 | joint parallel | 0.205 / 0.335 / 0.445 | 0.711 / 0.535 / 0.538 | 51.029 |
+
+| version / run | profile | C R1 / R2 / R3 ↑ | C precision / recall / density ↑ | C MM distance ↓ | caption precision / recall ↑ |
+| --- | --- | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 / seed17 step30000 | Direct-C | 0.247 / 0.399 / 0.512 | 0.906 / 0.377 / 1.046 | 28.535 | 0.578 / 0.414 |
+| v8.1C C3-25 / seed17 step30000 | joint parallel | 0.196 / 0.328 / 0.428 | 0.886 / 0.354 / 0.901 | 29.992 | 0.429 / 0.323 |
+
+| version / run | profile | r-FPD ↓ | projection precision / recall / density / coverage | g-FPD / error |
+| --- | --- | ---: | ---: | ---: |
+| v8.1C C3-25 / seed17 step30000 | joint parallel | 2.396 | 0 / 0 / 0 / 0 | 0 / 0 |
+
+这里的 projection `0` 同样只作 emitted-field completeness 记录，不作为“完美投影/物理质量”结论。
 
 ## 5. Read-only diagnostics
 
@@ -374,9 +461,9 @@ valid length 相同的 train/eval 行放在一起，length 递增：
 
 最窄结论：没有 dead-channel 或 branch-marginal collapse；raw Camera latent 的有效秩明显低于 Human，train-only whitening 按定义恢复 marginal scale，但 H-C 依赖仍存在。该结果只排除明显 cache health failure，不预测 `30K/105K` 生成质量。
 
-### D4 family：v8.1A Stage2 30K frozen diagnostics
+### D4 family：Stage2 30K frozen diagnostics
 
-D4/D4.2/D4.3 都是 v8.1A G3 的 N64 read-only diagnostics；t=50/500/950 是 diffusion timestep，不是训练 step。它们不训练、不写 cache、不授权 105K。
+原始 D4/D4.2/D4.3 是 v8.1A G3 的 N64 read-only diagnostics；C3-25 在自己的 `30K` formal 启动后只读复用了 D4.3 matched protocol。t=50/500/950 是 diffusion timestep，不是训练 step。它们不训练、不写 cache，也不单独授权新长训。
 
 ### 5.1 D4 residual propagation
 
@@ -400,13 +487,16 @@ D4/D4.2/D4.3 都是 v8.1A G3 的 N64 read-only diagnostics；t=50/500/950 是 di
 
 ### 5.3 D4.3 owning-decoder direction sensitivity
 
-| version / run | diffusion t | center actual v7.36→v8.1A | center cand/base | center actual/random | rotation actual v7.36→v8.1A | rotation cand/base | rotation actual/random | preregistered rule |
+| version / run | diffusion t | center actual baseline→candidate | center cand/base | center actual/random | rotation actual baseline→candidate | rotation cand/base | rotation actual/random | preregistered rule |
 | --- | ---: | --- | ---: | ---: | --- | ---: | ---: | --- |
 | v8.1A D4.3 r3 vs v7.36 r3 | 50 | 2.740→3.417 | 1.247× | 2.470× | 46.652→52.504 | 1.125× | 2.360× | center + rotation pass |
 | v8.1A D4.3 r3 vs v7.36 r3 | 500 | 3.079→3.290 | 1.069× | 2.287× | 57.817→53.394 | 0.923× | 2.449× | cand/base fail |
 | v8.1A D4.3 r3 vs v7.36 r3 | 950 | 3.460→3.073 | 0.888× | 1.958× | 68.347→71.821 | 1.051× | 3.096× | outside rule；cand/base fail |
+| v8.1C C3-25 D4.3 vs v7.36 r3 | 50 | 2.740→3.099 | 1.131× | 2.197× | 46.652→45.991 | 0.986× | 2.186× | center only pass |
+| v8.1C C3-25 D4.3 vs v7.36 r3 | 500 | 3.079→3.088 | 1.003× | 2.227× | 57.817→55.374 | 0.958× | 2.567× | cand/base fail |
+| v8.1C C3-25 D4.3 vs v7.36 r3 | 950 | 3.460→2.829 | 0.818× | 1.841× | 68.347→74.099 | 1.084× | 3.270× | outside rule；cand/base fail |
 
-最窄结论：Camera text 被使用，但 near-manifold 的低噪 residual 更集中命中 v8.1A owning decoder 的 Camera 高敏方向。责任是 Stage1 manifold/decoder 与 Stage2 objective/response 的 cross-stage calibration mismatch，不能单独归给某一 Stage。
+最窄结论：v8.1A 的 near-manifold 低噪 residual 更集中命中 owning decoder 的 Camera-center/rotation 高敏方向；C3-25 只保留较弱的 `t=50` center signature，rotation 不复现。由于 C3-25 `30K` Direct-C formal 没有 broad regression，预注册分支裁决为保留 attribution、不开 decoder-aware auxiliary short。两组 D4.3 都是 Stage1 manifold/decoder × Stage2 residual 的 system comparison，不能单独归给某一 Stage。
 
 > [!warning] D4.3 stats uncertainty
 > v8.1A parent contract 的 expected pre-resume stats SHA256 为 605049fa…71feb，当前文件为 94805397…5adc4，embedded train-cache 为 3b55223d…bd22。旧 serialization 已不存在，无法 tensor-by-tensor 追溯；r3 仅在显式记录三者后运行。因此 D4.3 永久是 diagnostic-only。
@@ -440,8 +530,13 @@ Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a286
 | v7.47 / official-AE Unified | Stage2 105K S-control | b8c06913a5efdbaa0c178e452998352033174614aa0a60ad96920fe14a8acbb2 | decoder e0ff0a66129d77eb27a18d0034b23f692aaec3ef53afd540097d8d9544a73e52；train/eval cache 1924c632…d1e8 / c642f7c7…d1d3 | contract 37d61e28076735979731e47712500cee016365a4e9e2eb7753d93a10416dee51 |
 | v7.36 A30 / matched control | Stage2 30K | 7dcf3b1911af144ea9ef2b30017dd07472d62f655fd04c1dc9263581e3382c0b | v7.14 decoder 91248bf4…7ce1；cache f7a00a48…a5983 / 6f13816c…9b25 | matched comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K stopped | becc2c11051bfd7857acb0602f61c755cd664969f34acef1f0232711feee5bb8 | v8.1A decoder ac47c219…151f；cache 3b55223d…bd22 / 1050748f…541d | contract c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59 |
-| v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；no metric row yet | pending 30K/105K immutable checkpoints | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | contract 2351a6f0…877；audit eb28815a…1fb；diagnostic-only |
-| MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d4268…8664；Mask 03787132…ff3c；Residual 89faab30…e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f9…8901；result 3a133b83…af70；records 6545ab1a…ed8；formal audit 71bd4b1d…3232；full replay audit 0d7d549e…8c2e |
+| v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；step30000 formal passed | 3533a4216b441b8fba0d6a791408d60a8708dc9a44e47b93d3187217ee83e226 | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | step contract 963327e766cf5acb168dc668616f7098df94c4df50b2a160299bcfcd2d2fe066；contract audit 6182d01d6f3ff4179b8c4f7b8d543d78f3fa4cce60b3db296f10e461e2daf597；H/C/J results c35566ed…b84b4 / accaa2c5…c5ea / 1606e328…9e5b；records 9e34e94d…d07c / e8ae3261…9dfb / 375e9ec5…b772；audits 11afdefc…7df6 / d7733761…8b90 / b6b747ec…925a；diagnostic-only |
+| MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d42684e4441b67782b8951e1a5e6c9e5c25bbd1bc460aa7fda138ea348664；Mask 037871329eaf980e320961445f5492c7a79ad85d60e9e2b79640678dfabeff3c；Residual 89faab30ffb62d185a789a814ae7c061ed5f5375f9ce5128dc4764756c43e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f900e26212e523dd1f0444fbbba5e6392a7c424e0441bab19c02238901；result 3a133b834bfac8203a9bfb92cea55e0127f50369bc51c68a53bb3b0d877baf70；records 6545ab1a4e17bc13b73663aafd983b439ccae664b016251640dcc22a0e067ed8；formal audit 71bd4b1d31409a8e70e991715ee7a09ee1706384df39831ea575e9f4a2ff3232；byte-exact replay audit 0d7d549e64ff863da2f4815245c18ecb03d997ecc1cef3f423ae817c90f28c2e |
+| v7.45 / MoLingo human | Stage2 240K formal Direct-H | 4669a56fb6c9a4adafc2cfedef39b27c060cd00949a7407c86c68cc9fa30200d | corrected v7.14 latent + owning decoder；offline bidirectional masked RF | contract 34544e1588a5af63614a1b04c50e2481c6f73ed97e21cfc3ab93ba657a2d163a；result 445695958ba86c11831cbc8f931939c71f72135453b21ca6b6d5e2f170b6f685；records 6edb7d5f9e54a61540b175028cad6911d5b573d4290e7dc95edc7e6fce122a9c |
+| MotionLab-MFT / v7.14 latent | Stage2 30K formal Direct-H | 45477134830f25c58b6db2ea54cfdce4cadd8f0e84c0e9312f1ead73bce468dd | corrected v7.14 latent + owning decoder | contract a2f4d063bad486075084d9a66d06084a430f012d28356f42a4b161f8eaef8002；result f1a45654d740d8937152c96b75f88a53a765bc37977719d6628ccef6c36d79ba；records 2b6d42544e75ad330e01091e4a3a294a67e02f2fe0db17ba14fc12e5afdca765 |
+| Director-C / native | Stage2 native formal Direct-C | ad27564052465ff11f5264c5606473f2daacaaf74abbf45adc7b563328b5e823 | native direct 9D C2W；GT pelvis trajectory；no StoryMotion tokenizer | contract 3a3635be17fa1c6cc155fa8e5ad7339d46e446c55195ec9ca1b350390addcaa1；result f9693592d62780dd2a4ed330dc2b102b88b775a839e459c6adefc6eb2bd97b15；records e0734d76e316dc5f66149214e2daf7cbdd42adaeec17c796a1897e88dfaf2e4a |
+| CCD-Pulp / v7.14 latent | Stage2 60K formal Direct-C | 8014b120c218a7ce8bd7d6f6c3e381cc009939950926da847c4dc2597f6603da | v7.14 cache + owning decoder；GT-H latent | contract bb1818fb9703035d34bc691bdbffe82a3c9447c9c68a3b6010cd3387e5b93039；result f016ba46250c1bb4895aed14b447088852658c9ca025f2118244b0ff9a144e5b；records 19354e7949d004af4057269f432b47b6f33392a8ceb1da376b1e2a05c64ba9c0 |
+| PulpMotion / official DiT-xy step92950 | Stage2 native formal joint | 7c11cb59d5f51b9090abc1448e76329d157459fc30485031f5a79a7a119660d9 | released Pulp AE + native sampler；same 4,053 IDs in native order | no-Aux result 499db08e4f957f178cebc9b8c5f07dbe53ed680bf1bce657c2b5438e1ebdbbf9；Aux result 5be1e1e30213e6415c0a057eca2a444af31c30614fea1517cbd2f2f3b637961d；no per-sample records artifact |
 
 v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。v7.47 training script 与 L0 historical training script SHA256 分别为 71a9a2a3b700d4f0a699fda5f28bf8da72f563c20871e1c1cfb5d4d4cae0ac08 / f207c840fa363afc13e308047ddbe3900683f048366c10e9c135b49a2da886c8，因此 strict representation isolation 未建立。
 
@@ -453,6 +548,7 @@ v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f841
 | v8.1A D4 vs v7.36 D4 | raw residual propagation | candidate 142614050c5d94ae8e0e680327129a7893d64afcd0cc3ff0070aaf3b1a02274f；baseline d22a13b9c0974c7610f7142c3b73ac6876ed5fb368ca0cb8ee8808550519469a；comparison 13f9715b446a33d32181a231b2a4eb7bd17eddcb2044b8c2228cda8cd4e20727 |
 | v8.1A D4.2 vs v7.36 D4.2 | Camera-text reliance | candidate 134195504286677d0a77c0da6ee7e8a897008525337a908b91506a301dedc795；baseline e8064825521865a74081c79f40b8d5481c72df1969521fd762eb27177ddf4148；comparison 8d98765900ee9f9683e84b3e2de309b66ae92733de41ce49490d9b149f5baed9 |
 | v8.1A D4.3 r3 vs v7.36 r3 | decoder direction sensitivity | candidate 58b6f62c6004e2ef24f94bd831790058e0e799e29650f1622a0a44e9eee19d7f；baseline 370e30d190deb63e66e675defc26265c103fe1c62a860a982e577597ad8e5c07；comparison ff0df9c541f351827ae234700b25cf5f9f355ec369b0c9f7c8525de0ab7ef7ae |
+| v8.1C C3-25 D4.3 vs v7.36 r3 | step30000 decoder direction sensitivity | contract 2c8294f034d1911900f308a11e183122900878b979964fa438b0ce5c163f1fa9；raw residual b82e1f6abc805237d7d702fb18ccb42f65142470eb7bce989ea973a0768689b2；candidate 88188b5459ed4835dea1d3c38039b6b3e5ca336aff9cbac218ec381855c8eaf6；comparison ff15128b9d36d79e718ef4556c26c157d1404e3932be165546b31005d32b7393 |
 
 ### 6.4 Evidence roots
 
@@ -464,8 +560,15 @@ v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f841
     runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/
     runs/train/stage2/v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719/
     runs/eval/stage2/v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719/
+    runs/eval/stage2/v8_1c_c3_25_d43_decoder_sensitivity_n64_seed17_5090g0_20260719/
     runs/stage2/v7_47_official_ae_unified_matched_seed17_5090g0_20260717/eval/official_pure4053/
     runs/legacy/eval/stage2/v7_36_p0a_asym_unified3_joint30k_seed17_4090g0_20260714/
     runs/legacy/eval/stage2/v8_1a_diag_unified3_30k_seed17_4090g0_20260718/
+    runs/legacy/eval/stage2/v7_45_molingo_offline_masked_ar_human240k_seed17_4090g0_20260717/
+    runs/legacy/eval/stage2/baseline_motionlab_mft_v714_human_seed17_4090g0_20260716/
+    baselines/runs/momask_pulp_human_native_seed17_5090g3_stage1matched_20260716/
+    baselines/runs/director_c_pure_matched_seed17_5090g3_20260716/
+    baselines/runs/ccd_pulp_camera_completion_v714_seed17_4090g1_20260716/
+    runs/eval/stage2/pulpmotion_official_matrix_20260616/full/
 
 旧 v7.17–v7.35 collapse/condition diagnostics、v7.39–v7.45 operator screens 与 invalidation provenance 仍由原 run artifacts 保存；它们不再复制成第二套 current ranking。版本族中的已闭合 milestone 与 bug 入口见 [[version_family]]。

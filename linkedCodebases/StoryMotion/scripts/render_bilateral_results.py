@@ -738,6 +738,11 @@ def main():
     p.add_argument('--sample-ids', nargs='*')
     p.add_argument('--tasks', nargs='+', choices=['camera', 'human', 'joint', 'human_text'], default=['camera', 'human', 'joint'])
     p.add_argument('--seed', type=int, default=20260614)
+    p.add_argument(
+        '--allow-nondefault-tokenizer-contract',
+        action='store_true',
+        help='Permit an explicitly declared diagnostic-only, non-causal representation control.',
+    )
     p.add_argument('--channel-gated-cfg', action='store_true',
                    help='For bilateral CFG, apply camera text guidance only to camera latent channels and human text guidance only to human latent channels.')
     p.add_argument('--joint-camera-latent-intervention', choices=['none', 'zero', 'shuffle', 'noise_matched'], default='none',
@@ -770,6 +775,16 @@ def main():
     bridge = load_local_module('storymotion_official_bridge_render', ROOT / 'scripts/storymotion_official_bridge_smoke.py')
     raw_cache = torch.load(args.cache_dir / 'val.pt', map_location='cpu')
     cache_meta = raw_cache.get('meta', {}) if isinstance(raw_cache, dict) else {}
+    mod.assert_non_causal_cache_meta(cache_meta)
+    if args.allow_nondefault_tokenizer_contract:
+        if cache_meta.get('diagnostic_only') is not True:
+            raise RuntimeError('non-default render cache must declare diagnostic_only=true')
+        if cache_meta.get('promotion_eligible') is not False:
+            raise RuntimeError('non-default render cache must declare promotion_eligible=false')
+        if not str(cache_meta.get('diagnostic_purpose', '')).strip():
+            raise RuntimeError('non-default render cache must declare diagnostic_purpose')
+    else:
+        mod.assert_default_cache_meta(cache_meta)
     owning_decoder, owning_decoder_record = bridge.resolve_owning_decoder(
         ROOT, cache_meta, autoencoder, device
     )
@@ -821,6 +836,9 @@ def main():
                'joint_coupling_scale': joint_coupling_scale,
                'joint_coupling_mode': joint_coupling_mode,
                'strict_run_sampler': strict_run_sampler,
+               'allow_nondefault_tokenizer_contract': bool(args.allow_nondefault_tokenizer_contract),
+               'diagnostic_only': bool(cache_meta.get('diagnostic_only', False)),
+               'promotion_eligible': bool(cache_meta.get('promotion_eligible', True)),
                'human_task_camera_conditioning': task_routing != 'human_first',
                'human_task_camera_display': 'dataset_gt_outside_model' if task_routing == 'human_first' else 'decoded_observed_branch',
                'joint_camera_latent_intervention': args.joint_camera_latent_intervention,
