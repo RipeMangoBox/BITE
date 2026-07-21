@@ -330,3 +330,29 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 7. 当前没有无条件新增的核心长训：先闭合 C3 `105K` active three-profile，再做 no-reference physical 与 blind render。只有 Direct-C 在 endpoint broad regress 才重开 rollout/semantic calibration；只有 joint Camera 单独失败才做 joint-condition fusion 单变量 screen。两者都通过后，才把 fixed-representation Stage2 seed23 repeat 放入低优先级队列。D6/H2C 与 cascade 不再参与 active priority；v8.1B/v8.2 不进入 `30K/105K` Unified。
 
 新 run 的 mutable state 只写入 remote run contract/log/manifest；G2/G3 的结论更新本页的一行 decision，formal audited metrics 只进入 [[StoryMotion-valid-metric-ledger]]，当前状态只摘要到 [[current]]，最终事件只追加到 [[version_family]]。该路由由仓库根 `AGENTS.md` 约束。
+
+## P0-JC：completion → joint 转化归因（2026-07-21 预注册）
+
+**冻结问题**：C3-25 的 Direct-H / Direct-C 优势为什么没有按相同幅度转化为 joint-parallel 优势；teacher-forced single-step 是否掩盖了 rollout exposure gap。
+
+| ID | 对照 | 唯一回答的问题 | 预注册判据 | 证据等级 |
+| --- | --- | --- | --- | --- |
+| P0-JC-1 | v8.1A-30K vs C3-25-30K | Stage1 representation 在相同 Stage2 budget 下是否改变 generatability | 仅使用相同 split、4053 IDs、seed17、DDIM50、CFG1、eta0 的正式 artifact | formal matched |
+| P0-JC-2 | C3-25 Direct-C(GT H) vs Direct-H → Direct-C(generated H replay) | Camera completion 优势是否依赖 clean Human 条件 | generated-H composition 若在 Camera semantic/distribution 与 paired geometry 上系统性退化，则支持 H→C condition exposure gap | root-cause attribution；非 gate |
+| P0-JC-3 | C3-25 generated-H composition vs joint-parallel | 剩余差距是否来自 joint task embedding / coupled rollout，而非 Human 条件质量本身 | composition 恢复而 parallel 仍差，才进入 joint task/coupling；二者都差则先修 H→C exposure | root-cause attribution；非 gate |
+| P0-JC-4 | v8.1A 与 C3-25 matched single-step | GT 邻域的局部去噪差异是否已存在 | 只报告 teacher-forced 局部诊断，不外推自由 rollout | diagnostic |
+| P0-JC-5 | 新 v8.1A-105K-control vs C3-25-105K | 105K 下的预算对齐结论 | continuation 必须新 run ID、保留 30K optimizer、使用与 C3 相同的 30001 LR decay；不得改写历史 30K run | formal matched after audit |
+
+**停止规则**：P0-JC-2 已确认 exposure gap 时，不先改 Stage1；先设计 Stage2 的 generated/noised-H conditioning 或 joint rollout curriculum。只有 P0-JC-1 与 P0-JC-5 均显示 representation 局限，且 P0-JC-2 不支持 exposure gap，才返回 Stage1。数据清洗和多数据集增广保持独立轴，不用于解释本轮差异。
+
+**运行记录位置**：有限步进度、PID、日志和中间 artifact 只写入对应 `runs/train|eval/stage2/<run_id>/`；本页只在 screen/formal decision 时更新判定行。
+
+### P0-JC screen/formal decision（2026-07-21）
+
+| ID | 状态 | 决策 |
+| --- | --- | --- |
+| P0-JC-1 | closed from existing matched formal artifacts | A30 ↔ C30 只回答 representation；不与 C105 混写。 |
+| P0-JC-2 | passed / hypothesis supported | full-4053 GT-H、generated-H 与 shuffled-H replay 均通过 source-contract audit；支持 H→C condition exposure gap。 |
+| P0-JC-3 | passed / second gap supported | generated-H replay 明显优于 joint-parallel，确认 parallel evolving-H / joint-task 的附加损失；下一步进入最小 Stage2 exposure remedy。 |
+| P0-JC-4 | running diagnostic | v8.1A-30K matched full single-step 正在独立 run 中补齐；不得阻塞已闭合的 rollout 归因。 |
+| P0-JC-5 | running control | 历史 v8.1A 仍停在 30K；独立 30K → 105K control 已通过 step/optimizer/contract preflight，formal 比较待 endpoint audit。 |

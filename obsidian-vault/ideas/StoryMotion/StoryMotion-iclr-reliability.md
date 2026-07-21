@@ -214,3 +214,33 @@ Stage2 Unified-3 checkpoint
 ## 8. 当前裁决
 
 StoryMotion 已从“多模式功能集合”推进到“有 matched evidence 的 unified reliability candidate”，但离强会闭环仍差三个硬证据：**sealed multi-seed、decoded/physical completeness、blind qualitative audit**。论文应围绕 Unified-3 + cross-stage reliability loop 展开；SOTA、inpainting 与 data curation 只在各自 gate 真正闭合后再进入贡献列表。
+
+## 三模式真实执行路径与 asymmetric 定义（2026-07-21 实现审计）
+
+> [!important] 口径更正
+> v8.1A 与 C3-25 run ID 中的 `diag` 表示当时以 diagnostic-only 身份执行，不表示 covariance normalization。两者实际都先做逐通道 mean/std z-normalization，再分别在 Human-128 与 Camera-64 分支内做 full-covariance Cholesky whitening（`cov_ridge=1e-4`）；不是 diagonal-only whitening。C3-25 后续被决策层正式选为 mainline，不回写历史 run ID 或不可变 contract。
+
+当前 Unified-3 的三种 active pipeline 为：
+
+1. **Direct-H / Human completion**：输入 Human text，不观察 Camera latent，生成 Human latent，再由该 Stage1 checkpoint 的 owning decoder 解码。`task_routing=human_first`，且训练配置 `v72_aux_text_scale=0.0`，所以 Camera text 在 Human task 中被置零。
+2. **Direct-C / Camera completion**：观察 clean Human latent，以 Camera text 为主条件生成 Camera latent，再由同一 owning decoder 联合解码。这里的 Human 条件来自 GT/缓存，不是模型自身 rollout。
+3. **Joint parallel**：从噪声并行生成 Human 与 Camera。`c_to_h_blocked` 使 Human 预测视图看不到 Camera latent 与 Camera text；Camera 预测视图仍看到随 DDIM 轨迹共同演化的 Human state。它不是先完整生成人再完整生成相机的 cascade。
+
+这里的 **asymmetric** 精确指向 `H → C` 允许、`C → H` 阻断：Human 分支不依赖 Camera，Camera 分支可以依赖 Human。它不表示 Human/Camera 使用不同 normalization，也不表示两个独立 specialist。训练中三种 task 的采样概率为 `1:1:1`，joint 使用 `element_mean`；在 `Human128 + Camera64` 下，joint 样本的逐元素目标天然给 Human 通道约两倍元素数，这也是需要与 rollout exposure gap 分开验证的优化偏置。
+
+> [!warning] single-step 的证据边界
+> teacher-forced single-step 从 `q(z_gt,t)` 预测 `z_0`，只能检查给定 GT 邻域状态时的局部去噪与 owning-decoder 输出。它不会让 Camera head 经历 joint rollout 中自身生成的 Human state，因此 `t<=599` 的视觉相似不能证明 joint-C 能继承 Direct-C 的 completion 优势。
+
+当前 P0 的首要根因假设是 **条件分布/暴露差异**：Direct-C 在训练与评测中观察 clean GT Human，而 joint-C 在 parallel DDIM 中观察自身生成且逐步漂移的 Human。归因顺序固定为：先比较同 checkpoint 的 Direct-C、generated-H composition 与 joint-parallel；再用 v8.1A-30K ↔ C3-25-30K 和新 v8.1A-105K-control ↔ C3-25-105K 分离 representation 与训练预算；只有证据否定该假设后，才进入 joint loss reweighting 或 Stage2 backbone 修改。
+
+### P0-JC 实证结论（2026-07-21）
+
+P0-JC-2/3 已用同一 C3-25 `105K` Unified checkpoint 的 full-4053 artifact 闭合。完整数字与 hashes 只由 [[StoryMotion-valid-metric-ledger#C3-25 completion → joint 条件暴露归因（2026-07-21）]] 持有。
+
+结论是两段式而非单一 Stage1 缺陷：
+
+1. **clean-H exposure gap**：GT-H replay 复现 Direct-C；改为最终生成的 Human replay 后，Camera semantics 大体保留，但 coverage 与 paired camera geometry 明显下降。
+2. **parallel rollout / task gap**：固定最终 generated-H 后再运行 Direct-C，仍显著优于 joint-parallel 的 Camera distribution、semantics 与 caption quality。parallel Camera head 在每个 DDIM step 看到 evolving/noisy self-generated H，且使用 joint task 路由；这部分不是 owning decoder 或 normalization 差异。
+3. **Human carry-over**：Direct-H → Direct-C composition 基本保留 Direct-H 质量，joint-H 仍有较小退化，说明 joint task 路由对 Human 也有成本。
+
+因此最小修复顺序是：先让 Camera head 在训练中接触 detached generated/noised-H，或在 joint-parallel 后增加同 checkpoint 的 Camera replay-refinement；再做 joint-vs-direct consistency。只有这些实验表明 exposure 不是主因时，才测试 Camera branch loss reweighting；当前证据不支持先返回 Stage1，也不支持把 full-cov normalization 改成 diagonal norm。

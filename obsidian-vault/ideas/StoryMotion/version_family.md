@@ -162,3 +162,10 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - Stage2 stop/continue ladder：[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]。
 - v8.2333 immutable curation contract：[[2026-07-17_storymotion-v8-2333-data-curation-plan]]。
 - 旧部署 snapshot、proposal 与 forensic note 保留在 `archived/`；它们不产生第二套 current decision。
+
+## 2026-07-21：P0-JC completion → joint 根因闭合
+
+- C3-25 seed17 `105K` 同 checkpoint 的 GT-H replay 复现 Direct-C，generated-H 与 shuffled-H replay 依次暴露 H→C condition dependency。
+- generated-H replay 仍显著优于 joint-parallel，因而根因分成 clean-H exposure gap 与 parallel evolving-H / joint-task gap；Stage1 与 normalization 暂不进入下一 intervention。
+- active next event 是独立 Stage2 exposure remedy；v8.1A-105K 只作为新 run 的 budget-matched control，历史 v8.1A-30K stop provenance 不变。
+- formal metrics 与 artifact hashes 只见 [[StoryMotion-valid-metric-ledger#C3-25 completion → joint 条件暴露归因（2026-07-21）]]。

@@ -44,11 +44,14 @@ evaluating, comparing, or documenting a StoryMotion experiment.
 
 ## Current Default
 
-The default tokenizer is the corrected v7.14 camera14 joint AE: normalized
-human199 plus official camera14, non-causal, `human128 + camera64`, human-first
-Stage2 cache order, and the owning local decoder. The Stage1 joint encoder saw
-paired human-camera inputs; record this coupling whenever interpreting a
-Stage2 branch-independence experiment.
+The default tokenizer is v8.1C C3-25 seed17: corrected camera14 joint AE with
+normalized human199 plus official camera14, non-causal, `human128 + camera64`,
+the selected low-dose decoded camera-center treatment, human-first Stage2
+cache order, and the owning local decoder. Its audited Unified-3 `105K`
+checkpoint is the selected Stage2 mainline. v7.14 is the former-mainline
+representation comparator. The Stage1 joint encoder saw paired human-camera
+inputs; record this coupling whenever interpreting a Stage2
+branch-independence experiment.
 
 camera9 separate VAE is a control, not the default. camera14 separate results
 must never be presented as camera14 joint results.

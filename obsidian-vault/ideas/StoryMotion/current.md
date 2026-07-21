@@ -115,18 +115,18 @@ C3-25 的 25% 表示 **C1 Camera-center weight 的 25%**，不是 25% 数据、�
 
 v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 G3 `30K` screen。Human 侧出现可重复 signal，但 Direct-C 与 joint parallel Camera 在 semantic/distribution/coverage 上 broad regression。D4/D4.2/D4.3 进一步表明：Camera text 确实被使用；主要问题是 near-manifold 低噪 residual 更集中命中 v8.1A owning decoder 的 Camera 高敏方向，即 Stage1 manifold/decoder 与 Stage2 objective/response 的 cross-stage calibration mismatch。
 
-这个证据不支持“只要多训到 `105K`”“condition 没接上”或“总曝光不足”。`105K` authorization 已明确关闭。
+这个证据当时不支持把“继续训练到 `105K`”当作自动修复，因此原 run 的 `105K` authorization 正确关闭，历史正式端点仍是 `30K`。2026-07-21 新授权的是独立的 **budget-matched causal control**：从只读 `30K` optimizer checkpoint 建立新 run ID，按 C3-25 相同的 `30,001` LR decay 续到 `105K`；它只回答同预算比较，不回写原 run，也不预设 v8.1A 会被修复或晋升。
 
 ## 5. 核心 TODO
 
 完整 contribution/claim 边界见 [[StoryMotion-iclr-reliability]]。当前只保留会改变主结论的任务：
 
-1. **P0 — 审计现有 Stage2 seed23 `105K`。** 三路 result/records 已写出，但在 exact checkpoint、cache、ordered IDs、sampler、contract 与 profile audit 闭合前，不称 formal repeat；若边界不匹配则重做，不能补标签。
-2. **P0 — 补 C3-25 decoded/no-reference evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；缺失值不是 pass。
-3. **P0 — 完成 blind render 与 sealed audit。** Gradio 的 matched L0、Top-5 与 single-step 只作 development evidence；最终结论需要随机/失败切片、blind review，以及训练前冻结的新 audit IDs/hash。
-4. **P1 — 将 Stage1 Human global-slope 作为非阻塞优化轴。** 后续 intervention 仍须 prospective、two-seed、单变量；不得改写原始数值，也不得因该轴未改善而降级已审计的 C3-25 mainline。
-5. **P1 — 补 condition reliance 与 fair baseline matrix。** Direct-H 验证无 camera leakage；Direct-C 做 Human/text shuffle-zero-noise；joint 做 branch intervention。native baselines 保持 system boundary，不冒充 matched ablation。
-6. **P2 — 延后独立轴。** temporal inpaint/inbetweening、v8.2333 curation 与 v8.4 backbone 在各自 preregistered gate 前不进入核心贡献或当前长训队列。
+1. **P0 — 验证最小 Stage2 exposure remedy。** P0-JC-2/3 已在 C3-25 `105K` 同一 Unified checkpoint 上闭合：Direct-C 的 clean-GT-H 条件优势在 generated-H replay 中出现明显 geometry/coverage 损失，joint-parallel 又叠加 evolving/noisy-H 与 joint task 路由损失。下一步优先做 detached generated/noised-H conditioning 或 Camera replay-refinement；joint loss reweighting 排在该因果轴之后，不返回 Stage1。
+2. **P0 — 完成预算对齐的 v8.1A `105K` control。** 历史 v8.1A 正式端点仍为 `30K`；新 continuation 使用独立 run ID，formal 结果尚未闭合。representation 只由 A30 ↔ C30 回答，`105K` maturity 只由新 A105-control ↔ C105 回答。
+3. **P0 — 审计现有 Stage2 seed23 `105K`。** 三路 result/records 已写出，但在 exact checkpoint、cache、ordered IDs、sampler、contract 与 profile audit 闭合前，不称 formal repeat；若边界不匹配则重做，不能补标签。
+4. **P0 — 补 decoded/no-reference 与 sealed blind evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；Gradio/Top-5 不替代冻结 IDs/hash 的 blind review。
+5. **P1 — 独立推进数据质量轴。** Human 先做可逆 pair-level quarantine，以物理质量与 TMR 分开验收；Camera 先建立可审计质量规则再清洗。不得与 representation 或 Stage2 backbone 共用 run。
+6. **P2 — 多数据集与增广保持独立。** HumanML3D → PulpMotion 的 motion/text 匹配、first-frame position/heading 对齐和合理 Camera 补全需单独 contract；Human/Camera 交叉交换先作为受控比例 ablation。temporal inpaint 与 v8.4 backbone 延后。
 
 ## 6. 文档与证据路由
 

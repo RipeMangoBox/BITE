@@ -572,3 +572,40 @@ v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f841
     runs/eval/stage2/pulpmotion_official_matrix_20260616/full/
 
 旧 v7.17–v7.35 collapse/condition diagnostics、v7.39–v7.45 operator screens 与 invalidation provenance 仍由原 run artifacts 保存；它们不再复制成第二套 current ranking。版本族中的已闭合 milestone 与 bug 入口见 [[version_family]]。
+
+## C3-25 completion → joint 条件暴露归因（2026-07-21）
+
+同一 C3-25 seed17 Unified-3 `105K` checkpoint；Pulp `pure_` test，`N=4053`，ordered IDs SHA256 `a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`，seed17，DDIM50，CFG1，eta0，eval batch32，decode batch16。composition 是同 checkpoint 的非 gating root-cause attribution，不替代 active joint-parallel score。
+
+### Camera 转化链
+
+| version / run | profile | FDCLaTr ↓ | CLaTr ↑ | CCov ↑ | caption F1 ↑ | Out ↓ | Cam-ADE ↓ | Cam-FDE ↓ | Rot. deg ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Direct-C, clean GT-H | 25.091 | 59.539 | 0.7503 | 0.7645 | n/a | 1.591 | 1.668 | 35.298 |
+| v8.1C C3-25 / `p0_c3_joint_conversion_seed17_4090g1_20260721` | GT-H replay | 25.207 | 59.475 | 0.7530 | 0.7652 | 0.1463 | 1.599 | 1.675 | 35.614 |
+| v8.1C C3-25 / `p0_c3_joint_conversion_seed17_4090g1_20260721` | generated-H replay | 32.849 | 60.191 | 0.6546 | 0.7565 | 0.1516 | 2.788 | 2.875 | 68.655 |
+| v8.1C C3-25 / `p0_c3_joint_conversion_seed17_4090g1_20260721` | shuffled generated-H replay | 39.674 | 59.652 | 0.6393 | 0.7554 | 0.1607 | 2.923 | 3.018 | 71.288 |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | joint-parallel | 70.580 | 46.720 | 0.6057 | 0.5988 | 0.1835 | 2.904 | 3.003 | 70.849 |
+
+### Human carry-over
+
+| version / run | profile | FDTMR ↓ | TMR ↑ | HCov ↑ | global MPJPE ↓ | root-aligned MPJPE ↓ | root ADE ↓ | root FDE ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Direct-H | 222.120 | 14.389 | 0.5275 | 0.846 | 0.241 | 0.754 | 1.275 |
+| v8.1C C3-25 / `p0_c3_joint_conversion_seed17_4090g1_20260721` | generated-H replay | 217.883 | 14.408 | 0.5263 | 0.857 | 0.241 | 0.767 | 1.302 |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | joint-parallel | 227.189 | 13.691 | 0.5327 | 0.864 | 0.253 | 0.765 | 1.294 |
+
+**审计结论**：GT-H replay 与 Direct-C 对齐，验证 composition evaluator 边界。generated-H replay 保留 Human completion 的大部分质量与 Camera text semantics，但 Camera coverage 和 paired geometry 显著退化，支持 clean-H → generated-H condition exposure gap。generated-H replay 又明显优于 joint-parallel 的 Camera distribution/semantics/caption，说明 parallel 中 evolving/noisy self-generated H 与 joint task 路由构成第二段损失。shuffled-H 的进一步退化确认 Camera head 实际使用 Human 条件。
+
+**证据边界**：paired geometry 对 one-to-many free generation 是 mandatory diagnostic，不是单独 hard gate；本结论为单 seed、同 checkpoint root-cause attribution。shuffled-H 的 Human text/GT 配对被故意打乱，其 Human TMR 不解释为模型回归。v8.1A-105K budget control 与 matched full single-step 尚未闭合，不在本节给出结论。
+
+### Artifact identity
+
+- C3-25 `105K` checkpoint SHA256：`689201d2bc0ba215648a7272c932806f78fe7d4f450f2bd85534b27e8479ca27`
+- Source contract SHA256：`7af1bf9a49a92609dcab1a1d176fee622b9ac844fc2add053982ed036e667851`
+- Direct-H result / records：`704180110482a4db774e2d5deeb015873024f7ca54951af9c5e4f1c9f081216e` / `712020076d9eecfcb76d5ebc853b0d86f824d87c5349302864c4563f247d7a99`
+- Direct-C result / records：`f713043df6f43cd4474b78968b4ce9a6ea1455b50b93d1ffbf0766bea075cc05` / `5ed0778004fa4972a23ad26cf395f31b3dc06272531a30dad19b58a8c60a3895`
+- joint-parallel result / records：`b0d8f936aca06d89caf980f0ae482ef177ea571086f9d6791d89ef935cbbf2eb` / `81945ad3cbe533ac7fdf6893b1b3c33352466f15f744f5df1a36998d659cd725`
+- GT-H replay result / records / audit：`6eceb3430eede08eb5ac5a49015932e03131bc762ef89ee98e494c6eae711c9a` / `f80f54f8092f1a3521eeaf1f846cd41f30f9a64dd19ecec2fe79ffb084c3d16b` / `19da362eba46c020ebb890a3285f28a934952aae5a31e0045e465a3b40546f04`
+- generated-H replay result / records / audit：`9d92edd0900eb694e55a0a82bd895142dcf50933b780fee167246ad0b9896a7e` / `3c6cc3ae8c395c31f7e2569060e30c49366b8498a7aa416c892e82973f284d95` / `efeb2c49200d9c76ecec1421462c44558d708272b46005314775824e53a411d4`
+- shuffled generated-H replay result / records / audit：`2e6805faa59b4c291a7407734cd2ed5a5070f2f7aff36f6acda24be5ba65ad49` / `456a60f3a846337478d5941d41e2b56232b765444bf8b9a8363dd94d17f69f8c` / `79214c0065cd2d4e1804b92f8eb013d8d4ef5bd14170a020330f540b3f88ac20`
