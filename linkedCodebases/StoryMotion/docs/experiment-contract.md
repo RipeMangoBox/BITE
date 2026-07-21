@@ -34,6 +34,12 @@ mainline representation values are asserted by
 `storymotion/experiment_invariants.py`; they are not copied into every Stage2
 run contract.
 
+As of 2026-07-21, the selected decision mainline is v8.1C C3-25 seed17 and its
+audited Unified-3 `105K` endpoint. The former Human global-slope threshold is
+a non-blocking diagnostic; C3-25 records that diagnostic as passed while
+retaining the raw `26.302 mm/100f` value. v7.14 and v7.38 remain reproducible
+former-mainline comparators.
+
 The main experimental unit is one Unified-3 checkpoint containing human,
 camera, and joint tasks. Human-only and camera-only numbers are task-sliced
 diagnostics of that checkpoint and its shared branch implementation. A
@@ -83,10 +89,17 @@ not sufficient cache provenance.
 A same-shape candidate tokenizer that is used only for a Stage2 diagnostic
 must add a `representation` object with `diagnostic_only: true`,
 `promotion_eligible: false`, and a non-empty `purpose`. It remains a control
-until its own promotion rule is met; it must never be relabeled as the
-mainline merely because its cache passes structural checks. Its cache must
-repeat `diagnostic_only: true`, `promotion_eligible: false`, and the same
-non-empty diagnostic purpose; the cache builder rejects an incomplete marker.
+until an explicit audited selection decision is recorded; structural cache
+checks alone never promote it. Its diagnostic cache must repeat
+`diagnostic_only: true`, `promotion_eligible: false`, and the same non-empty
+purpose.
+
+Promotion is a decision-layer event, not a reason to rewrite immutable
+artifacts. C3-25's historical run ID and contracts retain their original
+`diag`, `diagnostic_only: true`, and `promotion_eligible: false` fields as
+execution provenance. New caches and runs created after the C3-25 mainline
+decision must use the selected mainline representation contract and must not
+inherit those historical eligibility fields.
 
 For a curated-data control, the manifest is immutable and additionally records
 its parent-manifest SHA, caption/pair identity, quarantine reason, scorer and

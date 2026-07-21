@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-07-20T19:30:00+08:00
+updated: 2026-07-21T15:42:04+08:00
 ---
 
 # StoryMotion Valid Metric Ledger
@@ -27,7 +27,7 @@ updated: 2026-07-20T19:30:00+08:00
 > 本页只拥有已经审计的数值、比较边界和 artifact hashes。Stage1 reconstruction、Stage2 generation、30K diagnostic screen 与 105K formal evidence 分区记录；除明确标为 diagnostic 的 N64/short rows 外，正式表均为 official pure 4,053。当前裁决见 [[current]]，版本名称与完成 step 见 [[version_family]]，指标定义见 [[StoryMotion-metric-computation-io]]。
 
 > [!important] C3-25 当前证据边界
-> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 的 diagnostic-only Stage2 continuous `0→105K` run **已全部完成**：`30K` 与 `105K` 两处 immutable checkpoint 均完成 Direct-H、Direct-C、joint parallel 三项 formal audit。**`105K` Direct-H TMR `14.389` / FTD `222.12` 均击败 v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` 均击败 v7.38 L0（`55.64 / 33.29`）；joint parallel 无 broad regression。** 但整个 family 仍因 Stage1 prospective global-slope gate fail 而 `promotion_eligible=false`，不触发主线替换。seed23 仍只有 Stage1。
+> v8.1C C3-25 seed17/seed23 都完成了 Stage1 636K 与 pure4053 reconstruction audit。seed17 的 Stage2 continuous `0→105K` run **已全部完成**：`30K` 与 `105K` 两处 immutable checkpoint 均完成 Direct-H、Direct-C、joint parallel 三项 formal audit。**`105K` Direct-H TMR `14.389` / FTD `222.12` 均击败 former mainline v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` 均击败 v7.38 L0（`55.64 / 33.29`）；joint parallel 无 broad regression。** global-slope 现为非阻塞 diagnostic pass，C3-25 seed17 正式成为 Stage1/Stage2 mainline。历史 contract 的 `promotion_eligible=false` 保留为 provenance。Stage2 seed23 三路结果已写出但 audit pending，不进入本账本的 formal multi-seed claim。
 
 ## 1. 如何读表
 
@@ -49,14 +49,14 @@ updated: 2026-07-20T19:30:00+08:00
 | --- | --- | --- | ---: | --- |
 | GT identity / pure4053 | reference | reconstruction/paired target | 4,053 | evaluator 上界，不是 generator |
 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 pretrained | reconstruction | 4,053 | native released Stage1 baseline |
-| v7.14 / joint AE official r2 | Stage1 636K | reconstruction | 4,053 | current implementation mainline |
-| v7.38 L0 / clean 105K | Stage2 105K | Direct-H、Direct-C、parallel | 4,053 | current formal mainline |
+| v7.14 / joint AE official r2 | Stage1 636K | reconstruction | 4,053 | former implementation mainline comparator |
+| v7.38 L0 / clean 105K | Stage2 105K | Direct-H、Direct-C、parallel | 4,053 | former formal mainline comparator |
 | v7.47 / official-AE Unified 105K | Stage2 105K | Direct-H、Direct-C、parallel | 4,053 | S-tier system control |
 | MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | Direct-H | 4,053 | C-tier native-system baseline |
 | PulpMotion / official DiT-xy step92950 | Stage2 native endpoint | joint | 4,053 | C-tier native-system baseline |
 | v7.36 A30 vs v8.1A G3 | Stage2 30K | Direct-H、Direct-C、parallel | 4,053 | matched generatability screen，不与 105K 排名混合 |
-| v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | Direct-H、Direct-C、parallel | 4,053 | formal diagnostic screen；不改变 Stage1 non-promotion |
-| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | Direct-H、Direct-C、parallel | 4,053 | diagnostic-only 105K generatability evidence；不产生 promotion claim |
+| v8.1C C3-25 / seed17 step30000 | Stage2 30K historical diagnostic | Direct-H、Direct-C、parallel | 4,053 | formal screen passed；同一进程继续至 105K |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K mainline | Direct-H、Direct-C、parallel | 4,053 | formal mainline selection evidence；历史 diagnostic contract 不回写 |
 
 除下述 PulpMotion native rows 外，全表 formal ordered-ID SHA256 为 a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93。PulpMotion 两条 official DiT-xy rows 使用相同 4,053 identity set，但保留 native order `16d73df1916048dc44d407191bea9d3589113b55e22281b1acd574b16b9a8196`；因此它们是 C-tier system rows，不是 order-matched ablation。
 
@@ -68,7 +68,7 @@ updated: 2026-07-20T19:30:00+08:00
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | GT identity / pure4053 | reference | reference | 4,053 | 0.00 | 16.47 | 100.0% | 0.00 | 70.24 | 100.0% | 0.945 | 0.7% |
 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 pretrained | C | 4,053 | 109.34 | 15.94 | 92.4% | 17.66 | 60.53 | 84.5% | 0.776 | 3.5% |
-| v7.14 / joint AE official r2 | Stage1 636K | mainline | 4,053 | 31.10 | 14.99 | 97.9% | 0.48 | 69.46 | 99.5% | 0.927 | 5.1% |
+| v7.14 / joint AE official r2 | Stage1 636K | former mainline | 4,053 | 31.10 | 14.99 | 97.9% | 0.48 | 69.46 | 99.5% | 0.927 | 5.1% |
 | v7.14 / joint VAE official r2 | Stage1 636K | control | 4,053 | 69.61 | 13.77 | 93.1% | 2.28 | 68.45 | 97.7% | 0.914 | 7.9% |
 
 GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能在 Stage2 one-to-many generation 表中被当成可训练方法的胜者。
@@ -82,11 +82,11 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | GT identity / pure4053 | reference | reference | 0 / 0 | 0 / 0 | 0 | 0 / 0 | 0 | 0 / 0 | reference only |
 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 pretrained | C | 80.254 / 181.053 | 150.145 / 595.955 | — | 137.449 / 277.227 | 1.792 | −7.000 / −10.340 | native baseline |
 | MotionStreamer-Pulp / 500ep seed17 | Stage1 native 500 epochs | C | 79.937 / 281.524 | — | — | — | — | — | standalone causal baseline only |
-| v7.14 / joint AE official r2 | Stage1 636K | mainline | 80.731 / 212.735 | 169.640 / 415.430 | 21.640 | 41.760 / 51.500 | 0.619 | +29.020 / +145.300 | implementation mainline |
-| v8.1A / yaw001-root003 seed17 | Stage1 636K | candidate | 24.700 / 71.180 | 60.188 / 150.914 | 5.113 | 47.693 / 56.039 | 0.717 | +2.888 / +31.103 | global slope fail；no promotion |
-| v8.1C C2 / center100 seed17 | Stage1 636K | treatment | 25.927 / 74.406 | 62.688 / 158.011 | 5.360 | 31.956 / 41.183 | 0.859 | +4.641 / +38.799 | global slope + rotation fail |
-| v8.1C C3-25 / seed17 selected | Stage1 636K | candidate | 24.570 / 69.243 | 58.252 / 148.365 | 4.947 | 39.486 / 48.270 | 0.705 | +1.148 / +26.302 | only global slope fail；exact non-promotion Stage2 diagnostic parent |
-| v8.1C C3-25 / seed23 robustness | Stage1 636K | robustness | 24.699 / 70.804 | 59.797 / 142.732 | 4.957 | 39.053 / 46.705 | 0.776 | +0.444 / +27.594 | global slope + rotation fail；no Stage2 |
+| v7.14 / joint AE official r2 | Stage1 636K | former mainline | 80.731 / 212.735 | 169.640 / 415.430 | 21.640 | 41.760 / 51.500 | 0.619 | +29.020 / +145.300 | former implementation mainline |
+| v8.1A / yaw001-root003 seed17 | Stage1 636K | candidate | 24.700 / 71.180 | 60.188 / 150.914 | 5.113 | 47.693 / 56.039 | 0.717 | +2.888 / +31.103 | global-slope diagnostic above former threshold；Stage2 broad Camera regression |
+| v8.1C C2 / center100 seed17 | Stage1 636K | treatment | 25.927 / 74.406 | 62.688 / 158.011 | 5.360 | 31.956 / 41.183 | 0.859 | +4.641 / +38.799 | global-slope/rotation diagnostics above former thresholds；not selected |
+| v8.1C C3-25 / seed17 selected | Stage1 636K | mainline | 24.570 / 69.243 | 58.252 / 148.365 | 4.947 | 39.486 / 48.270 | 0.705 | +1.148 / +26.302 | global-slope non-blocking diagnostic pass；current mainline |
+| v8.1C C3-25 / seed23 robustness | Stage1 636K | robustness | 24.699 / 70.804 | 59.797 / 142.732 | 4.957 | 39.053 / 46.705 | 0.776 | +0.444 / +27.594 | global-slope non-blocking diagnostic pass；rotation limitation；robustness only |
 | v8.1C C3-50 / seed17 exploratory | Stage1 636K | diagnostic | 25.593 / 73.166 | 61.678 / 154.323 | 5.194 | 36.412 / 45.116 | 0.718 | +3.079 / +36.214 | Human horizon worse；no Stage2 |
 | v8.1B / residual AE seed17 | Stage1 636K | architecture control | 28.245 / 76.655 | 62.513 / 186.141 | 6.311 | 50.705 / 65.467 | 1.170 | −8.070 / −1.124 | Camera severe regression；no Stage2 |
 | v8.2 / human200 seed17 | Stage1 636K | representation control | 12.999 / 68.706 | 65.847 / 242.966 | 1.275 | 53.028 / 61.554 | 0.569 | −4.518 / −17.269 | Camera center fail；no Stage2 |
@@ -100,7 +100,7 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | 1–64 | 1,805 | GT identity / pure4053 | reference | 0 / 0 | 0 / 0 | 0 |
 | 1–64 | 1,805 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 C | 85.429 / 194.473 | — | — |
 | 1–64 | 1,805 | MotionStreamer-Pulp / 500ep seed17 | Stage1 C | 80.658 / 219.311 | — | — |
-| 1–64 | 1,805 | v7.14 / joint AE official r2 | Stage1 mainline | 70.806 / 146.844 | 43.220 / 50.651 | 0.825 |
+| 1–64 | 1,805 | v7.14 / joint AE official r2 | Stage1 former mainline | 70.806 / 146.844 | 43.220 / 50.651 | 0.825 |
 | 1–64 | 1,805 | v8.1A / yaw001-root003 seed17 | Stage1 candidate | 25.537 / 60.410 | 48.971 / 55.828 | 0.955 |
 | 1–64 | 1,805 | v8.1C C2 / center100 seed17 | Stage1 treatment | 26.046 / 61.894 | 34.112 / 42.474 | 0.974 |
 | 1–64 | 1,805 | v8.1C C3-25 / seed17 selected | Stage1 candidate | 26.010 / 60.819 | 41.423 / 48.946 | 0.936 |
@@ -111,7 +111,7 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | 65–128 | 1,411 | GT identity / pure4053 | reference | 0 / 0 | 0 / 0 | 0 |
 | 65–128 | 1,411 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 C | 78.527 / 168.342 | — | — |
 | 65–128 | 1,411 | MotionStreamer-Pulp / 500ep seed17 | Stage1 C | 75.063 / 299.147 | — | — |
-| 65–128 | 1,411 | v7.14 / joint AE official r2 | Stage1 mainline | 77.327 / 208.582 | 39.165 / 47.671 | 0.517 |
+| 65–128 | 1,411 | v7.14 / joint AE official r2 | Stage1 former mainline | 77.327 / 208.582 | 39.165 / 47.671 | 0.517 |
 | 65–128 | 1,411 | v8.1A / yaw001-root003 seed17 | Stage1 candidate | 21.882 / 65.795 | 46.122 / 53.208 | 0.598 |
 | 65–128 | 1,411 | v8.1C C2 / center100 seed17 | Stage1 treatment | 23.001 / 67.188 | 29.826 / 37.667 | 0.604 |
 | 65–128 | 1,411 | v8.1C C3-25 / seed17 selected | Stage1 candidate | 22.131 / 64.623 | 37.711 / 44.948 | 0.592 |
@@ -122,7 +122,7 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | 129–192 | 456 | GT identity / pure4053 | reference | 0 / 0 | 0 / 0 | 0 |
 | 129–192 | 456 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 C | 66.967 / 162.589 | — | — |
 | 129–192 | 456 | MotionStreamer-Pulp / 500ep seed17 | Stage1 C | 78.304 / 362.423 | — | — |
-| 129–192 | 456 | v7.14 / joint AE official r2 | Stage1 mainline | 87.527 / 305.344 | 39.103 / 54.846 | 0.363 |
+| 129–192 | 456 | v7.14 / joint AE official r2 | Stage1 former mainline | 87.527 / 305.344 | 39.103 / 54.846 | 0.363 |
 | 129–192 | 456 | v8.1A / yaw001-root003 seed17 | Stage1 candidate | 22.586 / 92.037 | 43.831 / 57.340 | 0.421 |
 | 129–192 | 456 | v8.1C C2 / center100 seed17 | Stage1 treatment | 24.214 / 89.011 | 27.508 / 40.450 | 0.871 |
 | 129–192 | 456 | v8.1C C3-25 / seed17 selected | Stage1 candidate | 21.415 / 83.650 | 34.343 / 47.512 | 0.418 |
@@ -133,7 +133,7 @@ GT 与 reconstruction rows 可直接解释 paired reconstruction；它们不能�
 | 193+ | 381 | GT identity / pure4053 | reference | 0 / 0 | 0 / 0 | 0 |
 | 193+ | 381 | Pulp official AE / aemmardm-xgmj0yjj-325 | Stage1 C | 78.034 / 186.646 | — | — |
 | 193+ | 381 | MotionStreamer-Pulp / 500ep seed17 | Stage1 C | 96.527 / 414.168 | — | — |
-| 193+ | 381 | v7.14 / joint AE official r2 | Stage1 mainline | 132.220 / 429.428 | 47.637 / 65.692 | 0.326 |
+| 193+ | 381 | v7.14 / joint AE official r2 | Stage1 former mainline | 132.220 / 429.428 | 47.637 / 65.692 | 0.326 |
 | 193+ | 381 | v8.1A / yaw001-root003 seed17 | Stage1 candidate | 33.705 / 117.184 | 52.082 / 65.968 | 0.385 |
 | 193+ | 381 | v8.1C C2 / center100 seed17 | Stage1 treatment | 38.251 / 142.931 | 34.958 / 48.965 | 1.239 |
 | 193+ | 381 | v8.1C C3-25 / seed17 selected | Stage1 candidate | 30.557 / 109.017 | 43.044 / 58.277 | 0.371 |
@@ -173,7 +173,7 @@ Dose 是 auxiliary loss 的 shared-encoder gradient target，不是数据比例�
 | C5-A / pure4053 alignment | Stage1 read-only | last-valid vs four-anchor multi-horizon | global-MPJPE Spearman all 0.67580→0.77947；193+ 0.70027→0.75837 | only supports a future preregistration；no training |
 | C5-B / fresh calibration seed17/23 | Stage1 read-only train-distribution | four-anchor multi-horizon unit gradient vs C3 parent | recommendations 0.04087558783454605 / 0.041733939559882145；max/min 1.020999；frozen base 0.041302533967803944 | freezes dose0.5=0.020651266983901972 and dose1.0=0.041302533967803944 for matched shorts only |
 
-C5-A 的 trained-endpoint estimated weight 0.008456624012361412 不是 fresh-init training dose。pure4053 已参与候选选择，后续 promotion 必须另冻结 sealed audit set。
+C5-A 的 trained-endpoint estimated weight 0.008456624012361412 不是 fresh-init training dose。pure4053 已参与 mainline 选择；后续论文级外推 claim 必须另冻结 sealed audit set。
 
 ## 3. Stage2 formal 105K evidence
 
@@ -183,7 +183,7 @@ L0–L4 都从 v7.36 A30 恢复 optimizer，到 Stage2 step 105,000；共享 see
 
 | version / run | Stage / budget | Direct-H FDTMR / TMR / HCov | Direct-C FDCLaTr / CLaTr / CCov / F1 | decision |
 | --- | --- | ---: | ---: | --- |
-| v7.38 L0 / clean | Stage2 105K | 333.88 / 13.294 / 40.54% | 33.29 / 55.640 / 73.23% / 0.715 | formal mainline |
+| v7.38 L0 / clean | Stage2 105K | 333.88 / 13.294 / 40.54% | 33.29 / 55.640 / 73.23% / 0.715 | former formal mainline |
 | v7.38 L1 / noisy-H | Stage2 105K | 319.80 / 13.087 / 41.4% | 63.98 / 51.339 / 68.5% / 0.677 | camera regression |
 | v7.38 L2 / human curriculum | Stage2 105K | 296.32 / 13.163 / 47.0% | 50.60 / 52.792 / 70.1% / 0.681 | Human/cascade Pareto；not mainline |
 | v7.38 L3 / camera temporal | Stage2 105K | 307.50 / 12.388 / 45.4% | 82.26 / 48.699 / 61.7% / 0.660 | camera forgetting |
@@ -191,7 +191,7 @@ L0–L4 都从 v7.36 A30 恢复 optimizer，到 Stage2 step 105,000；共享 see
 
 | version / run | Stage / budget | parallel H FDTMR / TMR / HCov | parallel C FDCLaTr / CLaTr / CCov / F1 | Out ↓ | decision |
 | --- | --- | ---: | ---: | ---: | --- |
-| v7.38 L0 / clean | Stage2 105K | 282.37 / 14.420 / 48.98% | 58.96 / 47.129 / 65.68% / 0.569 | 21.69% | formal mainline |
+| v7.38 L0 / clean | Stage2 105K | 282.37 / 14.420 / 48.98% | 58.96 / 47.129 / 65.68% / 0.569 | 21.69% | former formal mainline |
 | v7.38 L1 / noisy-H | Stage2 105K | 285.35 / 11.820 / 48.5% | 94.48 / 43.392 / 60.1% / 0.544 | 21.0% | camera regression |
 | v7.38 L2 / human curriculum | Stage2 105K | 288.45 / 11.571 / 47.6% | 80.17 / 43.933 / 62.9% / 0.540 | 24.3% | not mainline |
 | v7.38 L3 / camera temporal | Stage2 105K | 275.54 / 11.728 / 47.9% | 101.96 / 39.857 / 55.0% / 0.494 | 24.7% | camera forgetting |
@@ -204,13 +204,13 @@ Human completion contract：human text → H。GT 是 identity reference；观�
 | version / run | Stage / budget | tier | FDTMR ↓ | TMR ↑ | HCov ↑ | RA / global MPJPE ↓ | root ADE / FDE ↓ | status |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | GT identity / pure4053 | reference | reference | 0 | 16.47 | 100% | 0 / 0 mm | 0 / 0 mm | not a generator |
-| v7.38 L0 / clean | Stage2 105K | mainline | 333.880 | 13.294 | 40.54% | 250.364 / 863.112 mm | 769.275 / 1,280.066 mm | formal |
+| v7.38 L0 / clean | Stage2 105K | former mainline | 333.880 | 13.294 | 40.54% | 250.364 / 863.112 mm | 769.275 / 1,280.066 mm | formal comparator |
 | v7.47 / official-AE Unified | Stage2 105K | S | 228.966 | 18.424 | 33.31% | 196.083 / 807.756 mm | 740.720 / 1,301.127 mm | formal；strict isolation not established |
 | v7.42 / same-impl Human specialist | Stage2 task-exposure matched | A | 328.620 | 13.438 | 42.22% | — | — | formal |
 | v7.45 / MoLingo human | Stage2 240K human-only | B | 149.163 | 17.729 | 49.86% | 242.502 / 1,249.134 mm | 1,164.249 / 2,007.279 mm | semantic signal；geometry no-promotion |
 | MotionLab-MFT / v7.14 latent | Stage2 30K human-only | B | 156.350 | 18.172 | 59.19% | 250.782 / 951.380 mm | 857.640 / 1,436.396 mm | formal system peer |
 | MoMask-Pulp / native seed17 | Stage2 native VQ159K + Mask/Residual240K | C | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 mm | 998.888 / 1,610.472 mm | formal native baseline；full replay byte-exact；system boundaries differ |
-| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | 222.120 | 14.389 | 52.75% | — / — mm | — / — mm | diagnostic-only 105K evidence；TMR/FTD/coverage 均击败 v7.38 L0 mainline；Direct-H decoded geometry pending |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K mainline | mainline | 222.120 | 14.389 | 52.75% | — / — mm | — / — mm | current mainline；TMR/FTD/coverage 均击败 v7.38 L0；Direct-H decoded geometry pending |
 
 ### 3.3 Direct-C fair system table
 
@@ -219,12 +219,12 @@ Camera completion contract：observed/GT H + camera text → C。
 | version / run | Stage / budget | tier | human condition | FDCLaTr ↓ | CLaTr ↑ | CCov ↑ | F1 ↑ | Cam-ADE / FDE ↓ | rotation ↓ | status |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | GT identity / pure4053 | reference | reference | GT-H | 0 | 70.24 | 100% | 0.945 | 0 / 0 m | 0° | not a generator |
-| v7.38 L0 / clean | Stage2 105K | mainline | GT-H latent | 33.290 | 55.640 | 73.23% | 0.715 | 1.512 / 1.606 m | 32.926° | formal |
+| v7.38 L0 / clean | Stage2 105K | former mainline | GT-H latent | 33.290 | 55.640 | 73.23% | 0.715 | 1.512 / 1.606 m | 32.926° | formal comparator |
 | v7.47 / official-AE Unified | Stage2 105K | S | GT-H in official basis | 17.876 | 60.158 | 83.69% | 0.774 | 0.152 / 0.256 m | 2.084° | formal；strict isolation not established |
 | v7.42 / same-impl Camera specialist | Stage2 task-exposure matched | A | GT-H latent | 33.060 | 58.334 | 76.63% | 0.750 | — | — | formal |
 | Director-C / native | Stage2 15.299M exposures | C | GT pelvis trajectory | 32.437 | 52.662 | 81.49% | 0.688 | — | — | semantic/distribution formal；decoded geometry re-eval required |
 | CCD-Pulp / v7.14 latent | Stage2 60K × 256 | B | GT-H latent | 101.027 | 33.095 | 59.91% | 0.442 | — | — | semantic/distribution formal；decoded geometry re-eval required |
-| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | GT-H latent | 25.091 | 59.539 | 75.03% | 0.764 | — / — m | —° | diagnostic-only 105K evidence；FCD/CLaTr/F1 均击败 v7.38 L0 mainline；Direct-C decoded geometry pending |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K mainline | mainline | GT-H latent | 25.091 | 59.539 | 75.03% | 0.764 | — / — m | —° | current mainline；FCD/CLaTr/F1 均击败 v7.38 L0；Direct-C decoded geometry pending |
 
 ### 3.4 Joint parallel fair system table
 
@@ -233,12 +233,12 @@ Active joint profile 是 directed parallel。PulpMotion rows 使用 released AE 
 | version / run | Stage / budget | tier | H FDTMR / TMR / HCov | C FDCLaTr / CLaTr / CCov / F1 | Out ↓ | H RA / global ↓ | Cam-ADE / FDE / rotation ↓ | status |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | GT identity / pure4053 | reference | reference | 0 / 16.47 / 100% | 0 / 70.24 / 100% / 0.945 | 0.7% | 0 / 0 mm | 0 / 0 m / 0° | not a generator |
-| v7.38 L0 / clean | Stage2 105K | mainline | 282.370 / 14.420 / 48.98% | 58.960 / 47.129 / 65.68% / 0.569 | 21.69% | 252.670 / 842.297 mm | 2.912 / 3.026 m / 72.928° | formal mainline |
+| v7.38 L0 / clean | Stage2 105K | former mainline | 282.370 / 14.420 / 48.98% | 58.960 / 47.129 / 65.68% / 0.569 | 21.69% | 252.670 / 842.297 mm | 2.912 / 3.026 m / 72.928° | formal comparator |
 | v7.47 / official-AE Unified | Stage2 105K | S | 205.336 / 17.303 / 37.75% | 156.755 / 24.563 / 47.00% / 0.239 | 7.96% | 199.053 / 890.543 mm | 2.960 / 3.063 m / 69.212° | Human signal；Camera broad regression |
 | v7.42 / same-impl joint specialist | Stage2 task-exposure matched | A | 300.470 / 12.605 / 45.03% | 66.810 / 45.029 / 63.76% / 0.570 | 19.33% | — | — | formal |
 | PulpMotion / official DiT-xy no-Aux step92950 | Stage2 native endpoint | C | 375.015 / 20.532 / 14.90% | 94.842 / 35.691 / 48.33% / 0.491 | 39.54% | — | — | semantic/distribution formal；native order；decoded geometry re-eval required |
 | PulpMotion / official DiT-xy Aux step92950 | Stage2 native endpoint | C | 414.796 / 21.657 / 13.82% | 93.269 / 37.777 / 44.81% / 0.513 | 28.47% | — | — | semantic/distribution formal；native order；decoded geometry re-eval required |
-| v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | diagnostic | 227.189 / 13.691 / 53.27% | 70.580 / 46.720 / 60.57% / 0.599 | 18.35% | — / — mm | — / — m / —° | diagnostic-only 105K evidence；joint parallel no broad regression；decoded geometry pending |
+| v8.1C C3-25 / seed17 step105000 | Stage2 105K mainline | mainline | 227.189 / 13.691 / 53.27% | 70.580 / 46.720 / 60.57% / 0.599 | 18.35% | — / — mm | — / — m / —° | current mainline；joint parallel no broad regression；decoded geometry pending |
 
 Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 
@@ -255,25 +255,25 @@ Cascade 不再是 active score/gate；只保留同 checkpoint 历史归因：
 
 | valid length | n | version / run | Stage / tier | RA / global MPJPE ↓ | root ADE / FDE ↓ |
 | --- | ---: | --- | --- | ---: | ---: |
-| 1–64 | 1,805 | v7.38 L0 / clean | Stage2 105K mainline | 253.586 / 677.934 | — |
+| 1–64 | 1,805 | v7.38 L0 / clean | Stage2 105K former mainline | 253.586 / 677.934 | — |
 | 1–64 | 1,805 | v7.47 / official-AE Unified | Stage2 105K S | 212.067 / 638.744 | 554.517 / 958.293 |
 | 1–64 | 1,805 | v7.45 / MoLingo human | Stage2 B | 251.390 / 842.422 | 741.395 / 1,257.738 |
 | 1–64 | 1,805 | MotionLab-MFT / v7.14 latent | Stage2 B | 260.438 / 752.649 | 644.684 / 1,058.347 |
 | 1–64 | 1,805 | MoMask-Pulp / native seed17 | Stage2 C | 324.008 / 852.930 | 674.854 / 1,083.558 |
 | 1–64 | 1,805 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 245.048 / 659.947 | 557.421 / 906.060 |
-| 65–128 | 1,411 | v7.38 L0 / clean | Stage2 105K mainline | 249.884 / 895.589 | — |
+| 65–128 | 1,411 | v7.38 L0 / clean | Stage2 105K former mainline | 249.884 / 895.589 | — |
 | 65–128 | 1,411 | v7.47 / official-AE Unified | Stage2 105K S | 188.249 / 851.014 | 792.751 / 1,407.208 |
 | 65–128 | 1,411 | v7.45 / MoLingo human | Stage2 B | 235.229 / 1,310.340 | 1,233.567 / 2,109.151 |
 | 65–128 | 1,411 | MotionLab-MFT / v7.14 latent | Stage2 B | 241.908 / 991.529 | 907.651 / 1,525.572 |
 | 65–128 | 1,411 | MoMask-Pulp / native seed17 | Stage2 C | 311.172 / 1,248.485 | 1,092.817 / 1,796.358 |
 | 65–128 | 1,411 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 238.500 / 873.600 | 786.500 / 1,328.500 |
-| 129–192 | 456 | v7.38 L0 / clean | Stage2 105K mainline | 234.630 / 1,135.359 | — |
+| 129–192 | 456 | v7.38 L0 / clean | Stage2 105K former mainline | 234.630 / 1,135.359 | — |
 | 129–192 | 456 | v7.47 / official-AE Unified | Stage2 105K S | 166.025 / 1,062.929 | 1,017.026 / 1,843.047 |
 | 129–192 | 456 | v7.45 / MoLingo human | Stage2 B | 221.093 / 1,697.425 | 1,636.947 / 2,885.096 |
 | 129–192 | 456 | MotionLab-MFT / v7.14 latent | Stage2 B | 231.113 / 1,242.231 | 1,164.639 / 2,032.365 |
 | 129–192 | 456 | MoMask-Pulp / native seed17 | Stage2 C | 294.303 / 1,469.573 | 1,333.195 / 2,193.523 |
 | 129–192 | 456 | v8.1C C3-25 / seed17 step105000 | Stage2 105K diagnostic | 227.500 / 1,119.100 | 1,044.200 / 1,847.700 |
-| 193+ | 381 | v7.38 L0 / clean | Stage2 105K mainline | 255.706 / 1,294.288 | — |
+| 193+ | 381 | v7.38 L0 / clean | Stage2 105K former mainline | 255.706 / 1,294.288 | — |
 | 193+ | 381 | v7.47 / official-AE Unified | Stage2 105K S | 185.344 / 1,142.850 | 1,099.478 / 1,883.859 |
 | 193+ | 381 | v7.45 / MoLingo human | Stage2 B | 252.949 / 2,412.741 | 2,345.070 / 4,130.365 |
 | 193+ | 381 | MotionLab-MFT / v7.14 latent | Stage2 B | 261.443 / 1,396.085 | 1,313.889 / 2,183.871 |
@@ -348,7 +348,7 @@ projection 中的 `0` 是 native evaluator artifact 实际发出的字段，不�
 
 ## 4. Stage2 30K matched generatability screen
 
-v7.36 A30、v8.1A G3 与 v8.1C C3-25 共享 Unified-3 implementation、optimizer、batch、task probabilities、seed17、pure4053、DDIM50、CFG1、eta0 与 evaluator。必然不同的 Stage1 checkpoint、owning decoder、cache 和 train-only stats 被显式绑定，因此它回答 representation-system generatability，不是 Stage1 promotion。C3-25 的三项 formal audit 均通过，但其 Stage1 global-slope gate 已失败，所以该行永久保持 diagnostic-only。
+v7.36 A30、v8.1A G3 与 v8.1C C3-25 共享 Unified-3 implementation、optimizer、batch、task probabilities、seed17、pure4053、DDIM50、CFG1、eta0 与 evaluator。必然不同的 Stage1 checkpoint、owning decoder、cache 和 train-only stats 被显式绑定，因此它回答 representation-system generatability。C3-25 的三项 formal audit 均通过；结合 Stage1 Pareto 与非阻塞 global-slope diagnostic pass，该 endpoint 现为 mainline。历史 contract 的 diagnostic 字段不回写。
 
 ### 4.1 Primary metrics plus overall geometry
 
@@ -370,7 +370,7 @@ v7.36 A30、v8.1A G3 与 v8.1C C3-25 共享 Unified-3 implementation、optimizer
 | v8.1A G3 / diagnostic Unified | Stage2 30K | 245.886 / 12.439 / 50.41% | 195.453 / 21.856 / 44.88% / 0.223 | 34.59% | 0.269 / 0.877 m | 2.797 / 2.920 m / 72.151° | Camera semantic/distribution regression |
 | v8.1C C3-25 / seed17 step30000 | Stage2 30K diagnostic | 336.130 / 12.439 / 41.82% | 90.664 / 31.617 / 58.60% / 0.367 | 20.03% | 0.259 / 0.845 m | 3.226 / 3.325 m / 77.008° | passes joint comparison；continue 105K |
 
-G3 status：stop_30k_broad_camera_regression，v8.1A 不续 105K。C3-25 status：pass_30k_active_profiles_continue_105k；Direct-C 没有 broad regression，因此按预注册 D4.3 分支不启动 decoder-aware auxiliary short。两者都不改变各自 Stage1 promotion 状态。
+G3 status：stop_30k_broad_camera_regression，v8.1A 不续 105K。C3-25 的历史 G3 status 为 pass_30k_active_profiles_continue_105k，随后 `105K` formal 闭合并晋升为 mainline；Direct-C 没有 broad regression，因此按预注册 D4.3 分支不启动 decoder-aware auxiliary short。
 
 ### 4.2 Geometry by valid length
 
@@ -507,7 +507,7 @@ valid length 相同的 train/eval 行放在一起，length 递增：
 
 | version / run | Stage / status | checkpoint / owning-decoder SHA256 | geometry SHA256 | contract / audit SHA256 |
 | --- | --- | --- | --- | --- |
-| v7.14 / joint AE official r2 | Stage1 mainline | 91248bf440a4a5493a0f8b4994d6d36479fcaa221d331f6995a91ed1af8e7ce1 | abac845f8eac2b3c6da9beeabc02d26058e17b2007fa93d60dda54e7c3ee5248 | evaluator a52aba4d6260aeefac4e5891fbe510322bf6eaf12ce98e3d0bda16ffbc8ddf5e |
+| v7.14 / joint AE official r2 | Stage1 former mainline | 91248bf440a4a5493a0f8b4994d6d36479fcaa221d331f6995a91ed1af8e7ce1 | abac845f8eac2b3c6da9beeabc02d26058e17b2007fa93d60dda54e7c3ee5248 | evaluator a52aba4d6260aeefac4e5891fbe510322bf6eaf12ce98e3d0bda16ffbc8ddf5e |
 | v8.1A / yaw001-root003 seed17 | Stage1 full | ac47c2191c44d6368a5468510975cefcf0efd1338b03ace50266830c344151f1 | same-script evaluator above | owning checkpoint verified |
 | v8.1C C2 / center100 seed17 | Stage1 full no-promotion | f16fb879eb7feebbebba10d24c6039cfec4fbc7812492fadedd9cb5c9c73530e | 0f4cddf17fd15a4b73afeff17c2b489702f237928b099d9d699340eba2f31d96 | contract 904ae14866b0a62fed37cc0b09de5f6bf9d177f81cfcfea760fb96247bdcdac8 |
 | v8.1C C3-25 / seed17 selected | Stage1 full；exact Stage2 diagnostic parent | d0abb3268b14c19aada48fd2b9242fbbb03e9d808959539cac47f33448e4788a | 8b0ab3ba82f85192adeb066d99ce6a07f0fe645b2e916300c96e16b4aad43f4d | contract 80fbf5743aab7517acbfe9bcff6cde4311ce9257cd477e7af5baa658c2de6e73；audit 75d2daf8cd39d91affae8181cfb1365efb3a52bfbc85f50a1cdc6b7d90cf9b15 |
@@ -526,11 +526,11 @@ Stage1 train/eval ordered-ID SHA256：a0981b6c6223409d656ad8c43cfcf95cae6ec9a286
 
 | version / run | Stage / status | checkpoint SHA256 | owning decoder / cache boundary | contract / audit |
 | --- | --- | --- | --- | --- |
-| v7.38 L0 / clean | Stage2 105K mainline | ab474d353a29a4ee707c8ed4e37599fcc47ea79c124452ebdd366d5bdafdaf35 | v7.14 owning decoder | 20/20 family artifacts audited |
+| v7.38 L0 / clean | Stage2 105K former mainline | ab474d353a29a4ee707c8ed4e37599fcc47ea79c124452ebdd366d5bdafdaf35 | v7.14 owning decoder | 20/20 family artifacts audited |
 | v7.47 / official-AE Unified | Stage2 105K S-control | b8c06913a5efdbaa0c178e452998352033174614aa0a60ad96920fe14a8acbb2 | decoder e0ff0a66129d77eb27a18d0034b23f692aaec3ef53afd540097d8d9544a73e52；train/eval cache 1924c632…d1e8 / c642f7c7…d1d3 | contract 37d61e28076735979731e47712500cee016365a4e9e2eb7753d93a10416dee51 |
 | v7.36 A30 / matched control | Stage2 30K | 7dcf3b1911af144ea9ef2b30017dd07472d62f655fd04c1dc9263581e3382c0b | v7.14 decoder 91248bf4…7ce1；cache f7a00a48…a5983 / 6f13816c…9b25 | matched comparator |
 | v8.1A G3 / diagnostic Unified | Stage2 30K stopped | becc2c11051bfd7857acb0602f61c755cd664969f34acef1f0232711feee5bb8 | v8.1A decoder ac47c219…151f；cache 3b55223d…bd22 / 1050748f…541d | contract c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59 |
-| v8.1C C3-25 / continuous diagnostic | Stage2 `0→105K` active；step30000 formal passed | 3533a4216b441b8fba0d6a791408d60a8708dc9a44e47b93d3187217ee83e226 | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | step contract 963327e766cf5acb168dc668616f7098df94c4df50b2a160299bcfcd2d2fe066；contract audit 6182d01d6f3ff4179b8c4f7b8d543d78f3fa4cce60b3db296f10e461e2daf597；H/C/J results c35566ed…b84b4 / accaa2c5…c5ea / 1606e328…9e5b；records 9e34e94d…d07c / e8ae3261…9dfb / 375e9ec5…b772；audits 11afdefc…7df6 / d7733761…8b90 / b6b747ec…925a；diagnostic-only |
+| v8.1C C3-25 / current mainline；historical diagnostic contract | Stage2 `0→105K` completed；30K/105K formal passed | 3533a4216b441b8fba0d6a791408d60a8708dc9a44e47b93d3187217ee83e226 | C3-25 decoder d0abb326…4788a；train/eval cache bc8c847e…3fa9 / 39485590…f5d6；full-cov stats 0c97d247…3400 | step contract 963327e766cf5acb168dc668616f7098df94c4df50b2a160299bcfcd2d2fe066；contract audit 6182d01d6f3ff4179b8c4f7b8d543d78f3fa4cce60b3db296f10e461e2daf597；H/C/J results c35566ed…b84b4 / accaa2c5…c5ea / 1606e328…9e5b；records 9e34e94d…d07c / e8ae3261…9dfb / 375e9ec5…b772；audits 11afdefc…7df6 / d7733761…8b90 / b6b747ec…925a；historical flags retained |
 | MoMask-Pulp / native seed17 | Stage2 native formal Direct-H | VQ e21d42684e4441b67782b8951e1a5e6c9e5c25bbd1bc460aa7fda138ea348664；Mask 037871329eaf980e320961445f5492c7a79ad85d60e9e2b79640678dfabeff3c；Residual 89faab30ffb62d185a789a814ae7c061ed5f5375f9ce5128dc4764756c43e0b1 | native non-causal RVQ + MaskTransformer + ResidualTransformer + owning VQ decoder | eval contract 94a217f900e26212e523dd1f0444fbbba5e6392a7c424e0441bab19c02238901；result 3a133b834bfac8203a9bfb92cea55e0127f50369bc51c68a53bb3b0d877baf70；records 6545ab1a4e17bc13b73663aafd983b439ccae664b016251640dcc22a0e067ed8；formal audit 71bd4b1d31409a8e70e991715ee7a09ee1706384df39831ea575e9f4a2ff3232；byte-exact replay audit 0d7d549e64ff863da2f4815245c18ecb03d997ecc1cef3f423ae817c90f28c2e |
 | v7.45 / MoLingo human | Stage2 240K formal Direct-H | 4669a56fb6c9a4adafc2cfedef39b27c060cd00949a7407c86c68cc9fa30200d | corrected v7.14 latent + owning decoder；offline bidirectional masked RF | contract 34544e1588a5af63614a1b04c50e2481c6f73ed97e21cfc3ab93ba657a2d163a；result 445695958ba86c11831cbc8f931939c71f72135453b21ca6b6d5e2f170b6f685；records 6edb7d5f9e54a61540b175028cad6911d5b573d4290e7dc95edc7e6fce122a9c |
 | MotionLab-MFT / v7.14 latent | Stage2 30K formal Direct-H | 45477134830f25c58b6db2ea54cfdce4cadd8f0e84c0e9312f1ead73bce468dd | corrected v7.14 latent + owning decoder | contract a2f4d063bad486075084d9a66d06084a430f012d28356f42a4b161f8eaef8002；result f1a45654d740d8937152c96b75f88a53a765bc37977719d6628ccef6c36d79ba；records 2b6d42544e75ad330e01091e4a3a294a67e02f2fe0db17ba14fc12e5afdca765 |

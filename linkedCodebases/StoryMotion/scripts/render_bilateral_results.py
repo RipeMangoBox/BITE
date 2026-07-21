@@ -208,7 +208,7 @@ def load_model(ckpt_path, device):
 def build_pulp(args, device):
     pulp_args = argparse.Namespace(
         pulp_root=cache_mod.DEFAULT_PULP_ROOT, data_root=cache_mod.DEFAULT_DATA_ROOT,
-        model_dir=cache_mod.DEFAULT_MODEL_DIR, config_name='config_dit_xy', set_name='mixed_',
+        model_dir=cache_mod.DEFAULT_MODEL_DIR, config_name='config_dit_xy', set_name=args.set_name,
         train_split='train', val_split='test', out_dir=Path('/tmp'),
         device=str(device), batch_size=1, num_workers=0,
         limit_train=None, limit_val=None, dtype='float16',
@@ -755,6 +755,7 @@ def main():
                    help='Human task used by --ckpt before passing generated human to the H2C camera run.')
     p.add_argument('--joint-compose-h2c-source', choices=['replay', 'clean', 'noisy'], default='replay',
                    help='Source type passed to the H2C camera model during composed joint rendering.')
+    p.add_argument('--set-name', default='mixed_')
     args = p.parse_args()
     if args.vis_id:
         args.out_dir = run_layout.run_paths('stage2', args.vis_id, args.runs_root)['vis']

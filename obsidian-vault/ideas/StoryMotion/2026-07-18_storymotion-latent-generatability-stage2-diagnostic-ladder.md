@@ -1,6 +1,6 @@
 ---
 title: "StoryMotion Latent Generatability and Stage2 Diagnostic Ladder"
-status: proposed_non_promotion_diagnostic
+status: completed_c3_25_mainline_selection
 hypothesis: |
   Stage1 reconstruction quality is necessary but insufficient for Stage2. Under
   an identical frozen representation, cache contract, Unified implementation,
@@ -14,7 +14,7 @@ tags:
   - representation
   - latent-diffusion
   - diagnostic
-  - non-promotion
+  - mainline-selection
 aliases:
   - StoryMotion-Latent-Generatability-Ladder
 source_notes:
@@ -32,13 +32,13 @@ source_papers:
   - "[[analysis/ICLR_2026/Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based_Diffusion]]"
   - "[[analysis/IEEE_TIP_2024/Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Motion_Prediction]]"
 created: 2026-07-18T14:44:45+08:00
-updated: 2026-07-20T01:31:00+08:00
+updated: 2026-07-21T15:42:04+08:00
 ---
 
 # StoryMotion Latent Generatability and Stage2 Diagnostic Ladder
 
 > [!abstract] 先行裁决
-> 不应无条件并行启动 v8.1A、v8.1B、v8.2 三条 `105K` Unified。v8.1A 的 G3 `30K` 已因 Direct-C 与 joint parallel Camera broad regression 停止。Stage1 C3-25 seed17 目前只剩 Human global slope blocker，是当前最有希望的 v8 Stage1 candidate；其独立 exact-cache Stage2 run 已在 immutable `30K` checkpoint 完成 Direct-H、Direct-C 与 joint parallel formal audit，三项都通过 matched practical screen，故同一进程继续到 `105K`。Direct-C 没有 broad regression，所以 D4.3 的局部 center sensitivity 不触发 decoder-aware loss。该授权仍是 exposure/generatability diagnostic override，不改写 Stage1 gate；pure4053 已参与候选选择，最终 promotion 仍需新的 sealed audit set。所有 v8 cache/run 均为 `diagnostic_only`，不得成为 promotion-bearing cache。
+> v8.1A 的 G3 `30K` 已因 Direct-C 与 joint parallel Camera broad regression 停止。C3-25 seed17 则完成 Stage1 `636K` owning-decoder audit 与 exact-cache Stage2 continuous `0→105K`；`30K`、`105K` 的 Direct-H、Direct-C 与 joint parallel formal audit 均闭合。selection policy 已将 Human global-slope 改为非阻塞 diagnostic 并判定通过，因此 C3-25 正式成为当前 Stage1/Stage2 mainline。历史 run/cache 的 `diagnostic_only` 字段与 `diag` ID 保留为不可改写 provenance，不再代表当前 eligibility。pure4053 支持当前 selection，但 sealed set 仍用于论文级外推验证。
 
 ## 1. 判断对象与术语边界
 
@@ -84,11 +84,11 @@ updated: 2026-07-20T01:31:00+08:00
 | version / run | 进入的阶段 | 理由 | 当前禁止事项 |
 | --- | --- | --- | --- |
 | v8.1A / `v8_1a_joint_ae_yaw001_root003_seed17_4090g0_20260717` → `v8_1a_diag_unified3_30k_seed17_4090g0_20260718` | G3 `30K` 已闭合；不进入 G4 | 同 v7.14 human199/camera14 架构，仅 geometry loss；Direct-H 出现 signal，但 Direct-C 与 parallel/cascade camera 都是 broad regression | `105K` continuation、promotion cache、mainline rename、把单 seed 写为 promotion |
-| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage1 selected candidate；Stage2 `30K` formal passed、continuous `0→105K` active | Stage1 只剩 global slope blocker；exact parent/cache 的三路 G3 screen passed，继续观察长预算 generatability | promotion claim、用 v8.1A 30K artifact 代替 C3、在 30K 重启、cascade gate |
+| v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | Stage1/Stage2 mainline；continuous `0→105K` completed | global-slope non-blocking diagnostic passed；exact parent/cache 的 `30K`/`105K` 三路 formal audit 闭合 | 用 v8.1A 30K artifact 代替 C3、在 30K 重启、把 cascade 改成 gate |
 | v8.1C C5-B / two-seed matched short family | Stage1 short ladder 已闭合；不进入 full | C5-A 支持的 surrogate 在 seed17 有 signal，但 seed23 未通过同一两个 target | full/cache/Stage2、复用 short state、继续扩 dose、把 pure4053 当最终 promotion test |
 | v8.1B / `v8_1b_residual_ae_yaw001_root003_seed17_4090g0_20260717` | D0 → D1/D2 与 Stage1 camera root-cause | residual/optimization 与 geometry loss纠缠，且 short-bin camera severe regression | `30K/105K` Unified；它只会混合已知 Stage1 camera failure 与 Stage2 效果 |
 | v8.2 / `v8_2_human200_joint_ae_yaw001_root003_seed17_4090g1_20260717` | D0 → D1/D2 与 layout/stats/joint-opt root-cause | camera14 不变却出现各 bin center-translation regression，须先拆解 shared trade-off | `30K/105K` Unified；把 human200 改善误称为全系统收益 |
-| v7.14 / v7.36 / v7.38 controls | D0–D4 control | v7.36 是 exact 30K parent，v7.38 L0 是 exact 105K mainline | 用 `105K` L0 直接淘汰一个 `30K` candidate |
+| v7.14 / v7.36 / v7.38 controls | D0–D4 control | v7.36 是 exact 30K parent，v7.38 L0 是 exact 105K former-mainline comparator | 用 `105K` L0 直接淘汰一个 `30K` candidate |
 | v7.47 / `v7_47_official_ae_unified_matched_seed17_5090g0_20260717` | audited official-AE system control | 四个 pure4053 profile 的 JSON/records、contract 与 eval audit 已闭合；但其 Stage2 train-script SHA256 与 L0 不同，尚不是 strict representation-only comparison；它不是 corrected v7.14 local-AE 结果 | 把 control 结果重命名为 mainline、将其写成严格 representation isolation，或把 single-seed control 当 promotion |
 
 ## 5. Stage2 的可中止阶梯
@@ -143,13 +143,13 @@ G3 对未来 candidate 必须在同一 pure4053 ordered IDs 上完成 active 三
 
 `step_30000.pt` 的 pure4053 Direct-H、Direct-C 与 joint parallel contract/identity/non-causal/result audit 全部通过。相对唯一 matched `30K` comparator v7.36 A30：Direct-H 有 practical semantic/coverage signal且几何不退化；Direct-C 的 FDCLaTr 改善并无 broad regression；joint parallel 的 Camera semantic/distribution 与 Out 改善，几何保持同量级。正式数值与 hashes 只见 [[StoryMotion-valid-metric-ledger#4. Stage2 30K matched generatability screen]]。
 
-G3 decision=`pass_30k_active_profiles_continue_105k`。这只关闭 C3 的 `30K` generatability screen：同一进程继续到 `105K`，仍永久 `diagnostic_only=true`、`promotion_eligible=false`。由于 Direct-C 没有 broad regression，按已冻结的 D4.3 matched-attribution 分支不启动 decoded-Camera/decoder-aware auxiliary short；只有未来 `105K` 单独出现 joint parallel Camera failure 时，才允许预注册 joint branch/fusion 单变量 screen。
+历史 G3 decision=`pass_30k_active_profiles_continue_105k`；同一进程随后完成 `105K`，三路 formal audit 闭合。当前 selection decision 将该 endpoint 晋升为 mainline。run contract 中的 `diagnostic_only=true`、`promotion_eligible=false` 不回写，仅保留执行 provenance。由于 Direct-C 没有 broad regression，按已冻结的 D4.3 matched-attribution 分支不启动 decoded-Camera/decoder-aware auxiliary short。
 
 ### G4 — 105K continuation and formal comparison
 
-本 gate 是条件规则，不是当前队列。若某个未来 candidate 通过 G3，必须从同一 `30K` checkpoint 和 optimizer/RNG state 续训至 `105K`，不得重启、换 best checkpoint 或改 cache，再以完整 active three-profile protocol 与 v7.38 L0 的 `105K` formal 比较。v8.1A 已在 G3 失败并写入 `stop_30k_broad_camera_regression`，因此它没有 G4、不得续训。即使未来 candidate 的 G4 表现良好，它仍是 non-promotion diagnostic：原始 Stage1 promotion gate 没有被重写，不能据此替换 v7.14/v7.38 或启动 v8.2333。
+本 gate 是条件规则，不是当前队列。若某个未来 candidate 通过 G3，必须从同一 `30K` checkpoint 和 optimizer/RNG state 续训至 `105K`，不得重启、换 best checkpoint 或改 cache，再以完整 active three-profile protocol 与当前 C3-25 mainline 及 former-mainline v7.38 L0 比较。v8.1A 已在 G3 失败并写入 `stop_30k_broad_camera_regression`，因此它没有 G4、不得续训。未来 candidate 只有在 audited Stage1 Pareto、G4 与明确 selection decision 闭合后才能替换 mainline；global-slope 保持非阻塞 diagnostic。
 
-#### C3-25 seed17 用户授权的连续 `105K` 诊断
+#### C3-25 seed17 连续 `105K` mainline evidence run
 
 `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 是上述默认 G3→G4 quality gate 的显式协议修订，而不是给 v8.1A 续命。预注册问题是：C3-25 的 Stage1 Pareto 改善能否转化为 Stage2 generatability，以及其 `30K→105K` 轨迹是否显示“训练成熟度不足”还是稳定的 Camera/Joint failure。
 
@@ -157,7 +157,7 @@ G3 decision=`pass_30k_active_profiles_continue_105k`。这只关闭 C3 的 `30K`
 - Unified implementation、human-first routing、seed `17`、batch `512`、task probabilities `1:1:1:0`、full-cov train-only normalization、DDIM50/CFG1/eta0 与 v8.1A matched diagnostic 保持一致。
 - 单进程从 step `0` 连续到 `105K`；step `30001` 起 LR 从 `1e-4` 降至 `3e-5`。保存 `1K/5K/10K/30K/105K` immutable checkpoints，不在 `30K` 重启 optimizer。
 - `step_30000.pt` 单独计算 SHA256 并以冻结 contract snapshot 做 pure4053 Direct-H、Direct-C、joint parallel full eval；cascade 不运行。主训练同时继续，30K quality 结论不自动杀死 `105K`。
-- 唯一自动停止条件是 operational failure、non-finite state、contract/hash/identity/non-causal audit failure。无论 30K 或 105K 结果如何，该 run 都保持 `diagnostic_only=true`、`promotion_eligible=false`。
+- 唯一自动停止条件是 operational failure、non-finite state、contract/hash/identity/non-causal audit failure。该 run 按执行时 contract 保留 `diagnostic_only=true`、`promotion_eligible=false`；2026-07-21 的审计后 selection decision 独立记录其当前 mainline status。
 
 执行状态：`step_30000.pt` 与三路 formal audit 已闭合，decision 为 `pass_30k_active_profiles_continue_105k`；continuous trainer 未在 `30K` 重启，`105K` endpoint/formal 仍待完成。
 
@@ -206,7 +206,7 @@ G3 decision=`pass_30k_active_profiles_continue_105k`。这只关闭 C3 的 `30K`
 
 对“保持 human 优化同时提高 camera”的 Stage1 顺序也据此冻结：
 
-1. C3 的 `1.25%/2.5%` raw-gradient camera-center dose 都已在 fresh matched screen 中保住 v8.1A Human core 并改善 Camera translation；按预注册规则选择较小 `1.25%` dose。seed23 C3-25 已完成 full endpoint，证明低 dose signal 能扩展到完整预算，但仍以 Human global slope `27.594 mm/100f` 与 Camera rotation `0.776°` 未过原始 gate。seed17 selected endpoint 用于判断这一边界是否重现；任何 endpoint 过 gate 前都不能建 cache 或进入 Stage2。
+1. C3 的 `1.25%/2.5%` raw-gradient camera-center dose 都已在 fresh matched screen 中保住 v8.1A Human core并改善 Camera translation；按预注册规则选择较小 `1.25%` dose。seed23 C3-25 full endpoint 证明低 dose signal 能扩展到完整预算；Human global slope `27.594 mm/100f` 作为非阻塞 diagnostic 通过，Camera rotation `0.776°` 保留为 robustness limitation。seed17 endpoint 的完整 Stage1/Stage2 audit 支持当前 mainline selection。
 2. “两个 dose 都失败则停止 center-only sweep”的 failure branch未触发，但 seed23 已表明继续只扫 center weight不会直接解决 rotation/global-slope。下一条 Stage1 诊断应先测 human geometry auxiliary、camera base/velocity、camera center 与 camera rotation 在 shared encoder 的 per-layer gradient norm/cosine，再把 decoded Camera rotation 与 Human long-horizon yaw/root 拆成两个单变量 short screens；首轮不得同时修改两项。
 3. 只有确认 shared-gradient conflict 后，才在 balanced SE(3) camera auxiliary、shared-trunk gradient projection或更小的 branch-specific encoder改动中选择一个单变量 control。数据样本/manifest 与 inference 不是当前首要嫌疑，因为 v7.14/v8.1A 使用同一 ordered IDs，而单步 GT-H 已复现差异。
 
@@ -288,11 +288,11 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 | Stage1 camera C1/C2 | `v8_1c_joint_ae_yaw001_root003_cctr004067_full636k_seed17_5090g0_20260718` | completed and Stage1-specific audited; center translation improves, but rotation/global-slope boundary fails | only C3 center-weight dose screens; no cache, Unified or v8.1A G4 reopening |
 | Stage1 camera C3 first deployment | `v8_1c_center25pct_screen10176_seed17_4090g1_20260718` + `v8_1c_center50pct_screen10176_seed17_4090g0_20260718` | both aborted at optimizer step `214` after about `520 s` (`0.412 step/s`) because two random-small-file loaders contended on one 4090 HDD; no endpoint or eval exists | partial weights/optimizer state are invalid; any retry needs new run IDs, fresh initialization and a prevalidated per-host local-data I/O plan |
 | Stage1 camera C3 fresh screens | `v8_1c_center25pct_screen10176_seed17_4090g0_20260719` + `v8_1c_center50pct_screen10176_seed17_4090g1_20260719` | both completed pure4053 and passed contract/non-causal/decoder/gate audit on 4090 local NVMe | predeclared selection chooses the smaller 25% dose; screen weights remain non-promotion and cannot be resumed |
-| Stage1 camera C3 seed23 robustness full | `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | completed `636K / 81.38M` and pure4053 owning-decoder audit; Human held and Camera translation improved, but global-slope/rotation gate failed | full robustness evidence only; no promotion cache or Stage2; 5090 path text `nvme` is legacy naming over a SATA SSD replica |
-| Stage1 camera C3 selected full | `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | completed fresh `636K / 81.38M` and pure4053 owning-decoder audit；Human/Camera Pareto holds，rotation=`0.705°` passes，only global slope=`26.302 mm/100f` misses the original gate | exact diagnostic-only Stage2 cache/run has since been authorized；the failed original Stage1 gate still forbids promotion |
+| Stage1 camera C3 seed23 robustness full | `v8_1c_center25pct_full636k_seed23_5090g0_20260719` | completed `636K / 81.38M` and pure4053 owning-decoder audit；Human held and Camera translation improved；global-slope diagnostic passes under non-blocking policy，rotation remains a robustness limitation | robustness evidence；does not replace seed17 owner；5090 path text `nvme` is legacy naming over a SATA SSD replica |
+| Stage1 camera C3 selected full | `v8_1c_center25pct_full636k_seed17_4090g0_20260719` | completed fresh `636K / 81.38M` and pure4053 owning-decoder audit；Human/Camera Pareto holds，rotation=`0.705°` passes，global slope raw value=`26.302 mm/100f` | global-slope non-blocking diagnostic pass；current Stage1 mainline and exact Stage2 parent |
 | C3 D1 cache geometry | same Stage2 run；full train estimate + frozen eval report | completed and audited；train/eval IDs、cache/stats/contract hashes 与 non-causal boundary 全部匹配；H/C 均无 dead channel，whitened marginal 无 collapse，raw Camera effective rank 明显较低 | low-cost cache-health evidence only；不预测生成质量，不替代 D2 或 30K/105K full eval |
 | C3 `10K` three-profile screen | same Stage2 run；immutable `step_10000.pt` first-64 Direct-H/Direct-C/joint parallel | completed；三路 records、ordered first-64 IDs、checkpoint/cache/non-causal/sampler 与 finite audit 全过 | D3 health slice only；N64 数值不进入 formal ranking，也不改变 30K/105K 训练与评测计划 |
-| Stage2 C3 continuous diagnostic | `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | exact parent/decoder/cache/train-only full-cov stats、non-causal contract 与 hash audit 均通过；D1、`10K` health slice 与 `30K` active three-profile formal 已闭合；单一进程继续到 `105K` | `pass_30k_active_profiles_continue_105k`；不重启主训练，任何结果都不追溯改写 Stage1 gate |
+| Stage2 C3 mainline evidence run | `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | exact parent/decoder/cache/train-only full-cov stats、non-causal contract 与 hash audit 均通过；D1、`10K` health slice、`30K` 与 `105K` active three-profile formal 均闭合 | current Stage2 mainline；历史 run ID/contract flags 保留 provenance |
 | Stage1 camera C3-50 exploratory full | `v8_1c_center50pct_full636k_seed17_4090g1_exploratory_20260719` | completed fresh `636K / 81.38M` and pure4053 audit；more Camera translation improvement but all Human overall metrics and long-bin/slope regress versus C3-25 | dose-response attribution only；confirms higher center dose harms Human horizon and cannot replace selected C3-25 |
 | Stage1 C4 gradient calibration | `v8_1c_c4_gradient_calibration_seed17_5090g0_20260719` | completed read-only on 8 real seed17-ordered batches；rotation and horizon are near-orthogonal in the shared encoder；independent `1.25%` doses frozen | quality-neutral scale evidence only；selected endpoint triggers C4-H after C3-50 attribution closes，while C4-R remains blocked because selected rotation already passes |
 | Stage1 C4-H screen | `v8_1c_c4h_horizon_screen10176_seed17_4090g0_20260719` | completed fresh `8 epochs / 10,176 steps` and audited；all Pareto guards pass，but both required slope/`193+` targets fail | non-promotion screen closed；no resume and no 5090 fresh full；C5-A read-only follow-up has since closed |
@@ -325,7 +325,7 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 2. v8.1A 的 G3 已闭合并停止；不能用新筛选 checkpoint 或更长训练重开 G4。
 3. C3 fresh 25%/50% screens 已在 4090 本机 NVMe 双 loader 下闭合且都过 gate，证明旧 step-214 问题只是 I/O deployment failure。seed23/seed17 C3-25 full 与 seed17 C3-50 exploratory 也都完成；C3-50 的额外 translation 收益伴随全面 Human horizon 回退，因此不改变 selected C3-25。任何 screen/aborted checkpoint 都不得恢复。
 4. D4/D4.2/D4.3 已共同闭合：camera text 被使用，但 v8.1A 的低噪实际 residual 更集中命中 owning decoder 的高增益方向。C4 calibration/C4-H、C5-A 与 C5-B 均已闭合；C5-B seed23 未复现 seed17 target，two-seed screen 停止。pure4053 仍是 development set。
-5. 用户已授权 C3-25 seed17 的连续 Stage2 `105K` 非晋级诊断；D1、`10K` first-64 health slice 与 immutable `30K` three-profile formal 已闭合并通过，4090 GPU0 继续同一进程，4090 GPU1 保留给 endpoint formal/no-reference/render 复核。
+5. C3-25 seed17 的连续 Stage2 `105K` 已完成；D1、`10K` first-64 health slice、immutable `30K` 与 `105K` three-profile formal 均闭合。该 endpoint 已晋升为 mainline；no-reference/render 与 seed23 audit 继续补强外推证据。
 6. C5-B calibration、seed17 matched selection 与 seed23 confirmation 已全部闭合；预注册 gate fail，不扩展其他 dose/full。MoMask-Pulp native Direct-H pure4053 baseline 也已在独立 contract 下闭合；它只进入 C-tier ledger，不改变 C3 ladder。
 7. 当前没有无条件新增的核心长训：先闭合 C3 `105K` active three-profile，再做 no-reference physical 与 blind render。只有 Direct-C 在 endpoint broad regress 才重开 rollout/semantic calibration；只有 joint Camera 单独失败才做 joint-condition fusion 单变量 screen。两者都通过后，才把 fixed-representation Stage2 seed23 repeat 放入低优先级队列。D6/H2C 与 cascade 不再参与 active priority；v8.1B/v8.2 不进入 `30K/105K` Unified。
 

@@ -23,13 +23,13 @@ aliases:
 source_notes:
   - "[[current]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-20T01:55:00+08:00
+updated: 2026-07-21T15:42:04+08:00
 ---
 
 # StoryMotion v8.2333 Data Curation Preregistration
 
 > [!warning] 当前执行状态
-> 本文是 v8.2333 的唯一 plan 与 progress owner。v8.1A、v8.1B 与 v8.2 的 Stage1 endpoint 已完成，但没有 representation 通过原始 promotion gate；因此 `promoted_representation_selection` 仍为 `closed`。用户于 `2026-07-20` 单独授权提前完成 G1 raw lock，以及语义/物理两路只读分布打分；这不开放阈值冻结、人工裁决、quarantine、clean manifest、cache 或 raw-vs-clean 训练。
+> 本文是 v8.2333 的唯一 plan 与 progress owner。2026-07-21 的 selection decision 已将 C3-25 seed17 设为 Stage1/Stage2 mainline，因此 `promoted_representation_selection` 已闭合并选择 C3-25；global-slope 是非阻塞 diagnostic pass。该决定只移除 representation blocker，不自动开放阈值冻结、人工裁决、quarantine、clean manifest、cache 或 raw-vs-clean 训练。此前获授权的 G1 raw lock 与语义/物理只读分布打分保持有效。
 
 ## 0. 当前执行状态
 
@@ -46,7 +46,7 @@ updated: 2026-07-20T01:55:00+08:00
 | scorer jobs launched | `2`，physical 与 TMR 分开 |
 | GPU jobs launched | `1`，5090 GPU0 TMR read-only scoring |
 
-`annotated/quarantined=0` 表示这些动作尚未获授权，不表示扫描后没有异常。v8.1A 或 C3-25 的 amended non-promotion screen 都不构成 v8.2333 representation selection；在新的 prospective promotion 决定出现前，raw parent 继续是唯一有效数据源。
+`annotated/quarantined=0` 表示这些动作尚未获授权，不表示扫描后没有异常。v8.1A 的历史 screen 不构成 selection；C3-25 seed17 已由独立的 Stage1/Stage2 audit 与 2026-07-21 decision 选为 v8.2333 representation owner。该选择不修改数据 lineage，raw parent 在 clean manifest 获授权并物化前仍是唯一有效数据源。
 
 ### 0.1 Read-only evidence snapshot
 
@@ -84,7 +84,7 @@ v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一�
 
 `2026-07-20` protocol amendment：用户只授权在 G0 关闭时提前执行 G1 与 G2 的只读 availability/distribution 部分，以便观察数据分布并准备阈值校准。该 amendment 不允许跨到 G3–G5，也不能把 score artifact 命名为 quarantine 或 clean endpoint。
 
-1. **G0 — promoted representation selection**：Stage1 endpoint 的 completion marker、checkpoint、owning decoder 与 SHA256 可核验，且有一条 representation 通过其 prospective promotion gate 并被明确选择。当前三条 v8 endpoint 均未满足该条件，故不得冻结阈值、标注/quarantine、物化 clean manifest、构建 cache 或训练；唯一例外是上面的只读 G1/G2 amendment。
+1. **G0 — promoted representation selection**：**completed**。C3-25 seed17 的 Stage1 endpoint、owning decoder、SHA256 与 Stage2 `105K` 三路 formal audit 可核验，并已被明确选为 mainline。global-slope 作为非阻塞 diagnostic 判定通过。G0 完成不等于下游自动授权；阈值冻结、标注/quarantine、clean manifest、cache 与训练仍按本计划逐 gate 决策。
 2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。**状态：passed。**
 3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。**状态：partial；TMR singleton scorer verified/running，LaMP missing，automatic semantic quarantine disabled。**
 4. **G3 — calibration**：完成 `300–500` 个分层 pair 的人工标签，冻结 reason-code、physical rule 和 semantic threshold 版本。
@@ -177,7 +177,7 @@ v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一�
 - joint：上述适用指标、projection/framing 与 Out；
 - no-reference physical：foot contact/skating、acceleration/jerk、bone consistency、root speed/path distributions，并做同 IDs 的 blind render review。
 
-自由生成的 paired MPJPE/Cam-ADE 是 mandatory diagnostic，不单独视为 one-to-many 质量 hard gate。所有 mixed-version 表必须含非空 `version / run` 列。seed-17 matched screen 只能决定是否继续；promotion 至少要用预注册的额外 matched seeds 复核，不能把单 seed screen 写成数据清洗因果定论。
+自由生成的 paired MPJPE/Cam-ADE 是 mandatory diagnostic，不单独视为 one-to-many 质量 hard gate。所有 mixed-version 表必须含非空 `version / run` 列。C3-25 mainline selection 不等于数据清洗因果结论；raw-vs-clean claim 仍必须使用预注册的额外 matched seeds，不能由 single-seed representation evidence 代替。
 
 ### 7.1 Full-data pretrain → clean-data adaptation / SFT
 

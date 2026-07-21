@@ -24,9 +24,11 @@ These rules apply directly to any task involving StoryMotion code, experiments,
 metrics, runs, or research notes, even when the task starts outside the linked
 codebase:
 
-1. The mainline tokenizer is corrected v7.14 camera14 joint AE: normalized
-   human199 plus official camera14, non-causal, human128 plus camera64, and the
-   owning local decoder. camera9 separate is a control only; never merge
+1. The mainline tokenizer is v8.1C C3-25: corrected camera14 joint AE with
+   normalized human199 plus official camera14, non-causal, human128 plus
+   camera64, the selected low-dose decoded camera-center treatment, and its
+   owning local decoder. v7.14 is the former-mainline comparator. camera9
+   separate is a control only; never merge
    camera14 separate and camera14 joint evidence.
    Temporal causal tokenizers are forbidden in every Stage1/Stage2 setting;
    constructors, checkpoint/cache loading, training, and evaluation must assert
@@ -55,11 +57,16 @@ codebase:
    branch implementation used by Unified-3, or when its weights are explicitly
    transferred and verified. Do not train unrelated specialists as a gate for
    a different three-mode model.
-7. StoryMotion v8 is a candidate family, not a mainline rename. A candidate
-   must pass the preregistered Stage1 root/yaw geometry gate before it can
-   replace v7.14 or build a promotion-bearing Unified cache. On human199,
-   root-aligned MPJPE removes root translation but not heading; do not call it
-   local-pose error without a yaw-aware attribution.
+7. StoryMotion v8.1C C3-25 seed17 is the selected mainline representation and
+   Unified-3 `105K` system. Its former `20 mm/100f` Human global-slope threshold
+   is a non-blocking diagnostic and is recorded as passed under the revised
+   selection policy; the raw `26.302 mm/100f` value remains in the metric
+   ledger. Mainline selection is supported by the audited Stage1 Human/Camera
+   Pareto and Stage2 Direct-H, Direct-C, and joint-parallel evidence. Historical
+   run contracts and IDs retain their original diagnostic fields for
+   provenance; new mainline contracts must not copy those stale eligibility
+   flags. On human199, root-aligned MPJPE removes root translation but not
+   heading; do not call it local-pose error without a yaw-aware attribution.
 8. Data cleaning is versioned and reversible. Quarantine caption-motion pairs
    rather than deleting a whole motion when only one caption is wrong, retain
    immutable parent manifests and reason codes, and test cleaning separately
@@ -79,7 +86,7 @@ StoryMotion note.
 | `obsidian-vault/ideas/StoryMotion/version_family.md` | Version-family names, causal questions, unique interventions, completed Stage/steps, finalized milestones, invalidations, and bug provenance | Live priority, queue state, or a duplicate current-version matrix |
 | `obsidian-vault/ideas/StoryMotion/StoryMotion-metric-computation-io.md` | Metric definitions, evaluator/decoder semantics, and I/O contracts | Run-specific outcome tables or policy decisions |
 | `obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-2333-data-curation-plan.md` | The complete v8.2333 curation contract, gate state, zero/nonzero counters, manifest lineage, and curation-only decisions | A separate progress page or representation/backbone conclusions |
-| `obsidian-vault/ideas/StoryMotion/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder.md` | Representation-generatability diagnostics, Stage2 screen/continue/stop gates, and the current non-promotion experiment order | Formal result tables after an eval closes |
+| `obsidian-vault/ideas/StoryMotion/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder.md` | Representation-generatability diagnostics, Stage2 screen/continue/stop gates, and the closed C3-25 mainline-selection provenance | Formal result tables after an eval closes |
 
 Route incremental information in this order:
 

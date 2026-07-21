@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-20T19:30:00+08:00
+updated: 2026-07-21T15:42:04+08:00
 ---
 
 # StoryMotion Version Family
@@ -46,8 +46,8 @@ updated: 2026-07-20T19:30:00+08:00
 | C2 | v8.1C / Stage1 full | C1 高 dose 能否扩展到完整预算 | 与 v8.1A 唯一差异为 center weight=`0.00406677828128799` | fresh `636K / 81.38M` | Camera translation 改善；rotation 与 Human global slope fail；无 cache/Stage2 |
 | C3-25 short | v8.1C / Stage1 short | 降低 center dose 后能否形成 Pareto | C1 weight 的 `25%`，即 `0.0010166945703219975` | fresh `10,176` steps | 通过；按预注册成为 selected full arm |
 | C3-50 short | v8.1C / Stage1 short | 同一 dose-response 的较高臂 | C1 weight 的 `50%`，即 `0.002033389140643995` | fresh `10,176` steps | 通过；因两臂均过而不被选为主臂 |
-| C3-25 seed17 full | C3-25 / Stage1 full | selected treatment 的同 seed完整预算结果 | fresh seed17；不复用 short/aborted state | fresh `636K / 81.38M` + pure4053 | 完成；当前最佳 Stage1 candidate，只剩 global slope blocker；是下列 Stage2 diagnostic 的 exact parent |
-| C3-25 seed17 Unified | C3-25 seed17 / Stage2 diagnostic | 新 latent 是否可生成，以及 `30K→105K` 是否只是训练成熟度问题 | exact parent/decoder/cache/full-cov stats；同一进程 `0→105K`，30K 固化但不重启 | `30K` train/formal completed；**`105K` formal eval 闭合**：Direct-H TMR `14.389` / FTD `222.12` 击败 v7.38 L0；Direct-C CLaTr `59.539` / FCD `25.09` 击败 v7.38 L0；joint parallel 无 broad regression。原始 Stage1 gate 不变，永久 non-promotion |
+| C3-25 seed17 full | C3-25 / Stage1 full | selected treatment 的同 seed 完整预算结果 | fresh seed17；不复用 short/aborted state | fresh `636K / 81.38M` + pure4053 | 完成；当前 Stage1 mainline，global-slope 为非阻塞 diagnostic pass；是下列 Stage2 mainline 的 exact parent |
+| C3-25 seed17 Unified | C3-25 seed17 / Stage2 mainline selection | 新 latent 是否可生成，以及 `30K→105K` 是否只是训练成熟度问题 | exact parent/decoder/cache/full-cov stats；同一进程 `0→105K`，30K 固化但不重启 | `30K` 与 `105K` train/formal completed；Direct-H/Direct-C 多数指标击败 v7.38 L0，joint parallel 无 broad regression；当前 Stage2 mainline。历史 contract 的 non-promotion 字段只保留 provenance |
 | C3-25 seed23 full | C3-25 / Stage1 robustness | 低 dose signal 是否跨 seed | fresh seed23；不存在 seed23 full A baseline | fresh `636K / 81.38M` + pure4053 | 完成；Human RA `24.70` / global `70.80`；Camera ADE `39.05` translation signal 重现；rotation `0.776°` fail、slope fail；**无 Stage2** |
 | C3-50 seed17 full | C3-50 / Stage1 exploratory | 完整预算 dose-response | 用户后授权的 exploratory full；不改变 C3-25 selected 规则 | fresh `636K / 81.38M` + pure4053 | Camera ADE `36.41` 更好；Human global `73.17`、`193+` global `138.49`、slope `36.21` 全面变差；dose-response closed |
 | C4 calibration | C3-25 / Stage1 calibration | 分开 Camera rotation 与 Human horizon 责任轴 | 8-batch unit-gradient norm/cosine；两个 arm 各取 parent gradient `1.25%` | **无训练** | 得到 C4-R/C4-H weights；只证明尺度与方向可区分 |
@@ -76,7 +76,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 
 | family / run | Stage1 | Stage2 `10K` | Stage2 `30K` train/eval | Stage2 `105K` train/eval |
 | --- | --- | --- | --- | --- |
-| v7.38 L0 | v7.14 parent | completed in historical ladder | completed | **completed formal mainline** |
+| v7.38 L0 | v7.14 parent | completed in historical ladder | completed | completed former formal mainline；当前为 C3-25 comparator |
 | v7.46 official-AE control | official AE parent | completed screen | not completed | not completed |
 | v7.47 official-AE control | official AE parent | completed | completed | **completed formal system control** |
 | v8.1A | completed `636K` | completed within G ladder | **completed and audited** | **not run；stopped at 30K** |
@@ -86,7 +86,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v8.1C C3-25 seed23 | completed `636K` | not run | not run | not run |
 
 > [!important] C3-25 的直接答案
-> C3-25 seed17 已构建并审计自己的 Stage2 cache，D1 排除了 dead-channel 与 branch-marginal collapse；`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 的 `30K` 与 **`105K`** 三路 formal audit 均已闭合。**`105K` Direct-H TMR `14.389` / FTD `222.12` 双双击败 v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` 双双击败 v7.38 L0（`55.64 / 33.29`）**。但原始 Stage1 gate 不变，run 全程 `promotion_eligible=false`，不触发主线替换。任何 `v8_1a_diag_unified3_30k_*` 仍只属于父候选 v8.1A。
+> C3-25 seed17 已构建并审计自己的 Stage2 cache，D1 排除了 dead-channel 与 branch-marginal collapse；`v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 的 `30K` 与 **`105K`** 三路 formal audit 均已闭合。**`105K` Direct-H TMR `14.389` / FTD `222.12` 双双击败 former mainline v7.38 L0（`13.294 / 333.88`）；Direct-C CLaTr `59.539` / FCD `25.09` 双双击败 v7.38 L0（`55.64 / 33.29`）**。global-slope 现为非阻塞 diagnostic pass，C3-25 正式成为 Stage1/Stage2 mainline。run 的 `promotion_eligible=false` 是不可回写的历史执行字段。任何 `v8_1a_diag_unified3_30k_*` 仍只属于父候选 v8.1A。
 
 ## v8.0+ 家族地图
 
@@ -95,10 +95,10 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v8.0 | Stage1 read-only attribution | 定位 human199 长程误差责任通道 | GT-yaw oracle 完成；existing deep-AE screen No-Go |
 | v8.1A | Stage1 geometry loss + Stage2 generatability | 修复 yaw/root 并检查 latent 是否可生成 | Stage1 full、Stage2 `30K` 与 D4 family 完成；无 `105K` |
 | v8.1B | Stage1 architecture | residual AE capacity/control | Stage1 full 完成；无 Stage2 |
-| v8.1C | Stage1 Camera-center/Human-horizon treatment + Stage2 diagnostic override | 在 v8.1A 上形成 Human/Camera Pareto，并诊断 C3 latent generatability | C3-25 selected；C5-B two-seed short fail；seed17 Stage2 `30K` 三路 formal passed、continuous `105K` active，仍不具 promotion 资格 |
+| v8.1C | Stage1 Camera-center/Human-horizon treatment + audited Unified-3 | 在 v8.1A 上形成 Human/Camera Pareto，并验证 C3 latent generatability | C3-25 seed17 Stage1/Stage2 mainline；`105K` 三路 formal completed；C5-B optional repair two-seed short fail |
 | v8.2 | Stage1 feature layout | human200 non-integrative root/yaw | Stage1 full 完成；无 Stage2 |
 | v8.2333 | data curation | reversible physical/semantic pair quarantine | G1/raw 与 physical distribution complete、TMR singleton distribution active；G0/G2 decision gate closed，quarantine 仍为 `0` |
-| v8.4-A | Stage2 backbone | Motion Mamba-style non-AR latent DDPM | blocked on representation promotion |
+| v8.4-A | Stage2 backbone | Motion Mamba-style non-AR latent DDPM | C3-25 representation owner 已固定；待单独授权 |
 | v8.4-B | Stage2 backbone | TransPhase-style adjacent-phase control | blocked on v8.4-A matched baseline |
 
 ## v1–v7 家族压缩索引
@@ -109,12 +109,12 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 | v4–v6.4 | official Pulp latent 上的 unified/completion/coupling/reliability | historical official-system anchors 与 condition diagnostics |
 | v7.0–v7.4 | Stage2 routing、TrustGate、relation 与 asymmetric schedule | historical Stage2 design family；不回答 local tokenizer 质量 |
 | v7.5–v7.13 | data hygiene 与 local tokenizer AE/VAE/quantizer 探索 | 受旧 feature/decode contract 影响，不进入当前 ranking |
-| v7.14 | corrected normalized human199 + camera14 joint AE | 当前 Stage1 implementation mainline |
+| v7.14 | corrected normalized human199 + camera14 joint AE | former Stage1 implementation mainline；当前 comparator |
 | v7.15–v7.16 | local Stage2 transfer | wrong decoder/causal cache invalidated evidence |
 | v7.17–v7.30 | corrected cache/decoder、loss/normalization/sampler collapse closure | diagnostic chain；v7.30 证明 catastrophic collapse 可排除 |
 | v7.32–v7.35 | camera/topology controls 与 Unified-3 task conditioning | system controls；camera9 separate 不能并入 camera14 joint evidence |
 | v7.36 | `30K` asymmetric Unified-3 matched control | v8.1A G3 的唯一同预算 comparator |
-| v7.38 | `105K` L0/L1–L4 long-run family | L0 是当前 Stage2 formal mainline |
+| v7.38 | `105K` L0/L1–L4 long-run family | L0 是 former Stage2 formal mainline；当前 comparator |
 | v7.42–v7.45 | specialists/external operator/curriculum controls | task/operator attribution；不是统一 representation ranking |
 | v7.46 | official-AE Unified initial gate | 仅 `10K`；任务不适用 Out gate bug 后停止 |
 | v7.47 | corrected official-AE Unified full control | `105K` formal audited system control；不替换主线 |
@@ -124,7 +124,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-18：** v8.1A/B 与 v8.2 Stage1 endpoints 闭合；v8.1A 仅获 diagnostic-only Stage2 ladder。
 - **2026-07-18：** v8.1A G3 `30K` 完成并因 Camera broad regression 停止；D4 family 随后只作冻结归因。
 - **2026-07-19：** C3-25/50 fresh short 均完成；按预注册选择较低 dose C3-25。
-- **2026-07-19：** C3-25 seed17/seed23 与 exploratory C3-50 full 均完成 Stage1 audit；C3-25 seed17 把 blocker 收窄为 global slope。
+- **2026-07-19：** C3-25 seed17/seed23 与 exploratory C3-50 full 均完成 Stage1 audit；C3-25 seed17 形成最佳 Human/Camera Pareto，global slope 保留为诊断项。
 - **2026-07-19：** C4-H short fail；C5-A read-only alignment pass，但未授权 C5 training。
 - **2026-07-19：** C5-B fresh seed17/23 train-distribution calibration 完成；两条 recommendation 的 max/min=`1.021`，稳定性 guard 通过并冻结 `0.5×/1.0×` short doses。该事件只授权预注册 short，不授权 full。
 - **2026-07-19：** C5-B seed17 matched screen 完成；dose0.5 未过 target，dose1.0 通过两项 target 与八项 guards，按预注册只进入 seed23 confirmation，仍不授权 full。
@@ -134,7 +134,8 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-19：** MoMask-Pulp native VQ/Mask/Residual endpoint 的 Direct-H pure4053 formal eval 与独立 audit 闭合；第二次 full replay 的 4,053 条 records byte-exact。它只作为 C-tier native-system baseline，不解释为 StoryMotion representation ablation。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
 - **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
-- **2026-07-20：** C3-25 seed17 Stage2 immutable `30K` Direct-H、Direct-C 与 joint parallel formal audit 全部通过 matched practical screen；decision=`pass_30k_active_profiles_continue_105k`。同一训练进程继续，Stage1 global-slope blocker 与 non-promotion 状态不变。
+- **2026-07-20：** C3-25 seed17 Stage2 immutable `30K` Direct-H、Direct-C 与 joint parallel formal audit 全部通过 matched practical screen；decision=`pass_30k_active_profiles_continue_105k`，同一训练进程继续至 `105K`。
+- **2026-07-21：** C3-25 seed17 Stage2 `105K` 三路 formal audit 闭合；Direct-H 与 Direct-C 多数指标击败 v7.38 L0，joint parallel 无 broad regression。selection policy 将 global-slope 改为非阻塞 diagnostic 并判定通过，C3-25 正式成为 Stage1/Stage2 mainline；历史 run ID/contract 字段不回写。
 
 ## Bug 与 invalidation provenance
 
@@ -156,7 +157,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 
 ## Evidence boundary
 
-- 当前 mainline、blocker 与下一授权动作：[[current]]。
+- 当前 mainline、非阻塞优化轴与下一授权动作：[[current]]。
 - 所有正式数值、uncertainty 与核心 hashes：[[StoryMotion-valid-metric-ledger]]。
 - Stage2 stop/continue ladder：[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]。
 - v8.2333 immutable curation contract：[[2026-07-17_storymotion-v8-2333-data-curation-plan]]。
