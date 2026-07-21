@@ -215,7 +215,7 @@ def completion_metrics(ev: Evidence, task: str) -> str:
             *rows,
             "",
             contract,
-            "C3-25 remains `diagnostic_only=true` and `promotion_eligible=false`.",
+            "C3-25 is the current mainline; historical run-contract eligibility fields are retained only as provenance.",
         ]
     )
 
@@ -296,7 +296,7 @@ def single_step_metrics(ev: Evidence, task: str) -> str:
             *rows,
             "",
             "Each row is `q(z_gt,t) → one pred_x0` with deterministic per-sample noise. "
-            "It is not DDIM50 generation, a training curve, or promotion evidence.",
+            "It is not DDIM50 generation or a training curve, and it does not replace the formal mainline metrics.",
         ]
     )
 
@@ -528,8 +528,8 @@ def build_demo(ev: Evidence):
         gr.Markdown(
             "**展示主角：v8.1C C3-25 seed17 · Stage2 105K。** "
             "Direct-H、Direct-C 与 joint parallel 均使用 exact C3-25 checkpoint/cache/owning decoder；"
-            "v7.38 L0 仅作为 matched 105K baseline。C3-25 仍是 diagnostic-only candidate，"
-            "本页的视频、Top-5 与 single-step 结果不构成 promotion 或 blind quality claim。",
+            "v7.38 L0 仅作为 former-mainline matched 105K baseline。C3-25 是当前 mainline；"
+            "本页的视频、Top-5 与 single-step 结果不构成 blind quality claim。",
             elem_classes="verdict",
         )
         with gr.Tabs():
