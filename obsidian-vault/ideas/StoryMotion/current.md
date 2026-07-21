@@ -123,7 +123,7 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 
 1. **P0 — 验证最小 Stage2 exposure remedy。** P0-JC-2/3 已在 C3-25 `105K` 同一 Unified checkpoint 上闭合：Direct-C 的 clean-GT-H 条件优势在 generated-H replay 中出现明显 geometry/coverage 损失，joint-parallel 又叠加 evolving/noisy-H 与 joint task 路由损失。下一步优先做 detached generated/noised-H conditioning 或 Camera replay-refinement；joint loss reweighting 排在该因果轴之后，不返回 Stage1。
 2. **P0 — 完成预算对齐的 v8.1A `105K` control。** 历史 v8.1A 正式端点仍为 `30K`；新 continuation 使用独立 run ID，formal 结果尚未闭合。representation 只由 A30 ↔ C30 回答，`105K` maturity 只由新 A105-control ↔ C105 回答。
-3. **P0 — 审计现有 Stage2 seed23 `105K`。** 三路 result/records 已写出，但在 exact checkpoint、cache、ordered IDs、sampler、contract 与 profile audit 闭合前，不称 formal repeat；若边界不匹配则重做，不能补标签。
+3. **P0 — 重做真正的 Stage2 seed23 `105K` repeat。** 现有 run 已于 2026-07-22 fail-close：它实际是 `0–30K seed23 + 30K–105K seed17`，且缺 experiment contract/profile audit，不能进入 multi-seed。新 run 必须从正确 seed23 contract 独立训练或使用可审计 RNG-resume；不得给旧结果补标签。
 4. **P0 — 补 decoded/no-reference 与 sealed blind evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；Gradio/Top-5 不替代冻结 IDs/hash 的 blind review。
 5. **P1 — 独立推进数据质量轴。** Human 先做可逆 pair-level quarantine，以物理质量与 TMR 分开验收；Camera 先建立可审计质量规则再清洗。不得与 representation 或 Stage2 backbone 共用 run。
 6. **P2 — 多数据集与增广保持独立。** HumanML3D → PulpMotion 的 motion/text 匹配、first-frame position/heading 对齐和合理 Camera 补全需单独 contract；Human/Camera 交叉交换先作为受控比例 ablation。temporal inpaint 与 v8.4 backbone 延后。

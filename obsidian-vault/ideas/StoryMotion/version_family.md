@@ -176,3 +176,11 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - The prior run without `--eval-source single_step` remains invalid and cannot be reused as single-step evidence.
 - The A-side result establishes that joint degradation is not solely a multi-step rollout artifact; high-noise Camera degradation is already present inside the joint denoising mode.
 - No v8.1A-versus-C3 family decision is recorded from P0-JC-4 yet because the completed C3-25 `30K` artifacts are unavailable while the 5090 host is offline.
+
+## 2026-07-22 — existing Stage2 seed23 105K repeat invalidated
+
+- Run `v8_1c_c3_25_diag_unified3_seed23_105k_4090g1_20260720` is fail-closed and is not a formal seed23 repeat.
+- Its immutable `30K` checkpoint is seed23, but the continuation driver omitted `--seed`; the trainer initialized seed17 before resume, and the checkpoint did not preserve RNG state while resume restored only model and optimizer. The actual trajectory is therefore `0–30K seed23 + 30K–105K seed17`.
+- The three endpoint evaluations share the same `105K` checkpoint and otherwise match `4053` samples, ordered IDs, batch/decode batch, and DDIM settings, but they cannot repair the training-seed boundary. Their missing experiment contract/profile audits, `diagnostic_contract=null`, and absent explicit version/run identity are additional formal blockers.
+- Run-local provenance audit: `runs/train/stage2/v8_1c_c3_25_diag_unified3_seed23_105k_4090g1_20260720/provenance_audit_20260722.json`; SHA-256 `a8af56f7b2538216b079fe7b2cc2612bfc38b262ce6d16678f6b6ed54a12cae9`.
+- These results must not enter the metric ledger or multi-seed aggregate. A corrected seed23 run requires a new run ID and a predeclared seed/RNG-resume contract.
