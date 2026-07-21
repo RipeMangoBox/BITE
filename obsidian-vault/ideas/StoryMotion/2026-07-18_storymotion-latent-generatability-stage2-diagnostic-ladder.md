@@ -354,5 +354,12 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 | P0-JC-1 | closed from existing matched formal artifacts | A30 ↔ C30 只回答 representation；不与 C105 混写。 |
 | P0-JC-2 | passed / hypothesis supported | full-4053 GT-H、generated-H 与 shuffled-H replay 均通过 source-contract audit；支持 H→C condition exposure gap。 |
 | P0-JC-3 | passed / second gap supported | generated-H replay 明显优于 joint-parallel，确认 parallel evolving-H / joint-task 的附加损失；下一步进入最小 Stage2 exposure remedy。 |
-| P0-JC-4 | running diagnostic | v8.1A-30K matched full single-step 正在独立 run 中补齐；不得阻塞已闭合的 rollout 归因。 |
+| P0-JC-4 | partial formal audit | v8.1A-30K corrected half 已完成 full-4053 audit；C3-25-30K runner 已完成但 5090 artifact 当前不可达，matched decision 保持 open。 |
 | P0-JC-5 | running control | 历史 v8.1A 仍停在 30K；独立 30K → 105K control 已通过 step/optimizer/contract preflight，formal 比较待 endpoint audit。 |
+
+## 2026-07-22 P0-JC-4 corrected audit boundary
+
+- v8.1A `30K` side is complete and formally audited on `4053` samples for Direct-H, Direct-C, and joint-parallel at `t∈{199,399,599,799,999}`.
+- The corrected run explicitly uses `eval_source=single_step`; the earlier mislabeled source-cache run remains invalid provenance.
+- The v8.1C C3-25 `30K` runner is reported complete on 5090 GPU1, but its artifact directory is currently unreachable and was not mirrored to 4090. Therefore P0-JC-4 remains open as a matched comparison rather than being promoted from a one-sided audit.
+- A-side evidence already shows that the joint gap is present within one denoising diagnostic, especially on Camera: at `t=399`, FCD changes from `28.432` in Direct-C to `47.807` in joint; at `t=999`, from `75.184` to `413.863`. Multi-step rollout accumulation is therefore not the sole cause, although the missing C3 side prevents a representation-level A/C conclusion.

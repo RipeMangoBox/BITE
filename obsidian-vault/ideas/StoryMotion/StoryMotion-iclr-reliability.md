@@ -244,3 +244,11 @@ P0-JC-2/3 已用同一 C3-25 `105K` Unified checkpoint 的 full-4053 artifact �
 3. **Human carry-over**：Direct-H → Direct-C composition 基本保留 Direct-H 质量，joint-H 仍有较小退化，说明 joint task 路由对 Human 也有成本。
 
 因此最小修复顺序是：先让 Camera head 在训练中接触 detached generated/noised-H，或在 joint-parallel 后增加同 checkpoint 的 Camera replay-refinement；再做 joint-vs-direct consistency。只有这些实验表明 exposure 不是主因时，才测试 Camera branch loss reweighting；当前证据不支持先返回 Stage1，也不支持把 full-cov normalization 改成 diagonal norm。
+
+## P0-JC-4 corrected single-step evidence boundary (2026-07-22)
+
+The corrected v8.1A `30K` audit establishes one causal point before the matched C3 artifact is recovered: completion-to-joint degradation already exists in a teacher-forced single-step diagnostic. It is therefore incorrect to explain the formal joint deficit only as accumulated free-rollout error. Direct-C receives clean GT Human latent, whereas joint parallel operates with a simultaneously noised/evolving Human branch; the large Camera gap, especially at high noise, is direct evidence for a conditional-exposure and routing mismatch inside a denoising step. Free rollout can amplify that mismatch, but does not create it from nothing.
+
+The aggregate transition is consistent with the visual diagnostic boundary: results remain materially closer through `t≤599`, global/root and heading uncertainty becomes important near `t=799`, and `t=999` is a near-pure-noise stress point rather than a standalone promotion gate. Root-aligned MPJPE removes root translation but retains heading, so it is not labeled as local-pose error.
+
+This evidence does not change v8.1C C3-25 mainline status and does not yet establish whether C3 is better or worse than v8.1A at equal `30K` Stage2 budget. That claim requires the completed C3 run's result JSON, records, checkpoint identity, and ordered artifact hash. Until those are auditable, the active intervention remains Stage2 exposure alignment for joint generation, not a Stage1 rollback or loss reweighting.

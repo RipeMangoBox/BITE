@@ -169,3 +169,10 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - generated-H replay 仍显著优于 joint-parallel，因而根因分成 clean-H exposure gap 与 parallel evolving-H / joint-task gap；Stage1 与 normalization 暂不进入下一 intervention。
 - active next event 是独立 Stage2 exposure remedy；v8.1A-105K 只作为新 run 的 budget-matched control，历史 v8.1A-30K stop provenance 不变。
 - formal metrics 与 artifact hashes 只见 [[StoryMotion-valid-metric-ledger#C3-25 completion → joint 条件暴露归因（2026-07-21）]]。
+
+## 2026-07-22 — P0-JC-4 v8.1A corrected side closed; matched decision remains open
+
+- Finalized the corrected v8.1A `30K` single-step evaluation for Direct-H, Direct-C, and joint-parallel over five timesteps and the full `4053` test samples.
+- The prior run without `--eval-source single_step` remains invalid and cannot be reused as single-step evidence.
+- The A-side result establishes that joint degradation is not solely a multi-step rollout artifact; high-noise Camera degradation is already present inside the joint denoising mode.
+- No v8.1A-versus-C3 family decision is recorded from P0-JC-4 yet because the completed C3-25 `30K` artifacts are unavailable while the 5090 host is offline.

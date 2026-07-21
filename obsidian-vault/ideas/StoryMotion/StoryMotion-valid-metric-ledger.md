@@ -609,3 +609,45 @@ v7.47 official pure4053 ordered records SHA256：a0d7627ee827e36a229d33f9975f841
 - GT-H replay result / records / audit：`6eceb3430eede08eb5ac5a49015932e03131bc762ef89ee98e494c6eae711c9a` / `f80f54f8092f1a3521eeaf1f846cd41f30f9a64dd19ecec2fe79ffb084c3d16b` / `19da362eba46c020ebb890a3285f28a934952aae5a31e0045e465a3b40546f04`
 - generated-H replay result / records / audit：`9d92edd0900eb694e55a0a82bd895142dcf50933b780fee167246ad0b9896a7e` / `3c6cc3ae8c395c31f7e2569060e30c49366b8498a7aa416c892e82973f284d95` / `efeb2c49200d9c76ecec1421462c44558d708272b46005314775824e53a411d4`
 - shuffled generated-H replay result / records / audit：`2e6805faa59b4c291a7407734cd2ed5a5070f2f7aff36f6acda24be5ba65ad49` / `456a60f3a846337478d5941d41e2b56232b765444bf8b9a8363dd94d17f69f8c` / `79214c0065cd2d4e1804b92f8eb013d8d4ef5bd14170a020330f540b3f88ac20`
+
+## 2026-07-22 P0-JC-4 corrected single-step audit: v8.1A 30K side
+
+The v8.1A half of the budget-matched single-step diagnostic is formally audited on the full `4053` test set. Every result declares `eval_source=single_step` and the requested timestep. The earlier run that omitted `--eval-source single_step` remains invalid provenance and is not included below.
+
+Human-side results:
+
+| version / run | mode | t | FTD ↓ | TMR ↑ | HCov ↑ | Human global MPJPE ↓ | root-aligned MPJPE ↓ | root ADE ↓ | root FDE ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-H | 199 | 45.181976 | 14.570561 | 0.957072 | 0.383887 | 0.116796 | 0.334976 | 0.702490 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-H | 399 | 70.035065 | 14.313896 | 0.912413 | 0.471100 | 0.140654 | 0.413998 | 0.828723 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-H | 599 | 152.010498 | 13.217918 | 0.778686 | 0.588545 | 0.177869 | 0.513537 | 0.973637 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-H | 799 | 430.502075 | 11.361772 | 0.406853 | 0.754593 | 0.239914 | 0.642229 | 1.157316 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-H | 999 | 1100.505981 | 22.829824 | 0.003454 | 0.956949 | 0.347439 | 0.752152 | 1.293330 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 199 | 49.744156 | 14.808890 | 0.950168 | 0.391381 | 0.119121 | 0.342366 | 0.696597 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 399 | 81.952301 | 14.453433 | 0.892185 | 0.501677 | 0.147495 | 0.442777 | 0.855287 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 599 | 221.542160 | 12.913909 | 0.670126 | 0.644553 | 0.195943 | 0.560307 | 1.047456 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 799 | 439.399628 | 12.398417 | 0.401418 | 0.793564 | 0.251108 | 0.673192 | 1.201775 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 999 | 1168.204102 | 21.950464 | 0.003208 | 0.965373 | 0.345364 | 0.761827 | 1.308665 |
+
+Camera-side results:
+
+| version / run | mode | t | FCD ↓ | CLaTr ↑ | CCov ↑ | F1 ↑ | Out ↓ | Camera ADE ↓ | Camera FDE ↓ | rotation deg ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-C | 199 | 41.225098 | 56.840679 | 0.816185 | 0.656904 | n/a | 0.393062 | 0.409611 | 5.623002 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-C | 399 | 28.431860 | 57.370205 | 0.801387 | 0.712988 | n/a | 0.482769 | 0.500606 | 7.438351 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-C | 599 | 30.280588 | 55.379215 | 0.769795 | 0.706597 | n/a | 0.620907 | 0.643666 | 10.423446 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-C | 799 | 36.766373 | 51.315041 | 0.729574 | 0.649561 | n/a | 0.886995 | 0.925552 | 17.553371 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | Direct-C | 999 | 75.184395 | 37.893063 | 0.563279 | 0.465980 | n/a | 1.693056 | 1.810398 | 39.816601 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 199 | 47.530453 | 55.201073 | 0.824814 | 0.647821 | 0.141035 | 0.417059 | 0.431931 | 5.847152 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 399 | 47.806828 | 53.041084 | 0.791519 | 0.638116 | 0.162243 | 0.503057 | 0.524053 | 7.735443 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 599 | 53.571060 | 49.494736 | 0.758945 | 0.599320 | 0.178501 | 0.653854 | 0.684855 | 10.933043 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 799 | 65.882706 | 43.219013 | 0.703663 | 0.524966 | 0.224537 | 1.022698 | 1.065910 | 20.659601 |
+| v8.1A / p0_v8_1a_30k_single_step_corrected_seed17_4090g0_20260721 | joint parallel | 999 | 413.862885 | 25.385435 | 0.095004 | 0.232648 | 0.225383 | 2.259288 | 2.383702 | 61.599522 |
+
+Provenance:
+
+- Source checkpoint: `v8_1a_diag_unified3_30k_seed17_4090g0_20260718/step_30000.pt`; SHA-256 `82078ab184084db3e7714f67e8b876cd8cc4c0e9109225affd095fac7642c61f`.
+- Source contract SHA-256: `c841fda54b8611d27b59aeaa3ca3c74c26865eee100428828df8c1e73ca5ab59`.
+- Ordered full-result artifact set: `15` result JSON plus `15` record JSONL files; SHA-256 `6c85631adaaaf93271632cf8aaf18ce6c3a853e69e5506d362663cd3791ff487` over ordered relative paths and each file digest.
+- The `t=999` TMR scalar is not interpreted alone: near-zero HCov and extreme FTD show distribution collapse despite its numerically high TMR value.
+- The matched v8.1C C3-25 30K half is not formalized here. Its runner is reported complete, but the owning 5090 host is unavailable and no artifact copy exists on 4090 as of this audit.

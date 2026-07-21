@@ -138,3 +138,10 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 - v8.2333 curation contract 与全部零/非零计数：[[2026-07-17_storymotion-v8-2333-data-curation-plan]]。
 
 run 中的 ETA、有限 step、worker output 和 checkpoint 只进入 `runs/` manifest/log；formal audit 后才更新 ledger、本页和 version family。
+
+## Active evidence boundary — 2026-07-22
+
+- v8.1C C3-25 seed17 remains the formal `105K` mainline; no one-sided `30K` diagnostic changes that decision.
+- P0-JC-4 has a formally audited v8.1A `30K` half. The matched C3-25 `30K` runner is reported complete, but 5090 and its artifacts are currently unreachable and no copy exists on 4090. This is an artifact-access blocker, not a negative experiment result.
+- The audited A-side result strengthens the current root-cause direction: the completion-to-joint Camera gap is already visible within single-step denoising, so Stage2 conditional exposure/routing must be repaired before Stage1 replacement, data cleaning, or joint-loss reweighting is promoted.
+- The independent v8.1A `30K→105K` control on 4090 GPU1 remains an active control until its final checkpoint and three formal modes close; finite training progress belongs only to its run logs.
