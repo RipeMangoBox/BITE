@@ -32,7 +32,7 @@ source_papers:
   - "[[analysis/ICLR_2026/Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based_Diffusion]]"
   - "[[analysis/IEEE_TIP_2024/Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Motion_Prediction]]"
 created: 2026-07-18T14:44:45+08:00
-updated: 2026-07-21T15:42:04+08:00
+updated: 2026-07-22T13:30:00+08:00
 ---
 
 # StoryMotion Latent Generatability and Stage2 Diagnostic Ladder
@@ -369,3 +369,62 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 - P0-JC-4 is closed with both corrected `30K` halves. C3-25 is easier to denoise on Camera; v8.1A is easier on most Human diagnostics; joint Human is mixed.
 - P0-JC-5 is closed with a new independent v8.1A `105K` endpoint and three passed profile audits. The old comparison against v8.1A `30K` was maturity-confounded and must not support a universal completion claim.
 - C3-25 remains mainline for the coupled system because it is stronger on Direct-C and joint Camera/system outcomes. The next causal experiment targets Camera exposure to generated/noisy Human from the same C3-105K parent.
+
+## 2026-07-22 P0-JC-6 matched `105K→110K` condition-exposure screen
+
+> [!warning] Screen-only evidence
+> 本节是同一 C3-25 parent 上的 `N=512` first-ID screen，不是 pure4053 formal evidence，不进入 [[StoryMotion-valid-metric-ledger]]。四个 checkpoint 均由同一 evaluator 在 `seed=17`、DDIM50、`eta=0`、CFG1 下重新评估 Direct-H、Direct-C clean-H 与 joint parallel；不能拼接旧评估结果。
+
+### 训练臂与闭合 provenance
+
+三臂均从 `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` 的 exact `105K` checkpoint/optimizer 继续到 `110K`：
+
+| version / run | Direct-C 的 observed-H treatment | 设备 | 实测壁钟 | `110K last.pt` SHA256 | 合同状态 |
+| --- | --- | --- | ---: | --- | --- |
+| C0 / `p0_c3_25_105_110k_c0_clean_seed17_4090g0_20260722` | 仅 clean GT-H；matched continuation control | 4090 GPU0 | `41m56s` | `9d168f2e...390989` | passed；screen pending 后闭合 |
+| Tq / `p0_c3_25_105_110k_tq_forwardq_seed17_4090g1_20260722` | 对 50% Direct-C 样本使用同 timestep 的 `q(H_gt,t)` | 4090 GPU1 | `41m34s` | `eec094d2...36e93` | passed；screen pending 后闭合 |
+| Tj / `p0_c3_25_105_110k_tj_jointpred_seed17_5090g2_20260722` | 对 50% Direct-C 样本使用当前模型 same-timestep detached joint-pred-H Two-Forward；不是完整 DDIM replay | 5090 GPU2 | `34m51s` | `494076da...3399` | passed；screen pending 后闭合 |
+
+初次 post-train audit 因 driver 将完整 test split 基数 `4053` 写入 `data.eval_samples`、同时将本次 `eval.sample_count` 写为 `512` 而一致 fail-closed。修复提交 `b0a3bb0e0e41e0d6dd67c687bd306910a9a74ed2` 仅令二者都为本次实际样本数 `512`；三个 `110K` checkpoint 未修改、未重训。恢复后的 manifest 保留原失败时间和原因，正式 harness audit 与原 `verify_training` 均通过。评估器提交为 `df16b1e79ef8006148ff5f6d1605c9d9f1c63796`。
+
+C0 与 Tq 在 4090 同一步的 task exposure 完全一致。Tj 使用相同 seed、batch、task ratio 与总 exposure，但跨 5090/PyTorch 环境不保证逐样本 RNG bitwise identity；因此 Tj 的负向 screen 可用于停止该实现，不得写成严格 paired effect size。
+
+### 四 checkpoint × 三 profile 结果
+
+Direct-H：
+
+| version / run | FDTMR↓ | TMR↑ | HCov↑ | global MPJPE↓ |
+| --- | ---: | ---: | ---: | ---: |
+| C3-105K / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | 293.735 | 15.293 | 0.6486 | 0.7941 |
+| C0-110K / `p0_c3_25_105_110k_c0_clean_seed17_4090g0_20260722` | 324.255 | 14.247 | 0.6229 | 0.8074 |
+| Tq-110K / `p0_c3_25_105_110k_tq_forwardq_seed17_4090g1_20260722` | 303.547 | 14.846 | 0.6760 | 0.8050 |
+| Tj-110K / `p0_c3_25_105_110k_tj_jointpred_seed17_5090g2_20260722` | 346.757 | 13.635 | 0.6094 | 0.8639 |
+
+Direct-C clean-H：
+
+| version / run | FDCLaTr↓ | CLaTr↑ | CCov↑ | caption F1↑ | Cam-ADE↓ |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| C3-105K / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | 34.076 | 60.278 | 0.8989 | 0.7658 | 1.592 |
+| C0-110K / `p0_c3_25_105_110k_c0_clean_seed17_4090g0_20260722` | 57.650 | 54.257 | 0.8494 | 0.7344 | 1.507 |
+| Tq-110K / `p0_c3_25_105_110k_tq_forwardq_seed17_4090g1_20260722` | 47.735 | 55.597 | 0.8984 | 0.7235 | 1.699 |
+| Tj-110K / `p0_c3_25_105_110k_tj_jointpred_seed17_5090g2_20260722` | 47.943 | 55.208 | 0.8884 | 0.7287 | 1.628 |
+
+joint parallel：
+
+| version / run | H FDTMR↓ | H TMR↑ | C FDCLaTr↓ | C CLaTr↑ | CCov↑ | F1↑ | Out↓ | H global↓ | Cam-ADE↓ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| C3-105K / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | 305.243 | 14.045 | 75.215 | 48.185 | 0.7754 | 0.6184 | 0.1874 | 0.8034 | 2.872 |
+| C0-110K / `p0_c3_25_105_110k_c0_clean_seed17_4090g0_20260722` | 291.989 | 14.778 | 74.671 | 47.724 | 0.8047 | 0.6129 | 0.2199 | 0.8215 | 2.785 |
+| Tq-110K / `p0_c3_25_105_110k_tq_forwardq_seed17_4090g1_20260722` | 263.539 | 15.343 | 70.596 | 47.309 | 0.8121 | 0.5679 | 0.2179 | 0.8149 | 2.848 |
+| Tj-110K / `p0_c3_25_105_110k_tj_jointpred_seed17_5090g2_20260722` | 295.138 | 12.674 | 90.246 | 44.193 | 0.7340 | 0.5635 | 0.2627 | 0.8896 | 2.933 |
+
+全部原始 JSON/records、per-sample joint quality 与 `screen_manifest.json` 位于各 run 的 `runs/eval/stage2/<run_id>/condition_robustness_standard_n512_20260722/`，状态均为 `complete_screen_only`。
+
+### 因果解释与决策
+
+1. **C0 相对 parent 不是“多训 5K 必然更好”。** clean-only continuation 令 Direct-H 与 Direct-C semantic/distribution 整体退化，却改善 joint Human FDTMR/TMR/coverage 以及部分 joint Camera coverage/geometry。completion 与 joint 的梯度/条件域可以相反移动，因此不能再用 completion endpoint 单独预测 joint。
+2. **Tq 是正向但 mixed 的机制信号。** 相对 matched C0，Tq 将 Direct-H FDTMR 从 `324.255` 降至 `303.547`、TMR 从 `14.247` 升至 `14.846`，将 joint H FDTMR 从 `291.989` 降至 `263.539`、TMR 从 `14.778` 升至 `15.343`，并改善 joint Camera FDCLaTr 与 CCov。它仍未恢复 parent 的 clean completion，且 joint caption F1/Out 明显不如 parent，所以只支持“同 timestep noisy-H exposure 能缓解部分 joint domain gap”，不支持晋升。
+3. **Tj 当前实现停止。** same-timestep current-model joint-pred-H Two-Forward 在 Direct-H、joint Human、joint Camera、F1、Out 与 paired geometry 上均没有形成可接受的 trade-off；不继续加预算，也不将它外推为“所有 generated-H replay 都失败”。
+4. **当前 mainline 不变。** C3-105K 保持正式 mainline；C0 仅为 continuation control，Tj=`stop_current_two_forward_arm`，Tq=`continue_secondary_attribution_only`。Tq 在任何 pure4053 formal eval 或继续训练前，先做预注册的 `q(H_gt,t)` 分层鲁棒性曲线，并把低/中/高 timestep 对 Direct-C 与 joint 的作用拆开；不得盲目把 5K 扩到更长预算。
+
+这轮回答了“为什么 completion 优势未自动体现在 joint”：Direct-C 训练只消费 clean GT-H，而 joint Camera 在采样时消费随 timestep 演化的 Human；同时 shared Unified 的额外训练会产生任务间漂移。Tq 的局部修复支持 condition-domain gap，但 F1/Out 未恢复说明它不是唯一根因，joint task routing/caption-framing objective 仍需单独定位。
