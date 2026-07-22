@@ -651,3 +651,86 @@ Provenance:
 - Ordered full-result artifact set: `15` result JSON plus `15` record JSONL files; SHA-256 `6c85631adaaaf93271632cf8aaf18ce6c3a853e69e5506d362663cd3791ff487` over ordered relative paths and each file digest.
 - The `t=999` TMR scalar is not interpreted alone: near-zero HCov and extreme FTD show distribution collapse despite its numerically high TMR value.
 - The matched v8.1C C3-25 30K half is not formalized here. Its runner is reported complete, but the owning 5090 host is unavailable and no artifact copy exists on 4090 as of this audit.
+
+## 2026-07-22 P0-JC-4 closed: matched v8.1C C3-25 30K single-step
+
+Run `p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722` completed all `15` teacher-forced profiles on the same `4053` ordered test IDs, seed, per-sample noise formula, batch/decode batch, and timestep set as the corrected v8.1A `30K` run recorded above.
+
+Human-side results:
+
+| version / run | mode | t | FTD ↓ | TMR ↑ | HCov ↑ | Human global MPJPE ↓ | root-aligned MPJPE ↓ | root ADE ↓ | root FDE ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-H | 199 | 52.633282 | 14.297192 | 0.953611 | 0.391184 | 0.115863 | 0.343243 | 0.713497 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-H | 399 | 79.677002 | 14.065553 | 0.898843 | 0.477565 | 0.141283 | 0.420334 | 0.841556 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-H | 599 | 179.319382 | 12.937464 | 0.739947 | 0.604905 | 0.183141 | 0.526551 | 0.992376 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-H | 799 | 500.112091 | 11.006292 | 0.365412 | 0.761258 | 0.244923 | 0.644736 | 1.136579 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-H | 999 | 1154.527710 | 22.116016 | 0.001727 | 1.002013 | 0.349046 | 0.793759 | 1.372520 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 199 | 60.560608 | 14.372968 | 0.946205 | 0.379955 | 0.118712 | 0.331003 | 0.680925 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 399 | 98.203888 | 14.007329 | 0.870950 | 0.496347 | 0.149086 | 0.435989 | 0.853291 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 599 | 253.152451 | 12.487123 | 0.631630 | 0.654029 | 0.200873 | 0.565279 | 1.052036 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 799 | 503.182159 | 11.628004 | 0.341724 | 0.780642 | 0.254473 | 0.656547 | 1.156164 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 999 | 1119.255493 | 22.291971 | 0.003209 | 0.979014 | 0.347808 | 0.772690 | 1.332801 |
+
+Camera-side results:
+
+| version / run | mode | t | FCD ↓ | CLaTr ↑ | CCov ↑ | F1 ↑ | Out ↓ | Camera ADE ↓ | Camera FDE ↓ | rotation deg ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-C | 199 | 8.935503 | 64.284660 | 0.920803 | 0.835347 | n/a | 0.318065 | 0.331911 | 4.955630 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-C | 399 | 17.500673 | 61.114407 | 0.874670 | 0.798471 | n/a | 0.414495 | 0.430572 | 6.766792 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-C | 599 | 27.168301 | 57.277245 | 0.823592 | 0.744381 | n/a | 0.551891 | 0.574261 | 9.773680 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-C | 799 | 37.750679 | 53.037285 | 0.784102 | 0.690279 | n/a | 0.821915 | 0.860907 | 16.748635 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | Direct-C | 999 | 51.788593 | 43.375622 | 0.638032 | 0.515532 | n/a | 1.613627 | 1.728349 | 37.986005 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 199 | 10.815358 | 62.411350 | 0.892911 | 0.788265 | 0.110765 | 0.344801 | 0.360765 | 5.071369 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 399 | 19.471699 | 58.945274 | 0.856890 | 0.736602 | 0.139412 | 0.458358 | 0.476756 | 7.151476 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 599 | 32.330383 | 53.855469 | 0.794961 | 0.671162 | 0.168241 | 0.617504 | 0.644094 | 10.554107 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 799 | 56.439259 | 45.730095 | 0.692819 | 0.559550 | 0.219205 | 0.982800 | 1.024138 | 20.185984 |
+| v8.1C C3-25 / p0_v8_1c_c3_25_30k_single_step_corrected_seed17_4090g0_20260722 | joint parallel | 999 | 249.843613 | 30.426065 | 0.142621 | 0.251517 | 0.142551 | 2.273451 | 2.394285 | 61.087261 |
+
+Matched `30K` interpretation:
+
+- v8.1A is better on most Direct-H distribution and global/root diagnostics at every timestep. C3-25 does not provide a Human single-step generatability advantage at equal Stage2 budget.
+- C3-25 is better on essentially every Direct-C metric at every timestep; the only exception in the reported primary set is FCD at `t=799`, where v8.1A is slightly lower. The C3 representation advantage is therefore Camera-centered and already visible in local denoising.
+- Joint C3 preserves the large Camera advantage while Human remains mixed. This rules out a universal representation Pareto claim and motivates a Camera exposure remedy rather than a Stage1 Human rollback.
+
+Provenance:
+
+- C3 `30K` checkpoint SHA-256: `3533a4216b441b8fba0d6a791408d60a8708dc9a44e47b93d3187217ee83e226`.
+- Source contract SHA-256: `7af1bf9a49a92609dcab1a1d176fee622b9ac844fc2add053982ed036e667851`.
+- Corrected diagnostic contract SHA-256: `24a7752efae53e5a6e022feedb39e2a614dda2faa1b61015514afb9e8fe8c9f5`.
+- Audit SHA-256: `11d59f9f898177b84525c09d95c0ceb5b727ca0aaeccd0006f6a8a5e94444806`; ordered `30`-artifact set SHA-256: `f0f859f023eaf5158720780f43bb776d0962f77821fcff38b1b0b7c3274716ba`.
+- Final manifest SHA-256: `e9b49bf6f61c8da8f45401381ab22fc4d90c29e14fdcf82339a3c6250bc4e1f2`.
+
+## 2026-07-22 P0-JC-5 closed: matched 105K system comparison
+
+Human-side comparison:
+
+| version / run | mode | FTD ↓ | TMR ↑ | HCov ↑ | Human global MPJPE ↓ | root-aligned MPJPE ↓ | root ADE ↓ | root FDE ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1A / v8_1a_unified3_105k_cont_seed17_4090g1_20260721 | Direct-H | 221.381134 | 15.106874 | 0.523808 | 0.838809 | 0.238684 | 0.750955 | 1.244248 |
+| v8.1C C3-25 / v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719 | Direct-H | 222.120 | 14.389 | 0.5275 | 0.8455 | 0.2415 | 0.7538 | 1.2750 |
+| v8.1A / v8_1a_unified3_105k_cont_seed17_4090g1_20260721 | joint parallel | 242.114075 | 15.128328 | 0.514197 | 0.858145 | 0.250422 | 0.761895 | 1.265811 |
+| v8.1C C3-25 / v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719 | joint parallel | 227.189 | 13.691 | 0.5327 | 0.8638 | 0.25335 | 0.76488 | 1.2938 |
+
+Camera-side comparison:
+
+| version / run | mode | FCD ↓ | CLaTr ↑ | CCov ↑ | F1 ↑ | Out ↓ | Camera ADE ↓ | Camera FDE ↓ | rotation deg ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| v8.1A / v8_1a_unified3_105k_cont_seed17_4090g1_20260721 | Direct-C | 52.508801 | 54.693928 | 0.679981 | 0.697620 | n/a | 1.572528 | 1.662386 | 36.374108 |
+| v8.1C C3-25 / v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719 | Direct-C | 25.0907 | 59.5389 | 0.7503 | 0.76449 | n/a | 1.59095 | 1.66844 | 35.298 |
+| v8.1A / v8_1a_unified3_105k_cont_seed17_4090g1_20260721 | joint parallel | 79.107201 | 44.349442 | 0.579074 | 0.531933 | 0.224151 | 3.120434 | 3.219375 | 72.783735 |
+| v8.1C C3-25 / v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719 | joint parallel | 70.5798 | 46.7202 | 0.6057 | 0.5988 | 0.18348 | 2.904 | 3.003 | 70.849 |
+
+Matched `105K` interpretation:
+
+- Direct-H is not a C3 win: v8.1A is better on FTD, TMR, global/root-aligned MPJPE, root ADE, and root FDE; C3 is only slightly higher in HCov.
+- Direct-C is a strong C3 semantic/distribution win; paired Camera center ADE/FDE are nearly tied and slightly favor v8.1A, while rotation slightly favors C3.
+- Joint C3 is better on Human FTD/HCov and every reported Camera/framing metric; v8.1A is better on Human TMR and paired Human geometry. C3 remains mainline as the stronger coupled Human-Camera system, not as a universal Human-completion Pareto point.
+
+v8.1A `105K` provenance:
+
+- Checkpoint SHA-256: `dad04dac44fc778f02566d4221377e02aded322fe7e72bdccc01869245438b73`.
+- Experiment contract SHA-256: `a36dfd3664b23404959a4b246eb9d3108367f5e8500f9a4440835fe5bd12cd47`.
+- Final manifest SHA-256: `42a0effef73909adf7eee39cad5f9dfa4a0ec4da6f0057dcf57bba411fd9`.
+- Human result/records SHA-256: `4558dad025adc01c8ac4a55211e23a1ce5c2d18737a34f4d457d510bf36f4901` / `b92e22a2bef69ae31a973606299a7a60d049fbc74f19970905996bad505e8352`; audit SHA-256 `95dba60f9d0bd2a6062eb972a3e87836912d580b85439ea30edc576c98ed07c3`.
+- Camera result/records SHA-256: `2c1eadf434465bca3c705b351beb706128178bbd10e507b88841b3bbad4d60b1` / `cf9c090c193527fa988defc900712f317bc46ce763725798ebcd31f867c4c330`; audit SHA-256 `7c14ee14b3a279901e86911d7d96c973b17a377ca6d5974dfd22d973b9e99f0f`.
+- Joint result/records SHA-256: `e9da34e44d0103b717248071e6ce4688fd073d478eb7affb5912935aea10c5e2` / `fbbf5d16667600009b27240bead6765e5dfae368c1762c807770924d713c0fbd`; audit SHA-256 `8637306a7712dc8eba06fecf666ba562740fbab5e391ef47c62075c5a87e2fa6`.

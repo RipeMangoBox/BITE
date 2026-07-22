@@ -121,12 +121,11 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 
 完整 contribution/claim 边界见 [[StoryMotion-iclr-reliability]]。当前只保留会改变主结论的任务：
 
-1. **P0 — 验证最小 Stage2 exposure remedy。** P0-JC-2/3 已在 C3-25 `105K` 同一 Unified checkpoint 上闭合：Direct-C 的 clean-GT-H 条件优势在 generated-H replay 中出现明显 geometry/coverage 损失，joint-parallel 又叠加 evolving/noisy-H 与 joint task 路由损失。下一步优先做 detached generated/noised-H conditioning 或 Camera replay-refinement；joint loss reweighting 排在该因果轴之后，不返回 Stage1。
-2. **P0 — 完成预算对齐的 v8.1A `105K` control。** 历史 v8.1A 正式端点仍为 `30K`；新 continuation 使用独立 run ID，formal 结果尚未闭合。representation 只由 A30 ↔ C30 回答，`105K` maturity 只由新 A105-control ↔ C105 回答。
-3. **P0 — 重做真正的 Stage2 seed23 `105K` repeat。** 现有 run 已于 2026-07-22 fail-close：它实际是 `0–30K seed23 + 30K–105K seed17`，且缺 experiment contract/profile audit，不能进入 multi-seed。新 run 必须从正确 seed23 contract 独立训练或使用可审计 RNG-resume；不得给旧结果补标签。
-4. **P0 — 补 decoded/no-reference 与 sealed blind evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；Gradio/Top-5 不替代冻结 IDs/hash 的 blind review。
-5. **P1 — 独立推进数据质量轴。** Human 先做可逆 pair-level quarantine，以物理质量与 TMR 分开验收；Camera 先建立可审计质量规则再清洗。不得与 representation 或 Stage2 backbone 共用 run。
-6. **P2 — 多数据集与增广保持独立。** HumanML3D → PulpMotion 的 motion/text 匹配、first-frame position/heading 对齐和合理 Camera 补全需单独 contract；Human/Camera 交叉交换先作为受控比例 ablation。temporal inpaint 与 v8.4 backbone 延后。
+1. **P0 — 验证最小 Stage2 exposure remedy。** A30 ↔ C30 表明 C3 的稳定 representation 优势集中在 Camera，Human single-step 反而多数指标不如 v8.1A；A105 ↔ C105 又表明 C3 的系统优势集中在 Direct-C 与 joint Camera/coverage/framing，而非 Direct-H。下一步优先做从同一 C3-105K parent 分叉的 matched raw-continuation 与 detached generated/noised-H Camera replay-refinement；joint loss reweighting 排在该因果轴之后，不返回 Stage1。
+2. **P0 — 重做真正的 Stage2 seed23 `105K` repeat。** 现有 run 已于 2026-07-22 fail-close：它实际是 `0–30K seed23 + 30K–105K seed17`，且缺 experiment contract/profile audit，不能进入 multi-seed。新 run 必须从正确 seed23 contract 独立训练或使用可审计 RNG-resume；不得给旧结果补标签。
+3. **P0 — 补 decoded/no-reference 与 sealed blind evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；Gradio/Top-5 不替代冻结 IDs/hash 的 blind review。
+4. **P1 — 完成 Human 数据质量 calibration。** raw lock、physical-v2 与 TMR-v4 full distribution 已闭合，确定性的 `400`-pair queue 已物化为 `280` calibration + `120` holdout，`80` pair 双审；当前 `labels=0`、LaMP 缺失、automatic semantic quarantine disabled。先完成 blind render 与人工标签，再冻结阈值并物化可逆 quarantine/clean manifest；Camera 仍先建立独立可审计质量规则。
+5. **P2 — 多数据集与增广保持独立。** HumanML3D → PulpMotion 的 motion/text 匹配、first-frame position/heading 对齐和合理 Camera 补全需单独 contract；Human/Camera 交叉交换先作为受控比例 ablation。temporal inpaint 与 v8.4 backbone 延后。
 
 ## 6. 文档与证据路由
 
@@ -141,7 +140,7 @@ run 中的 ETA、有限 step、worker output 和 checkpoint 只进入 `runs/` ma
 
 ## Active evidence boundary — 2026-07-22
 
-- v8.1C C3-25 seed17 remains the formal `105K` mainline; no one-sided `30K` diagnostic changes that decision.
-- P0-JC-4 has a formally audited v8.1A `30K` half. The matched C3-25 `30K` runner is reported complete, but 5090 and its artifacts are currently unreachable and no copy exists on 4090. This is an artifact-access blocker, not a negative experiment result.
-- The audited A-side result strengthens the current root-cause direction: the completion-to-joint Camera gap is already visible within single-step denoising, so Stage2 conditional exposure/routing must be repaired before Stage1 replacement, data cleaning, or joint-loss reweighting is promoted.
-- The independent v8.1A `30K→105K` control on 4090 GPU1 remains an active control until its final checkpoint and three formal modes close; finite training progress belongs only to its run logs.
+- v8.1C C3-25 seed17 remains the formal `105K` mainline, but its claim is now scoped: it is a Camera/joint-system choice rather than a universal Human Pareto win.
+- P0-JC-4 is closed. At matched `30K`, C3 is substantially better on Camera across nearly all timesteps, while v8.1A is better on most Human single-step distribution and root/global diagnostics; joint inherits the Camera gain with mixed Human behavior.
+- The independent v8.1A `30K→105K` control is formally closed. At matched `105K`, v8.1A is better on most Direct-H metrics; C3 is decisively better on Direct-C semantic/distribution metrics and on joint Camera, coverage, framing, and Camera geometry.
+- The active causal target remains Stage2 conditional exposure/routing: Direct-C sees clean GT Human, while joint Camera must consume an evolving/noisy generated Human. The next intervention is a matched Camera replay-refinement exposure test, not a Stage1 rollback.

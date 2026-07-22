@@ -354,8 +354,8 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 | P0-JC-1 | closed from existing matched formal artifacts | A30 ↔ C30 只回答 representation；不与 C105 混写。 |
 | P0-JC-2 | passed / hypothesis supported | full-4053 GT-H、generated-H 与 shuffled-H replay 均通过 source-contract audit；支持 H→C condition exposure gap。 |
 | P0-JC-3 | passed / second gap supported | generated-H replay 明显优于 joint-parallel，确认 parallel evolving-H / joint-task 的附加损失；下一步进入最小 Stage2 exposure remedy。 |
-| P0-JC-4 | partial formal audit | v8.1A-30K corrected half 已完成 full-4053 audit；C3-25-30K runner 已完成但 5090 artifact 当前不可达，matched decision 保持 open。 |
-| P0-JC-5 | running control | 历史 v8.1A 仍停在 30K；独立 30K → 105K control 已通过 step/optimizer/contract preflight，formal 比较待 endpoint audit。 |
+| P0-JC-4 | completed | A30 与 C3-30 corrected single-step 均完成 full-4053、五 timestep、三模式 audit；结论为 C3 Camera 优势、v8.1A Human 优势、joint Human mixed。 |
+| P0-JC-5 | completed | 独立 v8.1A 30K → 105K control 与 C3-25 105K 三模式 matched audit 已闭合；C3 的正式优势集中在 Direct-C 与 joint Camera/system，不包含 Direct-H 全面领先。 |
 
 ## 2026-07-22 P0-JC-4 corrected audit boundary
 
@@ -363,3 +363,9 @@ aligned GT-H 的 camera geometry/semantic 均恢复到良好范围，shuffled GT
 - The corrected run explicitly uses `eval_source=single_step`; the earlier mislabeled source-cache run remains invalid provenance.
 - The v8.1C C3-25 `30K` runner is reported complete on 5090 GPU1, but its artifact directory is currently unreachable and was not mirrored to 4090. Therefore P0-JC-4 remains open as a matched comparison rather than being promoted from a one-sided audit.
 - A-side evidence already shows that the joint gap is present within one denoising diagnostic, especially on Camera: at `t=399`, FCD changes from `28.432` in Direct-C to `47.807` in joint; at `t=999`, from `75.184` to `413.863`. Multi-step rollout accumulation is therefore not the sole cause, although the missing C3 side prevents a representation-level A/C conclusion.
+
+## 2026-07-22 P0-JC-4/5 final decision
+
+- P0-JC-4 is closed with both corrected `30K` halves. C3-25 is easier to denoise on Camera; v8.1A is easier on most Human diagnostics; joint Human is mixed.
+- P0-JC-5 is closed with a new independent v8.1A `105K` endpoint and three passed profile audits. The old comparison against v8.1A `30K` was maturity-confounded and must not support a universal completion claim.
+- C3-25 remains mainline for the coupled system because it is stronger on Direct-C and joint Camera/system outcomes. The next causal experiment targets Camera exposure to generated/noisy Human from the same C3-105K parent.

@@ -184,3 +184,16 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - The three endpoint evaluations share the same `105K` checkpoint and otherwise match `4053` samples, ordered IDs, batch/decode batch, and DDIM settings, but they cannot repair the training-seed boundary. Their missing experiment contract/profile audits, `diagnostic_contract=null`, and absent explicit version/run identity are additional formal blockers.
 - Run-local provenance audit: `runs/train/stage2/v8_1c_c3_25_diag_unified3_seed23_105k_4090g1_20260720/provenance_audit_20260722.json`; SHA-256 `a8af56f7b2538216b079fe7b2cc2612bfc38b262ce6d16678f6b6ed54a12cae9`.
 - These results must not enter the metric ledger or multi-seed aggregate. A corrected seed23 run requires a new run ID and a predeclared seed/RNG-resume contract.
+
+## 2026-07-22 — P0-JC-4 matched 30K representation diagnostic closed
+
+- Corrected v8.1A and v8.1C C3-25 runs now share the same `4053` ordered IDs, five timesteps, seed/noise formula, batch/decode batch, and teacher-forced single-step boundary.
+- v8.1A is better on most Human diagnostics; C3-25 is decisively better on Camera diagnostics. Joint preserves the Camera gain with mixed Human behavior.
+- This finalizes C3-25 as a Camera-centered representation improvement, not a universal Human Pareto improvement.
+
+## 2026-07-22 — P0-JC-5 independent v8.1A 105K control closed
+
+- Run `v8_1a_unified3_105k_cont_seed17_4090g1_20260721` completed from the immutable v8.1A `30K` checkpoint with preserved model/optimizer boundary and the predeclared `30001` LR decay.
+- All three formal `105K` profiles passed their audits on the same `4053` ordered IDs and sampler settings as C3-25.
+- Direct-H mostly favors v8.1A; Direct-C and joint Camera/system favor C3-25. The historical C3-versus-A30 completion statement is invalidated as a maturity-confounded overgeneralization.
+- C3-25 remains mainline for the coupled Human-Camera objective. The next intervention moves to Stage2 Camera exposure alignment.

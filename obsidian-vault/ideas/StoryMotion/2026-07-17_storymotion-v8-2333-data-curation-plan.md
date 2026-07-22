@@ -1,14 +1,14 @@
 ---
 title: "StoryMotion v8.2333 Data Curation Preregistration"
-status: read_only_scoring_active_blocked_no_promoted_representation
-workflow_state: read_only_distribution_scoring_in_progress
+status: calibration_queue_complete_labels_pending
+workflow_state: calibration_blind_render_in_progress
 gate: promoted_representation_selection
 gate_state: closed
 processed_pairs: 326144
 annotated_pairs: 0
 quarantined_pairs: 0
 materialized_manifests: 1
-launched_jobs: 2
+launched_jobs: 4
 hypothesis: |
   在冻结同一 Stage1 representation、owning decoder 与 Unified Stage2 backbone 后，仅用可追溯的物理异常和 caption-motion pair 级语义错配 quarantine 替换 raw train manifest，可能改善生成动作的物理与文本一致性；该假设必须通过 raw-vs-clean 单变量实验验证，不能与 representation 或 generator 改动合并归因。
 tags:
@@ -23,7 +23,7 @@ aliases:
 source_notes:
   - "[[current]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-21T15:42:04+08:00
+updated: 2026-07-22
 ---
 
 # StoryMotion v8.2333 Data Curation Preregistration
@@ -35,16 +35,17 @@ updated: 2026-07-21T15:42:04+08:00
 
 | 字段 | 值 |
 | --- | --- |
-| recorded at | `2026-07-20 01:55 CST` |
+| recorded at | `2026-07-22 CST` |
 | execution gate | `promoted_representation_selection` |
 | gate state | `closed` |
-| workflow state | `read_only_distribution_scoring_in_progress / decision_gates_blocked` |
-| processed or scored pairs | physical：`162,760` motions / `326,144` pairs complete；TMR：Human-role full distribution running |
+| workflow state | `calibration_queue_complete / blind_render_in_progress / labels_pending` |
+| processed or scored pairs | physical：`162,760` motions / `326,144` pairs complete；TMR：`162,760 / 162,760` Human-role pairs complete |
 | manually annotated pairs | `0 / 300–500` |
 | quarantined pairs | `0` |
 | materialized manifests | `1 / 4`，仅 immutable `raw` |
-| scorer jobs launched | `2`，physical 与 TMR 分开 |
-| GPU jobs launched | `1`，5090 GPU0 TMR read-only scoring |
+| scorer jobs launched | `2`，physical-v2 与 TMR-v4 均 complete |
+| calibration queue | `400` pairs：`280` calibration + `120` sealed holdout；`80` double-review；labels `0` |
+| GPU jobs launched | `2`：5090 GPU0 TMR complete；5090 GPU1 blind GT render active |
 
 `annotated/quarantined=0` 表示这些动作尚未获授权，不表示扫描后没有异常。v8.1A 的历史 screen 不构成 selection；C3-25 seed17 已由独立的 Stage1/Stage2 audit 与 2026-07-21 decision 选为 v8.2333 representation owner。该选择不修改数据 lineage，raw parent 在 clean manifest 获授权并物化前仍是唯一有效数据源。
 
@@ -54,7 +55,7 @@ updated: 2026-07-21T15:42:04+08:00
 | --- | --- | --- | --- |
 | G1 role-aware raw lock | `162,760` motions；Human captions `162,760`；Camera captions `163,384`；unique pairs `326,144`；missing/empty `0` | raw SHA256 `49d53029c42ad6ee275172fd9d3e5d56e98f1142ae9daf5dcc0988faa2a9c458`；meta `39c2ac4404e55433fb28a6a8c83c0d0494e188897079c7fea2d6e87ec63b420c`；ordered motion/pair `a0981b6c…1dc9` / `182839ab…8eb4` | G1 passed；parent immutable |
 | physical distribution v2 | `162,760` motions、`326,144` pair coverage；Human 与 Camera 各按自己的 valid length 计算 | scores `ffd3f6639cd50d8992388e0d6092d5bd6ec77060932ce21c9ae2f9c43db09b76`；summary `87d5b1aed481016550c2b311a9c891292af33480871d7d9ffbfa81e8b3a861c9` | complete；thresholds `null`；actions `0` |
-| Human semantic distribution / TMR v4 | 目标 `162,760` Human-caption pairs；Camera-caption 不冒充 TMR applicable pair | singleton scorer `526b7807…e99c`；v4 preflight `01b76cbf…f519`；64-sample replay `6aad2f3a…0e2e`；5090 GPU0 从零 full scoring active | fixed microbatch `1`，replay 最大差 `0.0`；threshold `null`；LaMP missing，故 G2 overall blocked、automatic semantic quarantine disabled |
+| Human semantic distribution / TMR v4 | `162,760 / 162,760` Human-caption pairs complete；Camera-caption 不冒充 TMR applicable pair | scores `766e4522…a4b0`；summary `447a3d51…d00`；singleton scorer `526b7807…e99c`；64-sample replay `6aad2f3a…0e2e` | fixed microbatch `1`，replay 最大差 `0.0`；threshold `null`；LaMP missing，故 G2 overall partial、automatic semantic quarantine disabled |
 
 physical v2 另发现 `1 / 162,760` 条 Human/Camera valid-length mismatch，最大绝对差 `13` 帧；它只保留为 input audit finding，不在阈值冻结前自动 quarantine。当前可计算项是 Human root/yaw/joint/bone/foot distribution 与 Camera center/rotation dynamics；declared-contact、calibrated ground、mesh 与 environment 输入缺失的规则明确为 disabled，optional floating 也未启用。
 
@@ -219,7 +220,7 @@ full Stage1 joint AE
 4. Stage2 的 Direct-H、Direct-C、joint parallel matched formal eval，以及 raw-eval、clean holdout、physical stress slice 三类结果；cascade 不参与；
 5. 逐 seed、aggregate、unique coverage/repeat rate、blind render 和 rollback decision。只有 clean adaptation 相对 **matched raw continuation** 改善，而非仅相对较早的 full parent checkpoint 改善，才算 SFT 证据。
 
-当前执行结论仍是 `blocked_no_promoted_representation`：可以继续完善 manifest/scorer contract，但不得把本方案与正在闭合的 D4/C4 representation 任务混训，也不据此提前启动 GPU SFT。
+当前执行结论是 `calibration_queue_complete_labels_pending_lamp_missing`：representation gate 已闭合，physical/TMR 只读分布与人工队列已完成；在人工标签、阈值冻结、LaMP policy 与 manifest audit 闭合前，仍不得物化 quarantine/clean endpoint 或启动 GPU SFT。
 
 ## 8. 验收与 rollback
 
@@ -279,3 +280,16 @@ raw/clean Stage2 训练仍使用标准 run boundary：
 ```
 
 `SEED`、`DATE`、最终 fixed representation/backbone 和精确 run IDs 在 G0/G5 打开时写入各自 `experiment_contract.json`；当前不得用占位符创建假 run 或假 artifact。
+
+## 2026-07-22 scoring closure and calibration queue r1
+
+Human data-quality preparation advanced without emitting a threshold or quarantine action:
+
+- physical-v2 is complete for `162,760` motions and covers all `326,144` raw pairs; SHA-256 `ffd3f6639cd50d8992388e0d6092d5bd6ec77060932ce21c9ae2f9c43db09b76`.
+- singleton Human TMR-v4 is complete for `162,760 / 162,760` applicable pairs; SHA-256 `766e4522ab6a34f0c34b59635e20ae295a6ff06dcd8a9fd78084103292d8a4b0`.
+- Independent scoring completion audit SHA-256: `0a4af792b0dd938e857f96e01cda0db365f000474df186d3433e7d8cb79f2cab`.
+- User-authorized amendment r4 SHA-256: `8bb88026ec150f7b858c9b00fd07c54557a64458f2d7abb0959d4498f7cc89b0`. It authorizes only calibration queue and blind GT render preparation; threshold, quarantine, clean manifest, cache, and training remain forbidden.
+- Deterministic queue r1 contains `400` Human pairs: `280` calibration, `120` sealed holdout, and `80` double-review. It covers both-high, physical-high, semantic-high, scorer disagreement, boundary, clear-normal, duration/source, and coverage strata.
+- Queue SHA-256: `01ac64d9be01d79c95dad1baf61b60acb4dd1e8704a00e4293a3780d3f679207`; ordered pair IDs SHA-256 `ac27bae828bd57a42d2dc3384cb1e6e7f30b726b555d1edd3e06a4d366639068`; blind-review SHA-256 `8c4d3f7dc5e7cdac782d2eb145268631c05f908dc758b71c8ba1dd6b240a8e57`.
+- Two-sample GT render smoke passed with three camera views per sample; ordered smoke artifact SHA-256 `ce120327c601ae230e1c08cdb58e2a6c6852a1d3d0465f63684145daf06b4e61`. The `400`-sample render is active on 5090 physical GPU1 and owns its live state under `calibration/render_r1.status.json`.
+- Labels remain `0 / 400`, thresholds remain `null`, actions emitted remain `0`, and LaMP remains unavailable. Queue membership must not be interpreted as an error label.
