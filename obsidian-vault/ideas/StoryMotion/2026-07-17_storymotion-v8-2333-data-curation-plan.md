@@ -1,6 +1,6 @@
 ---
 title: "StoryMotion v8.2333 Data Curation Preregistration"
-status: calibration_queue_complete_labels_pending
+status: automatic_threshold_screening_in_progress_no_manual_labels
 workflow_state: calibration_blind_render_in_progress
 gate: promoted_representation_selection
 gate_state: closed
@@ -293,3 +293,52 @@ Human data-quality preparation advanced without emitting a threshold or quaranti
 - Queue SHA-256: `01ac64d9be01d79c95dad1baf61b60acb4dd1e8704a00e4293a3780d3f679207`; ordered pair IDs SHA-256 `ac27bae828bd57a42d2dc3384cb1e6e7f30b726b555d1edd3e06a4d366639068`; blind-review SHA-256 `8c4d3f7dc5e7cdac782d2eb145268631c05f908dc758b71c8ba1dd6b240a8e57`.
 - Two-sample GT render smoke passed with three camera views per sample; ordered smoke artifact SHA-256 `ce120327c601ae230e1c08cdb58e2a6c6852a1d3d0465f63684145daf06b4e61`. The `400`-sample render is active on 5090 physical GPU1 and owns its live state under `calibration/render_r1.status.json`.
 - Labels remain `0 / 400`, thresholds remain `null`, actions emitted remain `0`, and LaMP remains unavailable. Queue membership must not be interpreted as an error label.
+
+## 2026-07-22 人工预算更正、候选阈值敏感性与人物-镜头质量
+
+### 口径更正
+
+`curation_execution_amendment_20260722_r4.json` 及其 400 条队列是不可变的**自动分层候选池与渲染池**，不是 400 条人工标注任务。原队列中的 `calibration_candidate`、`holdout_candidate` 和 `double_review` 仅保留为历史字段，不再解释为最终人工分工；不得据此宣称已有 calibration、holdout 或人工标签。
+
+当前阶段只执行自动筛选，不启动 calibration、sealed holdout、double-review 或其他人工标注。400 条队列继续用于自动阈值敏感性、可视化抽查准备与失败模式覆盖；只有进入“创造新 pair”的数据增广阶段后，才另立人工抽查合同。
+
+### 当前实际保留量
+
+截至 2026-07-22，physical v2 与 TMR v4 均已全量完成，但两份报告都是 `thresholds=null`、`automatic_quarantine_enabled=false`、`action=score_only`。因此当前没有“筛选后删剩”的子集，实际状态如下。
+
+| 口径 | 覆盖数 | 当前保留数 | 当前 quarantine |
+| --- | ---: | ---: | ---: |
+| Physical，Human motion | 162,760 motions | 162,760 motions | 0 |
+| Physical，Human + Camera pair | 326,144 pairs | 326,144 pairs | 0 |
+| TMR，Human caption-motion | 162,760 pairs | 162,760 pairs | 0 |
+| Physical 与 TMR 的保留交集，Human | 162,760 pairs | 162,760 pairs | 0 |
+
+这张表是当前真实 manifest 口径。下面的数字是候选规则敏感性，不能改写为“已经清洗完成”。
+
+### 自动候选规则与阈值敏感性
+
+分层单位优先使用 `capture_source_proxy × valid_duration_bin`。若分层少于 500 条，则先回退到 `capture_source_proxy`；若该 source 仍少于 500 条，再回退到全局 `valid_duration_bin`。所有阈值都是分层内的经验 percentile rank，避免年份代理与时长分布差异把合法镜头或高动态动作系统性误判为异常。
+
+Physical 候选规则：
+
+- 结构冲突：`human_camera_length_delta != 0`，或 bone-length relative deviation 达到 extreme tail。
+- root family：root acceleration 与 root jerk 的较大 percentile rank。
+- yaw family：yaw rate 与 yaw acceleration 的较大 percentile rank。
+- articulation family：joint angular velocity 与 foot horizontal speed 的较大 percentile rank。
+- 动态异常只有在至少两个独立 family 同时达到 tail，且至少一个达到 extreme tail 时才命中。单一高速、急转或脚部快动不能独立触发。
+
+TMR 候选规则：同一分层内同时满足 `tmr_cosine` 位于底部 tail 且 `tmr_latent_l2` 位于顶部 tail。TMR 单模型分数只产生 semantic candidate；在 LaMP 缺失且未经过人工定标时，不允许自动 quarantine。
+
+| 敏感性档 | tail / extreme | Physical 候选 motion | 仅用 Physical 时 Human 保留 | TMR 候选 Human | 仅用 TMR 时 Human 保留 | 两者都命中的异常交集 | 任一命中的异常并集 | 同时通过两者的 Human 保留交集 | 若 Physical 同时隔离对应 Camera，全部 pair 保留 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 宽松候选 | `p99 / p99.9` | 427 | 162,333 | 991 | 161,769 | 1 | 1,417 | 161,343 | 324,300 |
+| 建议 calibration 起点 | `p99.5 / p99.9` | 362 | 162,398 | 450 | 162,310 | 0 | 812 | 161,948 | 324,970 |
+| 严格候选 | `p99.9 / p99.95` | 128 | 162,632 | 87 | 162,673 | 0 | 215 | 162,545 | 325,801 |
+
+“同时通过两者”按未被任一规则命中计算，即总数减去异常并集；它不同于“异常交集”。建议档出现 0 条异常交集，说明 Physical 与 TMR 捕捉的是近乎正交的问题，也说明不能用“两个筛选器一致”作为自动删除前提。建议档仅是 calibration 起点，不是正式阈值。
+
+### 当前执行边界
+
+- 本轮输出 Physical 与 TMR 各自的多阈值 candidate/retain 结果，以及两分支阈值笛卡尔积下的 retained intersection；所有输出都保留 parent hash、ordered-ID hash、reason code 与 `screen_only` 状态。
+- 本轮不产生人工标签，不把候选集宣称为正式 clean dataset，也不执行不可逆删除。
+- HCCC 与 HumanML3D 配对创造属于独立的数据增广轴，由单独 plan 管理；本页只保留原始 PulpMotion 的清洗合同。
