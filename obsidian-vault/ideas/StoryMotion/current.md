@@ -125,7 +125,7 @@ v8.1A 与 v7.36 做了同 Unified implementation、seed、预算和 sampler 的 
 2. **P0 — 重做真正的 Stage2 seed23 `105K` repeat。** 现有 run 已于 2026-07-22 fail-close：它实际是 `0–30K seed23 + 30K–105K seed17`，且缺 experiment contract/profile audit，不能进入 multi-seed。新 run 必须从正确 seed23 contract 独立训练或使用可审计 RNG-resume；不得给旧结果补标签。
 3. **P0 — 补 decoded/no-reference 与 sealed blind evidence。** Direct-H、Direct-C、joint parallel 补齐适用 geometry、integrated yaw、projection、foot/contact、acceleration/jerk、bone 与 root-path；Gradio/Top-5 不替代冻结 IDs/hash 的 blind review。
 4. **P1 — 完成 Human 数据质量 calibration。** raw lock、physical-v2 与 TMR-v4 full distribution 已闭合，确定性的 `400`-pair queue 已物化为 `280` calibration + `120` holdout，`80` pair 双审；当前 `labels=0`、LaMP 缺失、automatic semantic quarantine disabled。先完成 blind render 与人工标签，再冻结阈值并物化可逆 quarantine/clean manifest；Camera 仍先建立独立可审计质量规则。
-5. **P2 — 多数据集与增广保持独立。** HumanML3D → PulpMotion 的 motion/text 匹配、first-frame position/heading 对齐和合理 Camera 补全需单独 contract；Human/Camera 交叉交换先作为受控比例 ablation。temporal inpaint 与 v8.4 backbone 延后。
+5. **P2 — 多数据集与增广保持独立。** [[ideas/StoryMotion/2026-07-22_storymotion-humanml3d-fixed-camera-augmentation-plan]] 已建立；当前只有旧 v7.14 的 8 条 adapter 可视化，没有 C3-25 配对构造或 Stage2 混合训练证据。先做 fixed-Camera/augment-Human 的自动 A0-A2，Human/Camera 交叉交换只作为后续受控比例 ablation；temporal inpaint 与 v8.4 backbone 延后。
 
 ## 6. 文档与证据路由
 

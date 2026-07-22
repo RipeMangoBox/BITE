@@ -1,6 +1,6 @@
 ---
 title: "StoryMotion v8.2333 Data Curation Preregistration"
-status: automatic_threshold_screening_in_progress_no_manual_labels
+status: automatic_threshold_grid_complete_screen_only_no_manual_labels
 workflow_state: calibration_blind_render_in_progress
 gate: promoted_representation_selection
 gate_state: closed
@@ -342,3 +342,41 @@ TMR 候选规则：同一分层内同时满足 `tmr_cosine` 位于底部 tail �
 - 本轮输出 Physical 与 TMR 各自的多阈值 candidate/retain 结果，以及两分支阈值笛卡尔积下的 retained intersection；所有输出都保留 parent hash、ordered-ID hash、reason code 与 `screen_only` 状态。
 - 本轮不产生人工标签，不把候选集宣称为正式 clean dataset，也不执行不可逆删除。
 - HCCC 与 HumanML3D 配对创造属于独立的数据增广轴，由单独 plan 管理；本页只保留原始 PulpMotion 的清洗合同。
+
+### 2026-07-22 role-aware threshold grid v1 closure
+
+screen ID：`roleaware_grid_v1_20260722`。状态为 `complete_screen_only_not_applied`；人工标签数为 0，`automatic_quarantine_enabled=false`。该 screen 只把阈值实际施加到 scorer 输出上并生成 candidate manifests、ordered retained-ID hashes 与计数，没有修改 raw parent，也没有宣称任何一档为正式 clean dataset。
+
+独立分支结果：
+
+| 分支 | 阈值档 | 候选异常 | Human 保留 | 全部 pair 保留 |
+| --- | --- | ---: | ---: | ---: |
+| Physical | `tail p99 / extreme p99.9` | 427 motions / 854 pairs | 162,333 | 325,290 |
+| Physical | `tail p99.5 / extreme p99.9` | 362 motions / 724 pairs | 162,398 | 325,420 |
+| Physical | `tail p99.9 / extreme p99.95` | 128 motions / 256 pairs | 162,632 | 325,888 |
+| TMR | `tail p99` | 991 Human pairs | 161,769 | 仅筛 Human，不单独定义全部 pair clean set |
+| TMR | `tail p99.5` | 450 Human pairs | 162,310 | 仅筛 Human，不单独定义全部 pair clean set |
+| TMR | `tail p99.9` | 87 Human pairs | 162,673 | 仅筛 Human，不单独定义全部 pair clean set |
+
+Physical × TMR 九组结果。“保留交集”表示同时通过两个筛选器，即未被任一分支命中；“异常交集”表示两个分支同时命中的 pair，二者不能混用。
+
+| Physical 档 | TMR 档 | 异常交集 | 异常并集 | Human 保留交集 | 全部 pair 保留 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `p99 / p99.9` | `p99` | 1 | 1,417 | 161,343 | 324,300 |
+| `p99 / p99.9` | `p99.5` | 0 | 877 | 161,883 | 324,840 |
+| `p99 / p99.9` | `p99.9` | 0 | 514 | 162,246 | 325,203 |
+| `p99.5 / p99.9` | `p99` | 1 | 1,352 | 161,408 | 324,430 |
+| `p99.5 / p99.9` | `p99.5` | 0 | 812 | 161,948 | 324,970 |
+| `p99.5 / p99.9` | `p99.9` | 0 | 449 | 162,311 | 325,333 |
+| `p99.9 / p99.95` | `p99` | 1 | 1,118 | 161,642 | 324,898 |
+| `p99.9 / p99.95` | `p99.5` | 0 | 578 | 162,182 | 325,438 |
+| `p99.9 / p99.95` | `p99.9` | 0 | 215 | 162,545 | 325,801 |
+
+结论边界：除 TMR 宽松档与任一 Physical 档共享同一条异常外，其余组合的异常交集均为 0。Physical 与 TMR 是互补而非相互确认的 scorer；若选择 clean set，应采用“排除异常并集、保留通过交集”的口径，不能只删除异常交集。正式采用哪一档仍是后续决策，本页当前不冻结阈值。
+
+审计 artifact：
+
+- runner：`runs/data_curation/storymotion_v8_2333_data_curation_20260717/contract/apply_roleaware_threshold_grid_v1.py`，SHA256 `c49df46137dfa2566d5d0084268e0d44af9b0c22b687dce34ed863d4729ddb9d`。
+- threshold contract：`threshold_screens/roleaware_grid_v1_20260722/threshold_contract.json`，SHA256 `e8cd8afc868d2c8e7395b650cb9b9d443615fd7be8feab131a755ba455a0b2e9`。
+- summary：`threshold_screens/roleaware_grid_v1_20260722/summary.json`，SHA256 `93693ca866be852de37bbcc8345f27ea9755994b19480d892b7a6c8ee2cf18b8`。
+- manifest：`threshold_screens/roleaware_grid_v1_20260722/manifest.json`，SHA256 `93f059e12bc20c7493ad879edf7c004a41b1fc627ea8e0de6afd20c10ecefc90`。
