@@ -428,3 +428,58 @@ joint parallel：
 4. **当前 mainline 不变。** C3-105K 保持正式 mainline；C0 仅为 continuation control，Tj=`stop_current_two_forward_arm`，Tq=`continue_secondary_attribution_only`。Tq 在任何 pure4053 formal eval 或继续训练前，先做预注册的 `q(H_gt,t)` 分层鲁棒性曲线，并把低/中/高 timestep 对 Direct-C 与 joint 的作用拆开；不得盲目把 5K 扩到更长预算。
 
 这轮回答了“为什么 completion 优势未自动体现在 joint”：Direct-C 训练只消费 clean GT-H，而 joint Camera 在采样时消费随 timestep 演化的 Human；同时 shared Unified 的额外训练会产生任务间漂移。Tq 的局部修复支持 condition-domain gap，但 F1/Out 未恢复说明它不是唯一根因，joint task routing/caption-framing objective 仍需单独定位。
+
+## P0-JC-7：completion 三模式统一分析与 Tq 分层归因（2026-07-22）
+
+> [!important] 证据级别
+> 本节全部为固定首批 test IDs、`N=512`、seed17 的 screen-only 证据，不进入正式 metric ledger，也不改变 C3-105K 的 mainline 身份。四分支 full-sampling screen 已覆盖 Direct-H、Direct-C clean-H 与 joint-parallel；single-step 分层只保留 Parent、C0、Tq，因为 Tj 已在 matched screen 中形成广泛负向控制结论。
+
+### 四分支的三模式联合判读
+
+- **C0-110K**：相对 Parent，Direct-H 与 Direct-C 的语义/分布指标整体退化，但 joint Human 与部分 joint Camera 指标改善。额外 5K 的 joint 训练发生了 mode-specific drift，completion 不能替代 joint gate。
+- **Tq-110K**：相对 C0，Direct-H 的 FTD/TMR/HCov 与 Direct-C 的 FCD/CLaTr/CCov 均有恢复；joint 获得最佳 Human FTD/TMR，并改善 Camera FCD/coverage。相对 Parent，它仍未恢复 Direct-C caption F1，joint 的 F1/Out 也未形成优势，因此只能解释机制，不能 promotion。
+- **Tj-110K**：相对 C0，Direct-H、joint Human、joint Camera 与 framing 指标广泛退化；当前 Two-Forward 实现停止。该结论不外推到所有 generated-H replay。
+- **统一结论**：Tq 修复的是 noisy observed-H 条件域，而不是所有三模式共享的生成质量。Human denoising、Camera semantic alignment、framing/Out 必须继续并列报告，不能用任一 completion 或 joint 单项代替三模式证据。
+
+### standard single-step：收益与代价所在的 timestep
+
+Direct-H 中，Tq 的 TMR/coverage 改善主要出现在 `t≤599`，在 `t=799` 仅部分挽回 C0，`t=999` 三分支均坍缩。joint 的 Human 收益主要出现在 `t=199/599/799`，但 Camera/F1 经常同步退化。这与 full sampling 中“joint Human 强、framing 未恢复”的结果一致。
+
+Direct-C clean-H 则随 timestep 一致退化：
+
+| `t` | C0→Tq FCD ↓ | C0→Tq CLaTr ↑ |
+| ---: | ---: | ---: |
+| 199 | 4.797→5.549 | 69.482→69.044 |
+| 399 | 7.103→8.946 | 69.075→68.182 |
+| 599 | 9.868→13.600 | 68.469→66.707 |
+| 799 | 11.906→19.526 | 67.384→65.101 |
+| 999 | 26.956→52.183 | 62.318→56.854 |
+
+这排除了“Tq 只是让 clean-H Camera denoiser 更强”的解释。
+
+### exact `q(H_gt,t)` intervention：因果定位
+
+下表只改变 Camera 模型实际接收的 observed Human 条件：使用与目标 `q(z_gt,t)` 相同 timestep、相同确定性噪声的 `q(H_gt,t)`；最终 observed 分支与监督目标仍为 clean GT。
+
+| `t` | C0→Tq FCD ↓ | C0→Tq CLaTr ↑ | C0→Tq CCov ↑ | C0→Tq F1 ↑ | C0→Tq CamADE ↓ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 199 | 6.147→5.747 | 68.747→68.956 | .9863→.9863 | .8901→.8937 | .296→.282 |
+| 399 | 24.579→9.128 | 63.884→67.830 | .9473→.9688 | .8421→.8650 | .541→.394 |
+| 599 | 95.460→15.928 | 51.956→65.781 | .7791→.9647 | .6688→.8435 | 1.248→.550 |
+| 799 | 325.825→29.359 | 35.010→62.176 | .3397→.9083 | .3506→.7900 | 3.016→.910 |
+| 999 | 548.842→376.413 | 20.561→36.332 | .1173→.1664 | .1257→.2671 | 4.186→2.375 |
+
+- 有效带明确落在 `t=399–799`；`t=199` 差异很小。
+- `t=999` 虽相对 C0 有改善，但绝对质量仍坍缩，不能计为有效训练收益。
+- `t=999` 的 Human TMR 数值会在 FTD 约 970–999、HCov 约 .04–.05 时异常升高；这是 near-static/collapsed endpoint 的度量病理，不是语义质量提升。
+- uniform `t∈[0,999]`、probability `0.5` 的 Tq 暴露过强：它获得 noisy-H 鲁棒性，却损害 clean-H Camera 与 framing。
+- 唯一值得预注册的后续候选是 lower-dose band-limited mix，例如 `clean-H 75% + q(H_gt,t) 25%` 且 `t∈[399,799]`。该参数目前只是由 screen 导出的候选，不是已授权实验。
+
+### 产物与可复现性
+
+- code commit：`aed514788f3e8bc6ad76193b105baa4a8c714399`
+- standard：3 branches × 5 timesteps × 3 profiles = 45 outputs
+- exact forward-q Camera：3 branches × 5 timesteps = 15 outputs
+- 总计：60 outputs；所有 driver manifest 均为 `complete_screen_only`
+- 路径：`runs/eval/stage2/<run>/tq_timestep_attribution_standard_n512_20260722/`
+- 路径：`runs/eval/stage2/<run>/tq_timestep_attribution_forwardq_camera_n512_20260722/`

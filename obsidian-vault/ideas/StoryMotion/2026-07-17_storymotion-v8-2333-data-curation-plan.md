@@ -1,382 +1,158 @@
 ---
-title: "StoryMotion v8.2333 Data Curation Preregistration"
-status: automatic_threshold_grid_complete_screen_only_no_manual_labels
-workflow_state: calibration_blind_render_in_progress
-gate: promoted_representation_selection
-gate_state: closed
-processed_pairs: 326144
-annotated_pairs: 0
-quarantined_pairs: 0
-materialized_manifests: 1
-launched_jobs: 4
+title: "StoryMotion v8.2333 Data Curation Contract"
+status: automatic_screen_complete_candidate_only
 hypothesis: |
-  在冻结同一 Stage1 representation、owning decoder 与 Unified Stage2 backbone 后，仅用可追溯的物理异常和 caption-motion pair 级语义错配 quarantine 替换 raw train manifest，可能改善生成动作的物理与文本一致性；该假设必须通过 raw-vs-clean 单变量实验验证，不能与 representation 或 generator 改动合并归因。
+  在冻结 C3-25 representation、owning decoder 与 Unified Stage2 实现后，
+  只改变可逆、task-aware 的训练资格记录，可以检验物理异常与 Human
+  caption-motion 错配是否损害生成；Camera 语义质量必须作为独立未解决轴。
 tags:
   - StoryMotion
-  - v8
   - data-curation
-  - preregistration
-  - status/waiting
+  - stage2
+  - status/active
 aliases:
   - StoryMotion-v8.2333-Curation-Plan
-  - StoryMotion-v8.3-Curation-Plan
 source_notes:
   - "[[current]]"
+  - "[[sft-data-prepare]]"
 created: 2026-07-17T17:35:00+08:00
-updated: 2026-07-22
+updated: 2026-07-22T14:30:00+08:00
 ---
 
-# StoryMotion v8.2333 Data Curation Preregistration
+# StoryMotion v8.2333 Data Curation Contract
 
-> [!warning] 当前执行状态
-> 本文是 v8.2333 的唯一 plan 与 progress owner。2026-07-21 的 selection decision 已将 C3-25 seed17 设为 Stage1/Stage2 mainline，因此 `promoted_representation_selection` 已闭合并选择 C3-25；global-slope 是非阻塞 diagnostic pass。该决定只移除 representation blocker，不自动开放阈值冻结、人工裁决、quarantine、clean manifest、cache 或 raw-vs-clean 训练。此前获授权的 G1 raw lock 与语义/物理只读分布打分保持有效。
+> [!abstract] 当前裁决
+> raw lock、Physical-v2、Human TMR-v4 与 loose/proposed/strict threshold grid 已闭合。当前输出仍是 `candidate_only`：`manual_labels=0`、threshold 未冻结、quarantine=`0`、正式 clean manifest 未生成、训练未授权。C3-25 是固定 representation owner；数据清洗不能与 Stage1、backbone 或 sampler 改动合并归因。
 
-## 0. 当前执行状态
+## 1. 数据单位
 
-| 字段 | 值 |
-| --- | --- |
-| recorded at | `2026-07-22 CST` |
-| execution gate | `promoted_representation_selection` |
-| gate state | `closed` |
-| workflow state | `calibration_queue_complete / blind_render_in_progress / labels_pending` |
-| processed or scored pairs | physical：`162,760` motions / `326,144` pairs complete；TMR：`162,760 / 162,760` Human-role pairs complete |
-| manually annotated pairs | `0 / 300–500` |
-| quarantined pairs | `0` |
-| materialized manifests | `1 / 4`，仅 immutable `raw` |
-| scorer jobs launched | `2`，physical-v2 与 TMR-v4 均 complete |
-| calibration queue | `400` pairs：`280` calibration + `120` sealed holdout；`80` double-review；labels `0` |
-| GPU jobs launched | `2`：5090 GPU0 TMR complete；5090 GPU1 blind GT render active |
+| 单位 | 数量 | 精确定义 |
+| --- | ---: | --- |
+| joint motion record | 162,760 | 一个同步的 Human motion、Camera trajectory 与文本文件的 clip；这是联合样本基数 |
+| Human role row | 162,760 | `(motion_id, human, caption_index)` 的 Human caption-target 记录 |
+| Camera role row | 163,384 | `(motion_id, camera, caption_index)` 的 Camera caption-trajectory 记录；107 个文件含多 caption |
+| role-aware rows | 326,144 | 两种 role rows 之和；只用于文本 lineage 审计，不是 326,144 个 `<camera, motion>` 联合样本 |
 
-`annotated/quarantined=0` 表示这些动作尚未获授权，不表示扫描后没有异常。v8.1A 的历史 screen 不构成 selection；C3-25 seed17 已由独立的 Stage1/Stage2 audit 与 2026-07-21 decision 选为 v8.2333 representation owner。该选择不修改数据 lineage，raw parent 在 clean manifest 获授权并物化前仍是唯一有效数据源。
+raw artifact SHA256 为 `49d53029c42ad6ee275172fd9d3e5d56e98f1142ae9daf5dcc0988faa2a9c458`；ordered motion IDs SHA256 为 `a0981b6c…2c51dc9`；ordered role-row IDs SHA256 为 `182839ab…bbb8eb4`。
 
-### 0.1 Read-only evidence snapshot
+## 2. 已验证证据
 
-| evidence | scope / count | artifact boundary | decision state |
-| --- | --- | --- | --- |
-| G1 role-aware raw lock | `162,760` motions；Human captions `162,760`；Camera captions `163,384`；unique pairs `326,144`；missing/empty `0` | raw SHA256 `49d53029c42ad6ee275172fd9d3e5d56e98f1142ae9daf5dcc0988faa2a9c458`；meta `39c2ac4404e55433fb28a6a8c83c0d0494e188897079c7fea2d6e87ec63b420c`；ordered motion/pair `a0981b6c…1dc9` / `182839ab…8eb4` | G1 passed；parent immutable |
-| physical distribution v2 | `162,760` motions、`326,144` pair coverage；Human 与 Camera 各按自己的 valid length 计算 | scores `ffd3f6639cd50d8992388e0d6092d5bd6ec77060932ce21c9ae2f9c43db09b76`；summary `87d5b1aed481016550c2b311a9c891292af33480871d7d9ffbfa81e8b3a861c9` | complete；thresholds `null`；actions `0` |
-| Human semantic distribution / TMR v4 | `162,760 / 162,760` Human-caption pairs complete；Camera-caption 不冒充 TMR applicable pair | scores `766e4522…a4b0`；summary `447a3d51…d00`；singleton scorer `526b7807…e99c`；64-sample replay `6aad2f3a…0e2e` | fixed microbatch `1`，replay 最大差 `0.0`；threshold `null`；LaMP missing，故 G2 overall partial、automatic semantic quarantine disabled |
-
-physical v2 另发现 `1 / 162,760` 条 Human/Camera valid-length mismatch，最大绝对差 `13` 帧；它只保留为 input audit finding，不在阈值冻结前自动 quarantine。当前可计算项是 Human root/yaw/joint/bone/foot distribution 与 Camera center/rotation dynamics；declared-contact、calibrated ground、mesh 与 environment 输入缺失的规则明确为 disabled，optional floating 也未启用。
-
-TMR v1 的 B=1/8 审计发现同样本 score 最大差 `0.511034`；根因是 Pulp `match_skeletons` 用 batch-global 腿长最大值推导 skeleton scale。该进程已停止，partial 以 SHA256=`e16dc9f…4190` 只读保留并标记 invalid；fixed-padding-only v2 仍复现同一偏差，未启动 full。v3 不改 Pulp 源码，只在 scorer 内改为 per-sample skeleton scale，真实耦合降至 FP32 batch-shape 数值差 `1.5259e-5`；但它先在 `1e-5` 下失败、再放宽到 `1e-4`，不满足预检先于结果的要求，故在 `4,656` 条时停止并以 SHA256=`6fb98ab4…4bd3` 标记 invalid。v4 固定 semantic microbatch 为 `1`；64 样本正序/逆序 replay 三项分数最大差均为 `0.0`，通过后才从零重启 full distribution。
-
-raw lock 时的 contract SHA256=`5e962c829dc6b6cf56c4f36e7ced1a617d3bdf01559dad84cf4c26385153a4ea`；后续只读评分 contract SHA256=`8d8034ea53e3b2ccdf1dd792265a549074813b782de8ca698884f49777e4d704`。两者由 append-only amendment r1（SHA256=`98bb4ae617d95f65decb8550bffa5eac2646c8e8c50f8d9d49d1cc4ef850e7eb`）串联；TMR per-sample scale 由 amendment r2（SHA256=`fc774e040ecb7b8c8e816f48ec1fcd1cdfe8fc324fce1a03c701e1587c097435`）追加，singleton contract 再由 amendment r3（SHA256=`bc04b3f3aaba0b6c8b93cb475d86b7bbaf940d665f1314fbf09c7317b1b177da`）追加。physical v1 failure、physical v2 success 与 TMR v1/v2/v3 invalidation 都保留，没有改写历史状态。
-
-远端 evidence root：
-
-    /data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_2333_data_curation_20260717/
-
-## 1. 问题、数据边界与因果边界
-
-- **目标**：判断经过人工校准的物理异常与 pair-level 语义错配 quarantine，能否在固定 representation/backbone 下改善 StoryMotion 的 human、camera 与 joint 生成质量。
-- **源数据**：完整 ordered `162,760` train IDs 对应的 Pulp raw train manifest 及 caption 展开后的 pair 集合。实际 motion 数、caption 数和 pair 数必须在启动后从 raw parent 审计得到，不在本计划中臆造。
-- **选择规则**：先对完整 raw train parent 建只读快照；物理规则作用于 motion 证据但输出可逆的受影响 pair 记录，语义规则只作用于 `(motion_id, caption_id)`。test/eval 不参与阈值拟合。
-- **人工预算**：目标 `400` 个分层 pair，允许范围 `300–500`；少于 `300` 不冻结阈值，超过 `500` 需另行授权。
-- **输出目标**：四层 immutable manifest、校准标签与 scorer/threshold provenance、manifest lineage/audit，以及后续 matched raw-vs-clean Stage2 run contracts。
-
-v8.2333 是独立的 **data-curation axis**，不是 v8.2 representation 的一部分，也不是新的 Stage2 backbone。首个可归因实验固定已经选定的 Stage1 checkpoint、owning decoder、latent cache contract 和 Unified Stage2 实现，只改变 train manifest。不得同时更换 human feature layout、Stage1 checkpoint family、denoiser、task routing、sampler 或评测集。
-
-数据清洗主要检验 Stage2 prior，不回溯解释 v7.14/v8.2 的 Stage1 reconstruction。若将来要检验 clean data 对 Stage1 的作用，必须另建 Stage1 raw-vs-clean run family；不得与本计划的 Stage2 结果合并成一个“clean system”结论。
-
-## 2. 启动 gate
-
-按顺序满足以下 gate 后才能前进：
-
-`2026-07-20` protocol amendment：用户只授权在 G0 关闭时提前执行 G1 与 G2 的只读 availability/distribution 部分，以便观察数据分布并准备阈值校准。该 amendment 不允许跨到 G3–G5，也不能把 score artifact 命名为 quarantine 或 clean endpoint。
-
-1. **G0 — promoted representation selection**：**completed**。C3-25 seed17 的 Stage1 endpoint、owning decoder、SHA256 与 Stage2 `105K` 三路 formal audit 可核验，并已被明确选为 mainline。global-slope 作为非阻塞 diagnostic 判定通过。G0 完成不等于下游自动授权；阈值冻结、标注/quarantine、clean manifest、cache 与训练仍按本计划逐 gate 决策。
-2. **G1 — raw parent lock**：记录原始 manifest path/SHA256、ordered ID SHA256、split、motion/caption/pair counts 和 source revision；raw snapshot 写成新 immutable artifact，不修改 parent。**状态：passed。**
-3. **G2 — scorer availability**：TMR 与 LaMP 的代码版本、预处理版本、checkpoint path 和 SHA256 全部核验；PST 只有在可复现 checkpoint 与 hash 到位后才允许启用。**状态：partial；TMR singleton scorer verified/running，LaMP missing，automatic semantic quarantine disabled。**
-4. **G3 — calibration**：完成 `300–500` 个分层 pair 的人工标签，冻结 reason-code、physical rule 和 semantic threshold 版本。
-5. **G4 — manifest audit**：四层 manifest 通过 membership、order、hash、lineage、scope 和 set-equation 检查。
-6. **G5 — ablation contract**：raw 与 clean 两个 Stage2 run 的所有非数据字段逐项相等后，才能训练。
-
-任何 gate 失败都保持 raw parent 为有效数据源；不得把部分产物命名为 clean endpoint。
-
-## 3. 四层 immutable manifest
-
-四层文件都采用 JSONL data 加 JSON metadata sidecar。写出后只读；规则、阈值或标签变化必须产生新 revision 和新 hash，禁止覆盖旧文件。
-
-| manifest | 内容 | parent 与顺序规则 |
+| 证据 | 有效范围 | 状态 |
 | --- | --- | --- |
-| `raw` | source train manifest 的完整 pair-level snapshot | metadata 记录 source path/hash；保持原始 ordered motion IDs 与 caption order |
-| `physical_quarantine` | 被高置信物理规则命中的 pair；同一坏 motion 的每个受影响 caption 都显式列出 | `parent_manifest_sha256=raw`；记录 `scope=motion_physical`，不隐式删除 |
-| `semantic_pair_quarantine` | caption 与 motion 错配的精确 pair | `parent_manifest_sha256=raw`；固定 `scope=caption_motion_pair`，不得连带删除同 motion 的其他 caption |
-| `clean` | `raw − (physical_quarantine ∪ semantic_pair_quarantine)` 的 order-stable 子序列 | metadata 同时引用 raw 与两份 quarantine SHA256；不得重排、改 ID 或补写样本 |
-
-每份 metadata 至少记录：
-
-- `schema_version`、`manifest_kind`、`revision`、UTC/CST 生成时间、生成代码 commit SHA；
-- parent path/SHA256、原始 ordered IDs SHA256、当前 ordered pair IDs SHA256、行数与唯一 pair 数；
-- `reason_code_version`、`physical_rule_version`、`semantic_threshold_version`、人工 calibration labels SHA256；
-- 所有启用 scorer 的 model name、code revision、checkpoint path/SHA256、preprocess/config SHA256；
-- 生成命令、seed、split、输入 manifest hash 与输出 file SHA256。
-
-每条 quarantine record 至少含 `pair_id`、`motion_id`、`caption_id`、raw `order_index`、`scope`、`action=quarantine`、一个或多个 reason code、原始测量值/score、命中阈值及阈值版本、decision source（rule、model agreement 或 manual adjudication）。缺失 checkpoint 的 scorer 不写伪 hash，也不写零分；应在 metadata 中明确记录为 `disabled_missing_checkpoint`。
-
-## 4. 物理规则
-
-所有运动量只在 valid frames、统一单位和 owning geometry decode 下计算。先统计数据分布，然后筛选，避免阈值不合理。首版候选规则为：
-
-- world-root speed、acceleration、jerk；
-- yaw rate 与 yaw acceleration；
-- declared foot contact 下的 world foot sliding；
-- 地面穿透与持续悬空；【非强制，有些视频动捕是坐着或者在走楼梯，所以可能在空中】
-- bone-length drift；
-- joint angular velocity/acceleration；
-- mesh 可得时的 body self-penetration，以及 environment geometry 可得时的 environment penetration。输入不可得时必须标记该 rule 为 disabled，不能把“未计算”当作通过。
-
-阈值按 capture source、valid-duration bin（`1–64`、`65–128`、`129–192`、`193+`）和可用的动作/locomotion strata 计算 median/MAD robust statistics；小 strata 回退到已记录的上一级分组。数值阈值必须在 calibration 后冻结到 versioned config，本计划不预填未经数据验证的常数。
-
-单一高速值不等于错误。跑、跳、旋转等合法动作不得仅因 root speed 或 yaw rate 高而 quarantine。自动高置信物理 quarantine 至少要求一个直接结构冲突（例如 contact-skating、penetration 或 bone drift）或两个独立动态证据一致；边界值、单证据异常和 locomotion/semantic 冲突进入人工队列。reason code 至少区分 root jerk、yaw spike、contact skating、ground penetration、floating、bone drift、joint kinematics 与 mesh/environment penetration。
-
-## 5. 语义 pair 清洗与 checkpoint 禁令
-
-先数据集整体计算，然后计算每个 sample 的数值（大 batch 并行，如果 batchsize 不影响结果）
-- 首版自动语义判定只允许 **TMR global alignment + LaMP motion-aware alignment**。二者必须同时有可复现代码、精确 checkpoint 和 SHA256；任一 checkpoint 缺失时，TMR+LaMP 自动 semantic quarantine 整体禁用，只能保留人工审核队列。
-- 只有 TMR 与 LaMP 对同一 pair 方向一致、各自超过人工校准的高精度阈值，且没有人工 veto 时，才允许自动进入 `semantic_pair_quarantine`。模型分歧、只过一个阈值或细粒度关系不确定的样本进入人工队列。
-- 语义 reason code 至少覆盖 posture、direction、body-part、temporal order、locomotion、negation 与 global mismatch。错误 caption 只隔离该 pair；同一 motion 的其他 caption 默认保留。
-
-已核验的 pair-level 例子保留为 calibration evidence，而非已执行的 quarantine：`2019_vcdDRblTOmM_00038_001_a` 的 human caption 描述站立并轻微转头；其 GT 仅 `35` 帧，左右膝平均弯曲约 `85.17°/81.82°`，root Z 约 `0.849 m`、root XY displacement 约 `0.056 m`，与持续坐姿/深屈膝一致。gate 打开后，它应作为 semantic review 的明确候选；在此之前不得生成 quarantine record 或改动 manifest。
-
-## 6. `300–500` pair 人工校准【待自动化执行后处理】
-
-### 6.1 批次声明
-
-- **目标**：校准 conservative quarantine 阈值并估计 false-positive 风险，而不是最大化删除率。
-- **来源**：只从 locked raw train parent 采样；不查看 pure4053/test 结果。
-- **预算**：目标 `400`，最少 `300`、最多 `500`。
-- **输出**：`calibration/labels.jsonl`、`calibration/split.json`、reason-code book、annotator/adjudication audit 及它们的 SHA256。
-
-### 6.2 分层选择
-
-样本同时覆盖：
-
-- 四个 valid-duration bins、主要 capture sources 与 locomotion/non-locomotion；
-- physical rule 的 clear-normal、boundary、multi-evidence-high 三个区间；
-- TMR/LaMP 均通过、均失败、分歧和接近阈值区间；
-- posture、direction、body-part、temporal order、locomotion 与 negation 语义类别。
-
-目标预算的 `70%` 用于 threshold calibration，`30%` 作为冻结后的 holdout audit；两部分保持上述 strata。至少 `20%` pair 双人盲审，分歧经 adjudication 后写入独立字段，不覆盖原标签。
-
-自动 quarantine 的验收以 precision 优先：holdout empirical precision 必须 `≥0.90`，并同时报告置信区间、recall、各 reason/stratum 的样本数。若某 stratum 样本不足、checkpoint 不齐或 precision 未达标，该 stratum 降级为 manual-only，不通过调阈值追逐 holdout。
-
-## 7. Raw-vs-clean 单变量实验
-
-首个 ablation 只改变 Stage2 train manifest：
-
-- **A / raw**：locked `raw` manifest；
-- **B / clean**：由同一 raw parent 和冻结 quarantine revisions 得到的 `clean` manifest。
-
-两条 run 必须共享同一 Stage1 checkpoint/owning decoder hash、representation、train-only latent normalization protocol、Unified Stage2 code/backbone、任务概率、seed、optimizer、learning-rate schedule、batch size、总 sample exposures、CFG/sampler、eval ordered IDs 与 decode batch size。clean 数据量较小时用 deterministic resampling 匹配总 exposures，并额外报告 unique pair coverage、重复率和每类 exposure；不得靠少训换取表面优势。两条 cache 的内容 hash 因 manifest 不同而应不同，但 tokenizer checkpoint 和 cache builder revision 必须相同。
-
-正式 eval 使用同一冻结 eval manifest，不把 clean eval 替换成更容易的子集。人工校准 holdout 可作为单独 diagnostic，但不能替代 formal eval。正式标准只报告 Direct-H、Direct-C 与 joint parallel；cascade 不参与评估或 gate：
-
-- human：FDTMR、TMR、HCov，以及 root-aligned/global MPJPE、root ADE/FDE、integrated-yaw error；
-- camera：FDCLaTr、CLaTr、CCov、caption F1，以及 Cam-ADE/Cam-FDE/rotation；
-- joint：上述适用指标、projection/framing 与 Out；
-- no-reference physical：foot contact/skating、acceleration/jerk、bone consistency、root speed/path distributions，并做同 IDs 的 blind render review。
-
-自由生成的 paired MPJPE/Cam-ADE 是 mandatory diagnostic，不单独视为 one-to-many 质量 hard gate。所有 mixed-version 表必须含非空 `version / run` 列。C3-25 mainline selection 不等于数据清洗因果结论；raw-vs-clean claim 仍必须使用预注册的额外 matched seeds，不能由 single-seed representation evidence 代替。
-
-### 7.1 Full-data pretrain → clean-data adaptation / SFT
-
-**可行，但 Stage1 与 Stage2 的作用不同，不能共用一个 “SFT” 结论。** StoryMotion Stage1 joint AE 不消费 caption，因此 caption 修正不可能直接改善 Stage1；Stage1 上能做的是基于物理 clean motion manifest 的低学习率 continuation。真正利用 pair-level caption 清洗的是 Stage2 text-conditioned generator。[[analysis/arxiv_2026/OpenT2M_No_frill_Motion_Generation_with_Open_source_Large_scale_High_quality_Data|OpenT2M]] 支持“大规模数据预训练后在高质量目标数据上微调”的总体可行性；[[analysis/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval|MoCHA]] 则说明 caption 去噪可以降低监督/梯度方差，但也提示应保留 raw language view 作为后续抗遗忘 control。这些论文支持设计动机，不替代 StoryMotion 自身 matched ablation。
-
-推荐顺序为：
-
-```text
-full Stage1 joint AE
-  ├─ freeze endpoint → build owning cache → full Stage2 pretrain
-  │                                      ├─ matched raw continuation
-  │                                      └─ matched clean-pair SFT
-  └─ optional physical-clean Stage1 continuation
-       → 重新过 Human + Camera + root/yaw/physical gate
-       → 新 owning decoder + 新 cache + 独立 Stage2 matched family
-```
-
-这里的 Stage1 clean continuation 是独立 representation axis，不能在同一个 run 中同时改 Stage1 与 Stage2 manifest。若它产生新 checkpoint，所有下游 cache、inverse stats 与 owning decoder 都必须重建并重新 hash；旧 Stage2 checkpoint 不能直接跨 representation 续训后声称是 clean-data 收益。
-
-#### Stage1：只允许 physical-clean continuation
-
-- base 始终是完整 `162,760` ordered train IDs 上训练完成的 full-data Stage1；不从 clean subset 随机初始化。
-- clean 输入只能来自 motion-level 物理证据。semantic pair quarantine 不参与 Stage1 sampling，也不能因为一条 caption 错误而降低同一 motion 的 AE exposure。
-- 因果对照必须从同一个 full-data checkpoint 分叉：`raw-continuation` 与 `physical-clean-continuation` 使用相同新增 sample exposures、初始模型权重、optimizer 初始化策略、学习率、batch、RNG/seed 和停止点。建议两臂都重建同配置的低学习率 optimizer，避免一臂继承 momentum、另一臂重置。
-- 目标是降低 contact skating、penetration、root/yaw spike、camera center/rotation jitter 等重建异常，同时保持 v8.1A 的 Human 优势。它可能改善 decoder/representation 的物理局部性，但不能预设会改善 Stage2 generatability；必须重新通过 Stage1 Human、Camera、root/yaw 与 physical gate。
-
-#### Stage2：full-data pretrain 后做 clean-pair SFT
-
-- 这是 caption 清洗的首选阶段。冻结同一 Stage1 checkpoint、owning decoder、cache protocol 与 full-data Stage2 parent checkpoint，再从该 parent 分叉 `raw-continuation` 和 `clean-pair-SFT`；两臂使用相同额外 exposures、optimizer reset/resume 规则、低学习率 schedule、task probabilities、batch、seed 和 endpoint。
-- primary treatment 使用 union clean manifest，先回答“总体清洗是否有效”。若通过，再用 physical-only 与 semantic-only quarantine removal 做归因；不能一开始把物理清洗、caption 重写、loss 与 pipeline 一起变化。
-- clean-only SFT 是最清晰的因果主臂。若它改善 clean slice 却损伤 raw-language/general coverage，再新建 `clean + raw replay` follow-up；该 follow-up 检验抗遗忘机制，不得回写成 clean-only 的结果。clean 数据量较小时继续按 deterministic resampling 匹配 exposures，并报告重复率与 unique coverage。
-- 预期可改善 caption-body-part/direction/temporal-order 对齐、Direct-C camera-text conditioning、TMR/CLaTr/caption F1，以及由高置信物理坏样本诱发的 jerk/skating/Out。它不能修复 owning decoder 的高敏方向、Stage1 camera manifold、缺失动作覆盖或 evaluator 偏差；当前 D4/C4 representation 诊断仍须先独立闭合。
-
-#### 最小验收产物
-
-1. immutable full/physical-clean/semantic-clean/union-clean manifests、parent lineage、reason codes、counts 与 SHA256；
-2. full-data parent checkpoint、raw-continuation control 与 clean-adaptation checkpoint，各自模型/optimizer/scheduler/RNG/exposure contract；
-3. Stage1 continuation 的 owning-decoder reconstruction + physical gate；若被选中，新的 cache/stats/decoder hashes；
-4. Stage2 的 Direct-H、Direct-C、joint parallel matched formal eval，以及 raw-eval、clean holdout、physical stress slice 三类结果；cascade 不参与；
-5. 逐 seed、aggregate、unique coverage/repeat rate、blind render 和 rollback decision。只有 clean adaptation 相对 **matched raw continuation** 改善，而非仅相对较早的 full parent checkpoint 改善，才算 SFT 证据。
-
-当前执行结论是 `calibration_queue_complete_labels_pending_lamp_missing`：representation gate 已闭合，physical/TMR 只读分布与人工队列已完成；在人工标签、阈值冻结、LaMP policy 与 manifest audit 闭合前，仍不得物化 quarantine/clean endpoint 或启动 GPU SFT。
-
-## 8. 验收与 rollback
-
-### 8.1 Manifest 验收
-
-必须全部满足：
-
-1. 四层文件与 sidecar 均存在，SHA256 可重算，parent DAG 无断链；
-2. raw 无重复 pair；所有 quarantine pair 都属于 raw；clean 精确满足 set equation 且保持 raw 相对顺序；
-3. 每条 quarantine 都有 scope、reason、原始值/score、threshold/checkpoint provenance；
-4. semantic pair quarantine 不会删除同 motion 的未命中 caption；motion-level physical action 展开成显式受影响 pairs；
-5. 同 input/config 重跑得到相同 ordered IDs 和 hash；
-6. 人工 holdout precision gate 通过，未通过的 strata 只进入 review queue。
-
-### 8.2 实验验收
-
-clean 只有在 matched formal 中改善至少一个预注册的 semantic/physical primary diagnostic，且 mandatory human geometry、Cam-ADE/Cam-FDE、distribution/coverage 和 Out 没有超出 raw repeat uncertainty 的系统性退化时，才可成为候选 train manifest。结论必须同时给出逐 seed、aggregate 与 blind render；否则只保留为 diagnostic artifact。
-
-### 8.3 Rollback
-
-rollback 不删除任何文件：将 active data pointer 恢复到 locked raw SHA256，把失败 clean revision 标记为 `rejected_not_active`，停止/隔离由它派生的 cache/run，并保留完整 lineage、失败 gate 和 reason。修正规则或阈值只能从同一 raw parent 产生新 revision；禁止原地编辑 clean 或 quarantine 文件。
-
-## 9. 预注册输出路径
-
-数据产物留在远端 generated run space，不进入 Git：
-
-```text
-/data/public/ripemangobox/Motion/StoryMotion/runs/data_curation/storymotion_v8_2333_data_curation_20260717/
-  contract/curation_contract.json
-  contract/curation_execution_amendment_20260720_r1.json
-  contract/curation_execution_amendment_20260720_r2.json
-  manifests/raw.jsonl
-  manifests/raw.meta.json
-  manifests/physical_quarantine.jsonl
-  manifests/physical_quarantine.meta.json
-  manifests/semantic_pair_quarantine.jsonl
-  manifests/semantic_pair_quarantine.meta.json
-  manifests/clean.jsonl
-  manifests/clean.meta.json
-  calibration/labels.jsonl
-  calibration/split.json
-  calibration/reason_codebook.json
-  scores/physical.jsonl
-  scores/tmr.jsonl
-  scores/lamp.jsonl
-  audit/manifest_lineage.json
-  audit/sha256sums.txt
-  audit/acceptance.json
-  reports/curation_summary.json
-```
-
-raw/clean Stage2 训练仍使用标准 run boundary：
-
-```text
-/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_2333_raw_manifest_unified_SEED_DATE/
-/data/public/ripemangobox/Motion/StoryMotion/runs/stage2/v8_2333_clean_manifest_unified_SEED_DATE/
-```
-
-`SEED`、`DATE`、最终 fixed representation/backbone 和精确 run IDs 在 G0/G5 打开时写入各自 `experiment_contract.json`；当前不得用占位符创建假 run 或假 artifact。
-
-## 2026-07-22 scoring closure and calibration queue r1
-
-Human data-quality preparation advanced without emitting a threshold or quarantine action:
-
-- physical-v2 is complete for `162,760` motions and covers all `326,144` raw pairs; SHA-256 `ffd3f6639cd50d8992388e0d6092d5bd6ec77060932ce21c9ae2f9c43db09b76`.
-- singleton Human TMR-v4 is complete for `162,760 / 162,760` applicable pairs; SHA-256 `766e4522ab6a34f0c34b59635e20ae295a6ff06dcd8a9fd78084103292d8a4b0`.
-- Independent scoring completion audit SHA-256: `0a4af792b0dd938e857f96e01cda0db365f000474df186d3433e7d8cb79f2cab`.
-- User-authorized amendment r4 SHA-256: `8bb88026ec150f7b858c9b00fd07c54557a64458f2d7abb0959d4498f7cc89b0`. It authorizes only calibration queue and blind GT render preparation; threshold, quarantine, clean manifest, cache, and training remain forbidden.
-- Deterministic queue r1 contains `400` Human pairs: `280` calibration, `120` sealed holdout, and `80` double-review. It covers both-high, physical-high, semantic-high, scorer disagreement, boundary, clear-normal, duration/source, and coverage strata.
-- Queue SHA-256: `01ac64d9be01d79c95dad1baf61b60acb4dd1e8704a00e4293a3780d3f679207`; ordered pair IDs SHA-256 `ac27bae828bd57a42d2dc3384cb1e6e7f30b726b555d1edd3e06a4d366639068`; blind-review SHA-256 `8c4d3f7dc5e7cdac782d2eb145268631c05f908dc758b71c8ba1dd6b240a8e57`.
-- Two-sample GT render smoke passed with three camera views per sample; ordered smoke artifact SHA-256 `ce120327c601ae230e1c08cdb58e2a6c6852a1d3d0465f63684145daf06b4e61`. The `400`-sample render is active on 5090 physical GPU1 and owns its live state under `calibration/render_r1.status.json`.
-- Labels remain `0 / 400`, thresholds remain `null`, actions emitted remain `0`, and LaMP remains unavailable. Queue membership must not be interpreted as an error label.
-
-## 2026-07-22 人工预算更正、候选阈值敏感性与人物-镜头质量
-
-### 口径更正
-
-`curation_execution_amendment_20260722_r4.json` 及其 400 条队列是不可变的**自动分层候选池与渲染池**，不是 400 条人工标注任务。原队列中的 `calibration_candidate`、`holdout_candidate` 和 `double_review` 仅保留为历史字段，不再解释为最终人工分工；不得据此宣称已有 calibration、holdout 或人工标签。
-
-当前阶段只执行自动筛选，不启动 calibration、sealed holdout、double-review 或其他人工标注。400 条队列继续用于自动阈值敏感性、可视化抽查准备与失败模式覆盖；只有进入“创造新 pair”的数据增广阶段后，才另立人工抽查合同。
-
-### 当前实际保留量
-
-截至 2026-07-22，physical v2 与 TMR v4 均已全量完成，但两份报告都是 `thresholds=null`、`automatic_quarantine_enabled=false`、`action=score_only`。因此当前没有“筛选后删剩”的子集，实际状态如下。
-
-| 口径 | 覆盖数 | 当前保留数 | 当前 quarantine |
-| --- | ---: | ---: | ---: |
-| Physical，Human motion | 162,760 motions | 162,760 motions | 0 |
-| Physical，Human + Camera pair | 326,144 pairs | 326,144 pairs | 0 |
-| TMR，Human caption-motion | 162,760 pairs | 162,760 pairs | 0 |
-| Physical 与 TMR 的保留交集，Human | 162,760 pairs | 162,760 pairs | 0 |
-
-这张表是当前真实 manifest 口径。下面的数字是候选规则敏感性，不能改写为“已经清洗完成”。
-
-### 自动候选规则与阈值敏感性
-
-分层单位优先使用 `capture_source_proxy × valid_duration_bin`。若分层少于 500 条，则先回退到 `capture_source_proxy`；若该 source 仍少于 500 条，再回退到全局 `valid_duration_bin`。所有阈值都是分层内的经验 percentile rank，避免年份代理与时长分布差异把合法镜头或高动态动作系统性误判为异常。
-
-Physical 候选规则：
-
-- 结构冲突：`human_camera_length_delta != 0`，或 bone-length relative deviation 达到 extreme tail。
-- root family：root acceleration 与 root jerk 的较大 percentile rank。
-- yaw family：yaw rate 与 yaw acceleration 的较大 percentile rank。
-- articulation family：joint angular velocity 与 foot horizontal speed 的较大 percentile rank。
-- 动态异常只有在至少两个独立 family 同时达到 tail，且至少一个达到 extreme tail 时才命中。单一高速、急转或脚部快动不能独立触发。
-
-TMR 候选规则：同一分层内同时满足 `tmr_cosine` 位于底部 tail 且 `tmr_latent_l2` 位于顶部 tail。TMR 单模型分数只产生 semantic candidate；在 LaMP 缺失且未经过人工定标时，不允许自动 quarantine。
-
-| 敏感性档 | tail / extreme | Physical 候选 motion | 仅用 Physical 时 Human 保留 | TMR 候选 Human | 仅用 TMR 时 Human 保留 | 两者都命中的异常交集 | 任一命中的异常并集 | 同时通过两者的 Human 保留交集 | 若 Physical 同时隔离对应 Camera，全部 pair 保留 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 宽松候选 | `p99 / p99.9` | 427 | 162,333 | 991 | 161,769 | 1 | 1,417 | 161,343 | 324,300 |
-| 建议 calibration 起点 | `p99.5 / p99.9` | 362 | 162,398 | 450 | 162,310 | 0 | 812 | 161,948 | 324,970 |
-| 严格候选 | `p99.9 / p99.95` | 128 | 162,632 | 87 | 162,673 | 0 | 215 | 162,545 | 325,801 |
-
-“同时通过两者”按未被任一规则命中计算，即总数减去异常并集；它不同于“异常交集”。建议档出现 0 条异常交集，说明 Physical 与 TMR 捕捉的是近乎正交的问题，也说明不能用“两个筛选器一致”作为自动删除前提。建议档仅是 calibration 起点，不是正式阈值。
-
-### 当前执行边界
-
-- 本轮输出 Physical 与 TMR 各自的多阈值 candidate/retain 结果，以及两分支阈值笛卡尔积下的 retained intersection；所有输出都保留 parent hash、ordered-ID hash、reason code 与 `screen_only` 状态。
-- 本轮不产生人工标签，不把候选集宣称为正式 clean dataset，也不执行不可逆删除。
-- HCCC 与 HumanML3D 配对创造属于独立的数据增广轴，由单独 plan 管理；本页只保留原始 PulpMotion 的清洗合同。
-
-### 2026-07-22 role-aware threshold grid v1 closure
-
-screen ID：`roleaware_grid_v1_20260722`。状态为 `complete_screen_only_not_applied`；人工标签数为 0，`automatic_quarantine_enabled=false`。该 screen 只把阈值实际施加到 scorer 输出上并生成 candidate manifests、ordered retained-ID hashes 与计数，没有修改 raw parent，也没有宣称任何一档为正式 clean dataset。
-
-独立分支结果：
-
-| 分支 | 阈值档 | 候选异常 | Human 保留 | 全部 pair 保留 |
-| --- | --- | ---: | ---: | ---: |
-| Physical | `tail p99 / extreme p99.9` | 427 motions / 854 pairs | 162,333 | 325,290 |
-| Physical | `tail p99.5 / extreme p99.9` | 362 motions / 724 pairs | 162,398 | 325,420 |
-| Physical | `tail p99.9 / extreme p99.95` | 128 motions / 256 pairs | 162,632 | 325,888 |
-| TMR | `tail p99` | 991 Human pairs | 161,769 | 仅筛 Human，不单独定义全部 pair clean set |
-| TMR | `tail p99.5` | 450 Human pairs | 162,310 | 仅筛 Human，不单独定义全部 pair clean set |
-| TMR | `tail p99.9` | 87 Human pairs | 162,673 | 仅筛 Human，不单独定义全部 pair clean set |
-
-Physical × TMR 九组结果。“保留交集”表示同时通过两个筛选器，即未被任一分支命中；“异常交集”表示两个分支同时命中的 pair，二者不能混用。
-
-| Physical 档 | TMR 档 | 异常交集 | 异常并集 | Human 保留交集 | 全部 pair 保留 |
+| Physical-v2 | 162,760 joint records；Human 与 Camera dynamics | complete；SHA256 `ffd3f663…09b76` |
+| Human TMR-v4 | 162,760 Human role rows；microbatch 1，replay 差值 0 | complete；SHA256 `766e4522…a4b0` |
+| Camera semantic | Camera caption ↔ trajectory | unresolved；没有 verified scorer |
+| LaMP | Human fine-grained alignment | unresolved；缺 verified code/checkpoint |
+
+Physical 当前可用项包括 root/yaw/joint/bone/foot 与 Camera center/rotation dynamics。declared contact、calibrated ground、mesh 和 environment 输入不可得，保持 disabled，不能把“未计算”记为通过。
+
+## 3. Threshold screen
+
+Physical 只有在 length mismatch、bone extreme，或至少两个 dynamics family 同时进入 tail 且一个进入 extreme 时命中。TMR 要求分层内 cosine 进入低 tail 且 latent L2 进入高 tail。
+
+| 分支 | 档位 | candidate | 保留量 |
+| --- | --- | ---: | ---: |
+| Physical | loose `p99 / p99.9` | 427 joint motions | 162,333 joint motions；325,290 role rows |
+| Physical | proposed `p99.5 / p99.9` | 362 joint motions | 162,398 joint motions；325,420 role rows |
+| Physical | strict `p99.9 / p99.95` | 128 joint motions | 162,632 joint motions；325,888 role rows |
+| Human TMR | loose `p99` | 991 Human rows | 161,769 Human rows |
+| Human TMR | proposed `p99.5` | 450 Human rows | 162,310 Human rows |
+| Human TMR | strict `p99.9` | 87 Human rows | 162,673 Human rows |
+
+| Physical | TMR | 异常交集 | 异常并集 | Human 保留 | role rows 保留 |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `p99 / p99.9` | `p99` | 1 | 1,417 | 161,343 | 324,300 |
-| `p99 / p99.9` | `p99.5` | 0 | 877 | 161,883 | 324,840 |
-| `p99 / p99.9` | `p99.9` | 0 | 514 | 162,246 | 325,203 |
-| `p99.5 / p99.9` | `p99` | 1 | 1,352 | 161,408 | 324,430 |
-| `p99.5 / p99.9` | `p99.5` | 0 | 812 | 161,948 | 324,970 |
-| `p99.5 / p99.9` | `p99.9` | 0 | 449 | 162,311 | 325,333 |
-| `p99.9 / p99.95` | `p99` | 1 | 1,118 | 161,642 | 324,898 |
-| `p99.9 / p99.95` | `p99.5` | 0 | 578 | 162,182 | 325,438 |
-| `p99.9 / p99.95` | `p99.9` | 0 | 215 | 162,545 | 325,801 |
+| loose | loose | 1 | 1,417 | 161,343 | 324,300 |
+| loose | proposed | 0 | 877 | 161,883 | 324,840 |
+| loose | strict | 0 | 514 | 162,246 | 325,203 |
+| proposed | loose | 1 | 1,352 | 161,408 | 324,430 |
+| proposed | proposed | 0 | 812 | 161,948 | 324,970 |
+| proposed | strict | 0 | 449 | 162,311 | 325,333 |
+| strict | loose | 1 | 1,118 | 161,642 | 324,898 |
+| strict | proposed | 0 | 578 | 162,182 | 325,438 |
+| strict | strict | 0 | 215 | 162,545 | 325,801 |
 
-结论边界：除 TMR 宽松档与任一 Physical 档共享同一条异常外，其余组合的异常交集均为 0。Physical 与 TMR 是互补而非相互确认的 scorer；若选择 clean set，应采用“排除异常并集、保留通过交集”的口径，不能只删除异常交集。正式采用哪一档仍是后续决策，本页当前不冻结阈值。
+Physical 与 TMR 几乎不重叠，说明它们捕捉互补问题。clean 候选应排除异常并集；只删除异常交集会漏掉几乎所有候选。proposed/proposed 只是 operating-point candidate，不是正式阈值。
 
-审计 artifact：
+## 4. Task-aware 施加规则
 
-- runner：`runs/data_curation/storymotion_v8_2333_data_curation_20260717/contract/apply_roleaware_threshold_grid_v1.py`，SHA256 `c49df46137dfa2566d5d0084268e0d44af9b0c22b687dce34ed863d4729ddb9d`。
-- threshold contract：`threshold_screens/roleaware_grid_v1_20260722/threshold_contract.json`，SHA256 `e8cd8afc868d2c8e7395b650cb9b9d443615fd7be8feab131a755ba455a0b2e9`。
-- summary：`threshold_screens/roleaware_grid_v1_20260722/summary.json`，SHA256 `93693ca866be852de37bbcc8345f27ea9755994b19480d892b7a6c8ee2cf18b8`。
-- manifest：`threshold_screens/roleaware_grid_v1_20260722/manifest.json`，SHA256 `93f059e12bc20c7493ad879edf7c004a41b1fc627ea8e0de6afd20c10ecefc90`。
+| Stage2 task | 自动资格条件 | proposed 档预期基数 |
+| --- | --- | ---: |
+| Direct-H | Physical pass 且 Human TMR pass | 161,948 joint clips |
+| Direct-C | Physical pass；Human-caption TMR 不适用 | 162,398 joint clips |
+| joint | Physical pass 且 Human TMR pass；Camera semantic unresolved | 161,948 joint clips |
+
+Physical 是 clip-level 证据，命中后关闭三任务资格。Human TMR 是 Human caption-motion 证据，只关闭 Direct-H 与 joint 的该 Human condition，不能误删 Direct-C。Camera 多 caption 只增加 condition rows，不增加 joint motion 基数。
+
+candidate manifest 必须保留 raw parent hash、motion order、role pair IDs、reason codes、三任务 eligibility 与 `camera_semantic_status=unresolved_no_verified_scorer`；不得命名为 quarantine 或 clean。
+
+## 5. 未解决问题
+
+- Camera caption ↔ trajectory 没有 verified semantic scorer。
+- LaMP 不可用；TMR 只能产生 Human semantic candidate。
+- proposed threshold 未经 matched training ablation，不能冻结。
+- `capture_source_proxy` 使用年份代理，仍需检查 source/年份偏差。
+- 1 条 Human/Camera valid-length mismatch，最大差 13 帧。
+- contact/ground/mesh/environment 规则缺输入。
+- 8K/16K/32K/64K 子集缺 Camera semantic、rarity、complexity 与 coverage features。
+
+本阶段不做人工标记。未来若引入人工，必须另行授权，不回写本轮 automatic-only contract。
+
+## 6. 下一 gate
+
+1. 物化 proposed/proposed 的 task-aware `candidate_only` eligibility。
+2. 建立 Camera semantic 与 coverage features，再做 Pareto + stratified nested subset。
+3. 固定 C3-25 做 raw continuation、random-size control 与 task-aware SFT。
+4. 只有 matched ablation 支持后，才冻结 threshold 并生成可逆 quarantine/clean manifest。
+
+SFT 合同见 [[sft-data-prepare]]。HumanML3D 属于数据增广轴，不属于本清洗合同。
+
+## 7. Artifact registry
+
+- evidence root：`runs/data_curation/storymotion_v8_2333_data_curation_20260717/`
+- threshold screen：`threshold_screens/roleaware_grid_v1_20260722/`
+- threshold contract SHA256：`e8cd8afc868d2c8e7395b650cb9b9d443615fd7be8feab131a755ba455a0b2e9`
+- summary SHA256：`93693ca866be852de37bbcc8345f27ea9755994b19480d892b7a6c8ee2cf18b8`
+- artifact manifest SHA256：`93f059e12bc20c7493ad879edf7c004a41b1fc627ea8e0de6afd20c10ecefc90`
+- current state：raw locked；candidate screens complete；quarantine 0；formal clean 0
+
+
+## 已实现：task-aware SFT candidate v1（2026-07-22）
+
+> [!important] 计数单位更正
+> `326,144` 不是 `<camera trajectory, human motion>` joint pair 数。原始联合数据只有 `162,760` 个 motion/clip records；`326,144 = 162,760 Human role rows + 163,384 Camera role rows`，计数单位是 `(motion_id, caption_role, caption_index)` 文本目标行。Camera 比 motion 多 `624` 行，是因为 `107` 个 Camera caption 文件含多 caption。joint 训练的基础单位仍约 `16.3 万` 个 motion；多 caption 展开后的 Human×Camera condition combinations 需另行报告。
+
+已生成 candidate-only、不可直接训练的 task-aware manifest：
+
+| 项目 | 数量 |
+| --- | ---: |
+| raw joint motions | 162,760 |
+| raw Human role rows | 162,760 |
+| raw Camera role rows | 163,384 |
+| proposed Physical candidates | 362 motions |
+| proposed TMR candidates | 450 Human rows |
+| eligible Direct-H motions/rows | 161,948 |
+| eligible Direct-C motions | 162,398 |
+| eligible Direct-C Camera-condition rows | 163,022 |
+| eligible joint motions | 161,948 |
+| eligible joint Human×Camera combinations | 162,560 |
+| retained role rows（audit only） | 324,970 |
+| manual labels | 0 |
+
+任务门控保持分离：
+
+- Direct-H 排除 proposed Physical 与 Human-TMR candidates。
+- Direct-C 不因 Human-TMR 低分删除 Camera target；当前只排除 proposed Physical candidates。
+- joint 同时要求 Human target 与 observed-H condition 合格，因此取两类候选的 motion-level 并集。
+- `retained role rows` 只用于审计，不得再次称为 joint pair 或训练样本数。
+- Camera semantic scorer、LaMP、最终阈值与 coverage gate 尚未闭合，因此 `training_authorized=false`。
+
+产物：
+
+- `runs/data_curation/storymotion_v8_2333_data_curation_20260717/sft_candidates/task_aware_sft_candidate_v1_20260722/`
+- raw manifest SHA256：`49d53029c42ad6ee275172fd9d3e5d56e98f1142ae9daf5dcc0988faa2a9c458`
+- Physical candidates SHA256：`a2c31b4890f64d22e91df0247f648ce02e1500f97006828995cf9b8653194ef5`
+- TMR candidates SHA256：`ae7f03242943970f5359978fe0a93a5187dcd6d6d90097634e6f3e4bc961c4c6`
+- `eligibility.jsonl` SHA256：`9de1264495ec70a36efdc4e9628e45cbe5bd6eb42a77b3a05084c8b4d1ac853f`
+- `direct_h.jsonl` SHA256：`ac855a7228efc49724c1efe98209ab09429879874957c1261ad987bda563f375`
+- `direct_c.jsonl` SHA256：`bcf89f9a6528dad7615ce9808ce2a86e63e9f990635cc196ed2e3ec15edf80cb`
+- `joint.jsonl` SHA256：`cce4f29392c0d9caf13e8dcfd67b5d3bb6ee8093ae7341177a877b0c604fcce1`
