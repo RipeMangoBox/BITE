@@ -11,8 +11,10 @@ aliases:
 source_notes:
   - "[[2026-07-01_storymotion-v6.2-metric-data]]"
   - "[[2026-07-17_storymotion-stage1-length-condmdi-causal-priority]]"
+  - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
+  - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-07-17T14:57:00+0800
+updated: 2026-07-29T15:38:19+08:00
 ---
 
 ## 0. 当前裁决
@@ -44,6 +46,7 @@ updated: 2026-07-17T14:57:00+0800
 | Stage2 L0 task slices | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/v738_l0_direct_tasks_strict_20260715/completion/metrics/std_cfg1.0_eta0.0/render_summary.json` | same 8 fixed pure samples | same L0 step105k human-text-only、camera-from-GT-H、joint parallel/cascade | H/C strict single world/projection/concat MP4 与 trajectory PNG；Direct H projection 的 GT camera 仅作外部显示 | complete；80 MP4、16 PNG；`L0 task slices` tab on 4090 port `7865` |
 | Completion peer registry | `configs/completion_vis_registry.json` | same 8 fixed pure samples | separate `Human completion` / `Camera completion` tabs；L0 ready，specialist/baseline placeholders | human 固定 world camera；camera 对 GT human projection；每页同步播放、paired human/camera text 与逐列 asset 状态 | active；ready assets `missing=0`；4090 port `7865` |
 | Stage2 L0 single-step gate | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/l0_single_step_gate_20260715/render_summary.json` | same 8 fixed pure samples | `human`、`camera`、`joint` × raw GT / `t=999,799,599,399,199` | teacher-forced one-step `pred_x0` 的 world/projection MP4 与 geometry PNG | complete；288 MP4、120 PNG；仅作局部诊断，raw-loss gate 已取消（无效） |
+| Stage2 C3-25 Human-view architecture screen | `runs/vis/stage2/<H-FULL-or-H-ISOLATED>/architecture_view_{gradio_full,single_step}_r3_20260723/` | fixed 8 + frozen C3-25 joint Top-5；union 13 | Parent C3-25、H-FULL、H-ISOLATED × Direct-H、Direct-C、joint；single-step 为 raw GT + `t=999,799,599,399,199` | world-skeleton / camera-projection MP4、trajectory PNG、exact Human-view contract | active screen-only；r1/r2 invalid outputs excluded，r3 接入 4090 port `7865` |
 | HumanML3D human-only adapter | `runs/stage2/v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715/vis/humanml3d_fixed_camera_20260715/render_summary.json` | 8 HumanML3D test clips | canonical 263D inverse RIC、Pulp199 joints-level adapter、fixed camera | 每样例 MP4/首帧 PNG/NPZ；与 L0 样例仅作非配对语义近邻展示 | complete；8/8 decode；camera conditioning disabled |
 | Screen projection containment | `runs/visualizations/archived/screen_projection_containment_20260625/*/manifest.json` | legacy diagnostic | `clean_best`, `clean_last`, `screen_best` | per-sample camera projection / camera view videos | archived; exclude from registry |
 
@@ -573,3 +576,121 @@ samples 与 1,245 个 required files，`missing=0`。30 个 Top-5 callback views
 `127.0.0.1:7865`；转发命令保持不变。
 
 浏览器层再用 headless Chromium 经 SSH tunnel 等待 `networkidle` 后打开 Top tab：10 个 tab 均可发现，六个目标 label 全部 visible，visible video count=`6`，page errors=`0`、console errors=`0`。实际截图确认第二行视觉顺序为 joint specialist gen、Pulp recon、Pulp Aux gen，aggregate 表同时含 Pulp no-Aux/Aux。
+
+## 19. 2026-07-23 C3-25 Human-view architecture desk
+
+### 19.1 Evidence boundary
+
+本页只登记可视化资产与服务验收。H-FULL、H-ISOLATED 和 Parent C3-25 的 matched
+`N=512` 三模式 screen 数字、hashes 与 architecture 裁决由
+[[archived/diagnostics/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder_closed-through-human-only_20260724#H-axis 两端点 N=512 screen（2026-07-23）]]
+唯一持有；这些 screen 不进入正式 metric ledger。Gradio 的 v7.38 L0 row 只提供
+former-mainline 历史视觉上下文，不混入该 matched 数字表，也不改变 C3-25 seed17
+`105K` 的 mainline 身份。
+
+两个 fresh Stage2 endpoint 为：
+
+- H-FULL：`p0_c3_25_unified3_hview_full_0_105k_seed17_4090g0_20260722`，
+  checkpoint SHA256=`63c2e96dc685c1b1d447de334c77f1df18867d9b5243b114fbfb857da879999a`；
+  Direct-H 与 joint-H 均恢复为 `[H_t,C_t] + [e_C,e_H]`。
+- H-ISOLATED：`p0_c3_25_unified3_hview_isolated_0_105k_seed17_4090g1_20260722`，
+  checkpoint SHA256=`04ad0044870498f1c5a49e9048b02b6792c0b2644cf878df354e299bb53649e4`；
+  Direct-H 与 joint-H 均恢复为 `[H_t,0] + [0,e_H]`。
+
+### 19.2 Renderer invalidation 与 fresh r3
+
+精确 bug provenance 只见 [[version_family#Bug 与 invalidation provenance]]。展示层的
+artifact 裁决如下：
+
+- `architecture_view_gradio_full_20260723` 的 r1 只渲染默认三个 ID，保留为不完整
+  launch provenance。
+- `architecture_view_gradio_full_r2_20260723` 虽各有 13 个 ID，但 prompt-off 手工
+  loader 实际使用默认 `mixed` Human view，因此两份 summary
+  `3141bc53…0d1 / 3555851f…164` 永久禁止展示。
+- `architecture_view_single_step_r2_20260723` 在发现同一 loader 问题后中止，H-FULL /
+  H-ISOLATED 分别保留 `166 / 168` 个 partial files，无完成 summary。
+- 所有 r1/r2 目录、summary 与日志原样保留；页面只读取全新的 r3 路径，未覆盖或删除
+  任何历史文件。
+
+有效 r3 资产为：
+
+| arm | full render summary SHA256 | full files | single-step summary SHA256 | single-step files |
+| --- | --- | ---: | --- | ---: |
+| H-FULL | `ef09530f3d701afcf4789c9ec9851f0e67189e92e05d2b5c92daec20d890dcad` | `222` = 182 MP4 + 39 PNG + summary | `e443ede34dc28dd8bd86b52c7a1bd56893cfdd947e229dc4328c7455bc5cebdc` | `409` = 288 MP4 + 120 PNG + summary |
+| H-ISOLATED | `6e19af51ddb4963ebf6075b696ff4ca3e5348ab29b0a918fb302d8bee08014b3` | `222` = 182 MP4 + 39 PNG + summary | `74ae27ec5c8ccfa075f94a801931304f63b058af64c2851cf25f1030b37455cc` | `409` = 288 MP4 + 120 PNG + summary |
+
+full render 使用固定 8 个 display IDs 加冻结的 C3-25 joint Top-5，去重后共 13 个
+ordered IDs；协议为 DDIM50、CFG1、`eta=0`、seed17。single-step 使用相同 fixed-8，
+每个 task 显示 raw GT 与 `t=999,799,599,399,199` 五个 teacher-forced
+`q(z_gt,t) → one pred_x0` 结果。两类 summary 都绑定 exact checkpoint SHA，并显式
+记录完整 `human_view` contract 及 Camera latent/text conditioning flags。
+
+修复后代码 SHA256：
+
+- `scripts/render_bilateral_results.py`：`3f4e76628ab0de857762ba5bc52805526b87bac560373a4b1a570afb8580cc8d`；
+- `scripts/render_l0_single_step_gate.py`：`463b69fa4532155f695ca249e87aa57d51846c3179fc713d6c31d9e9a5d0f107`；
+- `scripts/v736_p0_matched_gradio.py`：`05206dbba4393d2d5552d7c8720552800d3e25b05be8448df7600f0c4f3f63be`。
+
+三个脚本在 4090 与 5090 的 byte SHA 相同。renderer 会恢复 checkpoint
+`human_view_mode`、与记录的完整 contract 做 exact comparison，并在加载后再次校验
+model attribute；Gradio 进一步检查 checkpoint SHA、ordered IDs、Human-view contract
+及三项 conditioning flags，任一不一致即 fail-close。
+
+### 19.3 Tabs、layout 与验收
+
+五个标签页最终命名与可见媒体数为：
+
+| tab | layout | visible videos |
+| --- | --- | ---: |
+| `H Completion · Architecture` | frozen GT/C3-25/L0 row + H-FULL row + H-ISOLATED row | 9 |
+| `C Completion · Architecture` | frozen GT/C3-25/L0 row + H-FULL row + H-ISOLATED row | 9 |
+| `Joint Top-5 · Architecture` | GT、C3-25、L0、H-FULL、H-ISOLATED 各一行；projection/skeleton 两列 | 10 |
+| `Single-step · Architecture` | C3-25、H-FULL、H-ISOLATED 三个分割区；每区 raw GT + 五个 timestep | 18 |
+| `HumanML3D · Stage1` | 独立 Stage1 adapter 边界 | 2 |
+
+最终验收：
+
+- `--validate-only`：13 个 render IDs、8 个 single-step IDs、3 个 six-video groups、
+  `required_files=1206`、`missing=0`，三份 screen manifest 的 ordered-ID SHA256 均为
+  `6b9c92a533d2d0aff76cce6c7ad23361733fb38d3157128bf7eee56cdc33d8df`。
+- fresh r3 新增媒体使用 renderer 所属 FFmpeg `7.0.2` 实际解码首帧：
+  MP4=`940/940`、失败 `0`；PNG=`318/318` verify、失败 `0`。
+- `_private/storymotion_architecture_view_gradio_smoke.py` 经 SSH tunnel 运行 headless
+  Chromium：五个 tab 的 exact label、row headings 与上述 visible-video 数全部通过；
+  page errors=`0`、console errors=`0`。
+- 新服务 PID `3904710` 运行于 4090 port `7865`；Mac 转发仍为
+  `ssh -N -L 7865:127.0.0.1:7865 4090`。
+
+## 20. 2026-07-29 v10 GT／Human reconstruction／v10-v9 Human teacher
+
+### 20.1 Evidence与展示边界
+
+4090 evidence root：
+
+```text
+runs/vis/stage2/
+  v10_hrelcam_phasea210k_human_teacher105k_seed17_4090g1_20260729/
+    gt_hrecon_v10v9_teacher_cfg1_cfg3_fixed8_r4_20260729/
+```
+
+首标签页仍命名为`v10 · GT / H recon / teacher`。每个fixed ID显示六个standalone MP4，按三行两列排列：
+
+1. Pulp pure-test GT Human；
+2. exact Phase-A `210K` frozen Human owner的deterministic reconstruction；
+3. v10 Phase-A-owner Stage2 Human-text-only teacher `105K`的CFG1输出；
+4. v9 Phase-C-owner Stage2 Human-text-only teacher `105K`的CFG1输出；
+5. 同一v10 teacher checkpoint的CFG3输出；
+6. 同一v9 teacher checkpoint的CFG3输出。
+
+六路使用完全相同的8个sample ID、raw length、GT Human tensor与per-sample world display bounds。manifest同时校验Stage1 fixed source、两条teacher checkpoint、各自owning decoder以及CFG1／CFG3字段；任一来源、角色、视频SHA或non-causal字段不符即fail-close。CFG1与CFG3是同一teacher checkpoint的两种inference guidance，不是四条独立训练run。artifact与implementation SHA只见 [[Storymotion-exp-sha]]。
+
+> [!warning] Claim boundary
+> 第二路虽然从旧三项loss Phase-B final-210K fixed artifact读取，但其Human branch与Phase-A owner逐元素exact；这里只把它作为Stage1 Human reconstruction，不把该文件当Camera证据。四条teacher视图使用相同ViMoGen-light topology与`105K`配方，但v10与v9分别属于Phase-A `210K`与Phase-C `636K` Human owner；其raw cache／train-only statistics不等价，不能复用teacher权重。精确owner审计见 [[StoryMotion-valid-metric-ledger#5.6 v9／v10 Human teacher owner非等价审计]]。本标签没有v10 Camera generation、Direct-C、sequential joint、synchronous joint或Unified-3证据。
+
+### 20.2 验收与服务
+
+- visual manifest SHA只见 [[Storymotion-exp-sha]]；`status=rendered`、8个ordered IDs、每ID恰有`gt / human_reconstruction / v10_human_teacher_cfg1 / v9_human_teacher_cfg1 / v10_human_teacher_cfg3 / v9_human_teacher_cfg3`六种role；
+- renderer所属FFmpeg `7.0.2`完整解码MP4=`48/48`，失败=`0`；
+- Gradio `--validate-only`：`required_files=1452`、`missing=0`、`v10_human_compare_samples=8`；
+- headless Chromium：exact tab label、六个heading、8个sample options、六路媒体HTTP、切换第二样本与同步播放全部通过；page errors=`0`、console errors=`0`、unexpected failed requests=`0`；
+- 当前4090服务PID=`1316999`，监听`0.0.0.0:7865`，HTTP=`200`；日志为`/tmp/storymotion_gradio_7865_v10v9_cfg13_20260729.log`。
