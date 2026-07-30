@@ -24,11 +24,12 @@ These rules apply directly to any task involving StoryMotion code, experiments,
 metrics, runs, or research notes, even when the task starts outside the linked
 codebase:
 
-1. The mainline tokenizer is v8.1C C3-25: corrected camera14 joint AE with
-   normalized human199 plus official camera14, non-causal, human128 plus
-   camera64, the selected low-dose decoded camera-center treatment, and its
-   owning local decoder. v7.14 is the former-mainline comparator. camera9
-   separate is a control only; never merge
+1. The StoryMotion system mainline is the co-equal v11 C0-LAT and C0-GEO
+   `105K` endpoints. They share the exact v9 Pulp-only non-causal Stage1 owner
+   (`human128 + interaction16 + camera48`), its owning decoder/cache/stats, and
+   the frozen v9 Human `105K` teacher; only the Camera objective differs.
+   v8.1C C3-25 is the former-mainline system baseline and v7.14 is the older
+   representation comparator. camera9 separate is a control only; never merge
    camera14 separate and camera14 joint evidence.
    Temporal causal tokenizers are forbidden in every Stage1/Stage2 setting;
    constructors, checkpoint/cache loading, training, and evaluation must assert
@@ -38,9 +39,10 @@ codebase:
    causal tokenizer only when its contract names MotionStreamer as the owning
    system and decoder; it must not build, consume, or gate a StoryMotion cache,
    Unified checkpoint, or representation control.
-2. Fixed representation settings live as code assertions in
-   `storymotion/experiment_invariants.py`. Do not repeat them as manually typed
-   per-run configuration.
+2. Fixed legacy representation settings live in
+   `storymotion/experiment_invariants.py`; v11 fixed boundaries additionally
+   fail closed in its configuration validator and contract preflight. Do not
+   replace either with manually typed per-run settings.
 3. The run contract audits mutable boundaries: exact Stage1 checkpoint and
    owning-decoder hashes, train/eval cache hashes and sample identities,
    train-only z-normalization source, seed, train/eval batch sizes, split,
@@ -48,25 +50,28 @@ codebase:
 4. A metric table mixing versions must include an explicit `version / run`
    column with a non-empty value in every row. If a matched comparison is not
    available, state the differing fields and restrict the conclusion.
-5. Human completion in the asymmetric Unified-3 model is human-text-only.
-   Camera completion consumes human latent plus camera text. Active evaluation
-   and promotion gates report Direct-H, Direct-C, and joint parallel. Cascade
-   is optional historical/root-cause attribution only, never a required score
-   or gate; if invoked, it must use the same unified checkpoint as parallel.
+5. Human completion in the asymmetric model is human-text-only. Camera
+   completion consumes human latent plus camera text. The v11 mainline reports
+   Direct-H, Direct-C, and sequential Human-then-Camera; evolving-H parallel
+   denoising is the removed failure axis. v11 must not train, evaluate, or gate
+   on joint parallel unless the user separately authorizes reopening that
+   solver axis. Historical C3 reports joint parallel; cascade is optional
+   historical/root-cause attribution only.
 6. A specialist result is valid only as a task-sliced diagnostic of the same
    branch implementation used by Unified-3, or when its weights are explicitly
    transferred and verified. Do not train unrelated specialists as a gate for
    a different three-mode model.
-7. StoryMotion v8.1C C3-25 seed17 is the selected mainline representation and
-   Unified-3 `105K` system. Its former `20 mm/100f` Human global-slope threshold
-   is a non-blocking diagnostic and is recorded as passed under the revised
-   selection policy; the raw `26.302 mm/100f` value remains in the metric
-   ledger. Mainline selection is supported by the audited Stage1 Human/Camera
-   Pareto and Stage2 Direct-H, Direct-C, and joint-parallel evidence. Historical
-   run contracts and IDs retain their original diagnostic fields for
-   provenance; new mainline contracts must not copy those stale eligibility
-   flags. On human199, root-aligned MPJPE removes root translation but not
-   heading; do not call it local-pose error without a yaw-aware attribution.
+7. StoryMotion v11 C0-LAT and C0-GEO seed17 are co-mainline Stage2 systems at
+   Camera optimizer `105K`. Their selection is supported by audited pure4,053
+   Direct-H, Direct-C, formal sequential, decoded geometry, physical
+   diagnostics, and matched bootstrap evidence. LAT and GEO remain co-equal
+   because their six Camera geometry confidence intervals cross zero and their
+   semantic/framing fields form a mixed Pareto. Historical run contracts and
+   IDs retain their original diagnostic fields for provenance; promotion does
+   not rewrite immutable artifacts. C3-25 retains its raw diagnostic ledger
+   values as the former-mainline baseline. On human199, root-aligned MPJPE
+   removes root translation but not heading; do not call it local-pose error
+   without a yaw-aware attribution.
 8. Data cleaning is versioned and reversible. Quarantine caption-motion pairs
    rather than deleting a whole motion when only one caption is wrong, retain
    immutable parent manifests and reason codes, and test cleaning separately

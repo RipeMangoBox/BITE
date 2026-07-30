@@ -27,12 +27,14 @@ evaluating, comparing, or documenting a StoryMotion experiment.
 6. Run the Markdown audit before editing a canonical metric ledger. A table
    mixing versions must contain an explicit `version / run` provenance column;
    a prose-only mapping is insufficient for new or edited mixed-version rows.
-7. Modify Unified-3 directly. Human/camera specialist callbacks are diagnostics
-   of the same unified checkpoint and branch code, not unrelated precursor
-   models. Active evaluation and promotion gates report Direct-H, Direct-C, and
-   joint parallel. Cascade is optional historical/root-cause attribution only,
-   never a required score or gate; if invoked, it uses the same unified
-   checkpoint as parallel.
+7. Human/camera specialist callbacks are diagnostics of the same branch
+   implementation, not unrelated precursor models. The v11 mainline reports
+   Direct-H, Direct-C, and sequential Human-then-Camera, and keeps joint
+   parallel disabled because evolving-H denoising is the removed failure axis.
+   Do not train, evaluate, or gate v11 on joint parallel without separate user
+   authorization. Historical C3 reports joint parallel; outside v11, cascade
+   remains optional historical/root-cause attribution and uses the same
+   checkpoint as parallel when invoked.
 8. v8 candidates remain controls until they pass the preregistered Stage1
    root/yaw geometry gate. For human199, root-aligned MPJPE removes translation
    but retains heading error; never relabel it as local-pose quality without a
@@ -44,14 +46,18 @@ evaluating, comparing, or documenting a StoryMotion experiment.
 
 ## Current Default
 
-The default tokenizer is v8.1C C3-25 seed17: corrected camera14 joint AE with
-normalized human199 plus official camera14, non-causal, `human128 + camera64`,
-the selected low-dose decoded camera-center treatment, human-first Stage2
-cache order, and the owning local decoder. Its audited Unified-3 `105K`
-checkpoint is the selected Stage2 mainline. v7.14 is the former-mainline
-representation comparator. The Stage1 joint encoder saw paired human-camera
-inputs; record this coupling whenever interpreting a Stage2
-branch-independence experiment.
+The system default is the co-equal v11 C0-LAT and C0-GEO seed17 pair at Camera
+optimizer `105K`. Both use the exact v9 Pulp-only non-causal Stage1 owner
+`stage1_hanchor_pulp_only_matched_r3_636k_seed17_4090g0_20260726`, with
+`human128 + interaction16 + camera48`, its owning decoder/cache/train-only
+statistics, and the frozen v9 Human `105K` teacher. C0-LAT uses latent flow;
+C0-GEO keeps that flow objective and adds the calibrated Stage1-style decoded
+Camera auxiliary. Neither is subordinate to the other.
+
+The former mainline v8.1C C3-25 remains the primary system baseline; v7.14 is
+the older representation comparator. Historical contracts retain their
+original diagnostic eligibility fields. Promotion is a decision-layer event
+and does not rewrite those immutable artifacts.
 
 camera9 separate VAE is a control, not the default. camera14 separate results
 must never be presented as camera14 joint results.

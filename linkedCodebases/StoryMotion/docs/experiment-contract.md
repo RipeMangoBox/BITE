@@ -34,11 +34,11 @@ mainline representation values are asserted by
 `storymotion/experiment_invariants.py`; they are not copied into every Stage2
 run contract.
 
-As of 2026-07-21, the selected decision mainline is v8.1C C3-25 seed17 and its
-audited Unified-3 `105K` endpoint. The former Human global-slope threshold is
-a non-blocking diagnostic; C3-25 records that diagnostic as passed while
-retaining the raw `26.302 mm/100f` value. v7.14 and v7.38 remain reproducible
-former-mainline comparators.
+As of 2026-07-31, the selected system mainline is the co-equal v11 C0-LAT and
+C0-GEO seed17 pair at Camera optimizer `105K`. Both bind the exact v9 Pulp-only
+Stage1 owner, owning decoder/cache/train-only statistics, and frozen Human
+teacher; only the Camera objective differs. C3-25 is the former-mainline system
+baseline, while v7.14 and v7.38 remain older reproducible comparators.
 
 The main experimental unit is one Unified-3 checkpoint containing human,
 camera, and joint tasks. Human-only and camera-only numbers are task-sliced
@@ -95,11 +95,11 @@ checks alone never promote it. Its diagnostic cache must repeat
 purpose.
 
 Promotion is a decision-layer event, not a reason to rewrite immutable
-artifacts. C3-25's historical run ID and contracts retain their original
+artifacts. C3-25 and v11 historical run IDs and contracts retain their original
 `diag`, `diagnostic_only: true`, and `promotion_eligible: false` fields as
-execution provenance. New caches and runs created after the C3-25 mainline
-decision must use the selected mainline representation contract and must not
-inherit those historical eligibility fields.
+execution provenance. New mainline runs must bind one of the two selected v11
+endpoints explicitly and must not copy stale eligibility flags from historical
+contracts.
 
 For a curated-data control, the manifest is immutable and additionally records
 its parent-manifest SHA, caption/pair identity, quarantine reason, scorer and
@@ -162,6 +162,14 @@ and `parallel` covers joint generation. `cascade` is not a required evaluation
 or promotion mode. A run may add it only for an explicitly declared historical
 or root-cause attribution question; such a diagnostic remains non-gating and
 must use the same Unified checkpoint as the parallel path.
+
+The explicit v11 Stage2-only family is the exception: its formal joint mode is
+`sequential`, meaning the frozen Human branch completes first and the Camera
+branch then samples from noise while conditioning on that final Human. A v11
+contract records `generation_modes: ["completion", "sequential"]` and must not
+declare, train, evaluate, or gate `parallel` unless the user separately
+authorizes reopening the evolving-H solver axis. Historical parallel artifacts
+remain unchanged and do not become sequential evidence.
 
 For Stage1, replace `parent_stage1` and `cache` with `model` and `checkpoint`:
 

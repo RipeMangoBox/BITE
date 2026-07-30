@@ -1,6 +1,6 @@
 ---
 title: "StoryMotion v10 Human-relative Camera Training Contract"
-status: active_corrected_phase_b_long_training
+status: paused_at_corrected_phase_b_210k_pending_formal
 hypothesis: |
   Reusing an exact Human-only Phase-A owner and learning an independent,
   explicit Human-relative Camera48 representation can remove v9's learned
@@ -23,8 +23,9 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[Storymotion-exp-sha]]"
   - "[[version_family]]"
+  - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
 created: 2026-07-29
-updated: 2026-07-29T15:59:48+08:00
+updated: 2026-07-29T19:20:32+08:00
 ---
 
 # StoryMotion v10 Human-relative Camera Training Contract
@@ -260,20 +261,20 @@ Stage2 Camera先运行`5e-5`与`1e-4`两条matched `10K` LR screen；除LR外，
 ## 7. 当前执行状态
 
 > [!warning] 当前边界
-> exact Phase-A Human owner与同owner的Human-text-only teacher `105K`已经闭合。旧三项objective的Phase-B `210K`及pure4,053 endpoint审计只保留历史diagnostic；补齐fixed-projective framing后的fresh Phase-B已完成contract、真实数据preflight、冻结Human回归与预注册first-128 `30K` smoke，五个核心轴逐项通过且Human exact。训练已从exact `30K` checkpoint在同run接续至`210K`，尚无修正版formal endpoint。
+> exact Phase-A Human owner与同owner的Human-text-only teacher `105K`已经闭合。旧三项objective的Phase-B `210K`及pure4,053 endpoint审计只保留历史diagnostic；补齐fixed-projective framing后的fresh Phase-B已完成contract、真实数据preflight、冻结Human回归与预注册first-128 `30K` smoke，五个核心轴逐项通过且Human exact，并已从exact `30K` checkpoint在同run续训至`210K`。当前优先级已切换到[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract|v11 Stage2-only rescue]]；v10修正版formal endpoint、cache与Camera Stage2暂停但未判失败。
 
-旧`207K`选择artifact保留，但其framing轴曾把raw joint-out occupancy误当lower-is-better error；旧final `210K`同样保留数值，不再作为Stage1 cache候选。只有修正版完成当前长训与pure4,053 formal audit后，才能重新产生候选endpoint。该更正不构成跨版本promotion。
+旧`207K`选择artifact保留，但其framing轴曾把raw joint-out occupancy误当lower-is-better error；旧final `210K`同样保留数值，不再作为Stage1 cache候选。只有已到达`210K`的修正版完成pure4,053 formal audit后，才能重新产生候选endpoint。该更正不构成跨版本promotion。
 
 以下项目尚未训练或评测，不能标作通过或失败：
 
-1. 修正版Phase-B `30K→210K`长训与pure4,053 formal endpoint；
+1. 已到达`210K`的修正版Phase-B pure4,053 formal endpoint audit；
 2. 修正版endpoint的新176D train/eval cache与Camera full-covariance statistics；
 3. 四route Camera flow两条`10K` LR screen；
 4. Camera `105K` continuation；
 5. GT-H Direct-C、sequential joint与synchronous joint A/B/C；
 6. 完整v10 Unified-3 promotion audit。
 
-v8.1C C3-25 seed17继续是Stage1／Stage2 mainline。v10 Human teacher只关闭Human prerequisite；它没有Camera输出，不能外推Camera或joint能力。
+自2026-07-31起，v11 C0-LAT／C0-GEO共同mainline取代C3-25；这不改变v10的未闭合边界。v10 Human teacher只关闭Human prerequisite，它没有Camera输出，不能外推Camera或joint能力。
 
 ## 8. 数据与claim边界
 

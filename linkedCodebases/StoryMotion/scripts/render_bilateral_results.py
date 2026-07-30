@@ -73,6 +73,19 @@ def parse_bool(value, default=False):
     return str(value).lower() in {'1', 'true', 'yes', 'on'}
 
 
+def resolve_human_view_contract(meta):
+    recorded = meta.get('human_view')
+    raw_args = meta.get('args', {})
+    mode = str(raw_args.get(
+        'human_view_mode',
+        recorded.get('mode', 'mixed') if isinstance(recorded, dict) else 'mixed',
+    ))
+    expected = mod.human_view_contract(mode)
+    if recorded is not None and recorded != expected:
+        raise RuntimeError(f'checkpoint human_view contract mismatch: {recorded!r} != {expected!r}')
+    return expected
+
+
 def load_h2c_model(ckpt_path, ckpt, device):
     h2c = load_local_module('train_stage2_h2c_minimal_render', ROOT / 'scripts/train_stage2_h2c_minimal.py')
     meta = ckpt.get('meta', {})
@@ -179,6 +192,7 @@ def load_model(ckpt_path, device):
 
     p2b_enabled = parse_bool(p2b_meta.get('enabled'), False) or parse_bool(meta_args.get('p2b_enable'), False)
     reliability_cond_dim = 5 if p2b_enabled else 0
+    human_view = resolve_human_view_contract(meta)
     model = mod.TemporalObsUNet(
         width,
         dim_mults,
@@ -194,6 +208,7 @@ def load_model(ckpt_path, device):
         v72_gate_bias=float(meta_args.get('v72_gate_bias', v72_config.get('gate_bias', 2.0))),
         reliability_cond_dim=reliability_cond_dim,
         num_task_embeddings=num_task_embeddings,
+        human_view_mode=human_view['mode'],
     ).to(device)
     model.load_state_dict(ckpt['model']); model.eval()
     if hasattr(mod, 'build_stage2_process'):
@@ -768,6 +783,15 @@ def main():
     print('Loading model...')
     model, diffusion, ckpt = load_model(args.ckpt, device)
     checkpoint_meta = ckpt.get('meta', {})
+    human_view = resolve_human_view_contract(checkpoint_meta)
+    if getattr(model, 'human_view_mode', None) != human_view['mode']:
+        raise RuntimeError(
+            f"loaded model human_view_mode mismatch: {getattr(model, 'human_view_mode', None)!r} "
+            f"!= {human_view['mode']!r}"
+        )
+    direct_h_view = human_view['direct_h']
+    human_camera_latent_conditioning = direct_h_view['latent'] == '[H_t,C_t]'
+    human_camera_text_conditioning = direct_h_view['text'] == '[e_C,e_H]'
     task_routing = str(checkpoint_meta.get('task_routing', checkpoint_meta.get('args', {}).get('task_routing', 'symmetric')))
     joint_coupling_scale = float(checkpoint_meta.get('joint_coupling_scale', checkpoint_meta.get('args', {}).get('joint_coupling_scale', 1.0)))
     joint_coupling_mode = str(checkpoint_meta.get('joint_coupling_mode', checkpoint_meta.get('args', {}).get('joint_coupling_mode', 'symmetric')))
@@ -840,7 +864,10 @@ def main():
                'allow_nondefault_tokenizer_contract': bool(args.allow_nondefault_tokenizer_contract),
                'diagnostic_only': bool(cache_meta.get('diagnostic_only', False)),
                'promotion_eligible': bool(cache_meta.get('promotion_eligible', True)),
-               'human_task_camera_conditioning': task_routing != 'human_first',
+               'human_view': human_view,
+               'human_task_camera_conditioning': human_camera_latent_conditioning or human_camera_text_conditioning,
+               'human_task_camera_latent_conditioning': human_camera_latent_conditioning,
+               'human_task_camera_text_conditioning': human_camera_text_conditioning,
                'human_task_camera_display': 'dataset_gt_outside_model' if task_routing == 'human_first' else 'decoded_observed_branch',
                'joint_camera_latent_intervention': args.joint_camera_latent_intervention,
                'joint_human_camera_input_mode': args.joint_human_camera_input_mode,

@@ -20,9 +20,11 @@ if str(ROOT) not in sys.path:
 
 from scripts.storymotion_run_layout import run_paths
 from storymotion.per_sample_quality import (
+    decoded_human_physical_batch,
     paired_geometry_batch,
     rank_joint_quality_records,
     score_joint_quality_batch,
+    summarize_decoded_human_physical,
     summarize_paired_geometry,
 )
 
@@ -109,18 +111,43 @@ def load_h2c_camera_model(
     return model, h2c_mod, run_info, None
 
 
-def resolve_run_znorm(run_dir: Path, cache_dir: Path, train_mod: Any) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+def resolve_run_znorm(
+    run_dir: Path,
+    cache_dir: Path,
+    train_mod: Any,
+    stats_path_override: Path | None = None,
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     meta = json.loads((run_dir / "meta.json").read_text())
     record = meta.get("latent_znorm", {"enabled": False})
     if not record.get("enabled", False):
+        if stats_path_override is not None:
+            raise ValueError("--run-znorm-stats-path cannot be used when the run disables z-normalization")
         return None, {"enabled": False}
-    stats_path = Path(record["stats_path"])
-    if not stats_path.exists():
+    stats_path = stats_path_override.resolve() if stats_path_override is not None else Path(record["stats_path"])
+    if stats_path_override is None and not stats_path.exists():
         candidate = cache_dir / stats_path.name
         if candidate.exists():
             stats_path = candidate
-    stats = train_mod.load_latent_znorm_stats(stats_path)
+    if stats_path_override is not None:
+        contract_path = run_dir / "experiment_contract.json"
+        if not contract_path.is_file():
+            raise FileNotFoundError(f"run stats override requires an experiment contract: {contract_path}")
+        contract = json.loads(contract_path.read_text())
+        expected_sha = contract.get("cache", {}).get("z_norm_stats_sha256")
+        if not isinstance(expected_sha, str) or len(expected_sha) != 64:
+            raise RuntimeError("run contract does not declare z_norm_stats_sha256")
+        actual_sha = sha256_file(stats_path)
+        if actual_sha != expected_sha:
+            raise RuntimeError(f"run stats override SHA256 mismatch: {actual_sha} != {expected_sha}")
+    stats = train_mod.load_latent_znorm_stats(
+        stats_path,
+        expected_source_cache=cache_dir / "train.pt",
+        require_full_covariance=bool(record.get("full_covariance", False)),
+        expected_cov_ridge=record.get("full_covariance_ridge"),
+    )
     verified = train_mod.latent_znorm_meta(True, stats, stats_path, cache_dir / "train.pt")
+    if verified.get("source_cache_sha256") != record.get("source_cache_sha256"):
+        raise RuntimeError("run normalization source-cache SHA256 does not match run metadata")
     return stats, verified
 
 
@@ -499,6 +526,7 @@ def predict_single_step_x0(
     joint_coupling_scale: float = 1.0,
     joint_coupling_mode: str = "symmetric",
     task_routing: str = "symmetric",
+    observed_x0: torch.Tensor | None = None,
 ) -> torch.Tensor:
     if not 0 <= timestep < diffusion.num_timesteps:
         raise ValueError(f"single-step timestep must be in [0,{diffusion.num_timesteps}), got {timestep}")
@@ -518,7 +546,7 @@ def predict_single_step_x0(
         x_t,
         diffusion.model_t(t),
         text,
-        z,
+        z if observed_x0 is None else observed_x0,
         obs_mask,
         task,
         source_meta,
@@ -897,6 +925,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use explicit train latent z-normalization stats for cache-only eval sources.",
     )
     p.add_argument(
+        "--run-znorm-stats-path",
+        type=Path,
+        help=(
+            "Portable path to the immutable stats declared by --run-dir. "
+            "The file must match the run contract byte SHA256 and source-cache provenance."
+        ),
+    )
+    p.add_argument(
         "--eval-source",
         choices=["stage2", "raw_gt", "cache_identity", "cache_perturbation", "single_step"],
         default="stage2",
@@ -947,7 +983,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--observed-latent-intervention",
-        choices=["none", "zero", "shuffle", "noise_matched"],
+        choices=["none", "zero", "shuffle", "noise_matched", "forward_q"],
         default="none",
         help="Perturb the observed latent branch for camera/human completion probes.",
     )
@@ -1073,8 +1109,15 @@ def main() -> None:
             device,
             checkpoint_path=args.checkpoint,
         )
-        znorm_stats, znorm_record = resolve_run_znorm(args.run_dir, args.cache_dir, train_mod)
+        znorm_stats, znorm_record = resolve_run_znorm(
+            args.run_dir,
+            args.cache_dir,
+            train_mod,
+            args.run_znorm_stats_path,
+        )
     else:
+        if args.run_znorm_stats_path is not None:
+            raise ValueError("--run-znorm-stats-path requires --run-dir")
         model = diffusion = None
         run_info = {"run_dir": None, "checkpoint": None, "step": None, "stage2_process": None}
         if args.znorm_stats_path is not None:
@@ -1114,7 +1157,12 @@ def main() -> None:
             train_mod,
             checkpoint_path=compose_camera_checkpoint,
         )
-        _, h2c_znorm_record = resolve_run_znorm(args.joint_compose_camera_run_dir, args.cache_dir, train_mod)
+        _, h2c_znorm_record = resolve_run_znorm(
+            args.joint_compose_camera_run_dir,
+            args.cache_dir,
+            train_mod,
+            args.run_znorm_stats_path,
+        )
         if h2c_znorm_record != znorm_record:
             raise RuntimeError("composed human and camera runs use different latent normalization contracts")
         if (
@@ -1124,6 +1172,10 @@ def main() -> None:
             raise RuntimeError("same-run composed human and camera passes must use the exact same checkpoint hash")
     h2c_task_routing = str((h2c_run_info or {}).get("task_routing", "symmetric"))
     cfg, dataset, autoencoder = build_pulp(cache_mod, story_root, args, device)
+    feature_dataset = getattr(dataset, "joint_dataset", None) or dataset
+    human_dataset = getattr(feature_dataset, "human_dataset", None)
+    if human_dataset is None or not hasattr(human_dataset, "feat_mean") or not hasattr(human_dataset, "feat_std"):
+        raise ValueError("paired Human heading diagnostics require the Pulp Human199 normalization stats")
     cache = train_mod.PulpLatentCache(args.cache_dir / args.cache_file, znorm_stats=znorm_stats)
     cache_path = args.cache_dir / args.cache_file
     cache_meta = load_cache_meta(cache_path)
@@ -1151,6 +1203,13 @@ def main() -> None:
                 f"num_task_embeddings={run_info.get('num_task_embeddings', 3)}"
             )
     callback, module = instantiate_official_metrics(cfg, pulp_root, metric_task_name, device)
+    observed_human_projection_callback = None
+    observed_human_projection_module = None
+    if metric_task_name == "camera":
+        (
+            observed_human_projection_callback,
+            observed_human_projection_module,
+        ) = instantiate_official_metrics(cfg, pulp_root, "joint", device)
     records_path = args.records or args.output.with_suffix(".records.jsonl")
     records_path.parent.mkdir(parents=True, exist_ok=True)
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -1207,7 +1266,12 @@ def main() -> None:
             {
                 "num_steps": 1,
                 "time_grid": f"fixed teacher-forced t={args.single_step_timestep}",
-                "observed_branch_policy": "one q(z_gt,t,per_sample_noise) construction; observed branch is clean GT inside the model",
+                "observed_branch_policy": (
+                    "one q(z_gt,t,per_sample_noise) construction; Camera completion receives the exact "
+                    "same-noise q(H_gt,t) inside the model"
+                    if args.observed_latent_intervention == "forward_q"
+                    else "one q(z_gt,t,per_sample_noise) construction; observed branch is clean GT inside the model"
+                ),
                 "padding_policy": "one q(z_gt,t,per_sample_noise) construction; padded frames are restored from GT latent",
                 "noise_seed_base": args.seed + 8009,
             }
@@ -1217,6 +1281,7 @@ def main() -> None:
     metric_batch_index = 0
     quality_records: list[dict[str, Any]] = []
     geometry_records: list[dict[str, Any]] = []
+    physical_records: list[dict[str, Any]] = []
     first_batch_summary: dict[str, Any] | None = None
     with records_path.open("a", encoding="utf-8") as records_handle, torch.no_grad():
         for batch_index, batch in enumerate(loader):
@@ -1228,13 +1293,37 @@ def main() -> None:
             batch_generator = torch.Generator(device=device)
             batch_generator.manual_seed(args.seed + args.start + processed * 1009 + batch_index * 9176)
             text_for_sampling = apply_text_intervention(text, args.text_intervention, generator=batch_generator)
-            z_for_sampling = apply_observed_latent_intervention(
-                z,
-                task_name,
-                args.observed_latent_intervention,
-                train_mod,
-                generator=batch_generator,
-            )
+            observed_x0_for_single_step = None
+            if args.observed_latent_intervention == "forward_q":
+                if args.eval_source != "single_step" or task_name != "camera":
+                    raise ValueError("forward_q observed-H is valid only for Camera completion single-step attribution")
+                if getattr(diffusion, "name", "diffusion") != "diffusion":
+                    raise ValueError("forward_q observed-H requires the diffusion process")
+                condition_noise = deterministic_noise(
+                    tuple(z.shape),
+                    sample_indices,
+                    args.seed + 8009,
+                    z.device,
+                    z.dtype,
+                )
+                condition_t = torch.full(
+                    (z.shape[0],),
+                    args.single_step_timestep,
+                    dtype=torch.long,
+                    device=z.device,
+                )
+                condition_q = diffusion.q_sample(z, condition_t, condition_noise)
+                observed_x0_for_single_step = z.clone()
+                observed_x0_for_single_step[:, : train_mod.HUM_DIM, :] = condition_q[:, : train_mod.HUM_DIM, :]
+                z_for_sampling = z
+            else:
+                z_for_sampling = apply_observed_latent_intervention(
+                    z,
+                    task_name,
+                    args.observed_latent_intervention,
+                    train_mod,
+                    generator=batch_generator,
+                )
             if args.eval_source == "raw_gt":
                 completion = None
             elif args.eval_source == "cache_identity":
@@ -1268,6 +1357,7 @@ def main() -> None:
                     args.joint_coupling_scale if task_name == "joint" else 1.0,
                     args.joint_coupling_mode if task_name == "joint" else "symmetric",
                     task_routing=task_routing,
+                    observed_x0=observed_x0_for_single_step,
                 )
             elif compose_joint:
                 completion = sample_composed_human_first_joint(
@@ -1339,11 +1429,30 @@ def main() -> None:
                         chunk_intrinsics,
                         chunk_pulp_batch["padding_mask"],
                     )
-                outputs = {"raw_input": chunk_raw_input, "raw_output": chunk_raw_output, "x_output": chunk_x_output}
+                outputs = {
+                    "raw_input": chunk_raw_input,
+                    "raw_output": chunk_raw_output,
+                    "x_input": chunk_x_input,
+                    "x_output": chunk_x_output,
+                }
                 official_outputs = official_outputs_for_task(outputs, metric_task_name)
                 geometry_records.extend(
-                    paired_geometry_batch(outputs, chunk_pulp_batch, chunk_sample_ids)
+                    paired_geometry_batch(
+                        outputs,
+                        chunk_pulp_batch,
+                        chunk_sample_ids,
+                        human_feature_mean=human_dataset.feat_mean,
+                        human_feature_std=human_dataset.feat_std,
+                    )
                 )
+                if metric_task_name in {"human", "joint"}:
+                    physical_records.extend(
+                        decoded_human_physical_batch(
+                            outputs,
+                            chunk_pulp_batch,
+                            chunk_sample_ids,
+                        )
+                    )
                 if args.per_sample_quality_output is not None:
                     quality_records.extend(
                         score_joint_quality_batch(
@@ -1354,6 +1463,14 @@ def main() -> None:
                         )
                     )
                 callback.on_test_batch_end(None, module, official_outputs, chunk_pulp_batch, metric_batch_index)
+                if observed_human_projection_callback is not None:
+                    observed_human_projection_callback.on_test_batch_end(
+                        None,
+                        observed_human_projection_module,
+                        official_outputs_for_task(outputs, "joint"),
+                        chunk_pulp_batch,
+                        metric_batch_index,
+                    )
                 metric_batch_index += 1
                 if first_batch_summary is None:
                     first_batch_summary = {
@@ -1406,6 +1523,24 @@ def main() -> None:
 
     callback.on_test_epoch_end(None, module)
     metrics = metric_values(module.eval_metrics)
+    observed_human_projective = None
+    if observed_human_projection_callback is not None:
+        observed_human_projection_callback.on_test_epoch_end(
+            None,
+            observed_human_projection_module,
+        )
+        projection_metrics = metric_values(
+            observed_human_projection_module.eval_metrics
+        )
+        observed_human_projective = {
+            "mode": "observed-Human Camera completion",
+            "human_boundary": "decoded observed Human latent; not free joint generation",
+            "metrics": {
+                key: value
+                for key, value in projection_metrics.items()
+                if key.startswith("test/proj/")
+            },
+        }
     quality_artifact = None
     if args.per_sample_quality_output is not None:
         quality_artifact = rank_joint_quality_records(
@@ -1581,7 +1716,13 @@ def main() -> None:
         },
         "metric_keys": sorted(metrics),
         "metrics": metrics,
+        "observed_human_projective": observed_human_projective,
         "paired_geometry": summarize_paired_geometry(geometry_records, metric_task_name),
+        "decoded_human_physical": (
+            summarize_decoded_human_physical(physical_records)
+            if metric_task_name in {"human", "joint"}
+            else None
+        ),
         "records_path": str(records_path),
         "per_sample_quality": (
             None

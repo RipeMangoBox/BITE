@@ -14,6 +14,7 @@ from typing import Any
 DEFAULT_ROOT = Path("/data/public/ripemangobox/Motion/StoryMotion")
 CFG_DIR = "std_cfg1.0_eta0.0"
 C325_ID = "v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719"
+C325_CANONICAL_EVAL_ID = "v8_1c_c3_25_unified3_105k_eval_r2_canonical4053_seed17_4090g1_20260727"
 L0_ID = "v7_38_l0_clean_lr3em5_105k_purefull_seed17_4090g0_20260715"
 C325_FULL_GROUP = "c3_25_gradio_full_20260721"
 L0_BASELINE_GROUP = "c3_25_gradio_l0_baseline_20260721"
@@ -96,6 +97,20 @@ V9_UNIFIED_EVAL_GROUPS = {
     "joint_parallel": "unified_210k_joint_parallel_n512_r2_20260728",
 }
 V9_CAMERA_VIS_GROUP = "unified_210k_direct_c_joint_parallel_fixed8_20260728"
+CAMERA_105K_C325_VIS_GROUP = "camera_105k_fixed8_composite_20260730"
+PULP_NATIVE_CAMERA_VIS_ID = "pulp_official_native_fixed8_camera105k_20260731"
+PULP_NATIVE_CAMERA_VIS_GROUP = "composite_fps30"
+PULP_NATIVE_CHECKPOINT_SHA256 = (
+    "7c11cb59d5f51b9090abc1448e76329d157459fc30485031f5a79a7a119660d9"
+)
+V11_PURE4053_AUDIT_ID = "v11_four_arm_105k_pure4053_audit_20260730"
+V11_CAMERA_VIS_GROUP = "confirmation_105000_fixed8"
+V11_CAMERA_RUNS = (
+    ("C0-LAT", "v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730"),
+    ("C0-GEO", "v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730"),
+    ("C1-LAT", "v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730"),
+    ("C1-GEO", "v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730"),
+)
 V10_HUMAN_TEACHER_ID = "v10_hrelcam_phasea210k_human_teacher105k_seed17_4090g1_20260729"
 V10_HUMAN_COMPARE_GROUP = "gt_hrecon_v10v9_teacher_cfg1_cfg3_fixed8_r4_20260729"
 V10_STAGE1_ENDPOINT_CHECKPOINT_SHA256 = (
@@ -163,7 +178,7 @@ CSS = """
   padding: 10px 14px;
 }
 .evidence-row { flex-wrap: nowrap !important; gap: 14px; align-items: flex-start; }
-.evidence-row > div { min-width: 0 !important; flex: 1 1 calc(33.333% - 10px) !important; }
+.evidence-row > div { min-width: 0 !important; flex: 0 1 calc(33.333% - 10px) !important; }
 .evidence-row.two-column-row > div { flex-basis: calc(50% - 7px) !important; }
 .evidence-row video {
   background: #151b1d;
@@ -316,6 +331,32 @@ class Evidence:
 
     def v9_camera_vis_root(self) -> Path:
         return self.canonical_vis(V9_PROTECTED_ID) / V9_CAMERA_VIS_GROUP
+
+    def camera_105k_c325_vis_root(self) -> Path:
+        return self.canonical_vis(C325_ID) / CAMERA_105K_C325_VIS_GROUP
+
+    def pulp_native_camera_vis_root(self) -> Path:
+        return self.canonical_vis(PULP_NATIVE_CAMERA_VIS_ID) / PULP_NATIVE_CAMERA_VIS_GROUP
+
+    def pulp_native_camera_source_summary(self) -> Path:
+        return self.canonical_vis(PULP_NATIVE_CAMERA_VIS_ID) / "render_summary.json"
+
+    def c325_camera_comparison_metric(self, filename: str) -> Path:
+        return self.canonical_eval(C325_CANONICAL_EVAL_ID) / filename
+
+    def v11_pure4053_matrix(self) -> Path:
+        return (
+            self.root
+            / "runs"
+            / "legacy"
+            / "eval"
+            / "stage2"
+            / V11_PURE4053_AUDIT_ID
+            / "matrix_audit.json"
+        )
+
+    def v11_camera_vis_root(self, run_id: str) -> Path:
+        return self.canonical_vis(run_id) / V11_CAMERA_VIS_GROUP
 
     def v10_human_compare_root(self) -> Path:
         return self.canonical_vis(V10_HUMAN_TEACHER_ID) / V10_HUMAN_COMPARE_GROUP
@@ -906,6 +947,199 @@ def v9_protected_view(
     ]
 
 
+def camera_105k_compare_view(
+    ev: Evidence,
+    variants: tuple[tuple[str, dict[str, Any]], ...],
+    sample_id: str,
+):
+    records = []
+    for label, payload in variants:
+        record = next(
+            item for item in payload["records"] if str(item["sample_id"]) == sample_id
+        )
+        records.append((label, record))
+    sample_ids = [str(item["sample_id"]) for item in variants[0][1]["records"]]
+    status = (
+        f"### Fixed-ID #{sample_ids.index(sample_id) + 1} · `{sample_id}` · "
+        f"{records[0][1]['valid_frames']} raw frames\n\n"
+        "外层七格各对应一个系统或实验 variant；每个视频内部均为上排 world skeleton、下排 "
+        "owning-camera projection。StoryMotion 六路的三列依次为 GT / Direct-C / formal joint；"
+        "PulpMotion official 的三列为 GT / native joint no-aux / native joint aux。  \n"
+        "**C3-25 与 v9：** formal joint 为 joint-parallel。  \n"
+        "**v11 四臂：** formal joint 为 sequential Human→Camera；按 v11 合同不展示或伪标 "
+        "joint-parallel。  \n"
+        "**PulpMotion official：** native joint-only baseline，不存在 StoryMotion Direct-C 接口；"
+        "不得把 no-aux 标成 Direct-C。七路共享 ordered fixed-8 ID，但 representation / decoder / "
+        "sampler 与 formal mode 不同，因此本页用于 matched-ID 视觉审查，不是单变量 ablation。"
+    )
+    return [
+        status,
+        *[existing(evidence_path(ev, str(record["video"]))) for _, record in records],
+    ]
+
+
+def camera_105k_metric_rows(ev: Evidence) -> list[dict[str, Any]]:
+    def official_row(
+        version_run: str,
+        mode: str,
+        samples: int,
+        metrics: dict[str, Any],
+        geometry: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        geometry = geometry or {}
+        return {
+            "version_run": version_run,
+            "mode": mode,
+            "samples": samples,
+            "fdclatr": metrics.get("test/clatr/fcd"),
+            "clatr": metrics.get("test/clatr/clatr_score"),
+            "coverage": metrics.get("test/clatr/coverage"),
+            "caption_f1": metrics.get("test/captions/fscore"),
+            "camera_ade": geometry.get("camera_center_ade"),
+            "camera_fde": geometry.get("camera_center_fde"),
+            "camera_rotation": geometry.get("camera_rotation_deg"),
+            "r_fpd": metrics.get("test/proj/r_fpd"),
+            "outscreen": metrics.get("test/proj/outscreen"),
+        }
+
+    c325_direct = load_json(ev.c325_camera_comparison_metric("direct_c_observed_h.json"))
+    c325_joint = load_json(ev.c325_camera_comparison_metric("joint_parallel.json"))
+    if any(item.get("evaluated_samples") != 4_053 for item in (c325_direct, c325_joint)):
+        raise RuntimeError("C3-25 Camera comparison metrics are not pure4,053")
+
+    v9_direct = load_json(ev.v9_eval_result(V9_UNIFIED_EVAL_GROUPS["direct_c"]))
+    v9_joint = load_json(ev.v9_eval_result(V9_UNIFIED_EVAL_GROUPS["joint_parallel"]))
+    if any(item.get("samples") != 512 for item in (v9_direct, v9_joint)):
+        raise RuntimeError("v9 Camera comparison metrics are not matched N=512")
+
+    v11 = load_json(ev.v11_pure4053_matrix())
+    if (
+        v11.get("status") != "audited_pure4053"
+        or v11.get("sample_count") != 4_053
+        or v11.get("joint_parallel") is not False
+        or set(v11.get("arms", {})) != {"c0_lat", "c0_geo", "c1_lat", "c1_geo"}
+    ):
+        raise RuntimeError("v11 pure4,053 matrix contract mismatch")
+
+    pulp = load_json(ev.pulp_native_camera_source_summary())
+    pulp_contract = pulp.get("pulp_official_stage2", {})
+    pulp_metrics = pulp.get("official_metrics", {})
+    if (
+        pulp_contract.get("checkpoint_sha256") != PULP_NATIVE_CHECKPOINT_SHA256
+        or pulp_contract.get("checkpoint_global_step") != 92_950
+        or any(
+            pulp_metrics.get(key, {}).get("evaluated_samples") != 4_053
+            for key in ("pulp_no_aux", "pulp_aux")
+        )
+    ):
+        raise RuntimeError("PulpMotion official metric contract mismatch")
+
+    rows = [
+        official_row(
+            f"v8.1C C3-25 / {C325_CANONICAL_EVAL_ID}",
+            "Direct-C observed-H",
+            4_053,
+            c325_direct["metrics"],
+            c325_direct["paired_geometry"]["overall_mean"],
+        ),
+        official_row(
+            f"v8.1C C3-25 / {C325_CANONICAL_EVAL_ID}",
+            "joint parallel",
+            4_053,
+            c325_joint["metrics"],
+            c325_joint["paired_geometry"]["overall_mean"],
+        ),
+        official_row(
+            f"v9 / {V9_PROTECTED_ID}",
+            "Direct-C",
+            512,
+            v9_direct["official_metrics"]["camera"],
+            v9_direct["paired_geometry"]["camera"]["overall_mean"],
+        ),
+        official_row(
+            f"v9 / {V9_PROTECTED_ID}",
+            "joint parallel",
+            512,
+            v9_joint["official_metrics"]["joint"],
+            v9_joint["paired_geometry"]["camera"]["overall_mean"],
+        ),
+    ]
+    arm_order = (
+        ("C0-LAT", "c0_lat"),
+        ("C0-GEO", "c0_geo"),
+        ("C1-LAT", "c1_lat"),
+        ("C1-GEO", "c1_geo"),
+    )
+    for label, key in arm_order:
+        arm = v11["arms"][key]
+        for mode, display_mode in (
+            ("direct_c", "Direct-C observed-H"),
+            ("sequential_joint", "formal sequential"),
+        ):
+            metrics = arm["official"][mode]
+            coverage_key = "coverage" if mode == "direct_c" else "camera_coverage"
+            geometry = arm["paired_geometry"][mode]["overall_mean"]
+            rows.append(
+                {
+                    "version_run": arm["version_run"],
+                    "mode": display_mode,
+                    "samples": 4_053,
+                    "fdclatr": metrics["fdclatr"],
+                    "clatr": metrics["clatr"],
+                    "coverage": metrics[coverage_key],
+                    "caption_f1": metrics["caption_f1"],
+                    "camera_ade": geometry["camera_center_ade"],
+                    "camera_fde": geometry["camera_center_fde"],
+                    "camera_rotation": geometry["camera_rotation_deg"],
+                    "r_fpd": metrics["r_fpd"],
+                    "outscreen": metrics["outscreen"],
+                }
+            )
+    for key, display_mode in (
+        ("pulp_no_aux", "native joint no-aux"),
+        ("pulp_aux", "native joint aux"),
+    ):
+        rows.append(
+            official_row(
+                "PulpMotion official / dit-xy-ddpm-p2ee3dj7 step92,950",
+                display_mode,
+                4_053,
+                pulp_metrics[key]["metrics"],
+                None,
+            )
+        )
+    return rows
+
+
+def camera_105k_metric_table(ev: Evidence) -> str:
+    def cell(value: Any, digits: int) -> str:
+        return "N/A" if value is None else f"{float(value):.{digits}f}"
+
+    table_rows = []
+    for row in camera_105k_metric_rows(ev):
+        table_rows.append(
+            f"| {row['version_run']} | {row['mode']} | {row['samples']:,} | "
+            f"{cell(row['fdclatr'], 3)} | {cell(row['clatr'], 3)} | "
+            f"{cell(row['coverage'], 4)} | {cell(row['caption_f1'], 4)} | "
+            f"{cell(row['camera_ade'], 4)} / {cell(row['camera_fde'], 4)} | "
+            f"{cell(row['camera_rotation'], 3)} | "
+            f"{cell(row['r_fpd'], 4)} / {cell(row['outscreen'], 4)} |"
+        )
+    return "\n".join(
+        [
+            "### Camera system metric index",
+            "",
+            "指标来自各系统已有formal artifact，不是fixed-8视频本身的统计。v9仅有matched `N=512`；"
+            "C3、v11与Pulp为pure-test `N=4,053`。representation、decoder、sampler与formal joint定义"
+            "不同，本表用于同页证据索引，不构成单变量排名。Pulp没有Direct-C或当前StoryMotion decoded-geometry，故显示`N/A`。",
+            "",
+            "| version / run | mode | N | FDCLaTr ↓ | CLaTr ↑ | coverage ↑ | caption F1 ↑ | Cam ADE / FDE ↓ m | rotation ↓ deg | r-FPD / Out ↓ |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | --- |",
+            *table_rows,
+        ]
+    )
+
+
 def v9_eval_metrics(ev: Evidence) -> str:
     human = load_json(ev.v9_eval_result(V9_HUMAN_EVAL_GROUP))
     direct_h = load_json(ev.v9_eval_result(V9_UNIFIED_EVAL_GROUPS["direct_h"]))
@@ -972,7 +1206,26 @@ def validate(ev: Evidence) -> dict[str, Any]:
     stage1_recon = load_json(ev.stage1_recon_manifest())
     v9_human_vis = load_json(ev.v9_human_vis_root() / "visual_manifest.json")
     v9_camera_vis = load_json(ev.v9_camera_vis_root() / "visual_manifest.json")
+    camera_105k_variants = (
+        (
+            "C3-25",
+            load_json(ev.camera_105k_c325_vis_root() / "visual_manifest.json"),
+        ),
+        ("v9", v9_camera_vis),
+        *[
+            (
+                f"v11 {label}",
+                load_json(ev.v11_camera_vis_root(run_id) / "visual_manifest.json"),
+            )
+            for label, run_id in V11_CAMERA_RUNS
+        ],
+        (
+            "PulpMotion official",
+            load_json(ev.pulp_native_camera_vis_root() / "visual_manifest.json"),
+        ),
+    )
     v10_human_compare = load_json(ev.v10_human_compare_manifest())
+    camera_metric_rows = camera_105k_metric_rows(ev)
     v9_eval_results = {
         "human_teacher": load_json(ev.v9_eval_result(V9_HUMAN_EVAL_GROUP)),
         **{
@@ -998,6 +1251,36 @@ def validate(ev: Evidence) -> dict[str, Any]:
     v9_human_ids = [str(record["sample_id"]) for record in v9_human_vis["paired_records"]]
     if v9_human_ids != [str(record["sample_id"]) for record in v9_camera_vis["records"]]:
         raise RuntimeError("v9 Human and Camera fixed-8 sample IDs are not aligned")
+    camera_105k_ids = [str(record["sample_id"]) for record in v9_camera_vis["records"]]
+    camera_105k_hash = v9_camera_vis.get("ordered_ids_sha256")
+    for label, payload in camera_105k_variants:
+        if (
+            payload.get("status") != "rendered"
+            or payload.get("samples") != 8
+            or payload.get("is_causal") is not False
+        ):
+            raise RuntimeError(f"Camera 105K {label} visualization is incomplete or causal")
+        if [str(record["sample_id"]) for record in payload.get("records", [])] != camera_105k_ids:
+            raise RuntimeError(f"Camera 105K {label} fixed-8 sample IDs differ")
+        if payload.get("ordered_ids_sha256") != camera_105k_hash:
+            raise RuntimeError(f"Camera 105K {label} ordered-ID SHA256 mismatch")
+    c325_camera_105k = camera_105k_variants[0][1]
+    if c325_camera_105k.get("step") != 105_000 or c325_camera_105k.get("joint_parallel") is not True:
+        raise RuntimeError("C3-25 Camera 105K visual contract mismatch")
+    for label, payload in camera_105k_variants[2:-1]:
+        if (
+            payload.get("step") != 105_000
+            or payload.get("joint_parallel") is not False
+            or payload.get("modes") != ["direct_c", "sequential_joint"]
+        ):
+            raise RuntimeError(f"Camera 105K {label} v11 formal-joint contract mismatch")
+    pulp_native = camera_105k_variants[-1][1]
+    if (
+        pulp_native.get("step") != 92_950
+        or pulp_native.get("joint_parallel") is not None
+        or pulp_native.get("modes") != ["native_joint_no_aux", "native_joint_aux"]
+    ):
+        raise RuntimeError("PulpMotion official native visual contract mismatch")
     if len(v9_human_vis.get("blind_records", [])) != len(v9_human_ids):
         raise RuntimeError("v9 Human paired and blind visualization counts differ")
     if (
@@ -1301,6 +1584,32 @@ def validate(ev: Evidence) -> dict[str, Any]:
         required.append(path)
         if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() != record["video_sha256"]:
             raise RuntimeError(f"v9 Camera video SHA256 mismatch: {path}")
+    for label, payload in (camera_105k_variants[0], *camera_105k_variants[2:]):
+        if label == "C3-25":
+            manifest_path = ev.camera_105k_c325_vis_root() / "visual_manifest.json"
+        elif label == "PulpMotion official":
+            manifest_path = ev.pulp_native_camera_vis_root() / "visual_manifest.json"
+        else:
+            manifest_path = (
+                ev.v11_camera_vis_root(
+                    next(run_id for arm, run_id in V11_CAMERA_RUNS if f"v11 {arm}" == label)
+                )
+                / "visual_manifest.json"
+            )
+        required.append(manifest_path)
+        for record in payload["records"]:
+            path = evidence_path(ev, str(record["video"]))
+            required.append(path)
+            if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() != record["video_sha256"]:
+                raise RuntimeError(f"Camera 105K {label} video SHA256 mismatch: {path}")
+    required.extend(
+        [
+            ev.c325_camera_comparison_metric("direct_c_observed_h.json"),
+            ev.c325_camera_comparison_metric("joint_parallel.json"),
+            ev.v11_pure4053_matrix(),
+            ev.pulp_native_camera_source_summary(),
+        ]
+    )
     missing = [path for path in required if not path.is_file()]
     if missing:
         preview = "\n".join(str(path) for path in missing[:20])
@@ -1317,6 +1626,8 @@ def validate(ev: Evidence) -> dict[str, Any]:
         "stage1_pulp_samples": stage1_recon["groups"]["pulp"]["samples"],
         "stage1_hml_samples": stage1_recon["groups"]["hml"]["samples"],
         "v9_human_camera_samples": len(v9_human_ids),
+        "camera_105k_variants": len(camera_105k_variants),
+        "camera_105k_metric_rows": len(camera_metric_rows),
         "v10_human_compare_samples": v10_human_compare["samples"],
         "screen_ordered_ids_sha256": ordered_ids,
         "single_step_timesteps": len(SINGLE_STEP_TIMESTEPS),
@@ -1336,6 +1647,24 @@ def build_demo(ev: Evidence):
     stage1_recon = load_json(ev.stage1_recon_manifest())
     v9_human_vis = load_json(ev.v9_human_vis_root() / "visual_manifest.json")
     v9_camera_vis = load_json(ev.v9_camera_vis_root() / "visual_manifest.json")
+    camera_105k_variants = (
+        (
+            "C3-25",
+            load_json(ev.camera_105k_c325_vis_root() / "visual_manifest.json"),
+        ),
+        ("v9", v9_camera_vis),
+        *[
+            (
+                f"v11 {label}",
+                load_json(ev.v11_camera_vis_root(run_id) / "visual_manifest.json"),
+            )
+            for label, run_id in V11_CAMERA_RUNS
+        ],
+        (
+            "PulpMotion official",
+            load_json(ev.pulp_native_camera_vis_root() / "visual_manifest.json"),
+        ),
+    )
     v10_human_compare = load_json(ev.v10_human_compare_manifest())
     c325_index = summary_index(c325_summary)
     single_index = summary_index(single_summary)
@@ -1368,8 +1697,9 @@ def build_demo(ev: Evidence):
     with gr.Blocks(title="StoryMotion Stage1 and Stage2 evidence") as demo:
         gr.Markdown("# StoryMotion · Stage1 / Stage2 evidence desk", elem_id="hero")
         gr.Markdown(
-            "**对照：C3-25 mainline、H-FULL 与 H-ISOLATED，均为 seed17 · fresh Stage2 105K。** "
-            "三者共享 exact Stage1/cache/normalization、task allocation 与 owning decoder；"
+            "**当前系统主线：v11 C0-LAT 与 C0-GEO；C3-25 为 former-mainline baseline。** "
+            "旧 H-FULL／H-ISOLATED 页均为 seed17 · fresh Stage2 105K，并共享各自声明的"
+            "exact Stage1/cache/normalization、task allocation 与 owning decoder；"
             "H-FULL/H-ISOLATED 只改变 Human slice 的 Camera latent/text view。"
             "独立 Human-only 页固定展示 native 192D Direct-H 的四个训练快照；"
             "六路 Human 页并排显示同 ID 的 GT、Stage1、C3-25、MARDM 与两条 ViMoGen-light；"
@@ -1424,6 +1754,39 @@ def build_demo(ev: Evidence):
                 outputs = [status, *videos]
                 callback = lambda sample_id: v9_protected_view(
                     ev, v9_human_vis, v9_camera_vis, sample_id
+                )
+                sample.change(callback, sample, outputs)
+                demo.load(callback, sample, outputs)
+
+            with gr.Tab("Camera 105K + Pulp · Seven systems"):
+                gr.Markdown(
+                    camera_105k_metric_table(ev),
+                    elem_classes=("metric-strip", "camera-metrics"),
+                )
+                sample_ids = [
+                    str(record["sample_id"])
+                    for record in camera_105k_variants[0][1]["records"]
+                ]
+                sample = gr.Dropdown(
+                    sample_ids,
+                    value=sample_ids[0],
+                    label="Matched ordered fixed-8 sample",
+                )
+                status = gr.Markdown(elem_classes="metric-strip")
+                videos = video_grid(
+                    (
+                        "C3-25 · former baseline · 105K · joint-parallel",
+                        "v9 · Camera 105K · joint-parallel",
+                        "v11 C0-LAT · co-mainline · Camera 105K · sequential",
+                        "v11 C0-GEO · co-mainline · Camera 105K · sequential",
+                        "v11 C1-LAT · Camera 105K · sequential",
+                        "v11 C1-GEO · Camera 105K · sequential",
+                        "PulpMotion official · native step 92,950 · joint",
+                    )
+                )
+                outputs = [status, *videos]
+                callback = lambda sample_id: camera_105k_compare_view(
+                    ev, camera_105k_variants, sample_id
                 )
                 sample.change(callback, sample, outputs)
                 demo.load(callback, sample, outputs)
@@ -1672,7 +2035,9 @@ def main() -> int:
         str(ev.stage1_recon_root().resolve()),
         str(ev.v9_human_vis_root().resolve()),
         str(ev.v9_camera_vis_root().resolve()),
+        str(ev.pulp_native_camera_vis_root().resolve()),
         str(ev.v10_human_compare_root().resolve()),
+        *[str(ev.v11_camera_vis_root(run_id).resolve()) for _, run_id in V11_CAMERA_RUNS],
     ]
     demo.launch(server_name=args.host, server_port=args.port, share=False, allowed_paths=allowed, css=CSS)
     return 0

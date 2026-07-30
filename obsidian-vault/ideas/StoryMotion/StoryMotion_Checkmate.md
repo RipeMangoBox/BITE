@@ -2,10 +2,9 @@
 title: "StoryMotion Checkmate: Problem-to-Decision Map"
 status: active
 hypothesis: |
-  v8.1A 的 Human 几何收益是真实且可复现的，但 Camera 问题由 Stage1
-  translation/rotation/long-slope trade-off 与 Stage2 decoder-sensitive
-  residual calibration 两层共同构成；必须按层、按单变量关闭，不能用更长训练、
-  condition-path 重写或继续扫 camera-center weight 代替归因。
+  StoryMotion 的关键不是把 Human 与 Camera 强行压入同一 latent，而是区分
+  可独立控制的 Human anchor、必要的 Human–Camera interaction 与 Camera state；
+  Stage2 还必须让时域建模、文本条件和连续 latent 的生成过程彼此匹配。
 tags:
   - StoryMotion
   - checkmate
@@ -19,15 +18,15 @@ source_notes:
   - "[[current]]"
   - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
-  - "[[current]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
+  - "[[2026-07-27_storymotion-stage1-human-anchor-residual-control]]"
 source_papers:
   - "[[analysis/arxiv_2026/What_Matters_for_Diffusion_Friendly_Latent_Manifold_Prior_Aligned_Autoencoders_for_Latent_Diffusion]]"
   - "[[analysis/SIGGRAPH_ASIA_2023/GeoLatent_A_Geometric_Approach_to_Latent_Space_Design_for_Deformable_Shape_Generators]]"
   - "[[analysis/CVPR_2024/DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance]]"
   - "[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions]]"
 created: 2026-07-19T12:48:00+08:00
-updated: 2026-07-21T15:42:04+08:00
+updated: 2026-07-28T12:19:45+08:00
 ---
 
 # StoryMotion Checkmate
@@ -63,12 +62,18 @@ flowchart TD
     L --> O{"Direct-C gate"}
     O -->|pass| P["再处理 joint parallel fusion"]
     O -->|fail| Q["停止或细化 objective；不先改 inference"]
+    M --> W["Stage2 external systems：MARDM 与 ViMoGen-light"]
+    W --> X["ViMoGen-light CLIP：N512 + fixed8 Human-only 最强 endpoint"]
+    X --> X2["仍非 Camera/joint 或 pure-backbone 证据"]
+    C --> Y["Redesign Stage1：Human anchor + interaction residual + Camera latent"]
+    Y --> Z["Pulp-only fixed8：独立控制机制与视觉偏好"]
+    Y --> Z2["HML partial arm：rot6D 伪缺失输入使 checkpoint 禁止进入 Stage2"]
 ```
 
 > [!abstract] 一页裁决
-> C3-25 seed17 已完成 Stage1 `636K` owning-decoder audit 与 Stage2 Unified-3 `105K` 三路 formal audit，形成 Human/Camera Pareto；Direct-H 与 Direct-C 多数指标击败 former mainline v7.38 L0，joint parallel 无 broad regression。global-slope 的旧阈值现为非阻塞 diagnostic，C3-25 判定通过并正式成为当前 Stage1/Stage2 mainline。原始 `26.302 mm/100f` 继续作为长程 limitation 报告。C3-50 证明更高 center dose 会伤害 Human horizon，C4-H/C5-B 未给出跨 seed 稳定 repair，因此这些轴关闭为 optional follow-up，不影响 mainline selection。seed23 Stage2 结果仍待 audit。
+> C3-25 seed17 仍是唯一完成 non-causal Stage1 与 Unified-3 `105K` 三模式 formal audit 的 mainline。新证据增加了两个方向：其一，redesigned Stage1 证明 Human latent 可以在结构上对 Camera 输入严格不变，并在 fixed-8 Pulp 视觉审查中展示更强的独立控制感；其二，ViMoGen-light CLIP 在同一 fixed-C3 Human cohort 的 canonical N=512 与 fixed-8 视觉审查中成为最强 Human-only endpoint。两者都还不能替代 mainline：HML+Pulp arm 使用被禁止的 rot6D 均值填充，不能进入 Stage2；ViMoGen-light 没有 Camera/joint branch，且 strict physical gate 未闭合。
 
-精确数值、四个长度 bin 与 hashes 只由 [[StoryMotion-valid-metric-ledger]] 维护；当前状态只看 [[current]]；本页只维护问题如何被验证、结论如何被收窄的因果脉络。
+精确数值与四个长度 bin 只由 [[StoryMotion-valid-metric-ledger]] 维护，hashes 只由 [[Storymotion-exp-sha]] 维护；当前状态只看 [[current]]；本页只维护问题如何被验证、结论如何被收窄的因果脉络。
 
 ## 1. 先把 Stage1 与 Stage2 分开
 
@@ -244,7 +249,7 @@ GPU kernel 已经在执行时，HDD 不会降低 CUDA core 本身的算力；真
 4. **三卡作为一个批次：** 4090 双卡用于两 seed fresh matched screens；5090 GPU0 先完成 read-only calibration/contract与 sealed-audit preflight，短筛双过后才获得一次 fresh full 资格。具体分工和 stop/go 条件须用户确认后执行，不能单独启动或监看某一 arm。
 5. **Stage2 S-C objective：** 只有新的 Stage1 candidate 过 gate 后，做一个 Direct-C-only、decoder-sensitivity-aware residual/objective 单变量 short control；Direct-C 通过后才允许 joint parallel camera balance/fusion。
 
-精确 C4 剂量、短筛阈值和 artifact hashes 只见 [[version_family#v8.1 命名解码与执行状态]] 与 [[StoryMotion-valid-metric-ledger]]。
+精确 C4 剂量与短筛阈值只见 [[version_family#v8.1 命名解码与执行状态]] 与 [[StoryMotion-valid-metric-ledger]]；artifact hashes 只见 [[Storymotion-exp-sha]]。
 
 ## 9. 数据清洗与 SFT 为什么是可行但独立的轴
 
@@ -255,3 +260,130 @@ PulpMotion 同时存在两种数据风险：motion 物理问题与 caption-motio
 - **清洗必须 pair-level、可逆、可归因。** caption 错时隔离该 caption-motion pair，不删除整条 motion；保留 immutable parent manifest、reason code 与 physical-only/semantic-only attribution。clean-only 是第一控制，只有观察到遗忘再单列 raw replay，不能把 replay 与清洗收益混成一个结论。
 
 因此当前顺序不变：先关闭 representation gate，再以固定 parent 分开比较 raw continuation 与 clean SFT。完整 manifest lineage、零/非零计数和启动 gate 只由 [[2026-07-17_storymotion-v8-2333-data-curation-plan]] 维护。
+
+## 10. Redesign Stage1：为什么要把 Human anchor 与 interaction 分开
+
+### 10.1 动机与实现
+
+旧 joint AE 把 Human 与 Camera 放在共享表示中，容易把两个不同需求混成一个容量竞争：Human motion 应能在没有 Camera 时独立编码、重建和复用；Camera 又必须读取 Human 才能维护构图与投影关系。redesign 因而采用**非对称解耦**，而不是假设两者完全独立：
+
+$$
+z_h=E_h(H),\qquad z_{hc}=E_{hc}(H,C),\qquad z_c=E_c(C\mid z_h,z_{hc})
+$$
+
+$$
+\hat H=D_h(z_h),\qquad (\hat C,\hat F)=D_{c,f}(z_h,z_{hc},z_c)
+$$
+
+- `z_h` 为 Camera-free Human anchor，维度 `128`；`D_h` 只读取 `z_h`。
+- `z_hc` 为低维 interaction residual，维度 `16`，只承载不能由单支独立解释的 H–C 关系。
+- `z_c` 为 Camera state，维度 `48`；Camera 与 framing decoder保留对 Human anchor 和 interaction 的读取。
+- 全部 encoder/decoder 为 `is_causal is False`。训练分为 Human anchor、冻结 Human 的 Camera/interaction、低 Human 学习率 joint replay 三个阶段，避免 Camera objective 在表示成形前污染 Human anchor。
+
+这套设计刻意阻断的是 `Camera input → Human latent/output`，而不是阻断 `Human → Camera`。后者对构图、相对距离和投影本来就是必要依赖。因此准确名称是 **Human-first asymmetric decoupling**，不是双向独立的两个模型。
+
+### 10.2 哪些证据支持解耦，哪些还不支持
+
+当前支持两层结论：
+
+1. **结构性证据：** `encode_joint(H,C)` 内的 `z_h` 直接调用 `encode_human(H)`；preflight 把同一 Human 配上随机 Camera 后，逐元素验证 `z_h` 完全不变。这不是相关性，而是代码路径保证的 Camera-invariance。
+2. **decoded branch 证据：** Pulp-only 与 HML+Pulp 在 GT-Human-origin 的 Camera trajectory 结果近似不变，而 Human 与 joint projection 明显分离。这说明 Camera decoder 自身没有随 Human 数据轴一起发生同量级崩坏。
+
+但这**不能**证明端到端 H–C 已完全独立：Camera decoder 仍显式读取 `z_h`，owning-camera origin 与屏幕投影仍依赖 decoded Human root/heading；Human 一旦漂移，joint Camera center 和 projection 会被放大。当前最强结论是：**redesign 有效隔离了 Human 表示免受 Camera 输入污染，并增强了单向独立控制；联合几何仍按设计耦合。** 若要升级为 population-level independent-control claim，还需要固定 H 改 C、固定 C 改 H 的 intervention matrix、latent swap 和 cross-Jacobian 审计。
+
+### 10.3 HML rot6D：可转换的是编码，不是已经丢失的观测
+
+`rot6D` 只是旋转矩阵的连续序列化；在 joint order、局部/全局定义、坐标基和 rest pose 都已知时，`rot6D ↔ SO(3)` 本身可以可靠转换。当前失败的是 **HumanML RIC263 → Pulp TRAM/SMPL observed rotation** 这条信息链：
+
+| boundary | 现有来源 | 信息状态 | 能否直接作为 Pulp `4:136` 监督 |
+| --- | --- | --- | --- |
+| HumanML RIC263 | 规范化关节位置经 fixed-skeleton IK 得到的 21-joint rotation；root heading另存 | bone-axis twist、leaf orientation、个体 shape/rest offsets 与部分 root orientation 已被丢弃或规范化 | 否；只能是带 provenance 的 retarget pseudo-label |
+| Pulp Human199 | TRAM/SMPL 路径给出的 22-joint local rotation，随后由 Pulp RIFKE 分离累计 yaw | 是 Pulp owning representation 的观测/估计通道 | 是 |
+| HumanML source pose / verified 272 builder | 上游 SMPL-family axis-angle 或 rotation matrix，可保留 22-joint local rotation | 若 joint map、body model、坐标与 root factorization 闭合，则没有 IK 的一对多逆问题 | 有条件可以 |
+
+根本障碍是 joint positions 到 rotations **非单射**：绕骨轴 twist 不改变下一关节位置，leaf joint rotation甚至不改变任何关节点；IK 只能依靠 skeleton、平滑和先验选择一个解。HumanML 的 uniform-skeleton、落地/原点/朝向规范化还进一步删除了与 Pulp 不同的观测自由度。因此从现有 RIC263 无法恢复“当时 TRAM/SMPL 会观测到的那个旋转”。线性插值 IK rot6D 后再正交化只能得到确定的伪旋转，不能把它变回同源测量。
+
+本次 HML arm 把 `4:136` 写成 Pulp 归一化均值、又不提供显式 missingness token，并把该块排除出 HML objective。即使数值有限，这仍把“缺失”伪装成“观测到平均姿态”；按当前政策是禁止的。由此训练出的 HML+Pulp checkpoint：
+
+- 可保留为 root/local partial-supervision diagnostic 的不可变 artifact；
+- 不得称为完整 Human199 tokenizer；
+- 不得构建正式 Stage2 cache、训练 Stage2 或参与 promotion。
+
+若继续使用 HML，有两条合规路线：
+
+1. **首选：从共同上游旋转重建。** 使用 HumanML/AMASS 的原始 SMPL-family pose，而不是 RIC263 IK；冻结 body model、joint map、rest offsets、轴系、root-yaw 分解与 20→30 fps 的 SO(3) 插值；用 FK/SMPL joint round-trip、逐关节 geodesic 和 Pulp 分布审计后再填 `4:136`。
+2. **信息确实缺失时显式建模。** HML 只进入独立 root/local encoder 或 geometry auxiliary，并携带 availability mask/domain token；缺失通道不写入 shared full-Human input，也不生成 full-Human Stage2 cache。
+
+4090 的 MotionStreamer272 副本虽含 22×rot6D，本机相邻 codebase 的 self-builder也显示它可以从 HumanML source `pose_data` 的 axis-angle 构造，而不是从 RIC263 joint IK 反推；这是一条可行候选。不过当前副本少于 split 声明的 motion 数，下载数据也没有与该 self-builder闭合的逐文件 provenance。它必须先补齐 immutable manifest，并完成 joint map、row/column 6D serialization、root heading、fps 和 FK round-trip，不能仅凭“有 272 维”直接放行。
+
+### 10.4 run 名末尾的 `r2/r3/r4`
+
+`rN` 是**该 artifact 类型内部**的 revision/retry ordinal，用来保证 fail-close 后不复用旧 root；它不是模型 setting、seed、epoch、数据版本或优劣等级。不同对象各自计数，不能横向对齐：
+
+- training run 的 `r3` 表示该训练 arm 的第三个命名 revision，当前有效 endpoint 恰好落在 `r3`；
+- Pulp true-length eval 的 `r4` 是该 eval root 的第四个 revision；
+- HML true-length eval 的 `r2` 是另一条 evaluator lineage 的第二个 revision；
+- fixed-8 bundle 或 Gradio 的 `r1/r3` 又是各自独立的 visual artifact revision。
+
+因此 “Pulp-only r3” 和 “eval r4” 不组成一个叫作 `r3/r4` 的算法配置。语义只能由完整 run ID、`experiment_contract.json` 或 `evaluation_contract.json` 决定；ordinal gap 会在旧 root 删除或归档后保留，不能据此重建失败原因或排序。
+
+### 10.5 当前视觉结论与末帧 Camera 跳变
+
+fixed-8 synchronized review 支持以下分层结论：
+
+- **核心视觉结论：** Redesign Stage1 Pulp-only 显著优于同一 redesign 的 HML+Pulp，并展示出比 C3-25 Stage1 更清楚的 Human-first controllability；在该 cohort 上，Human/Camera 观感相对 C3-25 没有可见恶化。canonical reconstruction 数值仍显示 C3-25 的 Human geometry更强，所以这是一条视觉与机制结论，不是替换 formal metric 排名。
+- **共享 failure：** C3-25 Stage1 与 redesign Pulp-only 在若干 sample 的最后一帧都有明显 Camera 跳动，随即造成 owning-camera projection 骤变。两者使用不同 Stage1 topology，却共享 Camera14 的速度积分与 terminal decode boundary；当前只能把它列为共同表示/解码边界的候选问题，不能直接归因于 redesign。
+- **OOD diagnostic：** Redesign Pulp-only 已能 zero-shot 重建若干 HumanML in-domain 动作，达到“Human anchor 可跨域工作”的最低预期；HML+Pulp 在 root/local 上进一步改善。但二者都随时间出现不合理的整人旋转。HML visualizer 只读取 root/local geometry，不读取 decoded rot6D，因此画面中的直接责任通道是累计 yaw/root；Pulp-mean rot6D 可能通过 shared encoder/domain cue 间接加剧该问题，但现有证据不能把全身旋转直接归因于 rot6D 渲染。
+
+末帧 Camera 的最小验证不是继续看视频，而是从现有 fixed samples 读取最后两步 Camera center displacement、SO(3) geodesic 与 projection delta，并与倒数第二步、GT、sequence length modulo 4 分组比较；随后做 last-frame hold/clamp replay。只有 spike 与 ConvTranspose/crop phase 或 Camera14 velocity endpoint稳定对应时，才能确定是 decoder boundary 还是数据终点定义。
+
+## 11. 为什么 ViMoGen-light CLIP 更适配 Human motion generation
+
+### 11.1 已经成立的证据
+
+在相同 C3-25 Human128 representation、owning decoder、first-512 ordered cohort 与 `105K` 预算下，ViMoGen-light CLIP 同时获得本轮最强的综合 canonical Human endpoint和 fixed-8 视觉偏好；同一 E6 topology/objective/sampler 内，CLIP 除 coverage 外也整体优于 UMT5。精确数值只由 [[StoryMotion-valid-metric-ledger]] 维护。
+
+这支持“ViMoGen-light CLIP 是本轮 Human-only system interaction 的胜出者”，但尚不支持三种更强说法：
+
+- 它没有 Camera 或 joint branch，不能替换 Unified-3 mainline；
+- 它仍未通过 strict Human physical-quality gate；
+- 相对 C3/MARDM 同时改变 topology、objective、sampler 和 condition interface，不能把全部收益归因于 pure backbone capacity。
+
+### 11.2 任务适配机制
+
+| 维度 | C3 Unified CondMDI | MARDM control | ViMoGen-light CLIP | 对本任务的可能影响 |
+| --- | --- | --- | --- | --- |
+| temporal operator | multi-scale Conv1d U-Net，局部卷积与下/上采样 | masked autoregressive token recovery + SiT denoising | 每个 latent frame是 token，逐层 full self-attention | Human root/heading 与动作阶段可在全序列直接交换信息 |
+| text interface | Camera/Human pooled CLIP halves经 MLP 合成全局 condition | cached pooled Human CLIP | 完整 CLIP token sequence逐层 cross-attention | 动作、方向、速度与修饰语不必先压成一个向量 |
+| generative path | `START_X` diffusion + DDIM | mask schedule + continuous denoiser | shifted continuous flow + deterministic Euler | 对连续、平滑、稠密的 motion latent 提供更直接的全程 velocity field |
+| task burden | 同一 trunk承担 Direct-H、Direct-C、joint parallel | Human-only | Human-only | E6 不承受 Camera/joint exposure 与梯度竞争 |
+
+最可信的组合解释是：
+
+1. **全局时域归纳偏置匹配。** C3 Human latent 只有有限长度，但 root/heading error会沿时间累积。full self-attention 让任何 frame 直接参考起点、终点和动作相位，比纯局部卷积路径更容易维持全局一致性。
+2. **文本是 token-to-token 对齐而非 pooled bias。** 每层 motion token 都可选择不同文本 token，适合 Pulp caption中的动作主体、方向、节奏和顺序。CLIP 胜过 UMT5 说明当前关键更像“条件表示与 motion/action 数据及 evaluator 的几何对齐”，而不是语言模型越大越好。
+3. **连续 flow 与连续 latent 相容。** E6 直接学习 noise-to-motion 的 velocity field，并在同一 shifted schedule 上积分；这避免 MARDM 的 mask-fill 离散决策边界，也避免 `START_X` 在不同噪声区间承担同一端点回归形式。该解释合理但尚未单变量验证。
+4. **specialist optimization 更简单。** E6 的全部参数、condition dropout 与采样预算只服务 Human128；C3 则要在一个 trunk 中协调三种 mode 与 Human/Camera。Human-only 胜出的一部分很可能来自任务隔离，而不是 Transformer 本身。
+
+### 11.3 如何把“架构适配”变成因果证据
+
+最小 matched ladder 应固定 C3 Human128、CLIP token cache、N=512 IDs、owning decoder、参数量级与训练 exposure，然后逐个切换：
+
+1. pooled CLIP → token-sequence cross-attention，其他不变；
+2. Conv1d U-Net → full Transformer，objective/sampler不变；
+3. `START_X` diffusion → shifted flow，topology/text不变；
+4. Unified exposure → Human-only exposure，backbone不变。
+
+若预算只能做一个 probe，优先做“同一 ViMoGen Transformer + pooled CLIP 对照”，因为 CLIP/UMT5 结果已经提示 condition geometry 是高价值解释；其次才是同 topology 的 diffusion/flow 对照。任何一项未匹配前，都应把当前胜出称为 **system-task fit**，而不是 backbone 上限证明。
+
+## 12. 可迁移的表征设计检查表
+
+以后遇到 multimodal tokenizer、heterogeneous dataset 或联合生成问题，先按下列顺序判断：
+
+1. **先画依赖方向。** 哪个变量应独立生成，哪个变量物理上必须条件化？不要把“去耦”误写成所有方向都独立。
+2. **shared latent 只承载真正共享的信息。** 模态私有状态进入各自 latent；交互只进入显式小 residual，并对 residual energy、交换和干预做审计。
+3. **missing 不等于 mean。** 缺失通道必须有 mask、独立 encoder/objective 或不进入输入；均值只能是带 missingness 的数值占位，不能冒充观测。
+4. **先审计信息是否仍可逆。** 如果上游已经通过 IK、canonicalization 或投影丢失自由度，后处理无法恢复同源 supervision；必须回到共同原始表示。
+5. **重建、可生成与联合几何分开过门。** branch reconstruction 好不代表 joint projection 好，Stage1 好也不代表 Stage2 manifold好；每层使用自己的 decoded evaluator。
+6. **视觉结论与 formal metric 并列但不互相冒充。** synchronized fixed cohort 用于发现 terminal jump、旋转或构图 failure；population claim 仍需 canonical records 或盲评。
+7. **架构胜出先写成组合系统胜出。** topology、objective、sampler、condition 与 task exposure 没有单变量匹配时，不把结果压缩成“模型更大”或“backbone 更强”。

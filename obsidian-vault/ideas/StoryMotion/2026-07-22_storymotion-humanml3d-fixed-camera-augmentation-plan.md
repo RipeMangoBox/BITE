@@ -1,6 +1,7 @@
 ---
 title: StoryMotion HumanML3D fixed-Camera augmentation plan
 date: 2026-07-22
+updated: 2026-07-27T12:11:37+08:00
 status: planned_no_substantive_experiment
 type: experiment-plan
 tags:
@@ -20,11 +21,14 @@ manual_labels_current: 0
 
 因此本页从 plan 状态开始，不把旧 8 条可视化计为数据质量 screen。原始 PulpMotion 自动筛选由 [[ideas/StoryMotion/2026-07-17_storymotion-v8-2333-data-curation-plan]] 单独管理；本页只管理“创造新 Human-Camera pair”的独立因果轴。
 
+> [!note] 与 Stage1 anchor control 分离
+> 2026-07-27 闭合的 [[2026-07-27_storymotion-stage1-human-anchor-residual-control]] 只比较 Pulp-only 与 HumanML-root-local exposure 下的 Stage1 reconstruction，没有执行本页的 retrieval、fixed-Camera pair construction、HCCC 或 Stage2 mixture。因此本页仍是 `planned_no_substantive_experiment`，不得借用该 control 宣称 A0–A4 已启动。
+
 ## 1. 核心假设与首选方案
 
 核心假设：在保持真实电影 Camera trajectory 与 camera text 不变时，用语义和动作均高度匹配的 HumanML3D Human 替换 PulpMotion Human，可以增加 Human motion/text 多样性；只有新 Human 与原 Camera 仍保持构图、跟随关系和电影语言兼容时，这些 pair 才能成为有效的 StoryMotion 联合训练数据。
 
-首选方案是 **fixed Camera, augment Human**。暂不执行 fixed Human, generate Camera，因为 PulpMotion Human 原始质量仍在筛选，且 Director 或 video-camera-control 链会同时引入 Camera 生成、视频生成与重估误差，无法把收益归因于多数据集增广。
+首选方案是 增广 human 而不是增广 camera，因为 PulpMotion Human 原始质量仍在筛选，且 Director 或 video-camera-control 链会同时引入 Camera 生成、视频生成与重估误差，无法把收益归因于多数据集增广。
 
 ## 2. 不可改变的边界
 
@@ -110,7 +114,7 @@ A0-A2 是数据构造实验，不训练新 Stage1/Stage2。A3 只改变 Stage2 �
 - Retrieval gate：报告绝对阈值、mutual-NN、margin 后的逐级 yield。若 dual gate 产出不足，不执行 Camera-Human 交换训练。
 - Human gate：应用 versioned Physical 与 TMR screen；两者按异常并集排除，不只删除异常交集。
 - Camera provenance gate：Camera14、camera text、Camera-only metrics 与 parent 保持一致；不一致说明构造 pipeline 改动了不该改的分支。
-- HCCC gate：增强 matched 分布必须显著优于 hard-shuffled；`FrameFit/FollowSync/PairContrast` 任一出现系统性越界即 quarantine candidate。
+- HCCC gate：增强 matched 分布必须显著优于 hard-shuffled；`FrameFit/FollowSync/PairContrast` 任一出现系统性越界即 quarantine candidate。Root representationRoot representation
 - Stage2 gate：A3 的训练步数、batch、task ratio、seed 和总 exposure 完全匹配。数据增广不得与 q(H_gt,t)/joint-pred-H robustness screen 同一 run 混合。
 
 ## 8. 必需 artifact
@@ -128,4 +132,3 @@ A0-A2 是数据构造实验，不训练新 Stage1/Stage2。A3 只改变 Stage2 �
 2. 把既有 HumanML3D adapter 绑定到 C3-25 invariant，执行 A0 的 1,024 条 geometry audit。
 3. 生成 HumanML3D train caption/motion embedding cache，并分别审计 CLIP/TMR encoder hash 与 batch invariance。
 4. 运行 A1 四组 retrieval screen；在看到 yield 分布前，不创建 A2 增强 pair 或 Stage2 cache。
-

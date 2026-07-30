@@ -14,6 +14,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, Subset
 
+from storymotion.training.human200 import human200_to_human199_raw
+
 
 class DummyModule:
     def __init__(self, device: torch.device) -> None:
@@ -116,6 +118,38 @@ def resolve_existing_path(path_value: str | None, run_dir: Path, train_mod: Any)
     return None
 
 
+def resolve_stage2_model_class(
+    meta: dict[str, Any],
+    args: dict[str, Any],
+    run_dir: Path,
+    train_mod: Any,
+) -> tuple[type[torch.nn.Module], str, Path]:
+    human_view = meta.get("human_view", {})
+    raw_camera_view_mode = args.get("camera_view_mode", human_view.get("camera_view_mode"))
+    camera_view_mode = "observed" if raw_camera_view_mode is None else str(raw_camera_view_mode)
+    if camera_view_mode == "observed":
+        return train_mod.TemporalObsUNet, camera_view_mode, Path(train_mod.__file__).resolve()
+    if camera_view_mode != "joint":
+        raise ValueError(f"unknown Stage2 Camera-view mode: {camera_view_mode!r}")
+
+    story_root_value = getattr(train_mod, "ROOT", None)
+    story_root = Path(story_root_value).resolve() if story_root_value is not None else run_dir.parents[3]
+    module_path = story_root / "scripts/train_stage2_condmdi_pulp_camera_joint_view.py"
+    if not module_path.is_file():
+        raise FileNotFoundError(f"joint Camera-view trainer is missing: {module_path}")
+    module_name = "storymotion_stage2_camera_joint_view_eval"
+    architecture_mod = sys.modules.get(module_name)
+    if architecture_mod is None:
+        architecture_mod = load_module(module_name, module_path)
+    loaded_path = Path(architecture_mod.__file__).resolve()
+    if loaded_path != module_path.resolve():
+        raise RuntimeError(f"joint Camera-view module path mismatch: {loaded_path} != {module_path.resolve()}")
+    model_class = architecture_mod.TemporalObsUNet
+    if getattr(model_class, "camera_view_mode", None) != "joint":
+        raise RuntimeError("joint Camera-view trainer did not expose the required model class")
+    return model_class, camera_view_mode, module_path.resolve()
+
+
 def load_stage2(
     run_dir: Path,
     train_mod: Any,
@@ -154,7 +188,13 @@ def load_stage2(
         else:
             data = torch.load(task_instruction_path, map_location="cpu")
             task_instruction_embeddings = data.get("embeddings", data.get("task_embeddings")) if isinstance(data, dict) else data
-    model = train_mod.TemporalObsUNet(
+    model_class, camera_view_mode, model_module_path = resolve_stage2_model_class(
+        meta,
+        args,
+        run_dir,
+        train_mod,
+    )
+    model = model_class(
         int(args.get("width", 384)),
         parse_dim_mults(args.get("dim_mults", [1, 2, 2])),
         cond_mask_prob,
@@ -171,6 +211,7 @@ def load_stage2(
         task_instruction_embeddings=task_instruction_embeddings,
         task_instruction_scale=float(args.get("task_instruction_scale", task_instruction_meta.get("scale", 1.0))),
         num_task_embeddings=infer_num_task_embeddings(meta, args),
+        human_view_mode=str(args.get("human_view_mode", meta.get("human_view", {}).get("mode", "mixed"))),
     ).to(device)
     ckpt_path = (checkpoint_path or run_dir / "last.pt").resolve()
     ckpt = torch.load(ckpt_path, map_location=device)
@@ -194,6 +235,16 @@ def load_stage2(
         "joint_loss_mode": args.get("joint_loss_mode") or meta.get("joint_loss_mode") or "element_mean",
         "joint_loss_weight": float(args.get("joint_loss_weight", meta.get("joint_loss_weight", 1.0))),
         "task_routing": str(args.get("task_routing", meta.get("task_routing", "symmetric"))),
+        "camera_view_mode": camera_view_mode,
+        "model_module": str(model_module_path),
+        "model_module_sha256": sha256_file(model_module_path),
+        "human_view_mode": str(args.get("human_view_mode", meta.get("human_view", {}).get("mode", "mixed"))),
+        "joint_coupling_scale": float(
+            args.get("joint_coupling_scale", meta.get("joint_coupling_scale", 1.0))
+        ),
+        "joint_coupling_mode": str(
+            args.get("joint_coupling_mode", meta.get("joint_coupling_mode", "symmetric"))
+        ),
         "joint_human_camera_input_mode": str(
             args.get("joint_human_camera_input_mode", meta.get("joint_human_camera_input_mode", "normal"))
         ),
@@ -267,6 +318,19 @@ def resolve_owning_decoder(
             raise ValueError(
                 "local tokenizer cache is missing tokenizer_is_causal; rebuild it with the owning checkpoint contract"
             )
+        human200_stats_path = None
+        human200_stats = cache_meta.get("human200_normalization")
+        if human200_stats is not None:
+            if not isinstance(human200_stats, dict) or not human200_stats.get("path"):
+                raise ValueError("human200 tokenizer cache is missing normalization stats path")
+            human200_stats_path = Path(str(human200_stats["path"]))
+            if not human200_stats_path.is_absolute():
+                human200_stats_path = story_root / human200_stats_path
+            if not human200_stats_path.exists():
+                raise FileNotFoundError(f"human200 normalization stats not found: {human200_stats_path}")
+            expected_stats_sha = str(human200_stats.get("sha256") or "")
+            if expected_stats_sha and sha256_file(human200_stats_path) != expected_stats_sha:
+                raise ValueError("human200 normalization stats hash does not match cache metadata")
         render_mod = load_module(
             "storymotion_owning_joint_tokenizer",
             story_root / "scripts/render_stage1_joint_separate_3d_reconstructions.py",
@@ -277,7 +341,10 @@ def resolve_owning_decoder(
             checkpoint=checkpoint,
             drop_camera_z=bool(cache_meta.get("drop_camera_z", False)),
         )
-        model = render_mod.build_model(spec, str(device))
+        if human200_stats_path is None:
+            model = render_mod.build_model(spec, str(device))
+        else:
+            model = render_mod.build_model(spec, str(device), human200_stats_path)
         model.eval()
         cache_is_causal = bool(cache_meta["tokenizer_is_causal"])
         if cache_is_causal:
@@ -286,10 +353,7 @@ def resolve_owning_decoder(
             raise ValueError(
                 f"cache/tokenizer is_causal mismatch: cache={cache_is_causal} checkpoint={bool(model.is_causal)}"
             )
-        return {
-            "kind": "storymotion_joint_tokenizer",
-            "model": model,
-        }, {
+        decoder_record = {
             "kind": "storymotion_joint_tokenizer",
             "checkpoint": str(checkpoint),
             "checkpoint_sha256": sha256_file(checkpoint),
@@ -297,6 +361,15 @@ def resolve_owning_decoder(
             "is_causal": cache_is_causal,
             "cache_source": source,
         }
+        if human200_stats_path is not None:
+            decoder_record["human200_normalization"] = {
+                "path": str(human200_stats_path),
+                "sha256": sha256_file(human200_stats_path),
+            }
+        return {
+            "kind": "storymotion_joint_tokenizer",
+            "model": model,
+        }, decoder_record
     if source:
         raise ValueError(f"unsupported cache source for decoder resolution: {source!r}")
     checkpoint = cache_meta.get("pulp_checkpoint")
@@ -324,13 +397,22 @@ def decode_with_owning_decoder(
     if decoder["kind"] != "storymotion_joint_tokenizer":
         raise ValueError(f"unknown decoder kind: {decoder['kind']!r}")
     native = to_official_order(z_hum_cam, train_mod).transpose(1, 2).contiguous()
-    human, camera = decoder["model"].decode(native, target_len=int(padding_mask.shape[1]))
+    model = decoder["model"]
+    human, camera = model.decode(native, target_len=int(padding_mask.shape[1]))
+    feature_dataset = getattr(dataset, "joint_dataset", None) or dataset
+    if hasattr(model, "human200_stats"):
+        human_dataset = getattr(feature_dataset, "human_dataset", None)
+        if human_dataset is None:
+            raise ValueError("human200 owning decoder requires a Pulp human feature dataset")
+        human_raw = human200_to_human199_raw(human, model.human200_stats)
+        human_mean = torch.as_tensor(human_dataset.feat_mean, device=human.device, dtype=human.dtype)
+        human_std = torch.as_tensor(human_dataset.feat_std, device=human.device, dtype=human.dtype)
+        human = (human_raw - human_mean) / human_std
     padding_mask = padding_mask.to(device=human.device, dtype=torch.bool)
     x_output = {
         "human": human.masked_fill(~padding_mask[..., None], 0.0),
         "camera": camera.masked_fill(~padding_mask[..., None], 0.0),
     }
-    feature_dataset = getattr(dataset, "joint_dataset", None) or dataset
     raw_output = feature_dataset.get_raw(x_output, intrinsics)
     return x_output, raw_output
 
@@ -363,6 +445,8 @@ def make_completion(
     task_id: int,
     timestep: int,
     task_routing: str = "symmetric",
+    joint_coupling_scale: float = 1.0,
+    joint_coupling_mode: str = "symmetric",
 ) -> torch.Tensor:
     task = torch.full((z.shape[0],), task_id, dtype=torch.long, device=z.device)
     obs_mask, _ = train_mod.make_branch_masks(z, valid, task, task_routing=task_routing)
@@ -375,7 +459,18 @@ def make_completion(
     x_t = diffusion.q_sample(z, t, noise)
     model_t = diffusion.model_t(t)
     source_meta = train_mod.build_source_meta(obs_mask, train_mod.SOURCE_GT)
-    pred = model(x_t, model_t, text, obs_x0=z, obs_mask=obs_mask, task=task, source_meta=source_meta)
+    pred = train_mod.predict_with_joint_coupling(
+        model,
+        x_t,
+        model_t,
+        text,
+        z,
+        obs_mask,
+        task,
+        source_meta,
+        joint_coupling_scale,
+        joint_coupling_mode,
+    )
     pred_x0 = diffusion.prediction_to_x0(pred, x_t, t)
     valid_bc = valid[:, None, :].expand_as(z)
     completion = torch.where(obs_mask, z, pred_x0)
@@ -576,6 +671,8 @@ def main() -> None:
                     task_id,
                     args.timestep,
                     task_routing=run_info["task_routing"],
+                    joint_coupling_scale=run_info["joint_coupling_scale"],
+                    joint_coupling_mode=run_info["joint_coupling_mode"],
                 )
                 x_output, raw_output = decode_feature_and_raw(autoencoder, dataset, train_mod, completion, intrinsics)
                 outputs = {"raw_input": raw_input, "raw_output": raw_output, "x_output": x_output}

@@ -51,6 +51,7 @@ TASK_HUMAN = 1
 TASK_JOINT = 2
 TASK_HUMAN_TEXT = 3
 TASK_NAMES = {TASK_CAMERA: "camera", TASK_HUMAN: "human", TASK_JOINT: "joint", TASK_HUMAN_TEXT: "human_text"}
+HUMAN_VIEW_MODES = ("mixed", "full", "isolated")
 DEFAULT_TASK_INSTRUCTIONS = {
     TASK_CAMERA: "generate camera trajectory from the observed human motion and camera description",
     TASK_HUMAN: "generate human motion from the observed camera trajectory and human description",
@@ -71,6 +72,27 @@ SOURCE_NAMES = {
 
 TEMPORAL_PATTERN_NAMES = ("span", "prefix", "suffix", "sparse", "mixed")
 TEMPORAL_MISSING_RATIO = (0.2, 0.6)
+
+
+def human_view_contract(mode: str) -> dict[str, Any]:
+    if mode not in HUMAN_VIEW_MODES:
+        raise ValueError(f"unknown human view mode: {mode}")
+    direct_h = {"latent": "[H_t,C_t]", "text": "[0,e_H]"}
+    joint_h = {"latent": "[H_t,0]", "text": "[0,e_H]"}
+    if mode == "full":
+        direct_h = {"latent": "[H_t,C_t]", "text": "[e_C,e_H]"}
+        joint_h = {"latent": "[H_t,C_t]", "text": "[e_C,e_H]"}
+    elif mode == "isolated":
+        direct_h = {"latent": "[H_t,0]", "text": "[0,e_H]"}
+    return {
+        "mode": mode,
+        "direct_h": direct_h,
+        "joint_h": joint_h,
+        "direct_c": {"latent": "[H_0,C_t]", "text": "[e_C,0]"},
+        "joint_c": {"latent": "[H_t,C_t]", "text": "[e_C,e_H]"},
+        "task_ids_unchanged": True,
+        "task_embeddings_unchanged": True,
+    }
 
 
 def betas_for_alpha_bar(num_diffusion_timesteps: int, alpha_bar, max_beta: float = 0.999) -> np.ndarray:
@@ -228,16 +250,84 @@ def latent_znorm_summary(stats: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def validate_latent_znorm_stats(stats: dict[str, Any], path: Path | None = None) -> dict[str, Any]:
-    mean = torch.as_tensor(stats.get("mean")).float().view(-1)
-    std = torch.as_tensor(stats.get("std")).float().view(-1)
+def validate_latent_znorm_stats(
+    stats: dict[str, Any],
+    path: Path | None = None,
+    *,
+    expected_source_cache: Path | None = None,
+    expected_eps: float | None = None,
+    require_full_covariance: bool = False,
+    expected_cov_ridge: float | None = None,
+) -> dict[str, Any]:
     where = f" in {path}" if path is not None else ""
-    if mean.numel() != LATENT_DIM or std.numel() != LATENT_DIM:
-        raise ValueError(f"expected {LATENT_DIM}-channel latent stats{where}")
+    if not isinstance(stats, dict):
+        raise ValueError(f"latent stats must be a dictionary{where}")
+    required = {"mean", "std", "count", "eps", "source_cache", "source_cache_sha256"}
+    missing = sorted(required - stats.keys())
+    if missing:
+        raise ValueError(f"latent stats missing required keys {missing}{where}")
+    mean = torch.as_tensor(stats["mean"]).float()
+    std = torch.as_tensor(stats["std"]).float()
+    if tuple(mean.shape) != (LATENT_DIM,) or tuple(std.shape) != (LATENT_DIM,):
+        raise ValueError(f"expected latent mean/std shape ({LATENT_DIM},){where}")
     if not torch.isfinite(mean).all() or not torch.isfinite(std).all() or (std <= 0).any():
         raise ValueError(f"invalid latent stats{where}")
+    if not isinstance(stats["count"], int) or isinstance(stats["count"], bool) or stats["count"] <= 0:
+        raise ValueError(f"latent stats count must be a positive integer{where}")
+    eps = float(stats["eps"])
+    if not math.isfinite(eps) or eps <= 0.0:
+        raise ValueError(f"latent stats eps must be finite and positive{where}")
+    if expected_eps is not None and not math.isclose(eps, float(expected_eps), rel_tol=0.0, abs_tol=1.0e-15):
+        raise ValueError(f"latent stats eps mismatch: {eps} != {expected_eps}{where}")
+    if not isinstance(stats["source_cache"], str) or not stats["source_cache"]:
+        raise ValueError(f"latent stats source_cache must be a non-empty string{where}")
+    source_sha = stats["source_cache_sha256"]
+    if not isinstance(source_sha, str) or len(source_sha) != 64 or any(c not in "0123456789abcdef" for c in source_sha):
+        raise ValueError(f"latent stats source_cache_sha256 must be lowercase SHA256{where}")
+    if expected_source_cache is not None:
+        actual_source_sha = sha256_file(expected_source_cache)
+        if source_sha != actual_source_sha:
+            raise ValueError(f"latent stats cache hash mismatch: {source_sha} != {actual_source_sha}{where}")
+
+    covariance = stats.get("full_covariance")
+    if require_full_covariance and not covariance:
+        raise ValueError(f"existing latent stats lack required full covariance{where}")
+    if covariance:
+        if not isinstance(covariance, dict) or set(covariance) != {"human", "camera"}:
+            raise ValueError(f"full covariance must contain exactly human and camera records{where}")
+        if "full_covariance_ridge" not in stats:
+            raise ValueError(f"full covariance missing full_covariance_ridge{where}")
+        ridge = float(stats["full_covariance_ridge"])
+        if not math.isfinite(ridge) or ridge <= 0.0:
+            raise ValueError(f"full covariance ridge must be finite and positive{where}")
+        if expected_cov_ridge is not None and not math.isclose(
+            ridge, float(expected_cov_ridge), rel_tol=0.0, abs_tol=1.0e-15
+        ):
+            raise ValueError(f"full covariance ridge mismatch: {ridge} != {expected_cov_ridge}{where}")
+        for key, dim in (("human", HUM_DIM), ("camera", CAM_DIM)):
+            record = covariance[key]
+            if not isinstance(record, dict):
+                raise ValueError(f"full covariance {key} record must be a dictionary{where}")
+            record_missing = sorted({"mean", "chol", "count", "ridge"} - record.keys())
+            if record_missing:
+                raise ValueError(f"full covariance {key} missing required keys {record_missing}{where}")
+            cov_mean = torch.as_tensor(record["mean"]).float()
+            chol = torch.as_tensor(record["chol"]).float()
+            if tuple(cov_mean.shape) != (dim,) or tuple(chol.shape) != (dim, dim):
+                raise ValueError(f"full covariance {key} shape mismatch{where}")
+            if not torch.isfinite(cov_mean).all() or not torch.isfinite(chol).all():
+                raise ValueError(f"full covariance {key} contains non-finite values{where}")
+            if (torch.diagonal(chol) <= 0).any() or not torch.equal(chol, torch.tril(chol)):
+                raise ValueError(f"full covariance {key} chol is not a valid lower-triangular factor{where}")
+            if not isinstance(record["count"], int) or isinstance(record["count"], bool) or record["count"] <= 0:
+                raise ValueError(f"full covariance {key} count must be a positive integer{where}")
+            record_ridge = float(record["ridge"])
+            if not math.isfinite(record_ridge) or not math.isclose(
+                record_ridge, ridge, rel_tol=0.0, abs_tol=1.0e-15
+            ):
+                raise ValueError(f"full covariance {key} ridge mismatch: {record_ridge} != {ridge}{where}")
     result = dict(stats)
-    result.update(mean=mean.cpu(), std=std.cpu())
+    result.update(mean=mean.cpu(), std=std.cpu(), eps=eps)
     result["summary"] = latent_znorm_summary(result)
     return result
 
@@ -306,23 +396,58 @@ def add_full_covariance_stats(cache_path: Path, stats: dict[str, Any], ridge: fl
     return result
 
 
-def load_latent_znorm_stats(path: Path) -> dict[str, Any]:
-    return validate_latent_znorm_stats(torch.load(path, map_location="cpu"), path)
+def load_latent_znorm_stats(
+    path: Path,
+    *,
+    expected_source_cache: Path | None = None,
+    expected_eps: float | None = None,
+    require_full_covariance: bool = False,
+    expected_cov_ridge: float | None = None,
+) -> dict[str, Any]:
+    return validate_latent_znorm_stats(
+        torch.load(path, map_location="cpu"),
+        path,
+        expected_source_cache=expected_source_cache,
+        expected_eps=expected_eps,
+        require_full_covariance=require_full_covariance,
+        expected_cov_ridge=expected_cov_ridge,
+    )
 
 
 def resolve_latent_znorm_stats(args: argparse.Namespace) -> tuple[dict[str, Any] | None, Path | None]:
     if not args.znorm:
         return None, None
     path = args.znorm_stats_path or latent_znorm_default_stats_path(args.cache_dir)
-    if path.exists() and not args.znorm_recompute:
-        stats = load_latent_znorm_stats(path)
-    else:
-        stats = compute_latent_znorm_stats(args.cache_dir / "train.pt", args.znorm_eps)
-    if args.full_cov and not stats.get("full_covariance"):
+    source_cache = args.cache_dir / "train.pt"
+    if path.exists():
+        if args.znorm_recompute:
+            raise FileExistsError(f"refusing to overwrite existing latent stats artifact: {path}")
+        stats = load_latent_znorm_stats(
+            path,
+            expected_source_cache=source_cache,
+            expected_eps=args.znorm_eps,
+            require_full_covariance=args.full_cov,
+            expected_cov_ridge=args.cov_ridge if args.full_cov else None,
+        )
+        return stats, path
+    if not args.znorm_recompute:
+        raise FileNotFoundError(
+            f"latent stats artifact does not exist: {path}; "
+            "pass --znorm-recompute only when explicitly creating a new artifact"
+        )
+    stats = compute_latent_znorm_stats(source_cache, args.znorm_eps)
+    if args.full_cov:
         stats = add_full_covariance_stats(args.cache_dir / "train.pt", stats, args.cov_ridge)
-    if not path.exists() or args.znorm_recompute or args.full_cov:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        torch.save(stats, path)
+    stats = validate_latent_znorm_stats(
+        stats,
+        expected_source_cache=source_cache,
+        expected_eps=args.znorm_eps,
+        require_full_covariance=args.full_cov,
+        expected_cov_ridge=args.cov_ridge if args.full_cov else None,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as handle:
+        torch.save(stats, handle)
     return stats, path
 
 
@@ -547,6 +672,7 @@ class TemporalObsUNet(nn.Module):
         task_instruction_embeddings: torch.Tensor | None = None,
         task_instruction_scale: float = 1.0,
         num_task_embeddings: int = 3,
+        human_view_mode: str = "mixed",
     ) -> None:
         super().__init__()
         self.cond_mask_prob = float(cond_mask_prob)
@@ -558,6 +684,9 @@ class TemporalObsUNet(nn.Module):
         self.v72_trust_gate_enabled = bool(v72_trust_gate)
         self.v72_relation_surrogate = bool(v72_relation_surrogate)
         self.task_instruction_scale = float(task_instruction_scale)
+        if human_view_mode not in HUMAN_VIEW_MODES:
+            raise ValueError(f"unknown human view mode: {human_view_mode}")
+        self.human_view_mode = human_view_mode
         self.time_mlp = nn.Sequential(
             nn.Linear(width, width * 4),
             nn.Mish(),
@@ -729,8 +858,20 @@ class TemporalObsUNet(nn.Module):
         hum_scale = torch.where((task == TASK_CAMERA).view(-1, 1), torch.full_like(hum_scale, aux), hum_scale)
         # C2H: human text dominant, camera text auxiliary.
         human_like = ((task == TASK_HUMAN) | (task == TASK_HUMAN_TEXT)).view(-1, 1)
+        if self.human_view_mode == "full":
+            human_like = (task == TASK_HUMAN_TEXT).view(-1, 1)
         cam_scale = torch.where(human_like, torch.full_like(cam_scale, aux), cam_scale)
         return torch.cat([cam_scale * text_cam, hum_scale * text_hum], dim=-1)
+
+    def _route_latent(self, x_t: torch.Tensor, task: torch.Tensor | None) -> torch.Tensor:
+        if self.human_view_mode != "isolated" or task is None:
+            return x_t
+        direct_human = task == TASK_HUMAN
+        if not direct_human.any():
+            return x_t
+        routed = x_t.clone()
+        routed[direct_human, HUM_DIM:, :] = 0
+        return routed
 
     def _source_pool(self, obs_x0: torch.Tensor, obs_mask: torch.Tensor) -> torch.Tensor:
         weight = obs_mask.float()
@@ -767,6 +908,7 @@ class TemporalObsUNet(nn.Module):
     ) -> torch.Tensor:
         if x_t.shape != obs_x0.shape or x_t.shape != obs_mask.shape:
             raise ValueError(f"x_t, obs_x0 and obs_mask must match, got {x_t.shape}, {obs_x0.shape}, {obs_mask.shape}")
+        x_t = self._route_latent(x_t, task)
         gate = self._trust_gate(source_meta, x_t.shape[0], x_t.device, x_t.dtype)
         if self.v72_soft_source:
             x = x_t + obs_mask.float() * gate * (obs_x0 - x_t)
@@ -1069,8 +1211,9 @@ def predict_with_joint_coupling(
 ) -> torch.Tensor:
     """Predict with explicit, bounded human-camera latent/text interaction.
 
-    ``coupling_scale=1`` is exactly the legacy joint forward. At smaller
-    scales, the human view attenuates camera latent/text inputs. In
+    ``coupling_scale=1`` is exactly the legacy joint forward under the default
+    mixed Human-view contract. At smaller scales, the human view attenuates
+    camera latent/text inputs. In
     ``symmetric`` mode the camera view also attenuates human inputs; in
     ``c_to_h_blocked`` mode the camera branch keeps the full joint view so
     H->C interaction remains available while C->H is bounded.
@@ -1082,8 +1225,11 @@ def predict_with_joint_coupling(
         raise ValueError(f"joint coupling scale must be in [0,1], got {scale}")
     if coupling_mode not in {"symmetric", "c_to_h_blocked"}:
         raise ValueError(f"unknown joint coupling mode: {coupling_mode}")
+    human_view_mode = getattr(model, "human_view_mode", "mixed")
+    if human_view_mode not in HUMAN_VIEW_MODES:
+        raise ValueError(f"unknown model human view mode: {human_view_mode}")
     joint_selected = task == TASK_JOINT
-    if scale == 1.0 or not joint_selected.any():
+    if (scale == 1.0 and human_view_mode != "isolated") or not joint_selected.any():
         return model(
             x_t,
             model_t,
@@ -1095,10 +1241,15 @@ def predict_with_joint_coupling(
         )
 
     text_half = text.shape[-1] // 2
+    human_scale = scale
+    if human_view_mode == "full":
+        human_scale = 1.0
+    elif human_view_mode == "isolated":
+        human_scale = 0.0
     human_x = x_t.clone()
-    human_x[joint_selected, HUM_DIM:, :] *= scale
+    human_x[joint_selected, HUM_DIM:, :] *= human_scale
     human_text = text.clone()
-    human_text[joint_selected, :text_half] *= scale
+    human_text[joint_selected, :text_half] *= human_scale
     branch_rng_state = None
     if model.training:
         branch_rng_state = (
@@ -1263,23 +1414,40 @@ def make_observed_condition_x0(
     noise_std: float,
     task_routing: str = "symmetric",
     treatment_mask: torch.Tensor | None = None,
+    rng: torch.Generator | None = None,
+    preselected_sample_use: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, dict[str, float]]:
     clean_meta = build_source_meta(obs_mask, SOURCE_GT)
     eligible_mask = obs_mask if treatment_mask is None else (obs_mask & treatment_mask)
     if prob <= 0.0 or mode == "clean" or not eligible_mask.any():
         return z, clean_meta, {}
-    sample_use = (torch.rand(z.shape[0], device=z.device) < prob).view(-1, 1, 1)
+    if preselected_sample_use is None:
+        sample_use = (torch.rand(z.shape[0], device=z.device, generator=rng) < prob).view(-1, 1, 1)
+    else:
+        if preselected_sample_use.shape != (z.shape[0], 1, 1):
+            raise RuntimeError(
+                "preselected observed-H treatment mask must have shape "
+                f"{(z.shape[0], 1, 1)}, got {tuple(preselected_sample_use.shape)}"
+            )
+        sample_use = preselected_sample_use.to(device=z.device, dtype=torch.bool)
     value_use = sample_use & eligible_mask
     if not value_use.any():
         return z, clean_meta, {"obs_self_condition_sample_frac": 0.0, "obs_self_condition_value_frac": 0.0}
 
-    noisy_candidate = z + noise_std * torch.randn_like(z)
+    noisy_candidate = None
+    if mode in {"noisy", "mixed"}:
+        noisy_candidate = z + noise_std * torch.randn(
+            z.shape,
+            dtype=z.dtype,
+            device=z.device,
+            generator=rng,
+        )
     generated_candidate = None
     generated_sample = torch.zeros_like(sample_use)
     if mode in {"joint_pred", "mixed"}:
         generated_sample = torch.ones_like(sample_use, dtype=torch.bool)
         if mode == "mixed":
-            generated_sample = torch.rand(z.shape[0], device=z.device).view(-1, 1, 1) < 0.5
+            generated_sample = torch.rand(z.shape[0], device=z.device, generator=rng).view(-1, 1, 1) < 0.5
         joint_task = torch.full((z.shape[0],), TASK_JOINT, dtype=torch.long, device=z.device)
         joint_obs_mask, _ = make_branch_masks(z, valid, joint_task, task_routing=task_routing)
         was_training = model.training
@@ -1300,6 +1468,8 @@ def make_observed_condition_x0(
 
     if mode == "noisy":
         candidate = noisy_candidate
+    elif mode == "forward_q":
+        candidate = x_t.detach()
     elif mode == "joint_pred":
         candidate = generated_candidate
     elif mode == "mixed":
@@ -1311,7 +1481,7 @@ def make_observed_condition_x0(
 
     obs_x0 = torch.where(value_use, candidate.detach(), z)
     source = torch.full((z.shape[0],), SOURCE_GT, dtype=torch.long, device=z.device)
-    if mode == "noisy":
+    if mode in {"noisy", "forward_q"}:
         source = torch.where(value_use.flatten(1).any(dim=1), torch.full_like(source, SOURCE_NOISY_GT), source)
     elif mode == "joint_pred":
         source = torch.where(value_use.flatten(1).any(dim=1), torch.full_like(source, SOURCE_GENERATED), source)
@@ -1342,6 +1512,12 @@ def make_observed_condition_x0(
         metrics["obs_self_condition_generated_sample_frac"] = float(
             generated_applied.flatten(1).any(dim=1).float().mean().detach().cpu()
         )
+    if mode == "forward_q":
+        q_applied = value_use.flatten(1).any(dim=1)
+        metrics["obs_self_condition_forward_q_sample_frac"] = float(q_applied.float().mean().detach().cpu())
+        metrics["obs_self_condition_forward_q_t_mean"] = float(t[q_applied].float().mean().detach().cpu())
+        metrics["obs_self_condition_forward_q_t_min"] = float(t[q_applied].min().detach().cpu())
+        metrics["obs_self_condition_forward_q_t_max"] = float(t[q_applied].max().detach().cpu())
     if mode in {"noisy", "mixed"}:
         noisy_applied = value_use & (~generated_sample if mode == "mixed" else torch.ones_like(value_use, dtype=torch.bool))
         metrics["obs_self_condition_noisy_sample_frac"] = float(
@@ -1367,6 +1543,9 @@ def diffusion_loss(
     obs_self_condition_prob: float = 0.0,
     obs_self_condition_mode: str = "clean",
     obs_self_condition_noise_std: float = 0.0,
+    obs_self_condition_generator: torch.Generator | None = None,
+    obs_self_condition_t_min: int | None = None,
+    obs_self_condition_t_max: int | None = None,
     temporal_mask_probability: float = 0.0,
     temporal_mask_task_weights: list[float] | tuple[float, float, float] = (1.0, 1.0, 1.0),
     joint_human_camera_input_mode: str = "normal",
@@ -1382,6 +1561,24 @@ def diffusion_loss(
         noise = torch.randn_like(z)
     if t is None:
         t = diffusion.sample_t(z.shape[0], z.device)
+    camera_task = task == TASK_CAMERA
+    preselected_obs_treatment = None
+    if obs_self_condition_mode == "forward_q" and obs_self_condition_t_min is not None:
+        if obs_self_condition_generator is None or obs_self_condition_t_max is None:
+            raise RuntimeError("band-limited forward_q requires a generator and both timestep bounds")
+        selected = (
+            torch.rand(z.shape[0], device=z.device, generator=obs_self_condition_generator)
+            < obs_self_condition_prob
+        ) & camera_task
+        band_t = torch.randint(
+            obs_self_condition_t_min,
+            obs_self_condition_t_max + 1,
+            (z.shape[0],),
+            device=z.device,
+            generator=obs_self_condition_generator,
+        )
+        t = torch.where(selected, band_t, t)
+        preselected_obs_treatment = selected.view(-1, 1, 1)
     obs_mask, loss_mask = make_branch_masks(z, valid, task, task_routing=task_routing)
     sample_loss_weights = None
     temporal_metrics: dict[str, float] = {}
@@ -1398,7 +1595,6 @@ def diffusion_loss(
     model_t = diffusion.model_t(t)
     target = diffusion.training_target(z, noise, t)
     source_treatment_mask = torch.zeros_like(obs_mask)
-    camera_task = task == TASK_CAMERA
     source_treatment_mask[camera_task, :HUM_DIM, :] = obs_mask[camera_task, :HUM_DIM, :]
     obs_x0, source_meta, obs_metrics = make_observed_condition_x0(
         model,
@@ -1415,7 +1611,15 @@ def diffusion_loss(
         obs_self_condition_noise_std,
         task_routing,
         source_treatment_mask,
+        obs_self_condition_generator,
+        preselected_obs_treatment,
     )
+    if preselected_obs_treatment is not None:
+        camera_count = camera_task.float().sum().clamp_min(1.0)
+        treated_count = preselected_obs_treatment[:, 0, 0].float().sum()
+        obs_metrics["obs_self_condition_forward_q_camera_conditional_frac"] = float(
+            (treated_count / camera_count).detach().cpu()
+        )
     pred = predict_with_joint_coupling(
         model,
         x_t,
@@ -1481,6 +1685,9 @@ def diffusion_loss(
     if joint_human_camera_input_mode != "normal":
         metrics["joint_human_camera_input_mode_active"] = float(joint_selected.float().mean().detach().cpu())
     metrics["joint_coupling_scale"] = float(joint_coupling_scale)
+    human_view_mode = getattr(model, "human_view_mode", "mixed")
+    metrics["human_view_mode_full"] = float(human_view_mode == "full")
+    metrics["human_view_mode_isolated"] = float(human_view_mode == "isolated")
     metrics.update(obs_metrics)
     metrics.update(temporal_metrics)
     return loss, metrics, pred
@@ -1769,6 +1976,8 @@ def build_loaders(
 def train(args: argparse.Namespace) -> None:
     set_seed(args.seed)
     device = torch.device(args.device)
+    obs_self_condition_generator = torch.Generator(device=device)
+    obs_self_condition_generator.manual_seed(args.obs_self_condition_seed)
     znorm_stats, znorm_stats_path = resolve_latent_znorm_stats(args)
     train_loader, eval_loader, test_loader, sizes, cache_audit = build_loaders(args, znorm_stats)
     dim_mults = tuple(int(v) for v in args.dim_mults)
@@ -1790,6 +1999,7 @@ def train(args: argparse.Namespace) -> None:
         task_instruction_embeddings=task_instruction_embeddings,
         task_instruction_scale=args.task_instruction_scale,
         num_task_embeddings=num_task_embeddings,
+        human_view_mode=args.human_view_mode,
     ).to(device)
     diffusion = build_stage2_process(
         args.generative_process,
@@ -1836,6 +2046,7 @@ def train(args: argparse.Namespace) -> None:
         "joint_human_camera_input_mode": args.joint_human_camera_input_mode,
         "joint_coupling_scale": args.joint_coupling_scale,
         "joint_coupling_mode": args.joint_coupling_mode,
+        "human_view": human_view_contract(args.human_view_mode),
         "task_names": TASK_NAMES,
         "task_probs_normalized": [float(v) for v in task_probs.tolist()],
         "cache_audit": cache_audit,
@@ -1854,6 +2065,9 @@ def train(args: argparse.Namespace) -> None:
             "mode": args.obs_self_condition_mode,
             "prob": args.obs_self_condition_prob,
             "noise_std": args.obs_self_condition_noise_std,
+            "selection_seed": args.obs_self_condition_seed,
+            "timestep_min": args.obs_self_condition_t_min,
+            "timestep_max": args.obs_self_condition_t_max,
         },
         "temporal_mask": {
             "enabled": bool(args.temporal_mask_probability > 0.0),
@@ -1976,6 +2190,9 @@ def train(args: argparse.Namespace) -> None:
                 obs_self_condition_prob=args.obs_self_condition_prob,
                 obs_self_condition_mode=args.obs_self_condition_mode,
                 obs_self_condition_noise_std=args.obs_self_condition_noise_std,
+                obs_self_condition_generator=obs_self_condition_generator,
+                obs_self_condition_t_min=args.obs_self_condition_t_min,
+                obs_self_condition_t_max=args.obs_self_condition_t_max,
                 temporal_mask_probability=args.temporal_mask_probability,
                 temporal_mask_task_weights=args.temporal_mask_task_weights,
                 joint_human_camera_input_mode=args.joint_human_camera_input_mode,
@@ -2114,6 +2331,8 @@ def train(args: argparse.Namespace) -> None:
 def check(args: argparse.Namespace) -> None:
     set_seed(args.seed)
     device = torch.device(args.device)
+    obs_self_condition_generator = torch.Generator(device=device)
+    obs_self_condition_generator.manual_seed(args.obs_self_condition_seed)
     znorm_stats, znorm_stats_path = resolve_latent_znorm_stats(args)
     geo_tokenizer = build_geo_tokenizer(args, device)
     geo_downsample = int(args.geo_downsample)
@@ -2200,8 +2419,25 @@ def check(args: argparse.Namespace) -> None:
         task_instruction_embeddings=task_instruction_embeddings,
         task_instruction_scale=args.task_instruction_scale,
         num_task_embeddings=num_task_embeddings,
+        human_view_mode=args.human_view_mode,
     ).to(device)
     model.eval()
+    direct_h_latent = model._route_latent(z, human_only)
+    direct_h_text = model._route_text(text, human_only)
+    text_half = text.shape[-1] // 2
+    if args.human_view_mode == "full":
+        if not torch.equal(direct_h_latent, z) or not torch.equal(direct_h_text, text):
+            raise RuntimeError("full Direct-H view is not [H_t,C_t] + [e_C,e_H]")
+    elif args.human_view_mode == "isolated":
+        if not torch.equal(direct_h_latent[:, :HUM_DIM], z[:, :HUM_DIM]):
+            raise RuntimeError("isolated Direct-H changed the Human latent")
+        if direct_h_latent[:, HUM_DIM:].count_nonzero() or direct_h_text[:, :text_half].count_nonzero():
+            raise RuntimeError("isolated Direct-H did not zero Camera latent/text")
+        if not torch.equal(direct_h_text[:, text_half:], text[:, text_half:]):
+            raise RuntimeError("isolated Direct-H changed Human text")
+    else:
+        if not torch.equal(direct_h_latent, z) or direct_h_text[:, :text_half].count_nonzero():
+            raise RuntimeError("mixed Direct-H view is not [H_t,C_t] + [0,e_H]")
     joint_obs_mask, _ = make_branch_masks(z, valid, joint_only, task_routing=args.task_routing)
     joint_source_meta = build_source_meta(joint_obs_mask, SOURCE_GT)
     check_t = torch.zeros((z.shape[0],), dtype=torch.long, device=device)
@@ -2217,7 +2453,7 @@ def check(args: argparse.Namespace) -> None:
     scale_one_pred = predict_with_joint_coupling(
         model, z, check_t, text, z, joint_obs_mask, joint_only, joint_source_meta, 1.0
     )
-    if not torch.equal(legacy_pred, scale_one_pred):
+    if args.human_view_mode != "isolated" and not torch.equal(legacy_pred, scale_one_pred):
         raise RuntimeError("joint coupling scale=1 changed the legacy forward")
     isolated_pred = predict_with_joint_coupling(
         model, z, check_t, text, z, joint_obs_mask, joint_only, joint_source_meta, 0.0
@@ -2235,7 +2471,9 @@ def check(args: argparse.Namespace) -> None:
         joint_source_meta,
         0.0,
     )
-    if not torch.equal(isolated_pred[:, :HUM_DIM, :], camera_perturbed_pred[:, :HUM_DIM, :]):
+    if args.human_view_mode != "full" and not torch.equal(
+        isolated_pred[:, :HUM_DIM, :], camera_perturbed_pred[:, :HUM_DIM, :]
+    ):
         raise RuntimeError("isolated human prediction changed under camera latent perturbation")
     human_perturbed = z.clone()
     human_perturbed[:, :HUM_DIM, :] += 1000.0
@@ -2276,7 +2514,9 @@ def check(args: argparse.Namespace) -> None:
         0.0,
         "c_to_h_blocked",
     )
-    if not torch.equal(directed_pred[:, :HUM_DIM, :], directed_camera_perturbed[:, :HUM_DIM, :]):
+    if args.human_view_mode != "full" and not torch.equal(
+        directed_pred[:, :HUM_DIM, :], directed_camera_perturbed[:, :HUM_DIM, :]
+    ):
         raise RuntimeError("C->H-blocked human prediction changed under camera latent perturbation")
     camera_text_perturbed = text.clone()
     camera_text_perturbed[:, : text.shape[-1] // 2] += 1000.0
@@ -2292,8 +2532,12 @@ def check(args: argparse.Namespace) -> None:
         0.0,
         "c_to_h_blocked",
     )
-    if not torch.equal(directed_pred[:, :HUM_DIM, :], directed_text_perturbed[:, :HUM_DIM, :]):
+    if args.human_view_mode != "full" and not torch.equal(
+        directed_pred[:, :HUM_DIM, :], directed_text_perturbed[:, :HUM_DIM, :]
+    ):
         raise RuntimeError("C->H-blocked human prediction changed under camera text perturbation")
+    if args.human_view_mode == "full" and not torch.equal(directed_pred, legacy_pred):
+        raise RuntimeError("full joint view is not the complete [H_t,C_t] + [e_C,e_H] forward")
     if not torch.equal(directed_pred[:, HUM_DIM:, :], legacy_pred[:, HUM_DIM:, :]):
         raise RuntimeError("C->H-blocked camera prediction changed from the full joint forward")
     model.train()
@@ -2319,6 +2563,9 @@ def check(args: argparse.Namespace) -> None:
         obs_self_condition_prob=args.obs_self_condition_prob,
         obs_self_condition_mode=args.obs_self_condition_mode,
         obs_self_condition_noise_std=args.obs_self_condition_noise_std,
+        obs_self_condition_generator=obs_self_condition_generator,
+        obs_self_condition_t_min=args.obs_self_condition_t_min,
+        obs_self_condition_t_max=args.obs_self_condition_t_max,
         temporal_mask_probability=args.temporal_mask_probability,
         temporal_mask_task_weights=args.temporal_mask_task_weights,
         joint_human_camera_input_mode=args.joint_human_camera_input_mode,
@@ -2346,6 +2593,7 @@ def check(args: argparse.Namespace) -> None:
         "metrics": metrics,
         "shape": list(pred_x0.shape),
         "latent_znorm": latent_znorm_meta(bool(args.znorm), znorm_stats, znorm_stats_path, args.cache_dir / "train.pt"),
+        "human_view": human_view_contract(args.human_view_mode),
         "roundtrip_max_error": roundtrip_max_error,
     }, sort_keys=True))
 
@@ -2412,7 +2660,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--task-routing",
         choices=["symmetric", "human_first"],
         default="symmetric",
-        help="human_first makes TASK_HUMAN text-only while TASK_CAMERA still observes human latent.",
+        help="human_first predicts only Human for TASK_HUMAN while TASK_CAMERA still observes human latent.",
+    )
+    p.add_argument(
+        "--human-view-mode",
+        choices=HUMAN_VIEW_MODES,
+        default="mixed",
+        help="Human-producing view contract: historical mixed, full Camera latent/text context, or fully isolated Camera context.",
     )
     p.add_argument("--geo-loss-weight", type=float, default=0.0, help="Frozen owning-decoder feature-space auxiliary loss weight")
     p.add_argument("--geo-tokenizer-checkpoint", type=Path)
@@ -2422,7 +2676,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--znorm", action="store_true", help="Use per-channel train valid-frame latent z-normalization")
     p.add_argument("--znorm-stats-path", type=Path)
     p.add_argument("--znorm-eps", type=float, default=1.0e-6)
-    p.add_argument("--znorm-recompute", action="store_true")
+    p.add_argument(
+        "--znorm-recompute",
+        action="store_true",
+        help="Explicitly create stats at a missing target; never overwrites an existing artifact.",
+    )
     p.add_argument("--full-cov", action="store_true", help="Whiten each human/camera branch with train-cache covariance")
     p.add_argument("--cov-ridge", type=float, default=1.0e-4)
     p.set_defaults(require_default_tokenizer_contract=True)
@@ -2464,8 +2722,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Training steps at which to save immutable step_<N>.pt checkpoints.",
     )
     p.add_argument("--obs-self-condition-prob", type=float, default=0.0)
-    p.add_argument("--obs-self-condition-mode", choices=["clean", "noisy", "joint_pred", "mixed"], default="clean")
+    p.add_argument(
+        "--obs-self-condition-mode",
+        choices=["clean", "noisy", "forward_q", "joint_pred", "mixed"],
+        default="clean",
+    )
     p.add_argument("--obs-self-condition-noise-std", type=float, default=0.0)
+    p.add_argument("--obs-self-condition-seed", type=int, default=170105)
+    p.add_argument("--obs-self-condition-t-min", type=int)
+    p.add_argument("--obs-self-condition-t-max", type=int)
     p.add_argument(
         "--temporal-mask-probability",
         type=float,
@@ -2522,6 +2787,15 @@ def main() -> None:
         raise ValueError("--obs-self-condition-prob must be in [0, 1]")
     if args.obs_self_condition_noise_std < 0.0:
         raise ValueError("--obs-self-condition-noise-std must be non-negative")
+    if args.obs_self_condition_seed < 0:
+        raise ValueError("--obs-self-condition-seed must be non-negative")
+    if (args.obs_self_condition_t_min is None) != (args.obs_self_condition_t_max is None):
+        raise ValueError("--obs-self-condition-t-min and --obs-self-condition-t-max must be set together")
+    if args.obs_self_condition_t_min is not None:
+        if args.obs_self_condition_mode != "forward_q":
+            raise ValueError("observed-H timestep bounds are only valid for --obs-self-condition-mode forward_q")
+        if not 0 <= args.obs_self_condition_t_min <= args.obs_self_condition_t_max < args.diffusion_steps:
+            raise ValueError("observed-H timestep bounds must satisfy 0 <= min <= max < diffusion steps")
     if not 0.0 <= args.temporal_mask_probability <= 1.0:
         raise ValueError("--temporal-mask-probability must be in [0, 1]")
     if any(value < 0.0 for value in args.temporal_mask_task_weights):
@@ -2559,6 +2833,8 @@ def main() -> None:
             raise ValueError("human_first requires --v72-text-role-router --v72-aux-text-scale 0")
         if args.joint_coupling_scale != 0.0 or args.joint_coupling_mode != "c_to_h_blocked":
             raise ValueError("human_first requires directed JOINT routing: --joint-coupling-scale 0 --joint-coupling-mode c_to_h_blocked")
+    elif args.human_view_mode != "mixed":
+        raise ValueError("non-default --human-view-mode requires --task-routing human_first")
     if args.task_instruction_embeddings is not None and not args.task_instruction_embeddings.exists():
         raise FileNotFoundError(args.task_instruction_embeddings)
     if len(args.task_probs) not in {3, 4}:
