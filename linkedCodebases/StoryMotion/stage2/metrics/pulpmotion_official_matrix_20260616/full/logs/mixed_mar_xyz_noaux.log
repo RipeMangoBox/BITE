@@ -1,66 +1,0 @@
-/data/public/ripemangobox/Motion/StoryMotion/scripts/pulpmotion_official_baseline_eval.py:28: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/pulpmotion_official_baseline_eval.py:28: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/pulpmotion_official_baseline_eval.py:28: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, name):
-/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/fabric/__init__.py:41: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-Seed set to 42
-GPU available: True (cuda), used: True
-TPU available: False, using: 0 TPU cores
-IPU available: False, using: 0 IPUs
-HPU available: False, using: 0 HPUs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [1]
---> CLaTr loaded from checkpoint
---> TMR loaded from checkpoint
---> Autoaligner loaded from checkpoint
-Testing: |          | 0/? [00:00<?, ?it/s]--> Autoaligner loaded from checkpoint
-Testing:   0%|          | 0/83 [00:00<?, ?it/s]Testing DataLoader 0:   0%|          | 0/83 [00:00<?, ?it/s]/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/transformer.py:515: UserWarning: The PyTorch API of nested tensors is in prototype stage and will change in the near future. We recommend specifying layout=torch.jagged when constructing a nested tensor, as this layout receives active development, has better operator coverage, and works with torch.compile. (Triggered internally at /pytorch/aten/src/ATen/NestedTensorImpl.cpp:178.)
-  output = torch._nested_tensor_from_mask(
-Testing DataLoader 0:   1%|          | 1/83 [00:24<33:27,  0.04it/s]Testing DataLoader 0:   2%|▏         | 2/83 [00:46<31:13,  0.04it/s]Testing DataLoader 0:   4%|▎         | 3/83 [01:07<30:07,  0.04it/s]Testing DataLoader 0:   5%|▍         | 4/83 [01:29<29:37,  0.04it/s]Testing DataLoader 0:   6%|▌         | 5/83 [01:52<29:08,  0.04it/s]Testing DataLoader 0:   7%|▋         | 6/83 [02:13<28:38,  0.04it/s]Testing DataLoader 0:   8%|▊         | 7/83 [02:34<27:57,  0.05it/s]Testing DataLoader 0:  10%|▉         | 8/83 [02:56<27:36,  0.05it/s]Testing DataLoader 0:  11%|█         | 9/83 [03:18<27:10,  0.05it/s]Testing DataLoader 0:  12%|█▏        | 10/83 [03:39<26:39,  0.05it/s]Testing DataLoader 0:  13%|█▎        | 11/83 [04:01<26:19,  0.05it/s]Testing DataLoader 0:  14%|█▍        | 12/83 [04:22<25:55,  0.05it/s]Testing DataLoader 0:  16%|█▌        | 13/83 [04:44<25:32,  0.05it/s]Testing DataLoader 0:  17%|█▋        | 14/83 [05:05<25:05,  0.05it/s]Testing DataLoader 0:  18%|█▊        | 15/83 [05:27<24:42,  0.05it/s]Testing DataLoader 0:  19%|█▉        | 16/83 [05:48<24:18,  0.05it/s]Testing DataLoader 0:  20%|██        | 17/83 [06:09<23:53,  0.05it/s]Testing DataLoader 0:  22%|██▏       | 18/83 [06:30<23:30,  0.05it/s]Testing DataLoader 0:  23%|██▎       | 19/83 [06:51<23:06,  0.05it/s]Testing DataLoader 0:  24%|██▍       | 20/83 [07:12<22:41,  0.05it/s]Testing DataLoader 0:  25%|██▌       | 21/83 [07:32<22:16,  0.05it/s]Testing DataLoader 0:  27%|██▋       | 22/83 [07:53<21:52,  0.05it/s]Testing DataLoader 0:  28%|██▊       | 23/83 [08:15<21:31,  0.05it/s]Testing DataLoader 0:  29%|██▉       | 24/83 [08:35<21:07,  0.05it/s]Testing DataLoader 0:  30%|███       | 25/83 [08:56<20:44,  0.05it/s]Testing DataLoader 0:  31%|███▏      | 26/83 [09:17<20:22,  0.05it/s]Testing DataLoader 0:  33%|███▎      | 27/83 [09:38<19:59,  0.05it/s]Testing DataLoader 0:  34%|███▎      | 28/83 [09:58<19:35,  0.05it/s]Testing DataLoader 0:  35%|███▍      | 29/83 [10:20<19:15,  0.05it/s]Testing DataLoader 0:  36%|███▌      | 30/83 [10:41<18:52,  0.05it/s]Testing DataLoader 0:  37%|███▋      | 31/83 [11:01<18:29,  0.05it/s]Testing DataLoader 0:  39%|███▊      | 32/83 [11:22<18:07,  0.05it/s]Testing DataLoader 0:  40%|███▉      | 33/83 [11:43<17:46,  0.05it/s]Testing DataLoader 0:  41%|████      | 34/83 [12:05<17:24,  0.05it/s]Testing DataLoader 0:  42%|████▏     | 35/83 [12:26<17:03,  0.05it/s]Testing DataLoader 0:  43%|████▎     | 36/83 [12:46<16:41,  0.05it/s]Testing DataLoader 0:  45%|████▍     | 37/83 [13:07<16:18,  0.05it/s]Testing DataLoader 0:  46%|████▌     | 38/83 [13:27<15:56,  0.05it/s]Testing DataLoader 0:  47%|████▋     | 39/83 [13:49<15:36,  0.05it/s]Testing DataLoader 0:  48%|████▊     | 40/83 [14:10<15:14,  0.05it/s]Testing DataLoader 0:  49%|████▉     | 41/83 [14:32<14:53,  0.05it/s]Testing DataLoader 0:  51%|█████     | 42/83 [14:51<14:30,  0.05it/s]Testing DataLoader 0:  52%|█████▏    | 43/83 [15:13<14:09,  0.05it/s]Testing DataLoader 0:  53%|█████▎    | 44/83 [15:34<13:47,  0.05it/s]Testing DataLoader 0:  54%|█████▍    | 45/83 [15:55<13:26,  0.05it/s]Testing DataLoader 0:  55%|█████▌    | 46/83 [16:16<13:05,  0.05it/s]Testing DataLoader 0:  57%|█████▋    | 47/83 [16:38<12:44,  0.05it/s]Testing DataLoader 0:  58%|█████▊    | 48/83 [16:58<12:22,  0.05it/s]Testing DataLoader 0:  59%|█████▉    | 49/83 [17:20<12:01,  0.05it/s]Testing DataLoader 0:  60%|██████    | 50/83 [17:41<11:40,  0.05it/s]Testing DataLoader 0:  61%|██████▏   | 51/83 [18:01<11:18,  0.05it/s]Testing DataLoader 0:  63%|██████▎   | 52/83 [18:22<10:57,  0.05it/s]Testing DataLoader 0:  64%|██████▍   | 53/83 [18:42<10:35,  0.05it/s]Testing DataLoader 0:  65%|██████▌   | 54/83 [19:03<10:14,  0.05it/s]Testing DataLoader 0:  66%|██████▋   | 55/83 [19:25<09:53,  0.05it/s]Testing DataLoader 0:  67%|██████▋   | 56/83 [19:45<09:31,  0.05it/s]Testing DataLoader 0:  69%|██████▊   | 57/83 [20:06<09:10,  0.05it/s]Testing DataLoader 0:  70%|██████▉   | 58/83 [20:26<08:48,  0.05it/s]Testing DataLoader 0:  71%|███████   | 59/83 [20:48<08:27,  0.05it/s]Testing DataLoader 0:  72%|███████▏  | 60/83 [21:09<08:06,  0.05it/s]Testing DataLoader 0:  73%|███████▎  | 61/83 [21:30<07:45,  0.05it/s]Testing DataLoader 0:  75%|███████▍  | 62/83 [21:51<07:24,  0.05it/s]Testing DataLoader 0:  76%|███████▌  | 63/83 [22:11<07:02,  0.05it/s]Testing DataLoader 0:  77%|███████▋  | 64/83 [22:32<06:41,  0.05it/s]Testing DataLoader 0:  78%|███████▊  | 65/83 [22:52<06:20,  0.05it/s]Testing DataLoader 0:  80%|███████▉  | 66/83 [23:13<05:59,  0.05it/s]Testing DataLoader 0:  81%|████████  | 67/83 [23:36<05:38,  0.05it/s]Testing DataLoader 0:  82%|████████▏ | 68/83 [23:57<05:17,  0.05it/s]Testing DataLoader 0:  83%|████████▎ | 69/83 [24:19<04:56,  0.05it/s]Testing DataLoader 0:  84%|████████▍ | 70/83 [24:39<04:34,  0.05it/s]Traceback (most recent call last):
-  File "/data/public/ripemangobox/Motion/StoryMotion/scripts/pulpmotion_official_baseline_eval.py", line 186, in <module>
-    main()
-  File "/data/public/ripemangobox/Motion/StoryMotion/scripts/pulpmotion_official_baseline_eval.py", line 150, in main
-    trainer.test(model=model, dataloaders=dataloader, verbose=False)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/trainer.py", line 754, in test
-    return call._call_and_handle_interrupt(
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/call.py", line 44, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/trainer.py", line 794, in _test_impl
-    results = self._run(model, ckpt_path=ckpt_path)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/trainer.py", line 987, in _run
-    results = self._run_stage()
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/trainer.py", line 1026, in _run_stage
-    return self._evaluation_loop.run()
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/loops/utilities.py", line 182, in _decorator
-    return loop_run(self, *args, **kwargs)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/loops/evaluation_loop.py", line 135, in run
-    self._evaluation_step(batch, batch_idx, dataloader_idx, dataloader_iter)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/loops/evaluation_loop.py", line 396, in _evaluation_step
-    output = call._call_strategy_hook(trainer, hook_name, *step_args)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/trainer/call.py", line 309, in _call_strategy_hook
-    output = fn(*args, **kwargs)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/lightning/pytorch/strategies/strategy.py", line 425, in test_step
-    return self.lightning_module.test_step(*args, **kwargs)
-  File "/data/public/ripemangobox/Motion/PulpMotion/src/models/mar.py", line 285, in test_step
-    raw_output = self.feat_to_raw(x_output, batch["x_raw"]["intrinsics"])
-  File "/data/public/ripemangobox/Motion/PulpMotion/src/datasets/multimodal_dataset.py", line 114, in get_raw
-    return self.joint_dataset.get_raw(feature, *args, **kwargs)
-  File "/data/public/ripemangobox/Motion/PulpMotion/src/datasets/modalities/traj+char+proj_dataset.py", line 94, in get_raw
-    human_raw = self.human_dataset.get_raw(human_feat)
-  File "/data/public/ripemangobox/Motion/PulpMotion/src/datasets/modalities/char_dataset.py", line 68, in get_raw
-    smpl_out = smpldata_to_bodymodel(self.body_model, smpl_joints, smpl_poses)
-  File "/data/public/ripemangobox/Motion/PulpMotion/utils/rifke_utils.py", line 178, in smpldata_to_bodymodel
-    smpl_out = body_model(
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/data/public/ripemangobox/Motion/PulpMotion/utils/smpl_utils.py", line 79, in forward
-    smpl_output = super(SMPL, self).forward(*args, **kwargs)
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/smplx/body_models.py", line 369, in forward
-    vertices, joints = lbs(betas, full_pose, self.v_template,
-  File "/home/ripemangobox/miniconda3/envs/storymotion-director-cu128/lib/python3.10/site-packages/smplx/lbs.py", line 238, in lbs
-    T = torch.matmul(W, A.view(batch_size, num_joints, 16)) \
-torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 3.94 GiB. GPU 0 has a total capacity of 31.36 GiB of which 3.24 GiB is free. Including non-PyTorch memory, this process has 28.09 GiB memory in use. Of the allocated memory 16.33 GiB is allocated by PyTorch, and 11.18 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
-Testing DataLoader 0:  84%|████████▍ | 70/83 [24:45<04:35,  0.05it/s]

@@ -1,8 +1,0 @@
-[02:17:50] ====== PHASE 0: Independent Dropout Fine-tuning ======
-[02:17:50] Fine-tuning branch_jh6ft with cond_mask_prob_cam=0.1 cond_mask_prob_hum=0.1 cond_mask_prob=0.0
-[02:17:50] Training on GPU0 ONLY. Remaining GPUs (1,2,3) run eval sweeps in parallel.
-[02:17:50] Training launched PID=2983911 output=/data/public/ripemangobox/Motion/StoryMotion/runs/train/stage2/independent_dropout_ft_20260614/gpu0_indepdrop_b512_50000
-[02:17:50] ====== PHASE 1: Full Joint Evals (GPU1,2,3) ======
-[02:17:50] LAUNCH std_c1_e0_full GPU=3
-[02:17:50] LAUNCH std_c2_e1_full GPU=1
-[02:17:50] LAUNCH bi_h2_c1_e0_full GPU=2

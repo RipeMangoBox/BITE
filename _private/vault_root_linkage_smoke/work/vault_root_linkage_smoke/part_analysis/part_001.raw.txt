@@ -1,1 +1,0 @@
-{"part_id": "part_001", "section_role": "mock_chunk", "method_evidence": [{"claim": "Mock method claim from this chunk.", "section": "chunk", "anchor": "part_001", "confidence": 0.8}], "experiment_evidence": [], "formula_evidence": [], "figure_table_roles": [], "open_questions": []}

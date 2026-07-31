@@ -1,7 +1,0 @@
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-{"camera_median": 0.0005344990931916982, "elapsed_sec": 3.330249547958374, "event": "trimodal_latent_render_written", "human_median": 0.0034754114458337426, "joint_median": 0.020071239210665226, "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_trimodal_latent_render_20260612", "samples": 512}

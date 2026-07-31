@@ -1,4 +1,0 @@
-block,endpoint_layer,n,l2_vs_baseline_mean,mean_abs_vs_baseline_mean,max_abs_vs_baseline_mean,allclose_count
-early,4,2,6570.3259,1.5014,172.0757,0
-middle,10,2,5096.3232,1.1798,189.2393,0
-late,15,2,0.0000,0.0000,0.0000,2

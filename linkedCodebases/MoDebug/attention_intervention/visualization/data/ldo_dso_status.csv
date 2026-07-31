@@ -1,7 +1,0 @@
-baseline,diagnostic,paper_level_status,formal_outputs,reason
-MotionCLR,LDO,blocked_incompatible_interface,2 seed manifests,MotionCLR CLRBlock outputs have varying channel/time resolutions inside UNet; they are not directly decodable motion outputs. Use DSO for MotionCLR step outputs.
-MotionCLR,DSO,full_evaluator_metrics_computed,1 full evaluator manifest,MotionCLR diffusion step outputs are legal scheduler endpoints for DSO diagnostics.
-MotionGPT,LDO,blocked_incompatible_interface,2 seed manifests,MotionGPT T5 decoder hidden states are not motion tokens and official generate() does not expose a stable direct-output decoder interface.
-MotionGPT,DSO,not_present_in_formal_root,0 formal manifests,No formal MotionGPT DSO manifest is present under formal_20260608.
-MoLingo,LDO,diagnostic_arrays_computed_not_official_metrics,2 seed manifests,"MoLingo early-exit outputs were decoded to arrays, but they are diagnostic direct-output proxies rather than official evaluator metrics."
-MoLingo,DSO,not_present_in_formal_root,0 formal manifests,No formal MoLingo DSO manifest is present under formal_20260608; current DSO implementation is documented for MotionCLR diffusion sampling only.

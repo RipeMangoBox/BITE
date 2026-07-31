@@ -60,8 +60,9 @@ model*.bin
 **/.claude/assistant-daemon-state.json
 
 # === Private workspace ===
-# _private is tracked by default; keep secrets, browser state, local app config,
+# _private is local-only; keep secrets, browser state, local app config,
 # bulky dataset staging, and generated recovery work out of Git.
+_private/
 _private/.archives/
 _private/acm_download_recovery/reports/
 _private/acm_download_recovery/secrets/
@@ -88,8 +89,6 @@ obsidian-vault/.trash/
 obsidian-vault/Clippings/
 obsidian-vault/_attachments/
 obsidian-vault/media/
-obsidian-vault/Pulp.md
-obsidian-vault/*.md
 
 # === Large/generated paper assets ===
 obsidian-vault/paperPDFs/
@@ -102,22 +101,38 @@ obsidian-vault/paper_list.csv.bak*
 # === Generated/local batch aliases ===
 /batches
 
-# Keep generated vault data and linked codebases out of Git sync.
-# Use the private Hugging Face dataset for obsidian-vault transfer.
+# === Local source and run data ===
+runs/
+paperSources/
+
+# Keep linked codebases and generated vault data out of Git sync.
+linkedCodebases/
 
 # === Large files pending review before remote sync ===
 # Generated from files >= 5 MiB; keep only files that still cannot be pushed directly.
 artifacts/storymotion_geo_patch/joint_cache_pure/train.pt
 artifacts/storymotion_geo_patch/joint_cache_pure/val.pt
 
-
-
-## obsidian-vault
+# === Obsidian note-only allowlist ===
+# The vault is ignored by default. Only human-authored note trees are versioned.
 obsidian-vault/*
 obsidian-vault/.*
-!obsidian-vault/.obsidian/
-!obsidian-vault/.obsidian/**
-obsidian-vault/.obsidian/workspace*.json
-obsidian-vault/.obsidian/workspaces.json
-obsidian-vault/.obsidian/researchflow_backups/
-linkedCodebases/
+!obsidian-vault/*.md
+obsidian-vault/README.md
+obsidian-vault/BitterReading/**
+!obsidian-vault/BitterReading/
+!obsidian-vault/BitterReading/**/*.md
+obsidian-vault/BitterReading/2026.07.md
+obsidian-vault/BlackBoard/**
+!obsidian-vault/BlackBoard/
+!obsidian-vault/BlackBoard/**/*.md
+obsidian-vault/ideas/**
+!obsidian-vault/ideas/
+!obsidian-vault/ideas/**/
+!obsidian-vault/ideas/**/*.md
+obsidian-vault/social/**
+!obsidian-vault/social/
+!obsidian-vault/social/**/*.md
+obsidian-vault/TX_HY/**
+!obsidian-vault/TX_HY/
+!obsidian-vault/TX_HY/**/*.md

@@ -1,3 +1,0 @@
-EXPERIMENT_SCOPE=formal_training_candidate
-PAPER_LEVEL_STATUS=not_final_until_official_evaluator_metrics
-OFFICIAL_EVAL_REQUIRED=true

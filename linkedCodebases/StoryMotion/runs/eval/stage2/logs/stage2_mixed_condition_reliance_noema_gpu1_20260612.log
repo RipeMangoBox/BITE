@@ -1,7 +1,0 @@
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-{"camera_visible_shuffle_delta": 1.0992052969104407, "ckpt_name": "last.pt", "elapsed_sec": 6.887784481048584, "event": "condition_reliance_written", "human_visible_shuffle_delta": 1.3583684612385696, "joint_text_shuffle_delta": 0.010589994490146637, "path": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_mixed_condition_reliance_20260612/mixed_noema_sched_last.pt_condition_reliance.json", "run_alias": "mixed_noema_sched", "samples": 4096}

@@ -1,8 +1,0 @@
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.bool` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
-/data/public/ripemangobox/Motion/StoryMotion/scripts/train_stage2_condmdi_pulp.py:32: FutureWarning: In the future `np.str` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, _name):
---> Autoaligner loaded from checkpoint
-{"camera_rmse_camera_mode": 0.03226052597165108, "elapsed_sec": 4.624694585800171, "event": "decode_render_smoke_written", "human_mpjpe_human_mode": 0.025033600628376007, "out_dir": "/data/public/ripemangobox/Motion/StoryMotion/runs/eval/stage2_decode_render_smoke_20260612", "sample_id": "2011_-4GsCEopbd4_00008_001_a"}

@@ -1,4 +1,0 @@
-	TMR FID: 3.794, conf. 0.000
-	TOP1: 0.763, conf. 0.000, TOP2. 0.892, conf. 0.000, TOP3. 0.938, conf. 0.000
-	Matching Score: 14.820, conf. 0.000
-

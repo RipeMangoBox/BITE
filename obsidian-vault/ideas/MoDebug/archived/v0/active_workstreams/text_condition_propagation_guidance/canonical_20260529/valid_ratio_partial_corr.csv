@@ -1,5 +1,0 @@
-model,n,valid_ratio_unique,r_valid_ratio_failure,p_valid_ratio_failure,r_metric_failure,p_metric_failure,r_metric_valid_ratio,p_metric_valid_ratio,partial_r_metric_failure_given_valid_ratio,partial_p
-MoGenTS,100,1,不适用,不适用,不适用,不适用,不适用,不适用,不适用,不适用
-MoLingo,100,34,0.11073572822586401,0.2727234654573881,0.28349638065754107,0.004260422958266622,0.6461079750463524,3.8920037746300667e-13,0.2794128182248059,0.004873146211481472
-MoMask original,100,1,不适用,不适用,不适用,不适用,不适用,不适用,不适用,不适用
-MotionGPT,100,1,不适用,不适用,不适用,不适用,不适用,不适用,不适用,不适用

@@ -1,0 +1,268 @@
+---
+title: "StoryMotion Latest Roadmap"
+status: active
+hypothesis: |
+  StoryMotion should keep the corrected joint AE/VAE as valid Stage1 candidates, first close the owning-decoder evaluation contract, and then isolate tokenizer geometry, denoiser error, and sampler accumulation before selecting a Stage2 topology.
+tags:
+  - StoryMotion
+  - Motion_Generation
+  - roadmap
+  - architecture
+  - status/active
+aliases:
+  - StoryMotion-Latest-Roadmap
+source_notes:
+  - "[[2026-07-12_storymotion-valid-metric-ledger]]"
+  - "[[2026-07-12_storymotion-stage1-stage2-loss-and-demanifold]]"
+  - "[[2026-07-11_storymotion-v7.14-corrected-results]]"
+  - "[[2026-07-12_storymotion-v7.17-decoder-cache-contract-execution]]"
+created: 2026-07-11T11:33:00+0800
+updated: 2026-07-12T12:20:00+0800
+---
+
+# StoryMotion Latest Roadmap
+
+> [!abstract] Route
+> Keep v7.14 corrected joint AE as the reconstruction reference, but reject the current local joint AE/VAE + START_X/MSE Stage2 recipe. Corrected matched 10k shows loss improves while decoded human manifold collapses; low-noise single-step predicted `z₀` is already off-manifold and the sampler amplifies it. Do not extend training or test topology yet. First isolate correlated latent geometry and prediction-target mismatch with short external-metric gates.
+
+Current metrics are maintained in [[2026-07-12_storymotion-valid-metric-ledger]].
+Corrected Stage1 evidence is maintained in [[2026-07-11_storymotion-v7.14-corrected-results]].
+The decoder/cache correction and matched Stage2 result are maintained in [[2026-07-12_storymotion-v7.17-decoder-cache-contract-execution]].
+Historical invalidation provenance remains in [[2026-07-11_storymotion-v7.15-matched-stage2-results]] and [[2026-07-11_storymotion-v7.16-stage2-forensic-audit]] under the archive.
+
+## 1. Core Goal
+
+Build one text-controlled human-camera motion system with four measurable capabilities:
+
+- `JOINT`: generate synchronized human motion and camera trajectory from human text + camera text.
+- `H2C`: generate camera from human source + camera text.
+- `C2H`: generate human from camera/source context + human text.
+- `EDIT`: regenerate masked human/camera temporal spans while preserving unmasked content and boundary continuity.
+
+The research target is not independent branch quality. A successful model must jointly preserve:
+
+- human semantics, realism, diversity, and root motion;
+- camera semantics, trajectory distribution, and event timing;
+- human-camera distance, visibility, shot scale, and on-screen framing;
+- robustness when the observed branch is GT, reconstructed, noisy, partial, or generated.
+
+## 2. Current Architecture
+
+```text
+text_h + text_c
+      ↓
+corrected Stage1 joint AE
+normalized human199 + official camera14 ↔ latent [human128, camera64]
+      ↓
+Stage2 CondMDI + diffusion
+explicit task / source / target contract
+      ↓
+JOINT / H2C / C2H / EDIT
+```
+
+Current defaults:
+
+- Stage1: v7.14 corrected joint AE; VAE remains an ablation.
+- Stage2 backbone: CondMDI + diffusion.
+- Symmetric unified model: reference baseline, not rejected.
+- Asymmetric human-first cascade: hypothesis under test, not the default winner.
+- RF, naive CLIP task projection, and camera prior/residual split: optional ablations, not current mainline.
+
+## 3. Core Conclusions
+
+1. **Stage1 contract is repaired.** Corrected AE reaches FDTMR `31.10`, HCov `97.9%`, FDCLaTr `0.48`, CCov `99.5%`, F1 `0.927`, and Out `5.1%` on pure `4053`.
+2. **AE is preferred over VAE.** VAE is valid but weaker on full official metrics and eight-sample root trajectory error.
+3. **Old local-tokenizer evidence is invalid.** It cannot support claims about joint/separate topology, quantization, or Stage2 architecture.
+4. **v7.15/v7.16 official Stage2 metrics are invalid.** Their evaluator used the official Pulp decoder for local joint-AE/VAE latents. A raw local cache → wrong decoder identity test reproduces the reported collapse without Stage2.
+5. **Clean H2C is not the bottleneck.** With GT human, clean H2C reaches camera FDCLaTr `28.03` and Out `6.1%`; generated human shifts it to FDCLaTr `266.46`.
+6. **Generated source reliability is the core failure.** Shuffling the generated human worsens camera further, proving that the H2C path uses source identity rather than ignoring it.
+7. **Replay adaptation is incomplete.** It improves generated-source camera FDCLaTr to `70.51`, but Out rises to `27.9%` and clean-source performance collapses.
+8. **Editing is not yet evidence-backed.** Mask-inpainting exists as a mechanism, but a full edit protocol and preservation metrics are missing.
+9. **Data cleaning is hygiene, not the method.** Conservative filtering removes about 20% of the old official cache, but clean-only fine-tuning did not restore human distribution quality.
+10. **Latent z-normalization code is repaired, but v7.16 cannot validate the corrected pipeline.** Its stats/hash/roundtrip describe a cache generated by the wrong causal encoder. New non-causal cache identity has passed on 256 samples; full-cache stats and retraining are required.
+11. **Joint tokenizer is not rejected by current evidence.** Stage1 shuffle audit shows camera→human latent leakage of only `2.65%` for AE and `3.61%` for VAE relative to human self-change, while camera latent is strongly human-dependent. This structure supports, rather than contradicts, a human-first `H → C` factorization.
+12. **Decoder repair alone is insufficient.** Old last checkpoints were optimized on the invalid causal cache; owning-decoder reevaluation can diagnose them but cannot establish that Stage2 is fixed.
+13. **Corrected 10k rejects the current local Stage2 recipe.** All three held-out losses reach a minimum near 5k, but official decoded metrics improve toward 10k while local AE/VAE human coverage collapses as loss falls.
+14. **The first local failure is single-step denoising.** At step-5k and `t=100`, official HCov remains `98.8%`; joint AE/VAE fall to `55.8%/39.0%`. Sampler accumulation worsens this, but is not the root cause.
+15. **AE remains the only local candidate.** It consistently beats VAE on identity, perturbation, single-step, and full sampler, but still fails promotion under the current target.
+
+## 4. Data and Evaluation
+
+| layer | train data | formal eval | rule |
+| --- | --- | --- | --- |
+| corrected Stage1 | `ae_train_split`, 162760 | official `pure_`, 4053 | owning local tokenizer decoder + official feature-to-raw contract |
+| legacy Stage2 evidence | official pretrained Pulp cache | official `mixed_`, 10549 | retained for historical Stage2 comparison |
+| corrected-AE/VAE Stage2 | 162760 | official `pure_`, 4053 | z-norm valid; must decode with the owning local tokenizer checkpoint |
+| conservative clean cache | train 75682 / val 8399 | diagnostic only | use for hygiene and visual audits, not as the default formal split |
+
+Every formal row must record:
+
+- Stage1 checkpoint and feature contract;
+- cache train ids, eval ids, latent ordering, and valid mask;
+- task, source type, source model/checkpoint, seed, steps, batch, sampler, and parameter count;
+- official metric JSON plus renderable failure cases.
+
+No mixed-vs-pure, different-budget, or different-Stage1 result may be labeled a causal architecture comparison.
+
+## 5. Existing Problems
+
+| problem | evidence | consequence |
+| --- | --- | --- |
+| evaluator decoder mismatch | local cache identity through official decoder reproduces v7.16 collapse | v7.15/v7.16 official topology evidence is invalid |
+| cache encoder architecture mismatch | v7.14 is non-causal, but old cache builder rebuilt a causal encoder; old/new latent RMS difference is `0.54–0.82` | old 10k loss and decoded metrics cannot judge corrected local latent |
+| corrected full Stage2 unknown | corrected 256 identity passes, but full cache and new 10k are still running | do not promote or reject the tokenizer yet |
+| joint-only checkpoint selection | aggregate `loss` includes three untrained tasks | `best_eval.pt` selects step 2k–3k rather than the best joint checkpoint |
+| human-text camera leakage | camera slice remains in `x_t` while only human loss is trained | asymmetric human generator sees paired camera evidence in train but noise at inference |
+| generated-human shift | generated H breaks clean H2C | cascade fails in realistic composition |
+| replay harms clean/framing | generated camera distribution improves while Out and GT-source results regress | source curriculum lacks preservation constraints |
+| joint relation is implicit | no explicit distance/visibility/shot-scale path | framing can improve or collapse independently of FDCLaTr |
+| edit protocol missing | no full masked-span benchmark | edit claim is premature |
+| metric contract is fragile | prior errors invalidated a large experiment family | every new cache/decode path needs identity tests |
+
+## 6. Stage Boundary and Decision Space
+
+The earlier `AE/VAE × symmetric/asymmetric × joint/separate` cube mixed two stages. The corrected decomposition is:
+
+- **Stage1 tokenizer:** `AE/VAE × joint/separate`, four cells. It learns a reconstruction representation, not a denoising dependency direction.
+- **Stage2 generator:** symmetric unified denoising vs asymmetric factorization/cascade. It decides whether human and camera can influence each other during generation.
+
+An "asymmetric joint AE" would bake a directed dependency into the representation and confound the Stage2 causal question. It is removed from the core plan. Stage1 asymmetry should return only if a specific tokenizer-side mechanism is independently motivated.
+
+### 6.1 Candidate Matrix
+
+| AE/VAE | topology | status | information value | priority |
+| --- | --- | --- | --- | ---: |
+| AE | joint | complete; v7.14 active | strongest corrected reconstruction; current Stage2 reference latent | reference |
+| VAE | joint | complete | weaker than AE on every route-relevant Stage1 metric | reference ablation |
+| AE | separate | not run | isolates whether tokenizer-side joint representation causes harmful entanglement | **P1** |
+| VAE | separate | not run | completes the Stage1 factorial comparison, but current joint VAE is weaker | P2 |
+
+Two of the four valid Stage1 cells are complete. v7.15 used the same corrected joint-AE cache for a matched two-GPU topology test:
+
+```text
+GPU0: Stage2 symmetric unified denoising — completed; formal result invalidated by decoder mismatch
+GPU1: Stage2 asymmetric human-first/H2C — completed; formal result invalidated by decoder mismatch
+```
+
+Why not separate AE + separate VAE first:
+
+- the suspected failure occurs during denoising: camera may corrupt human generation, and generated human may destabilize camera generation;
+- Stage2 symmetric/asymmetric on one frozen latent contract isolates that dependency graph directly;
+- changing the tokenizer simultaneously would confound representation with generation topology;
+- corrected joint AE currently dominates joint VAE, so VAE is not the most informative immediate compute allocation.
+
+Required Stage2 intervention probes, in addition to official end-to-end metrics:
+
+- human denoising under camera zero, shuffle, matched noise, and wrong-pair interventions;
+- camera denoising under human zero, shuffle, generated-source, and wrong-pair interventions;
+- denoiser output-delta ratio for C→H and H→C;
+- projection Out, relative distance, visibility, and root/frame alignment.
+
+Current decision:
+
+- invalidate symmetric/asymmetric ranking from v7.15;
+- repair owning-decoder evaluation and joint-only checkpoint selection before interpreting metrics;
+- use corrected cache for tokenizer continuity; old ckpts only remain as forensic controls;
+- retrain AE/VAE on corrected cache, then isolate one-step denoising, full-sampler accumulation, and human-text leakage;
+- generate a same-manifest official control before calling the official/local 10k curve strictly matched;
+- keep asymmetric full training and separate tokenizers below these gates.
+
+## 7. Highest-Priority Core Experiments
+
+### P0-1 Repair and Verify Owning-Decoder Evaluation
+
+Select the decoder from cache metadata and require its tokenizer checkpoint/preset/hash in every eval JSON. Local cache must never silently fall back to the official Pulp decoder. Select joint-only checkpoints with `joint_loss`, not aggregate loss over untrained tasks.
+
+Required gates:
+
+- raw cache latent → owning decoder reproduces Stage1 reconstruction metrics;
+- decoder checkpoint and cache tokenizer metadata match exactly;
+- normalized completion is denormalized once before local decode;
+- padding remains zero;
+- wrong decoder is a hard error;
+- step snapshots are selected by the trained task metric.
+
+### P0-2 No-Train Tokenizer/Denoiser/Sampler Audit — Completed
+
+Use official AE, local joint AE, and local joint VAE with their own decoders. Run latent perturbation at `σ ∈ {0, 0.01, 0.02, 0.05, 0.1}`, fixed-`t` `q(z_t) → predicted z₀ → decode`, and single-step versus full-sampler comparisons. Add camera normal/zero/shuffle/matched-noise intervention for the human-text checkpoint.
+
+Result: identity passes; local perturbation is more brittle but not infinitesimally discontinuous; the first decisive failure appears in single-step predicted `z₀`, and 50-step sampling amplifies it. Formal human-text leakage remains blocked until a viable symmetric latent/target contract exists.
+
+### P0-3 Strict Matched 10k Learnability Curve — Completed
+
+Train official Pulp AE latent, local joint AE + z-norm, and local joint VAE + z-norm on the same pure IDs with the same width, batch, seed, optimizer, joint task, sampler, and owning decoder. Save and evaluate step `1k/3k/5k/10k` checkpoints.
+
+Result: held-out loss improves to 5k for every latent, but local decoded human metrics worsen sharply while official metrics improve. No local branch may continue toward `50k/93k`; symmetric/asymmetric A/B remains blocked.
+
+### P0-4 Diffusion-Friendly Loss, Geometry and Target Controls
+
+Run in this order, using joint AE only and 1k/3k external snapshots:
+
+1. audit predicted residual covariance, Mahalanobis norm, temporal spectrum, and decoder-sensitive directions against official AE;
+2. add a small frozen-decoder feature/velocity consistency term while retaining latent diffusion loss;
+3. apply branchwise covariance whitening or low-rank prior alignment with exact inverse before decode;
+4. compare START_X against epsilon/v-style prediction targets;
+5. promote Stage1 prior-aligned or noise-regularized retraining only after a short control restores HCov.
+
+Kill gate: if decoded-feature auxiliary、geometry alignment和target change都不能阻止1k→3k external collapse，停止把当前joint tokenizer视为可用Stage2 representation，并推进separate AE作为下一项representation control。
+
+### P1-1 Generated-Source Reliability with Clean Preservation
+
+On the winning P0-3 architecture, build paired source buckets:
+
+- GT human;
+- corrected-AE reconstructed human;
+- frozen generated human;
+- shuffled generated human;
+- partial/noisy human.
+
+Train generated replay with explicit source type and a clean-preservation constraint. Evaluate every bucket with the same checkpoint.
+
+Success gate:
+
+- generated-source FDCLaTr and Out improve together;
+- GT/reconstructed-source camera metrics regress less than `10%` relative;
+- shuffled source remains substantially worse than paired source;
+- framing metrics and visual audit agree.
+
+Kill gate: if replay again improves FDCLaTr while Out or clean-source performance collapses, do not scale the replay recipe; move to explicit relation/framing conditioning.
+
+### P1-2 Separate AE Tokenizer Ablation
+
+Train corrected separate human AE and camera AE with the same data, total latent width, optimization budget, and evaluator as corrected joint AE. This tests representation entanglement only; it is not a symmetric/asymmetric choice.
+
+Run the winning P0 Stage2 topology on the separate-AE cache. Promote separate AE only if the end-to-end result improves human robustness or camera conditioning beyond the matched joint-AE baseline. Reconstruction metrics alone are insufficient.
+
+### P2-1 Separate VAE Completion
+
+Train separate VAE only if separate AE establishes a benefit from tokenizer factorization, or if Stage2 evidence identifies a need for stochastic latent regularization. This completes the four-cell Stage1 matrix but is not an immediate core experiment.
+
+## 8. Conditional Next Experiments
+
+Only after P0:
+
+1. Add explicit human-camera relation features: relative distance, visibility, view direction, root velocity, bbox center, and shot scale.
+2. Test camera prior + human-conditioned residual only if P0-3 confirms persistent source blind trust.
+3. Add edit-aware masks: branch, temporal multi-span, synchronized joint span, and boundary repair.
+4. Evaluate masked change, unmasked preservation, boundary continuity, semantics, and framing.
+5. Revisit RF or task-text semantics only as matched process/conditioning ablations.
+
+## 9. Route Decision
+
+```text
+cache tokenizer and decoder checkpoint match?
+  no  → hard fail and repair evaluator; old metrics invalid
+  yes → cache identity reproduces Stage1?
+          no  → repair reorder / mask / denormalize / decode contract
+          yes → perturbation + fixed-t denoise + sampler closure
+                   ↓
+                first failing layer identified?
+                   no  → add finer probes; no long train
+                   yes → strict official/local 10k curve
+                            ↓
+                         usable symmetric baseline recovered?
+                            no  → repair tokenizer/process issue
+                            yes → extend winner, then topology A/B
+```
+
+The v7.17 contract audit and corrected matched 10k are complete. Current evidence rejects direct continuation of local AE/VAE Stage2 and localizes the first decisive failure to single-step predicted `z₀`, before sampler accumulation. The immediate action is P0-4: off-manifold residual audit, hybrid decoded-feature auxiliary, branchwise geometry alignment, and prediction-target controls with 1k/3k external gates. Do not allocate full runs to topology, replay, quantizers, or editing; separate AE becomes the next representation control only if P0-4 fails.

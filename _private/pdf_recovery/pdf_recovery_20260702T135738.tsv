@@ -1,3 +1,0 @@
-status	path	source_url	original_logged_bytes	overcompressed_bytes	downloaded_bytes	final_bytes	method	reason
-page_mismatch	obsidian-vault/paperPDFs/arxiv_2025/WorldPlay_Towards_Long_Term_Geometric_Consistency_for_Real_Time_Interactive_World_Modeling.pdf	https://arxiv.org/abs/2512.14614	40577609	1738070	17739083			current_pages=18; downloaded_pages=23
-page_mismatch	obsidian-vault/paperPDFs/CVPR_2026/PoseGAM_Robust_Unseen_Object_Pose_Estimation_via_Geometry_Aware_Multi_View_Reasoning.pdf	https://arxiv.org/abs/2512.10840	39240419	1001112	39258813			current_pages=17; downloaded_pages=18
