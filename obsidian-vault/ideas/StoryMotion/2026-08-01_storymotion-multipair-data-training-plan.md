@@ -32,7 +32,7 @@ source_papers:
   - "[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions]]"
   - "[[analysis/SIGGRAPH_2026/ARDY_Autoregressive_Diffusion_with_Hybrid_Representation_for_Interactive_Human_Motion_Generation]]"
 created: 2026-07-31T23:41:25+08:00
-updated: 2026-08-01T21:43:51+08:00
+updated: 2026-08-01T22:10:20+08:00
 ---
 
 # StoryMotion Actor–Director 数据与条件设计方案
@@ -49,11 +49,15 @@ updated: 2026-08-01T21:43:51+08:00
 > [!info] Human-text adapter 30K mechanism screen（2026-08-01）
 > 三个run使用相同Pulp factual eval first-128 ordered IDs、共享Camera初始噪声、frozen v11 C0-GEO 105K parent与30K adapter exposure；三者`HT0` parent max-abs均为`0`。`HT-FILM`运行在4090，`HT-HX／HT-DR`运行在5090，因此不把跨host绝对值当作严格架构排名，判断以各run内部matching对HT0／HTS的差值为主。下表的两个括号差值依次为`HT−HT0／HT−HTS`，指标均为越低越好。
 >
-> | version / run | design | matching Camera64 MSE | matching GEO | screen判断 |
-> | --- | --- | ---: | ---: | --- |
-> | v11 / `v11_ht_film_c0geo105k_30k_seed17_4090g0_r2_20260801` | `HT-FILM` | `1.465146`（`+0.006892／-0.011197`） | `0.074677`（`-0.000084／-0.000992`） | 使用文本，但相对HT0没有一致净收益 |
-> | v11 / `v11_ht_hx_c0geo105k_30k_seed17_5090g2_r2_20260801` | `HT-HX` | `1.467344`（`+0.009089／-0.006500`） | `0.074711`（`-0.000049／-0.000469`） | 使用文本，但相对HT0没有一致净收益 |
-> | v11 / `v11_ht_dr_c0geo105k_30k_seed17_5090g3_r2_20260801` | `HT-DR` | `1.444918`（`-0.013337／-0.007588`） | `0.074490`（`-0.000270／-0.000202`） | 唯一同时超过HT0与HTS的候选 |
+> | version / run | design／condition | Camera64 MSE | GEO | Camera14 recon | temporal | framing | screen判断 |
+> | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+> | v11 / `v11_c0_geo_fixedh_gt30k_seed17_5090g3_r2_20260729` | `C0-GEO 0→30K ref` | `1.796990` | `0.113268` | `0.100128` | `0.005414` | `0.077255` | 历史同30K预算参照；不同起点／参数，不是causal control |
+> | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | `HT0／C0-GEO 105K` | `1.458255` | `0.074760` | `0.065600` | `0.003370` | `0.057899` | 三臂共享的exact parent；有效同父节点control |
+> | v11 / `v11_ht_film_c0geo105k_30k_seed17_4090g0_r2_20260801` | `HT-FILM matching` | `1.465146`（`+0.006892／-0.011197`） | `0.074677`（`-0.000084／-0.000992`） | `0.065478` | `0.003398` | `0.058001` | 使用文本，但相对HT0没有一致净收益 |
+> | v11 / `v11_ht_hx_c0geo105k_30k_seed17_5090g2_r2_20260801` | `HT-HX matching` | `1.467344`（`+0.009089／-0.006500`） | `0.074711`（`-0.000049／-0.000469`） | `0.065502` | `0.003411` | `0.057984` | 使用文本，但相对HT0没有一致净收益 |
+> | v11 / `v11_ht_dr_c0geo105k_30k_seed17_5090g3_r2_20260801` | `HT-DR matching` | `1.444918`（`-0.013337／-0.007588`） | `0.074490`（`-0.000270／-0.000202`） | `0.065395` | `0.003348` | `0.057474` | 唯一同时超过HT0与HTS的候选 |
+>
+> C0-30K post-hoc reference与三臂严格共享first-128 IDs、eval batch、Camera noise、50-step Euler、Stage1／decoder、eval cache／stats、Camera text和GEO target。三个matching HT结果相对它的五项误差均更低，但HT从frozen C0-GEO 105K开始且只训练`166,080`参数adapter；C0-30K则从v11初始状态训练完整Camera 30K。因此该差值包含额外75K parent训练与参数范围差异，不能归因于Human text，也不能代替`HT0／HTS`。
 >
 > `HT-DR`的matching condition还同时改善Camera14 reconstruction、temporal与framing三个decoded分量，因此进入下一层held-out／event-role验证；`HT-FILM`与`HT-HX`停止升级。该结果没有bootstrap／第二slice，只证明factual Human-text机制可被学习，不证明multi-pair Director、event grounding或Rect有效。
 
