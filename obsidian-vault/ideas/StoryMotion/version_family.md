@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T17:32:00+08:00
+updated: 2026-08-03T17:36:00+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -291,6 +291,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-03（Paper A核心任务与H199接口定位更正）：** H199 decode→re-encode只比较内部latent直连与显式Human API的round-trip影响；两侧都保持同一Human owner、Camera branch和顺序概率分解，因此它不决定capability-preserving asymmetric extension主张。该对照降为可选evaluator-only接口消融，不进入critical path。Paper A唯一剩余核心科学任务改为冻结Pulp Camera convention、生成有provenance的geometry-derived Camera text并完成自动／人工一致性审计；其他工作属于baseline、sealed evidence与复现投稿收口。本事件不改变模型、checkpoint或正式数值。
 - **2026-08-03（双论文内嵌图文档恢复）：** 审计确认完整双论文边界页及两张原始内嵌SVG此前只被移动到`archived/paper-scope/`，并未删除。现将该完整原文恢复为一级canonical `paper-boundary.md`；15:13创建的精简替代页移动为`archived/paper-scope/2026-08-03_paper-boundary-condensed-superseded.md`保留。两张SVG的节点、连线与文本不重画、不压缩；只同步H199接口已降为可选消融、Pulp Camera text为Paper A核心任务的最新claim边界。本事件不改变模型、artifact或正式数值。
 - **2026-08-03（`0803-1647` specialist合同纠偏与Camera geometry screen启动）：** 复核确认v7.33 Camera Stage1实际为$E_C(C)$／$D_C(z_C)$且旧任务fresh重训Human Stage2，不满足主对照要求的$E_C(H,C)$／$D_C(H,z_C)$与同一冻结Human prior；旧run在保留日志后以`stopped_contract_mismatch`关闭。用户明确授权fully-separate variant继续作为secondary system comparison，因此4090双卡改为并行运行`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`与`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`。前者固定exact v9 Human owner并重训独立Human-conditioned Camera64 Stage1，后者复用已审计v7.33 Stage1并fresh训练Human／Camera Stage2；两者均non-causal、只用factual GT-H／GT-C positive、LAT-only。同期`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`完成512条无LLM symbolic screen，gauge与time-reversal自动检查通过；Pulp阈值、raw conflict与语言化仍是screen／pending，不授权全量处理或数据贡献claim。本事件不改变C0-LAT／C0-GEO共同mainline。
+- **2026-08-03（specialist caption gate补充）：** 当前fully-separate Stage2绑定现有Pulp raw Camera text，只拥有`T_0` raw-caption native-system control身份；若Camera text选择不是raw，最终caption-matched C必须另训。Independent Conditional当前只训练text-free Camera Stage1；其Camera Stage2必须同时等待Stage1 endpoint审计与Camera caption选择冻结，不因GPU空闲自动启动。本补充收紧最终比较资格，不停止已授权的两条活动训练。
 
 ## Bug 与 invalidation provenance
 
