@@ -1,28 +1,31 @@
 ---
-title: "StoryMotion Actor–Director 数据与条件设计方案"
+title: "DIRECT: Dual-Frame Cinematographic Intent Transfer across Articulated Human Motions"
 hypothesis: |
-  StoryMotion下一阶段不追求一般Human–Camera解耦，而检验同一Camera program能否跨不同完整Human motion保持文本拥有的摄影意图，并依据目标Human的动作、事件和几何重新执行continuous 6-DoF Camera。Pulp内部重组是同域主证据，HumanML3D跨域重组是可独立失败的扩展证据。
+  DIRECT不追求一般Human–Camera解耦，而研究如何从factual H-C pair恢复dual-frame
+  cinematographic program，并针对不同完整Human motion重新执行。Pulp内部重组是同域
+  主证据，HumanML3D跨域重组是可独立失败的扩展证据。
 status: active_quality_boundary_before_rect
 tags:
   - StoryMotion
   - data
   - multi-pair
   - counterfactual
-  - Actor-Director
+  - DIRECT
+  - paper/B
   - training
-  - ICLR
-  - ICLR/2027
 aliases:
   - StoryMotion-MultiPair-Plan
   - StoryMotion-Capability-Plan
+  - DIRECT-Research-Plan
 source_notes:
-  - "[[current]]"
+  - "[[DIRECT/current]]"
   - "[[StoryMotion-iclr-reliability]]"
   - "[[StoryMotion-valid-metric-ledger]]"
-  - "[[2026-07-31_storymotion-v11-actor-director-counterfactual-control]]"
+  - "[[DIRECT/2026-07-31_storymotion-v11-actor-director-counterfactual-control]]"
   - "[[2026-07-31_storymotion-v11-explicit-framing-control]]"
   - "[[2026-07-17_storymotion-v8-2333-data-curation-plan]]"
-  - "[[2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]"
+  - "[[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]"
+  - "[[StoryMotion/paper-boundary]]"
 source_papers:
   - "[[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation]]"
   - "[[analysis/arxiv_2026/Auteur_Language-Driven_Cinematographic_Framing_for_Human-Centric_Video_Generation]]"
@@ -32,16 +35,23 @@ source_papers:
   - "[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions]]"
   - "[[analysis/SIGGRAPH_2026/ARDY_Autoregressive_Diffusion_with_Hybrid_Representation_for_Interactive_Human_Motion_Generation]]"
 created: 2026-07-31T23:41:25+08:00
-updated: 2026-08-01T22:10:20+08:00
+updated: 2026-08-03T15:13:03+08:00
 ---
 
-# StoryMotion Actor–Director 数据与条件设计方案
+# DIRECT: Dual-Frame Cinematographic Intent Transfer across Articulated Human Motions
+
+> [!important] 单仓库身份合同
+> `DIRECT`是Paper B的论文／方法身份，不是新仓库。实现、配置、run与artifact继续位于
+> `linkedCodebases/StoryMotion/`及其现有`runs/`布局；不创建DIRECT仓库。新DIRECT run
+> 使用`direct_`前缀，已有`storymotion_*`、`v11_*`与`Actor–Director`诊断ID不改名。
+> 共享Stage1／decoder／evaluator必须明确写为冻结的StoryMotion／Paper A基础设施，不能
+> 把Paper A的能力保持式非对称框架重复计为DIRECT贡献。
 
 > [!important] 当前结论
-> 高优先级只有两项：先构造并理解`RV-25`的数据质量边界；同时在exact v9 Stage1与v11 Stage2上短筛分角色的Human-text注入。caption同义扩写、Stage1 observation替换、B-series、co-design和editing均不得阻塞这两项。
+> 两个高优先级轴都已闭合：`RV-25`因source reconstruction `0/25`不授权Rect；三种Human-text Camera设计完成fresh `105K`与pure4,053 formal后形成geometry／semantic Pareto，没有单一全胜者。caption同义扩写、Stage1 observation替换、B-series、co-design和editing继续后置。
 
 > [!failure] 当前仍未授权Rect训练
-> D0已发现pure train／test共享`2,216`个parent source videos；N32中independent-validator agreement为`32/32`，但hard pass仅`13/32`、event alignment仅`10/16`。这些既有结果不回写、不被人工观感覆盖。修复split和solver后先做open-label `RV-25`开发审计；它用于认识边界和冻结规则，本身不授权Rect positive或训练。
+> D0发现的parent source-video leakage已经在RV target pool中隔离；旧N32结果仍不回写。新的`RV-25`虽然完成两条route，但source explainability前置门实际为`0/25`，因此target geometry局部通过也不能转成positive。当前停止Rect与HML规模扩展，先修factual program extraction／source reconstruction。
 
 > [!failure] `RV-25 r3`开发screen结论（2026-08-01）
 > `rv25_v0_boundary_seed17_5090cpu_r3_20260801`在row选择前从PP target pool剔除了donor split出现过的全部parent videos：移除`1,075`个重叠parent所含`1,418`条target samples，保留`2,635`条，过滤后parent交集为`0`。25个donor及12／8／5类配额先于solver冻结，失败row未补位。当前program template的source re-execution provisional screen为`0/25`；PP／XH target solver hard geometry分别为`14/25`和`16/25`，但source explainability失败使这些target pass均不能升级为positive，Rect edge仍为`0`。lateral path因没有样本同时满足Camera-text ownership与PP／XH exact-length pool而未进入本版，未放宽条件补齐。决策是停止扩Rect与HML规模，下一步先从factual actor-relative framing／style重做program extraction与source reconstruction。
@@ -61,18 +71,26 @@ updated: 2026-08-01T22:10:20+08:00
 >
 > `HT-DR`的matching condition还同时改善Camera14 reconstruction、temporal与framing三个decoded分量，因此进入下一层held-out／event-role验证；`HT-FILM`与`HT-HX`停止升级。该结果没有bootstrap／第二slice，只证明factual Human-text机制可被学习，不证明multi-pair Director、event grounding或Rect有效。
 
+> [!important] Human-text fresh `105K` formal结论（2026-08-02）
+> 后续用户独立授权三种设计从相同Camera初始状态fresh训练完整Camera分支与Human-text模块到`105K`。三臂与exact matched C0-GEO共同完成pure4,053 Direct-H、Direct-C、formal sequential、decoded geometry、physical diagnostics、10,000次matched bootstrap与固定8例可视化。HT-HX的Camera geometry最强但sequential语义明显回退；HT-DR的Camera semantic／caption最强但相对C0-GEO六项geometry CI全部跨零；HT-FILM较均衡。故30K时“只升级HT-DR”的短筛结论被更完整的Pareto证据取代，不选择单一设计、不改C0-LAT／C0-GEO共同mainline。由于105K formal只评matching Human text，仍需同endpoint absent／shuffled held-out归因后才能声称正确Human语义带来收益。正式数值与哈希只见[[StoryMotion-valid-metric-ledger#3.13 v11 Human-text Camera fresh 105K pure4,053 formal audit]]。
+
 > [!important] “去耦”用词修正
 > Stage1让Camera依赖Human是合理的几何耦合；数据扩充要消除的是“某个Human／parent ID只能对应某条Camera”的一对一捷径，而不是让Camera脱离Human。目标是同时增强Camera-text所有权与Human-conditioned execution的可识别性。
 
-本页是StoryMotion数据构造、Human-text注入、训练顺序和降级条件的唯一live owner。正式数字、哈希与不确定性只写入[[StoryMotion-valid-metric-ledger]]；版本事件只写入[[version_family]]；run进度只保留在对应`runs/` manifest／log。Pulp清洗与quarantine继续由[[2026-07-17_storymotion-v8-2333-data-curation-plan]]维护。solver输出统一称为`solver-qualified target`，不称GT。
+本页是DIRECT数据构造、Human-text注入、训练顺序和降级条件的唯一live owner。正式数字、哈希与不确定性只写入[[StoryMotion-valid-metric-ledger]]；版本事件只写入[[version_family]]；run进度只保留在StoryMotion仓库对应`runs/` manifest／log。Pulp清洗与quarantine继续由[[2026-07-17_storymotion-v8-2333-data-curation-plan]]维护。solver输出统一称为`solver-qualified target`，不称GT。
 
 ## 1. 研究问题、系统边界与优先级
 
-### 1.1 投稿落脚点
+### 1.1 DIRECT的论文问题
 
-StoryMotion不能把主贡献写成一般Human–Camera解耦，也不能只写“同时生成Human和Camera”。目标问题收缩为：
+DIRECT不能把主贡献写成一般Human–Camera解耦，也不能只写“同时生成Human和Camera”。目标问题收缩为：
 
 > 给定final articulated Human motion与Camera instruction，同一Camera program迁移到不同Human realization时，能否保持Camera文本拥有的shot intent，同时依据Camera文本没有给出的动作事件、朝向、局部关节状态和world geometry，重新确定执行时刻与continuous 6-DoF Camera trajectory？
+
+这里的`dual-frame`有固定含义：program在**actor／event-relative frame**表达应跨Human保持的
+摄影意图，在**world execution frame**中针对目标Human重新求解continuous 6-DoF Camera。
+它不是把source Human与source world Camera直接搬到另一个Human，也不是把HumanML3D Human
+和原Pulp world Camera组成positive。
 
 系统继续采用有向Actor–Director分解：
 
@@ -106,7 +124,7 @@ $$
 2. Pulp与HML均有效：再主张跨Human-source program transfer；
 3. raw solver pair有效但v9 Stage1 support失败：保留数据构造／solver诊断，不主张learned Director已吸收；
 4. Human-text无效或与shuffled control无差异：删除该路径，v11输入合同不变；
-5. A-pair只带来局部改进：按实际改善字段收缩claim，不声称完整Actor–Director能力闭合。
+5. A-pair只带来局部改进：按实际改善字段收缩claim，不声称完整DIRECT能力闭合。
 
 ## 2. 统一符号与数据语义
 
@@ -460,7 +478,7 @@ Human-text结果放在独立顶层标签页`Human-text ablation`，按`HT-FILM�
 
 1. `RV-25 r3`已完成parent-disjoint PP pool、25个donor与PP／XH target预冻结、raw $H,C,\Pi$构造、自动指标和25行×4列open-label可视化；r1／r2保留为失效审计，不改写。
 2. source explainability为`0/25`，因此先修factual program extraction／source reconstruction；不进入manual taxonomy、held-out confirmation或Rect-64。
-3. current O0／v11上的三种Human-text Camera adapter均已完成30K与HT0／matching／shuffle／zero机制评估；`HT-DR`是唯一进入下一层held-out／event-role验证的候选，不改Stage1。
+3. current O0／v11上的三种Human-text Camera设计已完成30K机制screen与fresh `105K` pure4,053 formal；当前是HT-HX geometry、HT-DR semantic、HT-FILM balance的Pareto，不选单一winner。若继续，只补同endpoint matching／absent／shuffled held-out归因，不改Stage1。
 4. 只有新的source reconstruction版本通过后，才重新冻结route-specific规则并在held-out donors／targets做confirmation；只有通过的route可生成Rect-64 raw targets。
 5. 先用PP做A0／A-pair；两者有信号时补最小data×HT交互，再补A-text完成正式归因。
 6. 只有PP有效后才训练XH arm；只有A-pair有效后才考虑Rect-320、B-series或Rect-4096。
@@ -520,6 +538,6 @@ Pulp绝大多数Human与Camera sample各只有一条caption，因此可对同一
 
 若PP A-pair有效，最稳妥的贡献表述是：
 
-> StoryMotion constructs grouped counterfactual supervision by extracting an auditable Camera program from a factual shot and re-executing it for a different articulated Human. This supervision preserves text-owned cinematographic intent while changing event timing and world-space Camera execution according to the target Human.
+> DIRECT recovers an auditable dual-frame cinematographic program from a factual Human–Camera pair and re-executes it for a different articulated Human. The resulting supervision preserves text-owned cinematographic intent while adapting event timing and world-space Camera execution to the target Human.
 
-只有XH route在独立adapter、compatibility、solver、Stage1与natural evaluation中也通过，才补充“跨Human source”。只有matching `HT`在独立评价中稳定超过`HT0`与`HTS`，才声称Human text有助于Director做动作事件／角色消歧。任何结果都不得被写成ViGen无法控制Human与Camera；StoryMotion的区别必须落在可审计3D program transfer与target-H re-execution。
+只有XH route在独立adapter、compatibility、solver、Stage1与natural evaluation中也通过，才补充“跨Human source”。只有matching `HT`在独立评价中稳定超过`HT0`与`HTS`，才声称Human text有助于Camera执行动作事件／角色消歧。任何结果都不得被写成ViGen无法控制Human与Camera；DIRECT的区别必须落在可审计dual-frame program transfer与target-H re-execution。

@@ -1,263 +1,188 @@
 ---
-title: "StoryMotion ICLR 2027 Reliability Plan"
-hypothesis: |
-  StoryMotion最有机会中稿的主张是可审计的non-causal asymmetric Human-first
-  generation，而不是全面SOTA或未经验证的editing。v11 C0-LAT/C0-GEO已经提供
-  系统端点；剩余工作应优先关闭贡献可解释性、统计复现、感知评测和复现性缺口。
+title: "StoryMotion Paper A ICLR Reliability and Closure Contract"
 status: in_progress
+hypothesis: |
+  Paper A检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
+  Direct-H、Direct-C与sequential composition。当前剩余两项核心科学任务是修正并审计
+  Pulp Camera text，以及完成独立Human／Camera specialist cascade系统对照。
 tags:
   - StoryMotion
+  - paper/A
   - reliability
-  - contribution
-  - ICLR
-  - ICLR/2027
+  - submission-closure
   - status/active
+aliases:
+  - StoryMotion-ICLR-Reliability
 source_notes:
-  - "[[current]]"
-  - "[[version_family]]"
-  - "[[StoryMotion-valid-metric-ledger]]"
-  - "[[StoryMotion-metric-computation-io]]"
-  - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
-  - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
-source_papers:
-  - "[[analysis/ICCV_2025/VACE_All-in-One_Video_Creation_and_Editing]]"
-  - "[[analysis/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm]]"
-  - "[[analysis/arxiv_2026/What_Matters_for_Diffusion_Friendly_Latent_Manifold_Prior_Aligned_Autoencoders_for_Latent_Diffusion]]"
+  - "[[StoryMotion/current]]"
+  - "[[StoryMotion/version_family]]"
+  - "[[StoryMotion/StoryMotion-valid-metric-ledger]]"
+  - "[[StoryMotion/StoryMotion-metric-computation-io]]"
+  - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-07-31T23:30:00+08:00
-supersedes: "[[2026-06-16_storymotion-v3-formal]]"
+updated: 2026-08-03T17:20:00+08:00
 ---
 
-# StoryMotion ICLR 2027 Reliability Plan
+# StoryMotion Paper A ICLR Reliability and Closure Contract
 
-> [!important] 总判断
-> StoryMotion 已经从“模型是否能工作”进入“论文是否能被相信”的阶段。v11
-> C0-LAT 与 C0-GEO 的 pure4,053 三模式、geometry、physical、bootstrap 与 visual
-> evidence 足以冻结共同 mainline，但尚不足以直接支撑 ICLR 接收。最大风险不是再少
-> 一个内部 arm，而是：方法故事仍显工程化、Stage1 必要性没有干净因果证据、主线仅
-> 有 seed17、视觉优势缺少盲评、external baseline 与复现实验包尚未形成闭环。
+> [!important] 唯一live范围
+> 本页只拥有Paper A的claim–evidence gap、投稿实验优先级、停止条件和降级措辞。
+> 正式数字与hash只见[[StoryMotion/StoryMotion-valid-metric-ledger]]；DIRECT状态只见
+> [[DIRECT/current]]。拆分前完整方案已归档，不再授权Rect、HumanML3D跨配对、program
+> solver、Actor–Director数据、ViGen utility、editing或joint-parallel训练。
 
-正式数字与 hashes 只见 [[StoryMotion-valid-metric-ledger]]；本页只拥有论文
-claim-evidence gap、优先级、停止条件与 acceptance strategy。
+## 1. 已冻结的方法与已有证据
 
-## 1. 建议冻结的论文中心
+$$
+p(H,C\mid T_H,T_C)=p_H(H\mid T_H)p_C(C\mid H,T_C).
+$$
 
-### 1.1 一句话主张
+Paper A只报告：
 
-> StoryMotion uses a non-causal asymmetric Human-first factorization to
-> support Human generation, observed-Human camera completion, and sequential
-> Human–Camera generation under an auditable representation and evaluation
-> contract.
+1. Direct-H：$T_H\rightarrow H$；
+2. Direct-C：observed $H+T_C\rightarrow C$；
+3. sequential composition：先生成并固定$H$，再由同一个Camera branch生成$C$。
 
-中文含义是：先建立可保护的人体生成 owner，再让 Camera 读取明确来源的 fixed
-Human context；联合生成采用 Human→Camera sequential solver，避免把 evolving-H
-parallel denoising重新引入主线。C0-LAT 与 C0-GEO 是同一方法的两个 Camera objective
-endpoint，用来诚实呈现 semantic／geometry Pareto，而不是两套互相竞争的方法。
+当前训练主线已经闭合。v11 C0-LAT与C0-GEO共享exact v9 Pulp-only non-causal Stage1、
+owning decoder／cache／train-only stats及冻结v9 Human `105K` teacher，仅Camera objective不同。
+seed17与seed23四个Camera endpoint均完成`105K`、Pulp pure4,053三接口、official metrics、
+decoded geometry／physical diagnostics和10,000次paired bootstrap。24个Camera geometry差异的
+95% CI全部跨零，因此只能写“没有稳健单一objective胜者”；不能写LAT／GEO等价，也不能选择GEO。
 
-### 1.2 三项可写贡献
+## 2. 独立specialist cascade系统对照
 
-1. **Asymmetric Human-first formulation。** 一个非因果、来源显式的 Human／Camera
-   latent factorization，支持 Direct-H、Direct-C 与 sequential joint，并在 Camera
-   训练中逐位保护 Human owner。
-2. **Objective-level Pareto evidence。** 在固定 Stage1、Human teacher、cache、sampler
-   和预算下，只改变 Camera LAT/GEO objective；结果不支持虚假的单一胜者，而支持
-   双 endpoint 的可复现 Pareto 报告。
-3. **Auditable system evaluation。** 把 checkpoint／decoder／cache／sample IDs／sampler
-   与 semantic、decoded geometry、framing、physical diagnostics、bootstrap 和 visual
-   evidence绑定，明确 system comparison 与 matched ablation 的边界。
+> [!important] 2026-08-03 Stage1复用裁决
+> 4090上的v7.33 Camera14 separate AE已完成可复用边界：`162,760`个ordered Pulp train
+> IDs、`4,053`个ordered pure-test IDs、seed17、batch128、`636,000` updates、non-causal、
+> Human199＋Camera14、H128＋C64，以及owning checkpoint／decoder和official pure4,053
+> reconstruction eval。逐项审计确认其train／test IDs及顺序与v9 mainline相同。因此按预声明
+> “存在则只重训Stage2，否则Stage1＋Stage2均重训”，本对照**不重训Stage1**。
 
-第三项只有在代码、配置和最终复现实验包真正可发布时才能写成贡献；否则降为实验
-严谨性，不单独占 contribution bullet。
+该对照不是H199 round-trip测试。它比较完整系统的共享／关系型Stage1与H／C-separate Stage1，
+并为Human与Camera分别训练Stage2权重、优化器和checkpoint。由于Stage1 architecture本身改变，
+它是full-stack specialist system comparison，不是只隔离Stage2 sharing的matched ablation。
 
-### 1.3 不应进入主 claim
+| arm | Stage1所有权 | Stage2所有权 | Human接口 | Camera训练positive | 允许回答的问题 |
+| --- | --- | --- | --- | --- | --- |
+| A · StoryMotion C0-LAT | exact v9 H-anchor Pulp-only；H128＋I16＋C48 | protected Human teacher＋Camera endpoint | H128 latent直连 | paired GT-H latent＋原Camera | current reference |
+| B · Specialist-Native-LAT | v7.33 separate AE；独立$E_H/D_H$与$E_C/D_C$；H128＋C64 | fresh Human specialist＋fresh Camera specialist；独立optimizer／checkpoint | observed或先生成并固定的H128 | paired GT-H latent＋原Camera；不构造generated-H＋原Camera positive | 完整独立specialist cascade在同数据、同Stage2预算下是否优于StoryMotion |
 
-- “所有指标全面 SOTA”或“C0-GEO 稳健优于 C0-LAT”；现有证据不支持。
-- “C0 sequential 在 matched 条件下支配 C3 joint parallel”；formal solver不同。
-- “v10 证明简化 Stage1 必然失败”；v10同时改变多个变量。
-- “支持 motion editing”；尚无正式任务、训练阶段或 masked-region evidence。
-- “physical validity 已解决”；contact／skate 仍是 heuristic。
+### 2.1 冻结身份与预算
 
-## 2. 距离 ICLR 中稿还有多远
+- Stage1 parent：`v7_33_separate_official14_ae_500ep_seed17_4090_20260713`；last checkpoint
+  SHA-256为`b8f8ca74748650481cd0901a1476b1580636aaf5fdcd7d4629b223655811aeb4`。
+- Stage1 contract：`is_causal=false`，Human199＋Camera14，H128＋C64，hidden256，downsample4；
+  Human encoder／decoder与Camera encoder／decoder无共享参数。总参数`957,333`；四个模块依次为
+  `251,520 / 379,335 / 60,224 / 266,254`。
+- Stage1 exposure：seed17、batch128、`636,000` optimizer steps；train／test IDs分别为
+  `162,760 / 4,053`，与v9 mainline逐项同序。历史pure4,053 artifact SHA-256为
+  `ca31514032105a84497083983f8d4fc175526cb0900aeea0d4e503a83d9c018d`。
+- Stage2 Human：与C0 Human模块相同的ViMoGen LightFlow，`71,870,080`参数，fresh seed17，
+  Human-text-only，batch128，`105K` optimizer steps，LAT flow，EMA `0.9999`。
+- Stage2 Camera：与C0-LAT Camera模块相同的CameraConditionedFlow，`84,492,096`参数，fresh
+  seed17，GT-H-only，batch128，`105K` optimizer steps，LAT flow，EMA `0.9999`。
+- 总Stage2 exposure与C0 matched：Human `105K×128`＋Camera `105K×128`；不追加GEO臂，避免把
+  specialist轴与Camera objective轴相乘。正式比较只对C0-LAT，不据此评价C0-GEO。
+- checkpoint数按逻辑owner计为两个Stage2 endpoint：Human teacher与Camera specialist；Stage1
+  owning checkpoint单独报告。GPU小时、峰值显存及Direct-H／Direct-C／sequential p50／p95
+  latency按实际测量报告，不用空闲GPU时间替代计算成本。
 
-当前状态属于**有完整系统结果，但论文因果链尚未闭合**。如果不再新增内部功能，
-仍需要完成以下 hard gaps：
+### 2.2 训练与评测gate
 
-| gap | 当前证据 | 审稿风险 | 接收前最低闭环 | 优先级 |
-| --- | --- | --- | --- | --- |
-| 方法中心与新颖性 | 有v11三模式和protected-H/sequential设计 | 被看成多个工程修补的组合 | 一张方法图、一句核心原则、三项以内贡献；每个模块绑定failure mode | P0 hard |
-| Stage1设计依据 | v9 Stage1有效，但Human anchor、interaction residual、三阶段schedule复杂 | “为什么需要这么复杂；简单模型是否也行？” | 明确它是贡献还是backbone；若是贡献，补最小matched ablation；若非贡献，收缩claim并给机制probe | P0 hard |
-| 统计复现 | 主线selection来自seed17；LAT/GEO CI只覆盖matched samples | seed特例、训练偶然性 | 至少完成独立Stage2 seeds；报告mean／std与失败率，不再用单seed选臂 | P0 hard |
-| 感知有效性 | fixed-8 visual已齐，C3有“平均化”视觉问题 | 指标与实际观感错位 | 预注册盲评：随机系统名、同prompt、质量／构图／动作一致性／偏好，报告置信区间 | P0 hard |
-| Baseline公平性 | C3、v9、Pulp已有；协议不完全一致 | 内部baseline多、公共同任务baseline不足 | 以Pulp native为必要外部baseline；其余只纳入能匹配任务和输出的公开系统，并逐行标差异 | P0 hard |
-| Generalization | pure4,053已被反复用于开发 | test-set overfitting／selection leakage | 冻结所有选择后，用新sampling seeds与预注册盲评cohort做一次sealed final audit | P0 hard |
-| Reproducibility | contracts／hashes丰富，远端代码仍有未入Git工作 | 结果不可复现、artifact依赖主机 | clean Git commit、配置、环境、命令、模型身份、训练成本、最小demo与table generator | P0 hard |
-| Editing | 尚未验证 | 若标题／摘要提及会成为直接缺陷 | 要么从主claim删除，要么完成独立Edit phase与formal masked evaluation | P1 conditional |
-| 跨数据域 | HumanML控制存在但有invalid arm | 只在Pulp有效 | 作为限制可接受；若宣称通用，必须补合法外域实验 | P1 conditional |
+1. 先以owning v7.33 AE按exact valid length重建train／pure-test cache；禁止让non-causal encoder
+   读取future padding。cache必须记录checkpoint、manifest、ordered IDs、latent order和train-only
+   normalization hashes。
+2. optimizer前必须通过：Stage1 strict load、H／C branch无共享参数、cache train/test identity、
+   H128＋C64 shape、`is_causal=false`、decoder round trip、8-sample finite bridge和初始参数hash。
+3. Camera只在真实Pulp pair上训练$p_C(C\mid H,T_C)$；Human condition来自同pair的GT Human经
+   v7.33 $E_H$编码。generated-H route没有合法re-execution target，只做sequential推理测试。
+4. first-512只作screen，不提前选checkpoint；正式endpoint固定EMA `105K`，在同一pure4,053上
+   报Direct-H、Direct-C、sequential、official metrics、decoded geometry／physical、10,000次
+   paired bootstrap和盲样本。
+5. 若B优于A，只能支持“完整specialist system是强对照”，不能否定能力保持式非对称分解；若B
+   不优于A，只能写“在该预声明数据／预算下没有胜过StoryMotion”，不能把差异单独归因为Stage2
+   sharing。任何参数或速度优势必须用完整系统参数、GPU小时和推理测量支持。
 
-在上述 hard gaps 中，继续训练 C1、恢复 v10 Camera Stage2 或新增更多 Camera objective
-都不是默认解法。它们提高内部覆盖，却不直接提高论文可信度。
+### 2.3 可选H199接口消融
 
-## 3. Stage1 复杂性：如何避免被 reviewer argue
+`H128 → D_H → H199 → E_H → H128`仍只检验显式Human API round-trip；它不属于本次
+Specialist-Native训练，也不阻塞Paper A。正文不声称latent接口优越时不执行。
 
-### 3.1 先做贡献归属决策
+## 3. 投稿闭环矩阵
 
-有两条合法路线，必须二选一，不能同时模糊表述：
+| 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
+| --- | --- | --- | --- | --- | --- |
+| P0 scientific core | Pulp Camera文本 | 已定位坐标选择会翻转方位；新caption尚未形成正式版本 | 冻结extrinsic convention、生成`T_C^geo`、保留raw provenance、自动一致性检查、分层人工抽检与directional subset审计 | 否，先审计 | 通过后写版本化factual caption修正 |
+| P0 system control | Independent specialists | v7.33 separate AE的162,760／4,053、non-causal、H199＋C14 parent及hash已闭合；尚无当前ViMoGen specialist Stage2 | exact-length cache后fresh训练Human／Camera各105K；单一LAT objective；三接口pure4,053 formal | 是，仅Stage2 | 完整specialist cascade system comparison；不作Stage2单变量归因 |
+| P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
+| P1 submission | relation-interface机制 | 结构合同存在；活动ledger没有正式zero／shuffle／route机制表 | 仅在正文需要机制归因时做冻结checkpoint敏感性检查 | 否 | 最多支持接口被使用，不宣称每个Stage1部件必要 |
+| P1 submission | 同协议主表 | C0、C3与PulpMotion pure4,053已有正式行；v9仅first-512；TSA／Auteur无活动formal row | 冻结baseline eligibility、split、N、decoder和指标；补可执行且任务匹配的缺行，不可比字段留空 | 原则上评测；未定义实现不长训 | 只作同协议或显式system-boundary比较 |
+| P1 submission | Sealed final audit | pure4,053已多次用于开发；seed23复现已闭合 | 冻结方法／指标／prompt taxonomy后，以新sampling seed一次性跑三接口及预注册表 | 否 | 降低selection leakage；不再据sealed结果改模型 |
+| P1 submission | 感知与失败披露 | fixed样例存在；随机／最好／最差分层和盲评未闭合 | 冻结cohort与排序规则，完成基础盲评、failure taxonomy、random／best／worst补充材料 | 否 | 视觉可信度与局限；不承担production claim |
+| P1 submission | 复现与成本 | contracts、hash和正式artifact齐，但论文包未冻结 | clean revision、环境、命令、三接口evaluator、参数量、GPU小时、p50／p95延迟、显存、table generator和最小demo | 否 | 可复现性与计算成本 |
+| P2 optional | H199 interface | C0已是Stage2 specialist decomposition；没有H199 round-trip正式结果 | 只有选择latent-interface优势claim时才做identity guard、pure4,053与paired bootstrap | 否 | 只决定可选接口优势，不决定Paper A主张 |
 
-**路线 A：Stage1 是论文贡献。** 需要证明 Human anchor、interaction residual 和训练
-分阶段各自解决什么，以及删掉它们会损害哪一项。审稿人会合理要求 matched
-ablation；仅展示最终重建和 Stage2 结果不够。
+### 3.1 Caption训练的条件边界
 
-**路线 B：Stage1 是可靠 backbone。** 主贡献放在 protected Human、fixed-context
-Camera 和 sequential solver。Stage1 只需说明设计原则、非因果合同、owning decoder
-和必要的机制检查，不声称每个部件都是新颖或最优。这条路线更容易在当前证据下
-闭环，也是建议默认。
+Camera文本修正通过数据审计后，默认只构成数据质量贡献，不自动授权Camera `105K`重训。
+只有正文准备主张“geometry-derived caption改善生成”，才需要另冻raw-text／geo-text matched
+训练合同、单一objective、预算和决策阈值；没有这项训练时，正文不得写生成增益。
 
-### 3.2 可以清楚说出的设计依据
+### 3.2 Baseline边界
 
-v9 Stage1 的复杂度可以压缩为三个功能，而不是逐项罗列内部版本：
+- C3-25与PulpMotion native的Pulp pure4,053行已经存在，不应重复训练。
+- v9只有first-512，不能伪装成pure4,053 matched row。
+- TSA／Auteur只有在输入、输出、数据和指标能对齐且存在可执行artifact时才进入formal表；
+  否则只进入related-work任务边界，不为凑表启动未定义长训。
+- Uni3C、ActCam与ViGen utility不属于Paper A实验门槛。
 
-1. `z_h` 只由 Human 输入拥有，`D_h` 只读取 `z_h`，用于给冻结 Human teacher一个
-   Camera-free owner。
-2. `z_hc` 单独承载 Human–Camera framing interaction，避免把全部耦合塞回 Human
-   latent或 Camera trajectory latent。
-3. `z_c` 承载 Camera-native trajectory；`D_c/D_f`联合读取`z_h,z_hc,z_c`，使
-   Camera reconstruction与构图仍有 owning decoder。
+## 4. Claim冻结表
 
-三阶段 schedule 的合理解释是：先建立 Human owner，再学习 Camera／interaction，
-最后以低 Human 学习率做joint calibration。这个解释是机制假设；只有已有的Human
-invariance、decoder/oracle与阶段checkpoint evidence能支持到哪，就写到哪，不把它
-扩张成“所有阶段均已证明必要”。
+### 4.1 初稿现在可以写死
 
-### 3.3 v10 能说明什么、不能说明什么
+- 方法是能力保持式非对称扩展，不是对称joint generator。
+- Direct-H复用冻结Human prior；Direct-C与sequential复用同一Camera branch。
+- Composition是两个条件分布的顺序组合，`joint_parallel=false`。
+- seed17／23不支持稳健的单一LAT／GEO胜者；两者作为共同mainline报告。
+- Paper A只使用Pulp factual Human–Camera pairs；不构造generated-H与原GT Camera positive。
 
-v10更简单，但它同时改变了 Human owner、interaction16、Camera factorization、loss
-contract、训练phase与下游Stage2完成度；早期版本还遗漏framing反传。因此：
+### 4.2 必须等实验再决定
 
-- 可以把v10写成“独立相对Camera factorization的探索性负结果／未闭合路线”；
-- 不能把v9-v10差异写成单变量Stage1复杂度消融；
-- 不能因为v10 Stage1/Stage2退化就断言interaction residual或三阶段schedule必需。
+- Pulp Camera caption修正能否列为数据贡献；由一致性审计和人工抽检决定。
+- 完整independent specialist cascade是否形成质量、参数或推理成本优势；由预声明LAT单臂决定。
+- 是否优于公开baseline、是否有主观优势；由同协议主表、sealed audit与盲评决定。
 
-### 3.4 最小补强，而不是重开大矩阵
+### 4.3 可选、不阻塞主张
 
-按收益排序：
+- 若正文不声称latent接口优于显式Human API，则无需运行H199 cascade。
+- 若正文需要relation／interaction机制归因，再补zero／shuffle／route检查；否则只把Stage1写成
+  冻结representation owner，不写component necessity。
 
-1. **零训练机制表。** 汇总 `z_h` Camera invariance、`z_hc/z_c` zero／shuffle／oracle、
-   owning-decoder敏感性和阶段checkpoint，只回答“模块是否被实际使用”。
-2. **若采用路线B，到此停止Stage1新训练。** 把复杂度诚实列为backbone limitation，
-   论文贡献不依赖其component-wise optimality。
-3. **若坚持路线A，只补一个matched ablation family。** 固定数据、参数量、loss、phase、
-   seed和Stage2协议，分别去掉interaction residual或合并phase；预注册一个主要问题，
-   不把v10拿来替代。没有资源完成端到端matched ablation时，应回到路线B。
+### 4.4 当前禁止写入摘要或contribution
 
-## 4. 接收导向的最小实验包
+- “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
+- “共享／关系型Stage1优于完整独立specialist stack”——等待Specialist-Native-LAT正式结果。
+- “LAT与GEO等价”或“GEO优于LAT”。
+- “Stage1每个部件都必要”、全面SOTA、calibrated physical validity或production-ready。
+- 同步joint generation、独立双文本控制、editing、Rect、program transfer或ViGen utility。
 
-### 4.1 必做
+## 5. 本周初稿与实验冻结顺序
 
-1. **独立Stage2复现。** 固定同一Stage1/Human owner，C0-LAT与C0-GEO各补至少两个
-   独立训练seed；同三模式、same pure cohort、same evaluator报告mean／std。共同
-   mainline身份不因单个seed raw mean改变，只有系统性失败才重开selection。
-2. **盲评。** C0-LAT、C0-GEO、C3与Pulp共享prompt cohort；至少评动作文本一致性、
-   Camera文本一致性、主体可见／构图、运动自然度和总体偏好。样本顺序与系统名随机，
-   统计unit是rater×sample而不是视频帧。
-3. **Sealed final audit。** 现在冻结模型选择与指标代码；更换生成seed并冻结一组此前
-   未用于挑选截图的prompt／sample，最终只跑一次。
-4. **公开baseline矩阵。** Pulp native必须保留；C3作为former-mainline internal
-   baseline；v9作为同owner失败端点。新增公开baseline只在能执行相同任务时进入，
-   不能用缺失模式补造排名。
-5. **复现实验包。** 两个mainline配置、exact artifact identities、环境、训练／评估
-   命令、三模式输出schema、table generator、fixed demo和计算成本一次冻结。
+初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
+和baseline superiority暂留占位符。当前顺序是：
 
-### 4.2 强烈建议
+1. 完成Camera convention与caption数据审计；
+2. 复用已审计v7.33 separate AE，完成Specialist-Native-LAT的两套Stage2 `105K`与formal audit；
+3. 冻结同协议baseline表，并按正文实际claim决定是否补最小机制检查；
+4. 冻结所有选择后做sealed audit、盲评与失败分层；
+5. 最后一次性冻结复现包、参数／GPU小时／推理成本和论文表格；
+6. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
 
-- 至少一个独立 Stage1/Human owner seed，再在预注册的一个 Camera objective 上完成
-  end-to-end repeat。这比继续扩 Camera objective 更直接检验整条pipeline稳定性。
-- 按长度、转向强度、Camera文本类型、主体出框风险做 failure taxonomy，并把最好、
-  随机、最差样本都纳入补充材料。
-- 报告参数量、训练GPU小时、推理延迟、显存和solver步数；共同mainline不能只报告
-  最好臂而隐藏另一臂成本。
+当前不进入critical path：H199 round-trip、caption重训、v10、C1、editing、
+Camera MAE、Human locality short screen、joint-parallel和DIRECT实验。
 
-### 4.3 低收益或暂缓
+## 6. 历史材料
 
-- C1 swapped-host replay：只在论文要声称teacher-final mixed context因果失败时需要。
-- v10 Camera Stage2：除非决定把Stage1简化作为论文主贡献，否则不阻塞中稿。
-- 更多LAT/GEO权重、Camera CFG、PCGrad或新adapter：当前没有直接关闭hard gap。
-- 对已开发的pure4,053继续挑checkpoint或样本：会加重selection leakage。
-
-## 5. Editing：先决定是否值得进入论文
-
-### 5.1 推荐默认
-
-如果论文标题和摘要聚焦 generation，**本轮不把 editing 作为必做**。明确写成future
-work比提供一个弱、无协议的demo更安全。三种generation模式已经足以形成完整主线。
-
-### 5.2 若坚持把 editing 写成贡献
-
-先冻结任务合同，再写代码。建议新增独立的 Stage2 Edit phase，初始化自两个C0
-endpoint，但不改写generation checkpoints：
-
-```text
-Phase E-H: observed Human outside mask + text -> masked Human latent
-Phase E-C: final/observed Human + observed Camera outside mask + camera text
-           -> masked Camera latent
-Joint edit: Phase E-H completes first, then Phase E-C; no joint parallel
-```
-
-最小训练与推理规则：
-
-- Stage1与owning decoder全冻结；C0-LAT/GEO各自拥有edit checkpoint。
-- 训练随机采样prefix、suffix与interior contiguous masks；loss只作用于masked region。
-- 每个solver step强制clamp unmasked latent，保证未编辑区域exact preservation。
-- Human edit先完成，Camera edit再读取final Human；不重新引入evolving-H parallel。
-- 不同时加入新数据清洗、Stage1表示或Camera CFG，保持因果轴单一。
-
-最低formal evaluation：masked-region Human MPJPE／root/yaw、Camera ADE/FDE／rotation、
-mask边界速度／加速度连续性、unmasked max-abs preservation、文本编辑成功率和盲评。
-prefix／suffix／inbetween必须分开报告。若只完成Camera edit，就明确称Camera trajectory
-editing，不称unified motion editing。
-
-停止条件：generation三模式回退、unmasked区域不再exact、编辑只在训练mask形状有效，
-或新增能力无法形成比主论文更清楚的第四个实验问题。出现任一项，就把editing移回
-future work。
-
-## 6. Paper-ready claim-evidence matrix
-
-| candidate claim | 当前状态 | paper-safe wording | 缺失证据 |
-| --- | --- | --- | --- |
-| 同一Human owner支持三种不对称模式 | 已有pure4,053 formal | supports Direct-H, observed-H Direct-C and sequential joint generation | multi-seed + sealed audit |
-| LAT/GEO存在可报告Pareto | 已有matched bootstrap | two co-mainline objectives expose a semantic/geometry Pareto | training-seed stability |
-| v11系统优于former C3 | 部分支持 | improves several semantic, coverage, framing and geometry axes under a system boundary | blind preference；不写全面支配 |
-| 优于PulpMotion | 只支持部分native指标 | favorable system-level metrics under explicit native boundaries | blind study；task mismatch说明 |
-| Stage1每个复杂部件均必要 | 未支持 | omit；或称failure-driven backbone design | matched component ablation |
-| Editing能力 | 未验证 | omit / future work | 完整Edit phase与formal evaluation |
-| Physical validity | 未闭合 | reports no-reference kinematic diagnostics | calibrated ground/contact evaluation |
-
-## 7. Go／no-go 标准
-
-### 可进入投稿整合
-
-- 中心主张稳定为Human-first asymmetric generation，贡献不超过三项；
-- C0-LAT／C0-GEO多seed没有系统性崩溃；
-- 盲评至少支持一项主观优势，且失败样本已披露；
-- Pulp与C3对照完成，所有不可比字段显式标注；
-- Stage1选择路线A或B，不再用v10做伪matched反证；
-- 代码、配置、artifact身份、表格生成和demo可从clean Git revision复现；
-- editing要么正式闭合，要么完全退出主claim。
-
-### 应暂停扩功能，先修论文
-
-- 新实验不能关闭上述任一hard gap；
-- 又引入新的representation／objective／solver而没有淘汰旧claim；
-- 只在开发cohort、单seed或挑选视频上改善；
-- 为了“更多功能”牺牲Human保护或sequential合同；
-- 结果需要靠改名、隐藏sample count或混合decoder才能看起来更好。
-
-## 8. 当前优先顺序
-
-1. 冻结 C0-LAT／C0-GEO co-mainline、论文一句话主张和 Stage1 路线B。
-2. 清理并同步代码／配置，生成一键三模式与baseline结果表。
-3. 启动主线独立Stage2 seeds，同时完成盲评协议与sealed cohort冻结。
-4. 完成Pulp／C3／v9 baseline矩阵、failure taxonomy与计算成本。
-5. 再决定editing：默认不进入主claim；只有能完整承担Phase E才启动。
-6. 只有路线A被重新选择时，才运行最小matched Stage1 ablation。
-
-这个顺序优先提高“审稿人是否相信核心结论”，而不是继续提高内部实验数量。
+重构前的完整reliability页与拆分前Actor–Director附录保留在
+[[StoryMotion/archived/paper-scope/2026-08-03_storymotion-iclr-reliability-pre-closure-refactor]]。
+它只作provenance，不是当前Paper A训练授权。

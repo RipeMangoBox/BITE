@@ -1,11 +1,11 @@
 ---
-title: "StoryMotion Current: v11 C0 Co-mainline"
+title: "StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation"
 status: v11_c0_lat_geo_co_mainline
 hypothesis: |
-  v11 C0-LAT and C0-GEO are co-equal system mainlines: they share one audited
-  v9 Stage1/Human owner and differ only in the Camera objective. Keeping both
-  preserves the observed semantic/geometry Pareto instead of selecting on
-  statistically unresolved Camera geometry differences.
+  Paper A StoryMotion owns the v11 C0-LAT/C0-GEO co-mainline and tests a
+  capability-preserving asymmetric Human–Camera extension. The remaining core
+  scientific tasks are the versioned correction and audit of Pulp Camera text,
+  plus a full independent Human/Camera specialist-cascade system comparison.
 tags:
   - StoryMotion
   - version/v11
@@ -21,12 +21,12 @@ source_notes:
   - "[[Storymotion-exp-sha]]"
   - "[[StoryMotion-metric-computation-io]]"
   - "[[StoryMotion-iclr-reliability]]"
-  - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
+  - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-31T23:30:00+08:00
+updated: 2026-08-03T17:20:00+08:00
 ---
 
-# StoryMotion Current: v11 C0 Co-mainline
+# StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
 
 > [!important] 当前裁决
 > 自 2026-07-31 起，v11 C0-LAT 与 C0-GEO 的 EMA Camera `105K` endpoint
@@ -36,9 +36,54 @@ updated: 2026-07-31T23:30:00+08:00
 > geometry 95% CI 全部跨零，语义、覆盖与构图字段又形成混合 Pareto，因此不把
 > 任一臂降为 subordinate alternate。C3-25 转为 former-mainline system baseline。
 
+> [!important] seed23 matched repeat已闭合
+> 两条C0 objective均以训练seed23从零启动并完成Camera `105K`、pure4,053三模式、
+> decoded geometry／physical与10,000次paired bootstrap。Direct-H frozen-owner replay
+> 通过；两个seed内的GEO−LAT及两个objective的seed23−seed17共24项Camera geometry
+> 95% CI全部跨零。独立训练seed缺口已经关闭，但sealed audit与视觉失败分层仍未完成；
+> C0-LAT／C0-GEO共同mainline不变。正式证据见
+> [[StoryMotion-valid-metric-ledger#3.14 v11 C0 seed23 105K pure4,053 matched repeat]]。
+
+> [!important] Paper A scope
+> 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
+> Generation**。DIRECT文档已迁移到`obsidian-vault/ideas/DIRECT/`，其状态只见
+> [[DIRECT/current|DIRECT current]]。两篇论文仍共享StoryMotion代码仓库；当前不创建
+> DIRECT代码仓库。完整贡献边界见[[paper-boundary]]。
+
+> [!failure] Explicit framing `30K` 不进入 mainline
+> 冻结 C0-GEO 上的 CF-4 framing adapter 虽在 N64／pure4,053 都形成可测 control
+> adherence，absent-control 路径也保持 exact，但 matched pure4,053 Direct-C 与
+> sequential 在 semantic、coverage、caption 与 projective framing 多字段回退。
+> 因而该轴以 diagnostic-only 关闭；C0-LAT／C0-GEO co-mainline 不变。裁决见
+> [[archived/experiments/2026-07-31_storymotion-v11-explicit-framing-control]]，正式数值见
+> [[StoryMotion-valid-metric-ledger#3.12 v11 explicit framing-control 30K pure4,053 formal]]。
+
+> [!warning] Camera触发hard stop；Human只有endpoint headroom，editing退出投稿queue
+> Camera64在mask外exact时仍造成far world Camera-center漂移，endpoint oracle也失败，
+> 因而当前Camera representation停止。Human128的naive clamp同样产生root／global-joint
+> 漂移，但N8 mask-local endpoint oracle四格全过，证明当前Human128存在端点闭合headroom。
+> 这只保留为endpoint-existence evidence；为收缩投稿scope，不再安排Human短screen，两轴
+> 均不启动MAE长训，也不形成paper editing claim。分别见
+> [[archived/experiments/2026-07-31_storymotion-v11-camera-temporal-inpainting-control]]与
+> [[archived/experiments/2026-07-31_storymotion-v11-human-temporal-locality-control]]。
+
+> [!important] v10关闭；Raw-H只作为v9 sibling control
+> 不再补v10 corrected endpoint、176D cache或Stage2。Stage1 observation现为低优先级，
+> 只允许在保留exact v9 Human owner、Camera64 layout与non-causal边界下另建sibling；当前
+> Paper A不启动Raw-H Stage1长训，也不借该历史轴改变matched specialist合同。
+
+## 0. Paper A路由
+
+- 当前论文：StoryMotion Paper A。
+- 当前方法owner：v11 C0-LAT／C0-GEO共同mainline。
+- 当前实验owner：[[StoryMotion-iclr-reliability]]。
+- 正式数字owner：[[StoryMotion-valid-metric-ledger]]。
+- DIRECT状态与队列：[[DIRECT/current|DIRECT current]]；不在本页复述。
+- 代码仍只有`linkedCodebases/StoryMotion/`；文档按Paper A／DIRECT分目录。
+
 本页只拥有当前选择、允许的 claim、活跃 blocker 与 evidence link。正式数字与哈希
-只见 [[StoryMotion-valid-metric-ledger]]；版本事件只见 [[version_family]]；论文中稿
-差距与实验优先级只见 [[StoryMotion-iclr-reliability]]。
+只见 [[StoryMotion-valid-metric-ledger]]；版本事件只见 [[version_family]]；Paper A中稿
+差距与优先级只见[[StoryMotion-iclr-reliability]]。
 
 ## 1. 共同 mainline 合同
 
@@ -78,39 +123,58 @@ joint parallel gate v11。历史合同中的 `diagnostic_only=true` 与
 
 ## 3. 当前论文主张
 
-StoryMotion 的目标是中稿 ICLR 2027。当前最可信的中心主张不是“全面 SOTA”，而是：
+StoryMotion 的目标是中稿 ICLR 2027。当前中心主张收口为：
 
-> 以 non-causal asymmetric Human-first factorization，将 Human generation、
-> observed-Human Camera completion 与 sequential joint generation统一到一个可审计
-> 系统中；保护 Human owner，并用 LAT/GEO 双 endpoint 显式保留 Camera
-> semantic／geometry Pareto。
+> 以non-causal asymmetric unified framework支持Human generation、observed-Human
+> Camera generation与sequential Human-then-Camera generation；在Camera扩展中保持
+> Human owner及其输出路径不变，并由同一Camera模型执行observed-H与generated-H。
 
-这一定义下，C0-LAT 与 C0-GEO 是同一方法的两个报告 endpoint，不是两个互相竞争
-的论文方法。数值比较、视觉对比和局限必须同时呈现两者。
+Sequential是factorized joint distribution的两个推理pass，不声称同步或双向joint
+denoising。Direct-H是被保留的基础能力，不写成Camera扩展带来的新提升。C0-LAT与
+C0-GEO是同一方法的两个报告endpoint，数值、视觉与局限必须同时呈现，不跨endpoint
+摘取单列最优。DIRECT的可迁移摄影program属于第二篇，不再覆盖本主张。
+
+Paper A另纳入一项次要数据贡献：固定Pulp Camera convention，根据实际Camera参数变化
+新增无歧义caption，同时保留原caption、来源与修订版本。该修正尚未完成，不得提前写成
+已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。
 
 ## 4. 活跃 blocker
 
-1. **Stage1 设计依据。** v9 Stage1 的 Human anchor、interaction residual 与三阶段
-   schedule 偏复杂。需要把每个部件绑定到明确 failure mode，并用最小 matched
-   ablation 证明必要性；不能只以“v10 更简单但退化”代替，因为 v10 同时改变了
-   owner、Camera factorization、loss 与下游训练，尚不是干净反证。
-2. **统计与感知证据。** 当前主线选择主要来自 seed17。论文还需要独立重复、盲评／
-   人体偏好与失败分层，避免只凭 development pure4,053 和均值指标定论。
-3. **Editing scope。** 现有系统尚无 formal edit task、mask protocol 或对应训练阶段。
-   若把 editing 写入主贡献，必须补任务定义与验证；若不补，则从标题、摘要和主
-   contribution 中删除，只保留 future work。
-4. **可复现性。** 需要冻结论文代码、配置、三模式 evaluator、checkpoint/decoder
-   身份、训练成本和最小复现实验包。详细优先级与停止条件见
-   [[StoryMotion-iclr-reliability]]。
+1. **Camera文本有效性。** 冻结Pulp Camera convention；构造
+   geometry-derived无歧义caption，
+   保留原文provenance；完成自动轨迹－文本一致性检查、抽样人工核验及canonical directional
+   subset对照。约16万样本不能依赖逐条人工修订。
+2. **独立specialist cascade。** 既有v7.33 Camera14 separate AE已完成同序`162,760`
+   train／pure4,053 eval、non-causal H199＋C14、H128＋C64和owning checkpoint审计，因此
+   Stage1不重训。活动对照只从零训练一条LAT specialist system：Human Stage2 `105K`＋
+   Camera Stage2 `105K`，Camera仍读取Human condition，generated-H不与原GT Camera组成
+   positive。该结果是full-stack system comparison，不作Stage2 sharing的单变量归因；完整
+   预声明见[[StoryMotion-iclr-reliability#2. 独立specialist cascade系统对照]]。
+3. **投稿证据闭环。** 冻结PulpMotion同split、同sample count、同指标的主表；Pulp Motion
+   与TSA是结构化motion主baseline，Auteur、Uni3C与ActCam按不同任务层级比较。
+   seed23独立长训与matched repeat audit已闭合，两个seed都不支持单一
+   Camera objective胜出；仍需sealed audit、随机／最好／最差可视化和failure taxonomy。
+   基础盲评只用于可信度。最终还需冻结论文代码、配置、三接口evaluator、checkpoint／decoder身份、
+   参数量、GPU小时、推理成本与最小复现实验包。
+4. **可选接口消融，不阻塞主张。** current sequential直接把Human generator的H128交给
+   Camera。H199 cascade只是在两者之间插入`D_H`与`E_H`，检验显式Human API的round-trip
+   误差；它不改变Human owner、Camera branch或概率分解。只有正文准备声称“latent直连优于
+   普通串行接口”时才做该evaluator-only对照，不重训Stage1／Stage2。
+5. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
+   controllability；生产可用性、Rect与program transfer全部留给DIRECT。
+
+RV、Rect、HumanML3D、Director ownership与ViGen utility均由
+[[DIRECT/current|DIRECT current]]路由，不再阻塞Paper A收口。
 
 ## 5. 当前行动边界
 
 - 冻结 C0-LAT 与 C0-GEO 两个 mainline endpoint，不因单个 raw mean 继续选臂。
-- C1、v10 Camera Stage2、swapped-host replay 和新 Stage1 全量训练均不是默认下一步；
-  只有它们直接关闭论文 hard gap 时才重新授权。
-- 优先完成论文 claim、Stage1 因果依据、multi-seed／盲评和可复现实验矩阵。
-- Editing 先做 paper-scope 决策，再决定是否设计训练阶段；不以“架构可能支持”写成
-  已验证能力。
+- Paper A先完成Pulp Camera坐标／文本修正；这是当前唯一核心科学任务。随后只做同协议
+  主表、sealed audit、视觉失败分层和复现包等投稿收口。
+- H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
+- multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
+- v10 Camera Stage2、C1、swapped-host replay和当前Camera64 MAE长训均保持关闭。
+- Formal editing与learned bounded staging留作投稿后future work，不进入当前queue。
 
 ## 6. Canonical owners
 
@@ -119,6 +183,14 @@ StoryMotion 的目标是中稿 ICLR 2027。当前最可信的中心主张不是�
 - 其余 run identity 与 visual index：[[Storymotion-exp-sha]]。
 - evaluator／decoder／指标语义：[[StoryMotion-metric-computation-io]]。
 - 版本完成事件与 invalidation：[[version_family]]。
-- ICLR claim-evidence gap 与实验优先级：[[StoryMotion-iclr-reliability]]。
+- 两篇论文正式题名、单仓库规则、scope与venue边界：
+  [[paper-boundary]]。
+- Paper A的claim–evidence gap、降级条件与reliability计划：
+  [[StoryMotion-iclr-reliability]]；其中拆分前内容不是当前实验授权。
+- DIRECT当前状态与全部Paper B owner：[[DIRECT/current|DIRECT current]]。
+- Camera temporal editing representation stop：
+  [[archived/experiments/2026-07-31_storymotion-v11-camera-temporal-inpainting-control]]。
+- Human temporal locality与endpoint headroom：
+  [[archived/experiments/2026-07-31_storymotion-v11-human-temporal-locality-control]]。
 - v11 原始四臂合同与停止规则：
-  [[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]。
+  [[archived/versions/v11/2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]。

@@ -12,19 +12,19 @@ tags:
 aliases:
   - StoryMotion-Exp-SHA
 source_notes:
-  - "[[current]]"
+  - "[[StoryMotion/current]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[version_family]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
   - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
 created: 2026-07-28T12:03:02+08:00
-updated: 2026-07-31T00:41:28+08:00
+updated: 2026-08-03T15:13:03+08:00
 ---
 
 # StoryMotion Experiment SHA Registry
 
 > [!abstract] Identity owner
-> 本页集中拥有 StoryMotion checkpoint、owning decoder、cache、ordered-ID、contract、result、records、visual 与 implementation SHA256。数值结论只见 [[StoryMotion-valid-metric-ledger]]；当前裁决只见 [[current]]。本页不重新解释指标，也不以 hash 存在替代 formal audit。
+> 本页集中拥有 StoryMotion checkpoint、owning decoder、cache、ordered-ID、contract、result、records、visual 与 implementation SHA256。数值结论只见 [[StoryMotion-valid-metric-ledger]]；当前裁决只见 [[StoryMotion/current]]。本页不重新解释指标，也不以 hash 存在替代 formal audit。
 
 ## 1. v9 redesign protected-H ViMoGen Unified-3
 

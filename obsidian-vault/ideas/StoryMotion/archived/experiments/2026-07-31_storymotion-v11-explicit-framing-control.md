@@ -5,18 +5,19 @@ hypothesis: |
   explicit subject screen position, scale, and visibility control while the
   absent-control path remains exactly identical to the selected parent and the
   Human owner remains frozen.
-status: preregistered_screen
+status: closed_formal_rejected
+archived: 2026-08-03
 tags:
   - StoryMotion
   - version/v11
   - control/framing
-  - status/active
+  - status/closed
 source_papers:
   - "[[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation]]"
   - "[[analysis/CGF_2024/Cinematographic_Camera_Diffusion_Model]]"
   - "[[analysis/arxiv_2026/Auteur_Language-Driven_Cinematographic_Framing_for_Human-Centric_Video_Generation]]"
 created: 2026-07-31T03:05:00+08:00
-updated: 2026-07-31T03:41:15+08:00
+updated: 2026-07-31T23:45:00+08:00
 ---
 
 # StoryMotion v11 Explicit Screen-space Framing Control
@@ -149,3 +150,38 @@ target／swap、absent exact 与 `1.5×` geometry gate；至少一臂完整通�
 `162,760` samples、batch `128`、`30K` optimizer steps、每 `1K` weights／每 `5K`
 full-resume；不得加载任一 screen adapter。每 `5K` 的 first-64 control screen 仍使用
 第 3 节 gate，连续两个 screen 反转时停止。
+
+## 8. `30K` endpoint screen
+
+`30K` EMA endpoint 在预注册的 ordered first-64、Euler50、batch `8` 与固定 noise
+screen 上继续通过全部 control gate。它相对 parent 的四字段 target／swap MAE 均改善，
+四个 swap response 方向均正确，absent-control sampler max-abs 仍为 `0.0`；Camera
+center／rotation 相对 parent 的误差因子为 `0.789 / 0.845`。
+
+| version / run | evidence role | target MAE `x / y / log-scale / out` | swap MAE `x / y / log-scale / out` | gate |
+| --- | --- | --- | --- | --- |
+| v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | parent | 0.2630／0.3548／0.1092／0.0631 | 0.4612／1.2159／0.4355／0.2785 | comparator |
+| v11 / `v11_f_cf4_framing_screen2k_seed17_4090g1_20260731` | selected 2K screen | 0.1854／0.2492／0.0780／0.0490 | 0.2110／0.5168／0.2140／0.1385 | pass |
+| v11 / `v11_f_cf4_framing_long30k_seed17_4090g0_20260731` | fresh full-train 30K | 0.2021／0.2354／0.0769／0.0505 | 0.2224／0.3914／0.1860／0.1177 | pass |
+
+该 screen 只回答 control adherence 与局部 stability，不能替代 batch `32`、
+parent-matched pure4,053 formal system-quality gate。
+
+## 9. Pure4,053 formal 与 fixed8 裁决
+
+> [!failure] 不晋升 explicit framing adapter
+> `30K` endpoint 虽保持 control adherence，但在与 C0-GEO parent 完全 matched 的
+> pure4,053 Direct-C 与 formal sequential Human→Camera 上出现多字段系统质量回退。
+> 因而停止该 adapter 轴，不替换、不从属化任何 v11 C0-LAT／C0-GEO mainline endpoint，
+> 也不追加 seed 以挽救已失败的 endpoint gate。
+
+正式评测使用相同 `4,053` ordered IDs、official inputs、Euler50、seed17、batch `32`
+与 noise schedule；Direct-H 因 Human owner 从未被 adapter 消费或更新而 exact
+继承 parent，`joint_parallel=false`。swapped-control 只作 intervention diagnostic，
+不以原 GT 计算官方语义排名。完整数值、哈希与 fixed8 身份只见
+[[StoryMotion-valid-metric-ledger#3.12 v11 explicit framing-control 30K pure4,053 formal]]。
+
+fixed8 与 parent 使用同一组样本，右侧四栏依次为 GT、target Direct-C、
+swapped-control Direct-C 与 target sequential H→C。第一次缺 ffmpeg 的 render 和
+第一次只实际输出三栏却声明四栏的 render 均保留在失败目录；只有经抽帧确认四栏、
+8 个 H.264 视频均可解码的重渲染进入展示。

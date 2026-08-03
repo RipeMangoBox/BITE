@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion GestureLSM × DC3D Joint Dual-Expert Design"
 status: active_preregistered_design
+archived: 2026-08-03
 hypothesis: |
   StoryMotion 的三模式瓶颈可能来自单一 Stage2 拓扑无法同时保留 Human
   body-part 时空结构与 Human-Camera projective geometry。先从 joint 生成

@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion v8.2333 Data Quality, Pool, and Training Allocation Contract"
 status: quality_gradient_v1_research_complete_v2_required_no_training_authorization
+archived: 2026-08-03
 hypothesis: |
   在冻结 C3-25 representation、owning decoder 与 Unified Stage2 实现后，
   只改变可逆、task-aware 的训练资格与抽样分布，可以检验物理质量、

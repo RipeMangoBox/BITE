@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion Checkmate: Problem-to-Decision Map"
-status: active
+status: archived_stale_mainline_snapshot
+archived: 2026-08-03
 hypothesis: |
   StoryMotion 的关键不是把 Human 与 Camera 强行压入同一 latent，而是区分
   可独立控制的 Human anchor、必要的 Human–Camera interaction 与 Camera state；

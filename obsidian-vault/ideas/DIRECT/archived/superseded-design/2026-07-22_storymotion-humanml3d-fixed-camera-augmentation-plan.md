@@ -1,11 +1,13 @@
 ---
 title: StoryMotion HumanML3D fixed-Camera augmentation plan
 date: 2026-07-22
-updated: 2026-07-27T12:11:37+08:00
-status: planned_no_substantive_experiment
+updated: 2026-08-03T14:30:39+08:00
+status: superseded_fixed_world_camera_not_positive
+archived_reason: "Fixed world-Camera reuse was superseded by per-Human Camera-program solving."
 type: experiment-plan
 tags:
   - StoryMotion
+  - DIRECT
   - data-augmentation
   - HumanML3D
   - human-camera-compatibility
@@ -14,6 +16,9 @@ manual_labels_current: 0
 ---
 
 # StoryMotion HumanML3D fixed-Camera augmentation plan
+
+> [!failure] 2026-08-01 superseded
+> 本计划的A0–A4从未形成实质实验，且“保留同一条world Camera trajectory、只替换Human”不能再作为positive-data方案。跨Human可复用的是Camera program；每个新Human必须重新求解并验证$C_{i,m}^*=\operatorname{SolveCamera}(H_i,P_m)$。naive fixed-Camera replacement只保留为negative／compatibility diagnostic。当前数据设计唯一入口为[[2026-08-01_storymotion-multipair-data-training-plan]]；历史Pulp+HML Stage1 batch mixing见[[2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]。
 
 ## 0. 当前证据边界
 

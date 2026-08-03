@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion Human-first Diagnostic Ladder"
 status: v9_e5_e6_human_controls_closed
+archived: 2026-08-03
 hypothesis: |
   Human128 and the fixed-C3 external Human-system diagnostics are closed.
   E5 MARDM and E6 ViMoGen-light establish Human free-generation capability

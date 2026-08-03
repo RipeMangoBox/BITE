@@ -10,7 +10,7 @@ tags:
 aliases:
   - StoryMotion-Metric-IO
 source_notes:
-  - "[[current]]"
+  - "[[StoryMotion/current]]"
   - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[2026-07-28_storymotion-v9-protected-h-three-stage-implementation-camera-diagnosis]]"
@@ -19,7 +19,7 @@ source_notes:
   - "[[archived/evidence/2026-07-11_storymotion-v7.14-corrected-results]]"
   - "[[archived/evidence/2026-07-12_storymotion-v7.17-decoder-cache-contract-execution]]"
 created: 2026-07-09T12:20:00+0800
-updated: 2026-07-29T13:54:38+08:00
+updated: 2026-08-03T15:13:03+08:00
 ---
 
 # StoryMotion Metric Computation IO

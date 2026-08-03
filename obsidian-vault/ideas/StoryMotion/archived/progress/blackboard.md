@@ -1,3 +1,15 @@
+---
+title: "StoryMotion Blackboard Archive"
+status: archived
+hypothesis: "Historical working notes preserved for provenance; not a live experiment owner."
+tags:
+  - StoryMotion
+  - archive
+  - progress
+created: 2026-08-03T00:00:00+08:00
+updated: 2026-08-03T00:00:00+08:00
+---
+
 1。Direct Human/camera 的实验目标/核心 setting 是什么？
 2。gradio的 top 标签页只是把第二行的 gt 单个视频改为 specialist，保持后两个为 pulp 的 recon/gen；指标也添加 pulpmotion baseline对比
 3。（高优先）https://github.com/robincourant/pulp-motion/issues/7是关于 stage1 的问答，目前没有完整公开。local 实现的 64 frame crop 是否会导致长序列处理能力缺失？测试的证据说话，比如找长序列数据 整个序列 recon 测 mpjpe；
@@ -1235,3 +1247,74 @@ git 同步 bite—process 和 4090/5090，将 v11 C0-LAT和 C0--geo 为共同的
 另外，目前剩下的实验整理（非必要，以中稿为目标）：
 （1）目前 v11 的 stage1 偏复杂，如果说不出明确的设计依据，可能被审稿人 argue。之前 v10 设计了简化的 stage1 但 stage1/2 指标均退化且没找到明确的原因。
 （2）还有 edit 能力没有探测与设计对应的训练阶段。
+
+---0801 10:16
+1. storymotion 在 v11 之后，计划补强的能力和重构的叙事是什么？落脚点不能在 human-camera 解耦，因为这是 ViGen 领域已经很成熟的工作，必须落到 ViGen 无法实现的更聚焦的point。data augmentation的目标是什么？storymotion 的数据处理，是否可以理解为构造合理但 unpair 的 H-C text data，从而让同一段 camera 能够处理不同的 human，以及同一段 human 能够被不同 camera 拍到？对于 storymotion 的预期和数据预期不能过于乐观，需要有降级备选。注意，由于终究是小数据小模型，因此过高的 claim+完美效果 是必然无法达成的，只要能在现有的 v11 上进一步提升 H，C，joint 质量，扩充多对多解耦控制与合理性，往 claim 靠拢（能验证方法有效性即可达到 ICLR 标准）。
+1.1 目前 camera 的 human observation 是 full human motion（199），还是只有 root？两者各有利弊需注意（我更倾向于符合叙事的 human motion不一定 199 但不能只有 root）：full 能够随着 human motion 变化而不只是关注 root（否则人物朝向、动作等都被忽视是不合理的），但同时容易过拟合 ；关注 root 则丢失 human motion，称不上 director。如果是 full，在 data augment 和配对设计的新训练机制与框架上设计，希望 camera 在 multi human shot 上关注哪些 camera text 没有传达的信息（camera 可能需要同时获取 H和C的 text）
+1.2 前者可以使用 humanml3d 扩充（之前已经有版本进行 pulp+hml，但后来聚焦 pulp only 最小变量先明确模型能力）；后者我不了解如何扩充。
+1.3 上述扩充方案能否适配storymotion的 actor-director claim？通过data augment，有机会进一步解耦 H-C，这是目前的目的吗？数据扩充方法+扩充的数据集 自然能作为一个贡献，如果能有力支持 claim 则认可度更高。注意： pulp data 是对 movie 处理获得的，虽然不要求augment的 data 不完全按照真正导演级别的运镜设计，但要尽量贴近。
+1.4 Rect-64，Rect-320，Rect-4096，A-series，B-series 分别指代什么？对于解耦控制的实验失败很正常，因为 pulp 的one-to-one 匹配限制能力上限。
+1.5 数据扩充方面，我倾向于先自动化大批量构建，然后再自动化筛选，最后一步人工筛选。如果必须 manual 打标，则先提供 100 pair的 pulp 可视化 gradio（一个标签页完整呈现 25 行 4 列）供参考，包含 human motion，相机轨迹，camera projection 在同一个 video 中。
+1.6 如果 pulp 的 同一个 sample（h 和c）text 各只有一个，则需要用 llm 先进行 text 同义写法扩充（如 humanml3d 多条 text 描述同一个 motion sample）。这算不上贡献，但对于提升泛化性有价值。
+2. v10 stage1 简化（stage2 适配）的路线失败，v10 stage1 不如 v9 的复杂版本，根因是什么？
+3. 放弃通过 MAE 的 edit 路线，这与 storymotion 的 stage2 训推架构不兼容，且 edit 特色不足；
+4. 解释你在 goal 中完成的每个实验的目的和操作流程（如 N128 共享噪声）
+4. gradio 标签页可视化v11 和 pulp 在修改 human/camera 后的效果（human，camera，projection），提供指标分别计算 human/camera 独立的与对应 gt的 metric（包含物理）；
+
+
+2030. 有价值的下一篇想法（不保证可行性）：让 camera 能够自主判断需要聚焦 human/object/scene 的重要局部，得接 LLM，且目标更明确，因为很多时候不是局部or 全身的问题，而是自主运镜来提升叙事，可以做 ViGen。
+
+---0801 12：35
+1. stage1 与表征：
+1.1 放弃 v10 的调整，之前 redesign stage1的 pulp+hml 是如何进行 hml 数据的混入的？对数据混合，独立一个md说明。
+2. v9 stage1 尝试 raw human pose + camera latent variant（潜在好处是 camera 能够看到 pose root，因而提升 relatve distance 精度）：camera 从观察 human latent 变为 观察 human motion（需要评估使用 human199，还是纯 pose的 22*3=66，66 rep的root 外的 joint 是 global 还是 local rep）。但这条路线需要重新适配 stage1，如 camera concate human pose 而不是 human latent 进行 decode。这会造成 camera decode 时包含 human 的 raw 和 camera 的 latent，但我关注到 ARDY 提出了类似的 root raw + local latent 的hierarchical representation。6 组实验：
+  - human199
+  - human66，root + local motion
+  - human66，global motion
+  - Coarse-H：root、heading、height。
+  - Coarse-H + oracle event time。
+  - Full-H + predicted event time。
+【去看 v11 的 pipeline】
+
+2. human text 的 stage2 注入如何设计？考虑点是什么？
+
+3. 三组实验变量：
+（1）text 多样化（与 Rect 是一个含义吗）；
+（2）human text 注入；
+（3）stage1 human ovservation
+如何在最小代价内合理找出组合最优？优先进行什么实验？避免进度回滚和返工。
+
+4. 没理解`augmentation 不是简单扩充样本数，而是补足“Camera intent 所有权”和“Human-conditioned execution”监督`
+  [
+  C^*_{i,m}=\operatorname{SolveCamera}(H_i,P_m)
+  ]
+
+  即复用 Camera program (P_m)，而不是把同一条 world Camera trajectory 生硬配给不同 Human。原始 unpaired H_i + C_j 只能作为 negative/control 和人工兼
+  容性诊断，不能直接成为 positive。
+
+5. Rect 指的就是 text 丰富化吗？
+6. 放在 gradio 哪个标签页？
+7. 文档添加核心信息，清晰化表述但避免冗长，对缩写的实验添加说明
+
+---0801 18：03
+我来梳理目前我理解的内容：
+任务优先级：
+高优先：
+1. 数据构造，包含RV-25（需要包含 pulp 源数据（h，c，proj），humanml3d，以及双方 text），Rect-N；（1）暂时不盲评，我先了解质量边界；（2）思考，stage1 是将 human motion 耦合到 camera的，扩充数据的目的是打破耦合，是否有冲突？（3）进行数据分组矩阵处理后，是否数据扩充不局限于 pulp 和 hml，也可以 pulp 内部组合扩充？（4）RV-25的构造原则是什么？如何筛选混合的数据以及通过筛选的标准是什么？pulp 内部组合以及 hml+pulp 跨组合标准有区别吗？
+2. human text 注入 camera 分支，或许需要改为层次化、不同角色处理 camera text，human text 和 human observation（仍然使用v9 stage1 和 v11 stage2）；
+
+低优先：
+1. text 扩充；
+2. stage1 pose 替换：HT0／HT1／HTS，O0–O3，N1–N3，J66-RL／J66-G，H68-HYB；
+
+不理解内容：
+1. MARDM／ViMoGen-light Human-only runs有局部改善，但三个external-style Human systems均未过strict physical gate，且没有Camera／composition输出，这是进行了额外的 train/eval 吗？
+2. 实验缩写表格不完整，如 N128 缺少解释。
+3. 文档优化重构，目前若干表述晦涩冗余且分布多处且缺乏符号解释（如`而不是默认每个cell都合法`的A()=1 和()=1，注意全文符号的统一避免歧义。将关闭和后置实验放到末尾，正文都是核心内容。
+
+1. 4090 实验已完成，全量 metric eval（含物理），提供 gradio 可视化
+2. RV 的具体筛选逻辑在哪里？ RV gradio 布局难以理解
+
+---0802 17:38(待发)
+1. 发现高优先级问题：pulp data对于 camera 方位描述不明确，原因是世界坐标系构建没固定。由于是从视频中处理 human 和 camera，将世界坐标系分别放到 human-camera 连线的左侧和右侧，则 camera的移动方位描述完全相反。这会导致camera的 text 与实际轨迹不匹配，导致生成和控制效果削弱。由于数据集有 16W 左右camera 数据，合理做法是根据相机具体参数的变化，将 camera text（新增，不删除原有 text）变成非歧义描述。但由于数据量大，无法通过可视化逐一判断，需设计质检手段。
+2. 统计 camera 的元指令种类，

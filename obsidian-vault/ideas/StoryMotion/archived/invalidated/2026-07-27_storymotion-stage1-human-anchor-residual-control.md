@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion Stage1 Human-anchor residual control"
 status: closed_invalid_hml_imputation_no_stage2
+archived: 2026-08-03
 hypothesis: |
   A Camera-free Human anchor is structurally useful, but heterogeneous HumanML
   supervision is admissible only when missing rotations are explicit or derived
@@ -16,9 +17,10 @@ source_notes:
   - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[StoryMotion-metric-computation-io]]"
-  - "[[2026-07-22_storymotion-humanml3d-fixed-camera-augmentation-plan]]"
+  - "[[archived/superseded-design/2026-07-22_storymotion-humanml3d-fixed-camera-augmentation-plan]]"
+  - "[[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]"
 created: 2026-07-27T12:11:37+08:00
-updated: 2026-07-28T12:19:45+08:00
+updated: 2026-08-03T14:30:39+08:00
 ---
 
 # StoryMotion Stage1 Human-anchor residual control
@@ -28,7 +30,7 @@ updated: 2026-07-28T12:19:45+08:00
 
 ## 1. 与 fixed-Camera augmentation 的边界
 
-本实验不是 [[2026-07-22_storymotion-humanml3d-fixed-camera-augmentation-plan]] 的 A0–A4 数据增广：它没有检索 HumanML3D–Pulp pair、没有构造 fixed-Camera 新样本，也没有建立 HCCC 或 Stage2 mixture。这里回答的是一个独立 Stage1 问题：在同一 Human-anchor/residual architecture 与训练日程下，用 HumanML3D partial root/local exposure 替换 Pulp-only anchor exposure是否形成可晋升的 reconstruction trade-off。
+本实验不是 [[archived/superseded-design/2026-07-22_storymotion-humanml3d-fixed-camera-augmentation-plan]] 的 A0–A4 数据增广：它没有检索 HumanML3D–Pulp pair、没有构造 fixed-Camera 新样本，也没有建立 HCCC 或 Stage2 mixture。这里回答的是一个独立 Stage1 问题：在同一 Human-anchor/residual architecture 与训练日程下，用 HumanML3D partial root/local exposure 替换 Pulp-only anchor exposure 是否形成可晋升的 reconstruction trade-off。
 
 ## 2. Matched contract
 
@@ -54,11 +56,7 @@ run 名里的 `rN` 只表示该 artifact lineage 内部的 revision/retry ordina
 
 ## 4. HML 与 Pulp 如何联合训练
 
-| phase | steps | HML+Pulp arm | Pulp-only matched arm | 更新边界 |
-| --- | ---: | --- | --- | --- |
-| A | 210K | anchor cycle `HML×4 + Pulp×1` | 以 Pulp anchor 替代 HML，保持相同 role exposure | Human anchor/local modules |
-| B | 210K | Pulp full joint | Pulp full joint | Camera/framing/interaction；Human modules frozen |
-| C | 216K | replay `HML×3 + Pulp×7` | matched Pulp replay | joint；Human learning rate 为主率 `0.1×` |
+逐 phase source cycle、预处理、通道 mask、梯度所有权与 matched Pulp-only control 现由 [[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]] 单独维护。本页只保留会影响本次结果解释的 supervision boundary：HML step是 Human-only，Pulp step才拥有完整 Human199、Camera14 与 framing target。
 
 “HML-root-local”描述的是这次 artifact 的 **partial supervision boundary**，不是一个合规的 full-Human representation：
 

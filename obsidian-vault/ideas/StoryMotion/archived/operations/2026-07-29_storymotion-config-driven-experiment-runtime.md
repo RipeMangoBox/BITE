@@ -2,6 +2,7 @@
 title: "StoryMotion 配置驱动实验运行层"
 hypothesis: "将主机适配、运行路径、GPU 映射和阶段命令收敛为严格配置，可以减少版本脚本复制，同时保持模型与评测语义的代码所有权。"
 status: active
+archived: 2026-08-03
 source_papers: []
 tags:
   - StoryMotion

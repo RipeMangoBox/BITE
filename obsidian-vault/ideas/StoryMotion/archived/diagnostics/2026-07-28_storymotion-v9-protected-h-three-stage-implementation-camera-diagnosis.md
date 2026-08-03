@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion v9 protected-H 三阶段实现与 Camera 失稳诊断"
 status: active_camera_root_cause
+archived: 2026-08-03
 hypothesis: |
   当前 Camera 失败首先来自 Direct-C、HC 两种不一致条件分布在同一
   Camera branch、AdamW 与 EMA 上串行再逐步交替所造成的遗忘、late

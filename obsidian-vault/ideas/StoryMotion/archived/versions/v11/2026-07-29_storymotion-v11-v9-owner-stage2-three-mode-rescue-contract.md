@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion v11 v9-owner Stage2 Three-Mode Rescue Contract"
 status: four_arm_105k_pure4053_completed_c0_co_mainline
+archived: 2026-08-03
 hypothesis: |
   v9 的 Human-anchor Stage1 与 protected Human teacher 已足以作为可审计的
   三模式父边界；固定 Stage1、Human teacher、LR 与 Camera initialization，

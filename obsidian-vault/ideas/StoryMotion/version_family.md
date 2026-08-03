@@ -1,5 +1,5 @@
 ---
-title: "StoryMotion Version Family"
+title: "StoryMotion Repository Version Family"
 status: active
 hypothesis: |
   Stable version-family names must identify the causal question, Stage boundary,
@@ -7,6 +7,7 @@ hypothesis: |
   not inferred from a letter or version number alone.
 tags:
   - StoryMotion
+  - DIRECT
   - version-family
   - provenance
   - status/active
@@ -15,24 +16,41 @@ aliases:
   - StoryMotion-History
   - history
 source_notes:
-  - "[[current]]"
+  - "[[StoryMotion/current]]"
+  - "[[DIRECT/current]]"
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[Storymotion-exp-sha]]"
   - "[[StoryMotion-metric-computation-io]]"
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
   - "[[2026-07-27_storymotion-stage1-human-anchor-residual-control]]"
+  - "[[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]"
   - "[[2026-07-28_storymotion-v9-protected-h-three-stage-implementation-camera-diagnosis]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
   - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
+  - "[[DIRECT/2026-08-01_storymotion-multipair-data-training-plan]]"
+  - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-07-31T23:30:00+08:00
+updated: 2026-08-03T15:45:01+08:00
 ---
 
-# StoryMotion Version Family
+# StoryMotion Repository Version Family
 
 > [!abstract] 本页职责
-> 本页解释每个版本族在问什么、只改什么、属于 Stage1 还是 Stage2、实际完成到多少 step，以及哪些名字只是诊断编号。当前优先级只看[[current]]；正式数字及其绑定的checkpoint／result／records／audit SHA只看[[StoryMotion-valid-metric-ledger]]；其余run identity与visual索引看[[Storymotion-exp-sha]]；run中进度只看对应`runs/` manifest/log。
+> 本页解释每个版本族在问什么、只改什么、属于 Stage1 还是 Stage2、实际完成到多少 step，以及哪些名字只是诊断编号。当前优先级只看[[StoryMotion/current]]；正式数字及其绑定的checkpoint／result／records／audit SHA只看[[StoryMotion-valid-metric-ledger]]；其余run identity与visual索引看[[Storymotion-exp-sha]]；run中进度只看对应`runs/` manifest/log。
+
+## 单仓库双论文版本合同
+
+- 代码版本族继续统一归属StoryMotion仓库；`DIRECT`是Paper B身份，不创建第二套repository
+  version family。
+- Paper A正式题名为“StoryMotion: Preserving Human Motion Priors in Asymmetric
+  Human–Camera Generation”；Paper B正式题名为“DIRECT: Dual-Frame Cinematographic
+  Intent Transfer across Articulated Human Motions”。
+- 新run用`paperA_`或`direct_`前缀声明论文轨道；已有run ID、checkpoint、artifact路径与
+  `Actor–Director`历史诊断名保持不可变。
+- shared Stage1／decoder／evaluator只表示代码与provenance复用。Paper A的系统promotion与
+  DIRECT的program-transfer promotion是两个独立事件，任一方失败不得自动升降另一方。
+- 2026-08-03完成文档身份重构，不改变任何checkpoint eligibility、正式数值或当前训练授权。
 
 ## v11 v9-owner Stage2-only rescue
 
@@ -44,22 +62,38 @@ v11固定v9 Pulp-only Human-anchor Stage1 `636K`、Human128 + Camera64 represent
 | v11 C0-GEO GT-H | same parent／init / Stage2 | Stage1-style decoded Camera auxiliary是否改善GT-H Camera？ | `L_flow + lambda_geo L_geo^S1`；内部`recon:temporal:framing=1:1:0.1` | `105K` + first-512／pure4,053三模式 audited + fixed8；5090 GPU3 | 2026-07-31 co-mainline；与C0-LAT为混合Pareto，六项geometry CI全跨零 |
 | v11 C1-LAT GT+FINAL | same parent／init / Stage2 | GT与teacher-final同一步exposure能否支持Direct-C与sequential joint？ | `L_flow`；每步`64 GT_H + 64 TEACHER_FINAL_H`；Human CFG1 cache | `105K` + first-512／pure4,053三模式 audited + fixed8；4090 GPU0 | 完整cohort Direct-C与formal sequential geometry显著回退；route trade-off；停止 |
 | v11 C1-GEO GT+FINAL | same parent／init / Stage2 | decoded auxiliary在mixed context下是否带来净增益？ | `L_flow + lambda_geo L_geo^S1`；同`64/64` schedule；与C0-GEO共享lambda | `105K` + first-512／pure4,053三模式 audited + fixed8；4090 GPU1 | GEO未消除mixed-context Direct-C／sequential geometry代价；停止 |
+| v11 F-CF4 explicit framing | C0-GEO `105K` frozen parent / Stage2 adapter | 数值化screen position／scale／visibility能否带来可控构图且保住系统质量？ | zero-init Camera-token adapter；own-pair GEO + batch-shift counterfactual decoded-framing loss；Human／Camera parent frozen | fresh full-train `30K` + N64 endpoint gate + pure4,053 Direct-C／sequential formal + four-way fixed8；4090 GPU0 | control adherence与absent exact成立，但formal semantic／coverage／caption／projective framing多字段回退；diagnostic-only，拒绝晋升 |
+| v11 HT-FILM fresh | C0-GEO matched initial Camera / Stage2 | Human text应否先整体调节Camera看到的Human observation？ | pooled Human-text scale／shift Human128；完整Camera与fusion从相同初态共同训练 | fresh `105K` + pure4,053三模式／physical／bootstrap + fixed8；4090 GPU0 | sequential geometry、caption与framing较均衡，但FDCLaTr不占优；Pareto diagnostic |
+| v11 HT-HX fresh | C0-GEO matched initial Camera / Stage2 | Human text是否需要逐时刻对齐Human observation？ | Human temporal tokens cross-attend Human-text tokens；完整Camera共同训练 | fresh `105K` + pure4,053三模式／physical／bootstrap + fixed8；4090 GPU1 | Camera geometry最强，sequential semantic／caption明显回退；Pareto diagnostic |
+| v11 HT-DR fresh | C0-GEO matched initial Camera / Stage2 | Human text是否更适合直接修正Camera执行？ | noisy Camera＋Human query Human text，对Camera velocity加residual；完整Camera共同训练 | fresh `105K` + pure4,053三模式／physical／bootstrap + fixed8；4090 GPU0 | Camera semantic／caption最强，六项相对C0 geometry CI全跨零；Pareto diagnostic |
 | v11 post-failure representation/oracle | four-arm `30K` matrix / diagnostic | 若两种objective仍失败，问题是否在Camera64、normalization或decoder传播？ | covariance／whitening／sensitivity与四项oracle按结果最小触发 | not triggered | C0证明Camera64可生成；无需默认触发，后续须新授权 |
 
 v11的活动三模式是Direct-H、Direct-C与formal sequential Human→Camera。第一轮不构造Camera CFG分支；Human CFG1只用于teacher-final cache。四臂已按合同闭合于Camera optimizer `105K`、first-512／pure4,053 formal audit与fixed-8 visual，joint-parallel从未参与。2026-07-31显式selection event将C0-LAT与C0-GEO共同晋升为mainline：LAT／GEO六项Camera geometry CI全跨零且其余字段为混合Pareto，不指定单一默认臂。C1保留Direct-C／sequential route trade-off结论。C0／C1与训练主机完全混杂，严格schedule归因仍需swapped-host replay；该可选归因不阻塞系统selection。完整原始合同见 [[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]。
 
+后续 explicit framing 轴没有改变上述 selection。CF-4 在短 screen 与 `30K` endpoint
+均满足 control-adherence gate，但 matched pure4,053 暴露系统质量回退，因此以
+diagnostic-only 关闭。完整计划裁决见
+[[2026-07-31_storymotion-v11-explicit-framing-control]]；数值只见
+[[StoryMotion-valid-metric-ledger#3.12 v11 explicit framing-control 30K pure4,053 formal]]。
+
+后续Human-text fresh三臂同样没有改变selection。三臂在matching factual Human text下
+形成HT-HX geometry、HT-DR semantic／caption、HT-FILM balance的Pareto；105K formal没有
+同endpoint absent／shuffled完整cohort，故不把差值完全归因于正确Human语义，也不外推为
+Rect／event／Director证据。数值只见
+[[StoryMotion-valid-metric-ledger#3.13 v11 Human-text Camera fresh 105K pure4,053 formal audit]]。
+
 ## v10 Human-relative Camera 前置版本
 
-v10不再修补 v9 的 `interaction16 + conditioned-camera48`。它以 Pulp-only Phase A `210K` 的 Human owner为唯一父节点，显式把Camera转换到 Human heading frame，Stage1只学习独立 relative-Camera48；Stage2 Human与Camera保持单向三角分解。Human teacher前置端点已完成；首条Camera Phase-B长训因缺少framing反传降为历史diagnostic，corrected-framing fresh run已通过30K smoke并在同run续训至210K，formal audit尚未闭合。Camera flow／Unified-3尚未开始。
+v10不再修补 v9 的 `interaction16 + conditioned-camera48`。它以 Pulp-only Phase A `210K` 的 Human owner为唯一父节点，显式把Camera转换到 Human heading frame，Stage1只学习独立 relative-Camera48；Stage2 Human与Camera保持单向三角分解。Human teacher前置端点已完成；首条Camera Phase-B长训因缺少framing反传降为历史diagnostic，corrected-framing fresh run已通过30K smoke并在同run续训至210K，formal audit尚未闭合。**2026-08-01用户决定终止v10后续：不补formal endpoint、不建176D cache、不启动Camera flow／Unified-3。**
 
 | label | parent / Stage | causal question | unique intervention | completed budget | finalized result |
 | --- | --- | --- | --- | --- | --- |
 | v10 HREL-C old-3-loss Phase B | Pulp-only Phase A `210K` / Stage1 | 冻结 Phase-A Human后，独立 Human-relative Camera48能否形成可重建的Camera表示？ | relative recon + temporal + rotation；漏掉v9合理framing supervision；Human exact；non-causal | Camera-only local `210K` + pure4,053 canonical audit + fixed8 | 历史diagnostic；不得resume、构建cache或晋升 |
-| v10 HREL-C corrected-framing Phase B | same Phase-A `210K` / Stage1 | 在不恢复Human／interaction耦合时补齐Camera framing supervision能否形成正式endpoint？ | fresh `E_c,D_c`；fixed-projective center／log-scale／soft-out loss `0.1`；无learned framing head；Human frozen | contract + real-data preflight + first-128 `30K` smoke pass；same-run已到`210K` | formal endpoint未闭合；v10 Stage2暂停；无cache候选 |
+| v10 HREL-C corrected-framing Phase B | same Phase-A `210K` / Stage1 | 在不恢复Human／interaction耦合时补齐Camera framing supervision能否形成正式endpoint？ | fresh `E_c,D_c`；fixed-projective center／log-scale／soft-out loss `0.1`；无learned framing head；Human frozen | contract + real-data preflight + first-128 `30K` smoke pass；same-run已到`210K` | formal endpoint未闭合；2026-08-01按scope关闭；无cache候选 |
 | v10 Phase-A Human teacher | same Phase-A Human128 / Stage2 prerequisite | 未来Unified-3同实现Human branch能否独立形成可用Direct-H signal？ | Human-text-only `ViMoGenLightFlow`；fresh `105K` EMA；无Camera参数 | `105K` + first-512 Euler50 CFG1／CFG3 + v9 matched six-way fixed8 | basic generatability pass；CFG不是单调增益；strict physical gate未闭合；可作strict-transfer teacher；非Camera／joint证据 |
-| v10 Camera flow / Unified-3 | future corrected Stage1 endpoint + Human teacher105K / Stage2 | 四route Camera flow能否同时支持GT-H Direct-C、sequential joint与synchronous joint？ | new176D cache；Camera48；route embedding与reliability gate；Camera不得影响Human | not run | blocked by corrected Stage1 formal endpoint及Human CFG support合同；不得从历史reconstruction或Human teacher提前推断结果 |
+| v10 Camera flow / Unified-3 | future corrected Stage1 endpoint + Human teacher105K / Stage2 | 四route Camera flow能否同时支持GT-H Direct-C、sequential joint与synchronous joint？ | new176D cache；Camera48；route embedding与reliability gate；Camera不得影响Human | not run | cancelled by 2026-08-01 scope decision；不得从历史reconstruction或Human teacher提前推断结果 |
 
-v10当前严格结论是：Phase-A父节点更正与Human teacher长训已经闭合；旧Camera Phase-B `210K`只拥有历史diagnostic身份，corrected-framing Phase-B通过30K screen后续训至210K但formal endpoint仍未在当前决策层闭合。两条前置路径尚未汇合成Camera flow或Unified checkpoint。v11接管当前Stage2优先级后，v10 Camera Stage2暂停；这不是v10 Camera的性能失败结论。durable合同仍见 [[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]。C3-25自2026-07-31起转为former-mainline baseline。
+v10当前严格结论是：Phase-A父节点更正与Human teacher长训已经闭合；旧Camera Phase-B `210K`只拥有历史diagnostic身份，corrected-framing Phase-B通过30K screen后续训至210K但formal endpoint未闭合。两条前置路径从未汇合成Camera flow或Unified checkpoint，现按scope关闭且不再恢复；这不是v10 Camera的性能失败结论。durable合同仍见 [[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]。后续Raw-H observation是保留exact v9 Human／Camera64边界的新sibling control，不是v10续作。C3-25自2026-07-31起转为former-mainline baseline。
 
 ## v9 外部系统与 matched-backbone 证据版本
 
@@ -202,7 +236,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-19：** C3-25 Stage2 D1 完成 full train estimate 与 frozen pure4053 eval cache audit；未发现 dead-channel 或 branch-marginal collapse，raw Camera latent 仍呈低有效秩。该结果只关闭 cache health 风险，不产生生成质量结论。
 - **2026-07-19：** MoMask-Pulp native VQ/Mask/Residual endpoint 的 Direct-H pure4053 formal eval 与独立 audit 闭合；第二次 full replay 的 4,053 条 records byte-exact。它只作为 C-tier native-system baseline，不解释为 StoryMotion representation ablation。
 - **2026-07-19：** active Stage2 standard 收敛为 Direct-H、Direct-C 与 joint parallel；cascade 降为历史/显式 root-cause diagnostic。
-- **2026-07-19：** `version.md` 与 v8 总页合并为 [[current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
+- **2026-07-19：** `version.md` 与 v8 总页合并为 [[StoryMotion/current]]；`history.md` 重构为本页；data-curation axis 改名 v8.2333，避免占用正常迭代号。
 - **2026-07-20：** C3-25 seed17 Stage2 immutable `30K` Direct-H、Direct-C 与 joint parallel formal audit 全部通过 matched practical screen；decision=`pass_30k_active_profiles_continue_105k`，同一训练进程继续至 `105K`。
 - **2026-07-21：** C3-25 seed17 Stage2 `105K` 三路 formal audit 闭合；Direct-H 与 Direct-C 多数指标击败 v7.38 L0，joint parallel 无 broad regression。selection policy 将 global-slope 改为非阻塞 diagnostic 并判定通过，C3-25 正式成为 Stage1/Stage2 mainline；历史 run ID/contract 字段不回写。
 - **2026-07-22：** Tb25-band r4 从 C3-105K matched continuation 到 110K 后在 N=512 三模式 screen broad regression 并停止；no-update attribution 未确认 Direct-C/joint-C 在 shared trunk、Camera I/O 与 output head 的负平均梯度夹角，C3-105K 保持 mainline。
@@ -242,12 +276,28 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-07-30（v11四臂`105K` formal + visual闭合）：** 用户在原fallback裁决后独立授权四臂续训；四臂经`30K→35K`父run与`35K→105K`恢复子run完整到达Camera optimizer `105K`，真实TensorBoard与周期checkpoint共同覆盖授权区间，旧`0→30K`仍不回填。四个EMA `105K`在同first-512 Direct-C + formal sequential合同下通过跨臂审计，并各自生成相同fixed-8三联visual。C0两臂广泛成熟；C0-LAT保留诊断端点、C0-GEO保留Pareto alternate。C1-LAT的Direct-C semantic局部较强，但geometry与formal sequential回退，结论更新为route trade-off。C0在共同Direct-C字段上广泛优于v9 exact30K与v9 final105K；相对C3-25 canonical512为跨representation Pareto。C3-25 promotion mainline不变。
 - **2026-07-30（v11四臂`105K` pure4,053 formal闭合）：** 四个EMA `105K`在相同4,053 ordered IDs、official inputs、Euler50、CFG1上完成Direct-H、Direct-C与formal sequential Human→Camera，并通过artifact、MPJPE／trajectory／yaw、Camera geometry、decoded-Human physical及10,000次matched-sample bootstrap审计；`joint_parallel=false`。C0-GEO对C0-LAT的六项Camera geometry CI全部跨零，C1两臂相对C0的Direct-C与sequential geometry显著回退。相对C3 pure4,053，C0-LAT在semantic／coverage／framing与多数geometry字段更强，但C3保留部分Camera semantic、略低joint Camera geometry与更接近reference的Human dynamics。C0-LAT成为唯一当前v11 system-mainline replacement candidate；本轮没有显式promotion selection event，故C3-25仍是现行mainline。
 - **2026-07-31（v11 C0共同mainline selection）：** 用户显式选择C0-LAT与C0-GEO为共同mainline。两者共享exact v9 Pulp-only Stage1、owning decoder/cache/stats与冻结Human `105K` teacher，只在Camera objective上分叉；pure4,053中六项LAT/GEO Camera geometry CI全部跨零且其余字段为混合Pareto，因此不指定单臂默认。正式模式固定为Direct-H、Direct-C与sequential Human→Camera，`joint_parallel=false`；历史eligibility字段不回写。C3-25转为former-mainline system baseline。
+- **2026-07-31（v11 explicit framing `30K` formal + visual 闭合）：** frozen C0-GEO 上的 CF-4 zero-init adapter 从 fresh 初始化完成 full-train `30K`。N64 endpoint 通过 target／swap `4/4`、direction `4/4` 与 absent-control exact，但完全 matched 的 pure4,053 Direct-C／sequential formal 在 semantic、coverage、caption 与 projective framing 多字段回退；因此该轴 diagnostic-only 关闭，不做 seed 补强，C0-LAT／C0-GEO co-mainline 不变。fixed8 与 parent sample IDs 对齐，正式四栏视觉与指标比较已接入 4090:7865 Gradio。
+- **2026-08-01（能力／数据／co-design计划合并）：** `2026-08-01_storymotion-multipair-data-training-plan.md`保留为能力上限、multi-pair数据、Director、preservation-gated selective co-design、Stage1简化与editing边界的唯一live owner；原capability plan与co-design QA全文移动到`archived/superseded-design/`。所有active inbound links已收口；本次只改变文档所有权，不改变mainline、实验结果、run状态或claim evidence level。
+- **2026-08-01（双分支依赖与投稿scope冻结）：** 统一计划将$\mathcal H_D$的`Rect-64/320 → A-series → B-series/Rect-4096`与$\mathcal H_J$的`J16 → positive-only J64`改为可独立失败的并行证据链；P0-J不再阻塞A-series，P0-D失败也不抹去显式solver co-design headroom。当时预注册的A-series `12K`预算未创建run，并由下一条exposure audit在执行前失效；外部Human只作非阻塞sensitivity，Stage1 simplification仅为Rect-64 support fallback，learned staging与general editing退出投稿时间线。本次不改变任何已有run或formal evidence level。
+- **2026-08-01（冻结前合同校正）：** A-series改为共享`50% F_original`基础流与互斥`50%`干预流，Rect-320主终点改为`1K`、`250/500`仅监控、`2K`为最大延长点；P0-M拆分observed／generated-H，Rect-64拆分Natural 32／Event-rich 32，full-H necessity增加Coarse + oracle-event baseline，Stage1 identity比较降为受控诊断，regret改用program-stratum robust scale。该冻结修订发生在任何A-series run创建前，不改变已有mainline或formal evidence。
+- **2026-08-01（v10关闭与Raw-H observation立项）：** 用户决定放弃v10 corrected endpoint、176D cache及Stage2适配；历史v10结果保留为未闭环diagnostic，不改写成性能失败。新的representation sibling保留exact v9 Human owner、Camera64 layout与non-causal合同，只比较Camera observation／owning decoder的H128、H199、J66 root-local／global和Coarse/event variants。text多样化、Human-text adapter、Stage1 observation按低成本到高成本顺序执行，最终只做`O0/O* × HT0/HT1`交互确认。旧HML fixed-world-Camera replacement plan同时被supersede：跨Human只复用Camera program并重新solve trajectory，naive $H_i+C_j$只作control。完整设计见[[DIRECT/2026-08-01_storymotion-multipair-data-training-plan]]，历史Pulp+HML source cycle见[[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]。
+- **2026-08-01（Rect-validity资格门收缩）：** 外部方案复核后不扩展为三份新合同、六路混训或HumanML3D大规模Rect。现有v0及N32失败保持不可改写；下一数据里程碑改为Pulp-only generic `RV-25`无训练审计，以source explainability、target-H re-execution相对naive world-C copy的指标优势和25×4盲评共同决定Rect是否成立。通过后才授权generic Rect-64，event与外部Human分别后置。本次只改变未执行计划，不改变run、mainline或formal evidence。
+- **2026-08-01（RV开发范围与优先级更正）：** 用户在任何`RV-25` run创建前，将上一条Pulp-only＋盲评授权设计改为open-label质量边界开发包：冻结同25个Pulp Camera-program donors，分别建立`RV-PP25` Pulp→Pulp与`RV-XH25` Pulp-program→HumanML3D两块25×4面板，显示source／target Human text、donor Camera text、Human、Camera与projection。两条route分别冻结规则、分别做held-out confirmation；XH不得补齐PP失败，当前RV本身不授权Rect positive。Human-text分角色注入与RV并列高优先，caption扩写和Stage1 observation sibling降为低优先。本次更正只改变未执行计划，不改变v0／N32结果、mainline、run或formal evidence。
+- **2026-08-02（`RV-25`开发审计闭合）：** parent-disjoint target pool、25个solver前冻结donors、Pulp／HumanML3D双route、自动检查与open-label可视化全部完成。source reconstruction为`0/25`，故PP／XH target geometry的局部通过不能转成训练positive；Rect-64、Rect-320与A-series继续未授权。后续若重开，只先修factual program extraction／source reconstruction。
+- **2026-08-02（Human-text fresh `105K` formal闭合）：** HT-FILM／HT-HX／HT-DR从matched Camera初态分别fresh训练完整Camera与Human-text route到`105K`，并与C0-GEO完成pure4,053三模式、decoded geometry、physical diagnostics、10,000次matched bootstrap及两模式fixed8五栏可视化。三臂形成geometry／semantic／balance Pareto，无单一winner；matching-only formal不足以做正确Human语义因果归因，C0-LAT／C0-GEO共同mainline不变。
+- **2026-08-03（v11 C0 seed23 matched repeat闭合）：** `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`与`paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803`均从fresh seed23 parent以full-state边界续至Camera `105K`，并完成pure4,053 Direct-H／Direct-C／sequential、decoded geometry／physical及10,000次paired bootstrap审计。Direct-H frozen-owner replay通过；seed内objective对照与objective内跨seed对照共24项Camera geometry 95% CI全部跨零。独立seed缺口关闭，但没有稳健单一objective胜者；C0-LAT／C0-GEO共同mainline不变。正式数值只见[[StoryMotion-valid-metric-ledger#3.14 v11 C0 seed23 105K pure4,053 matched repeat]]。
+- **2026-08-03（Paper A／DIRECT文档物理分离与specialist Stage1裁决）：** Paper A文档保留在`obsidian-vault/ideas/StoryMotion/`，Paper B program-transfer、Actor–Director控制、Pulp–HML轴及其专属历史迁移到`obsidian-vault/ideas/DIRECT/`；代码继续只有StoryMotion仓库。Paper A matched specialist冻结exact v9 Stage1，不重训H–C separate Stage1，也不重训Stage2；先执行H199 decode→re-encode的no-training evaluator audit。Camera-owned Stage1只保留为未授权Cascade-Native system comparison。本事件不改变任何checkpoint、正式数值或mainline eligibility。
+- **2026-08-03（Paper A一级文档收口与投稿闭环冻结）：** StoryMotion一级目录只保留current、version family、paper boundary、reliability、metric ledger、metric I/O、SHA registry与Gradio长期owner；日期／版本化执行页、stale Checkmate、blackboard和拆分前reliability全文均移动到分类archive。新的reliability owner明确：current C0的Human／Camera Stage2 specialist权重已完成，但H199 Cascade-Matched对照尚未评完；该对照、机制检查、caption审计、baseline、sealed／盲评与复现成本均不默认触发训练。本事件只改变文档路由和claim授权，不改变checkpoint、指标或mainline。
+- **2026-08-03（Paper A核心任务与H199接口定位更正）：** H199 decode→re-encode只比较内部latent直连与显式Human API的round-trip影响；两侧都保持同一Human owner、Camera branch和顺序概率分解，因此它不决定capability-preserving asymmetric extension主张。该对照降为可选evaluator-only接口消融，不进入critical path。Paper A唯一剩余核心科学任务改为冻结Pulp Camera convention、生成有provenance的geometry-derived Camera text并完成自动／人工一致性审计；其他工作属于baseline、sealed evidence与复现投稿收口。本事件不改变模型、checkpoint或正式数值。
+- **2026-08-03（双论文内嵌图文档恢复）：** 审计确认完整双论文边界页及两张原始内嵌SVG此前只被移动到`archived/paper-scope/`，并未删除。现将该完整原文恢复为一级canonical `paper-boundary.md`；15:13创建的精简替代页移动为`archived/paper-scope/2026-08-03_paper-boundary-condensed-superseded.md`保留。两张SVG的节点、连线与文本不重画、不压缩；只同步H199接口已降为可选消融、Pulp Camera text为Paper A核心任务的最新claim边界。本事件不改变模型、artifact或正式数值。
 
 ## Bug 与 invalidation provenance
 
 | issue | 影响 | 当前处理 |
 | --- | --- | --- |
 | v7.5–v7.13 使用旧 raw human199/camera9 与错误 decode contract | local Stage1/Stage2 ranking 不可靠 | 只保 provenance；v7.14 corrected contract 起算 |
+| explicit-framing formal／visual 首轮边界错误 | 首次 evaluator loader 读错 checkpoint hash key，第二次沿用 N64 batch/noise 而非 parent formal batch32/noise，均未形成正式结果；首次成功 render 又声明四栏但 base renderer 实际只画三栏 | 三个 roots 全部保留为 failed provenance；formal 只接受重新预注册且 matched 的完整4,053结果，visual 只接受抽帧确认四栏且 manifest 绑定 base-renderer SHA 的 fresh root |
+| Human-text fixed8首条render命令使用失效的Pulp fast-root | pure4,053 eval与audit不受影响；render在首个cell前因缺失`smpl_rifke`失败，只留下空`arrays/` | 空目录经确认后移除；r2改用实际Pulp dataset root，完成80-cell manifest并通过逐文件SHA审计 |
 | v7.15–v7.16 cache builder 忽略 `is_causal=false`，且 evaluator 用错 decoder | local Stage2 collapse 无法归因 | rows invalidated；v7.17 重建 cache并绑定 owning decoder |
 | v7.18 epsilon/v full sampler 曾把 prediction 当 `x0` | pre-fix sampler rows 无效 | 只保修复后 rows；仍未通过 gate |
 | v7.34 checkpoint contract 缺相邻 `run_config.json` | 首次 eval 在采样前 hard fail | 补齐 exact contract 后重跑；无无效 metrics |
@@ -272,10 +322,10 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 
 ## Evidence boundary
 
-- 当前 mainline、非阻塞优化轴与下一授权动作：[[current]]。
+- 当前 mainline、非阻塞优化轴与下一授权动作：[[StoryMotion/current]]。
 - 所有正式数值与 uncertainty：[[StoryMotion-valid-metric-ledger]]；所有 SHA 与 immutable identity：[[Storymotion-exp-sha]]。
-- Stage2 stop/continue ladder：[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]。
-- v8.2333 immutable curation contract：[[2026-07-17_storymotion-v8-2333-data-curation-plan]]。
+- Stage2 stop/continue ladder：[[archived/diagnostics/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]。
+- v8.2333 immutable curation contract：[[archived/data/2026-07-17_storymotion-v8-2333-data-curation-plan]]。
 - 旧部署 snapshot、proposal 与 forensic note 保留在 `archived/`；它们不产生第二套 current decision。
 
 ## 2026-07-21：P0-JC completion → joint 根因闭合

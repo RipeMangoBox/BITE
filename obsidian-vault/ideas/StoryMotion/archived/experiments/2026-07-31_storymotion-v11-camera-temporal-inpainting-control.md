@@ -7,6 +7,7 @@ hypothesis: |
   non-causal Stage1 decoder permits localized edits; mask-aware training is
   authorized only if that representation gate passes.
 status: stopped_representation_gate
+archived: 2026-08-03
 tags:
   - StoryMotion
   - version/v11

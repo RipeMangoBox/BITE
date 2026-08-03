@@ -7,13 +7,17 @@ tags:
   - provenance
   - status/active
 created: 2026-07-12T12:35:00+0800
-updated: 2026-07-25
+updated: 2026-08-03T15:45:01+08:00
 ---
 
 # StoryMotion Archive Manifest
 
 > [!abstract] Scope
-> archive 中的内容用于历史追溯，不作为当前默认结论。当前入口见 [[current]]，有效指标见 [[StoryMotion-valid-metric-ledger]]。
+> archive 中的内容用于历史追溯，不作为当前默认结论。当前入口见 [[StoryMotion/current]]，有效指标见 [[StoryMotion-valid-metric-ledger]]。
+
+> [!info] Paper B archive
+> DIRECT专属历史已迁移到[[DIRECT/archived/ARCHIVE_MANIFEST|DIRECT Archive Manifest]]，
+> 本页不再拥有Actor–Director、HumanML3D fixed-Camera或co-design历史。
 
 整理前完整快照：
 
@@ -51,12 +55,33 @@ updated: 2026-07-25
 
 ## Current Canonical Notes
 
-- [[current]]
+- [[StoryMotion/current]]
 - [[version_family]]
+- [[paper-boundary]]
+- [[StoryMotion-iclr-reliability]]
 - [[StoryMotion-valid-metric-ledger]]
 - [[StoryMotion-metric-computation-io]]
-- [[2026-07-17_storymotion-v8-2333-data-curation-plan]]
-- [[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]
+- [[Storymotion-exp-sha]]
+- [[StoryMotion_Gradio_Render]]
+
+## 2026-08-03 Paper A root-surface cleanup
+
+| original root note | archived path | evidence status | reason |
+| --- | --- | --- | --- |
+| 2026-07-17 v8.2333 data curation | `data/` | retained historical contract | 未授权训练；不再占用Paper A live surface |
+| 2026-07-18 generatability ladder | `diagnostics/` | closed diagnostic | 结论已被current／ledger吸收 |
+| 2026-07-25 dual-expert design | `superseded-design/` | superseded | joint-parallel与DC3D不属于当前Paper A |
+| 2026-07-27 Stage1 H-anchor control | `invalidated/` | invalid for Stage2 | HumanML3D rot6D伪观测边界已关闭 |
+| 2026-07-28 v9 Camera diagnosis | `diagnostics/` | retained provenance | v11已替代其live执行状态 |
+| 2026-07-29 runtime plan | `operations/` | retained implementation history | 长期执行合同已由代码仓库文档接管 |
+| 2026-07-29 v10 contract | `versions/v10/` | closed by scope | 不再执行 |
+| 2026-07-29 v11 rescue contract | `versions/v11/` | completed | 正式结果已进入ledger，版本事件已进入version family |
+| 2026-07-31 Camera／framing／Human locality controls | `experiments/` | stopped／closed／future work | 不进入当前投稿queue |
+| 2026-08-02 two-paper positioning | restored as `../paper-boundary.md` | active canonical | 完整双论文定义与两张内嵌SVG恢复到一级长期owner |
+| 2026-08-03 condensed paper boundary | `paper-scope/2026-08-03_paper-boundary-condensed-superseded.md` | superseded condensed | 精简替代页保留；不得取代完整图文owner |
+| StoryMotion Checkmate | `diagnostics/` | stale-mainline snapshot | 仍以C3为current，不再是长期owner |
+| blackboard | `progress/` | working-note archive | 只保留历史问题与接力记录 |
+| pre-refactor ICLR reliability | `paper-scope/` | retained full snapshot | 拆分前附录不再混入Paper A live closure |
 
 ## Interpretation Rule
 

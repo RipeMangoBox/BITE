@@ -1,6 +1,7 @@
 ---
 title: "StoryMotion v10 Human-relative Camera Training Contract"
-status: paused_at_corrected_phase_b_210k_pending_formal
+status: closed_by_scope_no_further_execution
+archived: 2026-08-03
 hypothesis: |
   Reusing an exact Human-only Phase-A owner and learning an independent,
   explicit Human-relative Camera48 representation can remove v9's learned
@@ -12,7 +13,7 @@ tags:
   - stage2
   - human-relative-camera
   - protected-human
-  - status/active
+  - status/closed
 aliases:
   - StoryMotion-v10-Training-Contract
   - StoryMotion-v10-HREL-C
@@ -24,14 +25,18 @@ source_notes:
   - "[[Storymotion-exp-sha]]"
   - "[[version_family]]"
   - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
+  - "[[DIRECT/2026-08-01_storymotion-multipair-data-training-plan]]"
 created: 2026-07-29
-updated: 2026-07-29T19:20:32+08:00
+updated: 2026-08-03T14:30:39+08:00
 ---
 
 # StoryMotion v10 Human-relative Camera Training Contract
 
 > [!abstract] Durable contract
 > 本页是v10架构、Stage1／Stage2训练顺序、推理模式与A/B/C gate的durable owner。原始任务书与执行快照保留在 [[2026-07-29_full_re]]；正式数值只见 [[StoryMotion-valid-metric-ledger]]，artifact身份只见 [[Storymotion-exp-sha]]，当前是否继续只见 [[current]]。
+
+> [!failure] 2026-08-01执行关闭
+> 用户决定放弃v10后续调整：不补corrected Phase-B formal endpoint，不建176D cache，不运行v10 Camera flow／Unified-3或Stage2适配。下文未执行的Stage2与gate设计保留为历史合同，不再构成授权queue；已完成artifact不删除，也不把scope关闭改写成v10性能失败。新的Raw-H Camera observation control保留exact v9 Human owner与Camera64 layout，设计见[[DIRECT/2026-08-01_storymotion-multipair-data-training-plan#9.4 低优先：Stage1 Human observation sibling]]，不是v10续作。
 
 ## 1. 范围与术语
 
@@ -261,11 +266,11 @@ Stage2 Camera先运行`5e-5`与`1e-4`两条matched `10K` LR screen；除LR外，
 ## 7. 当前执行状态
 
 > [!warning] 当前边界
-> exact Phase-A Human owner与同owner的Human-text-only teacher `105K`已经闭合。旧三项objective的Phase-B `210K`及pure4,053 endpoint审计只保留历史diagnostic；补齐fixed-projective framing后的fresh Phase-B已完成contract、真实数据preflight、冻结Human回归与预注册first-128 `30K` smoke，五个核心轴逐项通过且Human exact，并已从exact `30K` checkpoint在同run续训至`210K`。当前优先级已切换到[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract|v11 Stage2-only rescue]]；v10修正版formal endpoint、cache与Camera Stage2暂停但未判失败。
+> exact Phase-A Human owner与同owner的Human-text-only teacher `105K`已经闭合。旧三项objective的Phase-B `210K`及pure4,053 endpoint审计只保留历史diagnostic；补齐fixed-projective framing后的fresh Phase-B已完成contract、真实数据preflight、冻结Human回归与预注册first-128 `30K` smoke，五个核心轴逐项通过且Human exact，并已从exact `30K` checkpoint在同run续训至`210K`。2026-08-01 scope decision已把修正版formal endpoint、cache与Camera Stage2从“暂停”改为“关闭且不再执行”；未执行不等于性能失败。
 
-旧`207K`选择artifact保留，但其framing轴曾把raw joint-out occupancy误当lower-is-better error；旧final `210K`同样保留数值，不再作为Stage1 cache候选。只有已到达`210K`的修正版完成pure4,053 formal audit后，才能重新产生候选endpoint。该更正不构成跨版本promotion。
+旧`207K`选择artifact保留，但其framing轴曾把raw joint-out occupancy误当lower-is-better error；旧final `210K`同样保留数值，不再作为Stage1 cache候选。修正版`210K`也不再补做formal audit或产生候选endpoint。该关闭不构成跨版本promotion。
 
-以下项目尚未训练或评测，不能标作通过或失败：
+以下项目未训练或未评测，现均为cancelled-by-scope，不能标作通过或失败：
 
 1. 已到达`210K`的修正版Phase-B pure4,053 formal endpoint audit；
 2. 修正版endpoint的新176D train/eval cache与Camera full-covariance statistics；
