@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-03T17:36:00+08:00
+updated: 2026-08-03T18:05:00+08:00
 ---
 
 # StoryMotion Paper A ICLR Reliability and Closure Contract
@@ -61,8 +61,10 @@ OpenCV right-down-forward，并计算$C_1^{-1}C_t$。每条轨迹最多均匀采
   `7.105427357601002e-15`；512／512个固定坐标基的时间反转symbolic代数检查通过。
 - 输入rotation最大orthogonality误差为`6.425823300126865e-07`，最大determinant偏差为
   `6.512800068136926e-07`。
-- 小样本log-space双簇得到的临时阈值为每个sampled step `0.0022658727 m`与
-  `0.1305610°`；它们没有复制TriMotion的`0.02 m / 0.3°`，但仍只属于screen calibration。
+- TriMotion官方实现并不从数据估计阈值，而是直接固定每个sampled step `0.02 m`与`0.3°`。
+  本screen另外引入log-space双簇heuristic，得到`0.0022658727 m`与`0.1305610°`后再送入
+  TriMotion-style axis／dominance分类器；因此这两个数**不是TriMotion阈值逻辑的输出**，也没有
+  formal calibration资格。
 - preliminary raw conflict计数为`263 true / 90 false / 159 unknown`，**不能解释成Pulp缺陷率**：
   当前保守parser主要识别static与truck，而临时阈值又让大量轨迹同时出现正反方向symbolic。
   下一步必须先复核随机／高风险样本，补齐Pulp的push-in／pull-out／boom词表，并重新校准phase
@@ -89,6 +91,8 @@ Stage2与Camera Stage1／Stage2，是完整系统比较。H199 round-trip仍是�
 
 ### 2.1 冻结身份与预算
 
+- Paper A后续specialist实验若无另行说明，默认seed17；run ID与contract仍须显式写出seed。
+  任何seed变更必须在optimizer前记录理由，不追溯改名既有seed23 artifact。
 - B固定exact v9 Stage1 Human owner与v9 Human `105K` teacher，不训练任何Human参数；独立
   Camera Stage1采用Camera64、`is_causal=false`、`326,478`个可训练参数，形式为
   $E_C(H_{199},C_{14})$／$D_C(H_{199},z_C)$。其参数量与v7.33 Camera encoder＋decoder的

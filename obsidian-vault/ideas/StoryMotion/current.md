@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T17:36:00+08:00
+updated: 2026-08-03T18:05:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -176,6 +176,8 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
 ## 5. 当前行动边界
 
 - 冻结 C0-LAT 与 C0-GEO 两个 mainline endpoint，不因单个 raw mean 继续选臂。
+- Paper A后续specialist实验若没有另行说明，默认seed17；run ID与contract仍必须显式记录
+  `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
 - Paper A当前并行关闭两个核心工作包：Pulp Camera坐标／文本修正，以及Independent
   Conditional Cascade主对照；fully-separate native variant作为第二系统边界，不替代主对照。
 - Camera text在`N=512` geometry screen之后仍保持“无LLM、未授权全量”；先复核临时阈值、
