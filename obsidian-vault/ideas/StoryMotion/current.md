@@ -5,7 +5,7 @@ hypothesis: |
   Paper A StoryMotion owns the v11 C0-LAT/C0-GEO co-mainline and tests a
   capability-preserving asymmetric Human–Camera extension. The remaining core
   scientific tasks are the versioned correction and audit of Pulp Camera text,
-  plus a full independent Human/Camera specialist-cascade system comparison.
+  plus an Independent Conditional Cascade and a secondary fully-separate system comparison.
 tags:
   - StoryMotion
   - version/v11
@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T17:20:00+08:00
+updated: 2026-08-03T17:32:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -136,20 +136,25 @@ C0-GEO是同一方法的两个报告endpoint，数值、视觉与局限必须同
 
 Paper A另纳入一项次要数据贡献：固定Pulp Camera convention，根据实际Camera参数变化
 新增无歧义caption，同时保留原caption、来源与修订版本。该修正尚未完成，不得提前写成
-已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。
+已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。首个
+`N=512`、seed17、无LLM的TriMotion-compatible geometry screen已经完成自动检查，但其阈值与
+raw conflict都仍是screen级结果，不能据此启动全量语言化或宣称缺陷比例。
 
 ## 4. 活跃 blocker
 
-1. **Camera文本有效性。** 冻结Pulp Camera convention；构造
-   geometry-derived无歧义caption，
-   保留原文provenance；完成自动轨迹－文本一致性检查、抽样人工核验及canonical directional
-   subset对照。约16万样本不能依赖逐条人工修订。
-2. **独立specialist cascade。** 既有v7.33 Camera14 separate AE已完成同序`162,760`
-   train／pure4,053 eval、non-causal H199＋C14、H128＋C64和owning checkpoint审计，因此
-   Stage1不重训。活动对照只从零训练一条LAT specialist system：Human Stage2 `105K`＋
-   Camera Stage2 `105K`，Camera仍读取Human condition，generated-H不与原GT Camera组成
-   positive。该结果是full-stack system comparison，不作Stage2 sharing的单变量归因；完整
-   预声明见[[StoryMotion-iclr-reliability#2. 独立specialist cascade系统对照]]。
+1. **Camera文本有效性。** `paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`
+   已在不调用LLM的前提下完成首帧相对RDF轨迹、symbolic phases、Pulp临时阈值、全局刚体
+   gauge与时间反转检查。下一步先人工复核随机／高风险子集并校正阈值与raw-text parser，之后
+   才能冻结全量规则、生成short／long文本并做matched Stage2数据消融。约16万样本不能依赖
+   逐条人工修订。
+2. **独立specialist cascade。** `0803-1647`要求的主对照必须有独立且Human-conditioned的
+   Camera Stage1，即$E_C(H,C)$与$D_C(H,z_C)$。v7.33只有$E_C(C)$／$D_C(z_C)$，且旧任务
+   fresh重训Human Stage2，因此不是该主对照。旧任务已按合同不匹配停止并保留；当前GPU1
+   运行Independent Conditional Camera64 Stage1，固定exact v9 Human owner，之后只训练
+   Camera Stage2。GPU0并行运行用户另行确认必要的v7.33 fully-separate native variant；它
+   复用已审计Stage1并fresh训练Human／Camera两个Stage2。两者都只用factual GT-H／GT-C
+   positive，正式解释严格分开。完整预声明见
+   [[StoryMotion-iclr-reliability#2. 独立specialist cascade系统对照]]。
 3. **投稿证据闭环。** 冻结PulpMotion同split、同sample count、同指标的主表；Pulp Motion
    与TSA是结构化motion主baseline，Auteur、Uni3C与ActCam按不同任务层级比较。
    seed23独立长训与matched repeat audit已闭合，两个seed都不支持单一
@@ -169,8 +174,10 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
 ## 5. 当前行动边界
 
 - 冻结 C0-LAT 与 C0-GEO 两个 mainline endpoint，不因单个 raw mean 继续选臂。
-- Paper A先完成Pulp Camera坐标／文本修正；这是当前唯一核心科学任务。随后只做同协议
-  主表、sealed audit、视觉失败分层和复现包等投稿收口。
+- Paper A当前并行关闭两个核心工作包：Pulp Camera坐标／文本修正，以及Independent
+  Conditional Cascade主对照；fully-separate native variant作为第二系统边界，不替代主对照。
+- Camera text在`N=512` geometry screen之后仍保持“无LLM、未授权全量”；先复核临时阈值、
+  原文冲突判定与高风险样本，再决定全量处理合同。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、C1、swapped-host replay和当前Camera64 MAE长训均保持关闭。

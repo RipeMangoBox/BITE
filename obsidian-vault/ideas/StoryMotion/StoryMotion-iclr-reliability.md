@@ -4,7 +4,8 @@ status: in_progress
 hypothesis: |
   Paper A检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。当前剩余两项核心科学任务是修正并审计
-  Pulp Camera text，以及完成独立Human／Camera specialist cascade系统对照。
+  Pulp Camera text，以及完成Human-conditioned Independent Conditional Cascade主对照；
+  fully-separate variant作为次要system comparison单列。
 tags:
   - StoryMotion
   - paper/A
@@ -20,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-03T17:20:00+08:00
+updated: 2026-08-03T17:32:00+08:00
 ---
 
 # StoryMotion Paper A ICLR Reliability and Closure Contract
@@ -51,69 +52,78 @@ decoded geometry／physical diagnostics和10,000次paired bootstrap。24个Camer
 
 ## 2. 独立specialist cascade系统对照
 
-> [!important] 2026-08-03 Stage1复用裁决
-> 4090上的v7.33 Camera14 separate AE已完成可复用边界：`162,760`个ordered Pulp train
-> IDs、`4,053`个ordered pure-test IDs、seed17、batch128、`636,000` updates、non-causal、
-> Human199＋Camera14、H128＋C64，以及owning checkpoint／decoder和official pure4,053
-> reconstruction eval。逐项审计确认其train／test IDs及顺序与v9 mainline相同。因此按预声明
-> “存在则只重训Stage2，否则Stage1＋Stage2均重训”，本对照**不重训Stage1**。
+> [!failure] 旧任务不满足`0803-1647`主对照
+> v7.33的Camera branch是$E_C(C)$／$D_C(z_C)$，不读取Human；旧任务还fresh重训了Human
+> Stage2。它只能作为fully-separate native variant，不能冒充要求$E_C(H,C)$／
+> $D_C(H,z_C)$且复用同一冻结Human prior的Independent Conditional Cascade。旧run
+> `paperA_v11_specialist_native_lat_h105k_c105k_seed17_4090g0_20260803`已停止并标记
+> `stopped_contract_mismatch`；停止点和日志保留，不进入正式比较。
 
-该对照不是H199 round-trip测试。它比较完整系统的共享／关系型Stage1与H／C-separate Stage1，
-并为Human与Camera分别训练Stage2权重、优化器和checkpoint。由于Stage1 architecture本身改变，
-它是full-stack specialist system comparison，不是只隔离Stage2 sharing的matched ablation。
+主对照与secondary variant必须分开解释。主对照只替换Camera representation与Camera Stage2，
+Human prior及其输出owner与StoryMotion相同；fully-separate variant则同时改变Human Stage1／
+Stage2与Camera Stage1／Stage2，是完整系统比较。H199 round-trip仍是另一个可选evaluator-only轴。
 
 | arm | Stage1所有权 | Stage2所有权 | Human接口 | Camera训练positive | 允许回答的问题 |
 | --- | --- | --- | --- | --- | --- |
 | A · StoryMotion C0-LAT | exact v9 H-anchor Pulp-only；H128＋I16＋C48 | protected Human teacher＋Camera endpoint | H128 latent直连 | paired GT-H latent＋原Camera | current reference |
-| B · Specialist-Native-LAT | v7.33 separate AE；独立$E_H/D_H$与$E_C/D_C$；H128＋C64 | fresh Human specialist＋fresh Camera specialist；独立optimizer／checkpoint | observed或先生成并固定的H128 | paired GT-H latent＋原Camera；不构造generated-H＋原Camera positive | 完整独立specialist cascade在同数据、同Stage2预算下是否优于StoryMotion |
+| B · Independent Conditional Cascade | exact v9 Human owner冻结；独立Camera64 $E_C(H,C)$／$D_C(H,z_C)$，不共享Camera representation／decoder／参数 | 复用exact v9 Human teacher；fresh独立Camera Stage2 optimizer／checkpoint | observed H199，或v9 Human输出decode后的固定H199 | factual paired GT-H199＋GT-C；generated-H只在推理时使用 | relation-aware shared representation相对普通Human-conditioned specialist串联是否有质量／成本优势 |
+| C · Fully-Separate-Native-LAT | v7.33独立$E_H/D_H$与无条件$E_C(C)/D_C(z_C)$；H128＋C64 | fresh Human specialist＋fresh Camera specialist；独立optimizer／checkpoint | Stage2 Camera读取GT或先生成并固定的H128 | factual paired GT-H latent＋GT-C；不构造generated-H＋原Camera positive | 完全分离系统在同数据与Stage2预算下的native system boundary；不作主对照归因 |
 
 ### 2.1 冻结身份与预算
 
-- Stage1 parent：`v7_33_separate_official14_ae_500ep_seed17_4090_20260713`；last checkpoint
-  SHA-256为`b8f8ca74748650481cd0901a1476b1580636aaf5fdcd7d4629b223655811aeb4`。
-- Stage1 contract：`is_causal=false`，Human199＋Camera14，H128＋C64，hidden256，downsample4；
-  Human encoder／decoder与Camera encoder／decoder无共享参数。总参数`957,333`；四个模块依次为
-  `251,520 / 379,335 / 60,224 / 266,254`。
-- Stage1 exposure：seed17、batch128、`636,000` optimizer steps；train／test IDs分别为
-  `162,760 / 4,053`，与v9 mainline逐项同序。历史pure4,053 artifact SHA-256为
+- B固定exact v9 Stage1 Human owner与v9 Human `105K` teacher，不训练任何Human参数；独立
+  Camera Stage1采用Camera64、`is_causal=false`、`326,478`个可训练参数，形式为
+  $E_C(H_{199},C_{14})$／$D_C(H_{199},z_C)$。其参数量与v7.33 Camera encoder＋decoder的
+  `60,224＋266,254=326,478`精确相同。
+- B的Camera Stage1固定seed17、batch128、`210K` steps，即`26,880,000`个Camera sample
+  exposures；只从factual pair学习Human-yaw-relative Camera。完成后Camera Stage2固定LAT、
+  seed17、batch128、`105K`、EMA `0.9999`，并复用exact v9 Human teacher。
+- C复用已审计的v7.33 non-causal separate Stage1，不重复其`636K×128`历史训练；checkpoint
+  SHA-256为`b8f8ca74748650481cd0901a1476b1580636aaf5fdcd7d4629b223655811aeb4`，
+  pure4,053 artifact SHA-256为
   `ca31514032105a84497083983f8d4fc175526cb0900aeea0d4e503a83d9c018d`。
-- Stage2 Human：与C0 Human模块相同的ViMoGen LightFlow，`71,870,080`参数，fresh seed17，
-  Human-text-only，batch128，`105K` optimizer steps，LAT flow，EMA `0.9999`。
-- Stage2 Camera：与C0-LAT Camera模块相同的CameraConditionedFlow，`84,492,096`参数，fresh
-  seed17，GT-H-only，batch128，`105K` optimizer steps，LAT flow，EMA `0.9999`。
-- 总Stage2 exposure与C0 matched：Human `105K×128`＋Camera `105K×128`；不追加GEO臂，避免把
-  specialist轴与Camera objective轴相乘。正式比较只对C0-LAT，不据此评价C0-GEO。
-- checkpoint数按逻辑owner计为两个Stage2 endpoint：Human teacher与Camera specialist；Stage1
-  owning checkpoint单独报告。GPU小时、峰值显存及Direct-H／Direct-C／sequential p50／p95
-  latency按实际测量报告，不用空闲GPU时间替代计算成本。
+- C fresh训练Human Stage2 `105K×128`与Camera Stage2 `105K×128`；两者分别为独立权重、
+  optimizer与逻辑checkpoint。Camera Stage2仍以GT-H latent为训练条件，LAT-only。
+- 本轮不把specialist轴与LAT／GEO轴相乘：B和C均只跑LAT。最终表分别报告Stage1／Stage2
+  参数、checkpoint数、历史与新增sample exposure、实测GPU小时、峰值显存及三接口p50／p95
+  latency；不能把C写成与A／B的单变量parameter-matched ablation。
 
 ### 2.2 训练与评测gate
 
-1. 先以owning v7.33 AE按exact valid length重建train／pure-test cache；禁止让non-causal encoder
-   读取future padding。cache必须记录checkpoint、manifest、ordered IDs、latent order和train-only
-   normalization hashes。
-2. optimizer前必须通过：Stage1 strict load、H／C branch无共享参数、cache train/test identity、
-   H128＋C64 shape、`is_causal=false`、decoder round trip、8-sample finite bridge和初始参数hash。
-3. Camera只在真实Pulp pair上训练$p_C(C\mid H,T_C)$；Human condition来自同pair的GT Human经
-   v7.33 $E_H$编码。generated-H route没有合法re-execution target，只做sequential推理测试。
-4. first-512只作screen，不提前选checkpoint；正式endpoint固定EMA `105K`，在同一pure4,053上
-   报Direct-H、Direct-C、sequential、official metrics、decoded geometry／physical、10,000次
-   paired bootstrap和盲样本。
-5. 若B优于A，只能支持“完整specialist system是强对照”，不能否定能力保持式非对称分解；若B
-   不优于A，只能写“在该预声明数据／预算下没有胜过StoryMotion”，不能把差异单独归因为Stage2
-   sharing。任何参数或速度优势必须用完整系统参数、GPU小时和推理测量支持。
+1. B先训练独立Human-conditioned Camera Stage1；构造optimizer前必须通过v9 owner hash、
+   Human无梯度、Camera参数`326,478`、non-causal、production batch128、finite decoder与初态hash
+   检查。Stage1 endpoint审计通过后才生成Camera cache并授权Camera Stage2 `105K`。
+2. C先用v7.33 owner按exact valid length重建train／pure-test cache；optimizer前必须通过
+   Stage1 strict load、H／C参数不共享、cache身份、H128＋C64、non-causal、decoder round trip、
+   production-shape forward／backward与初态hash检查。
+3. B与C均只用真实Pulp pair训练$p_C(C\mid H,T_C)$；不得把generated-H与原GT Camera组成
+   positive。generated-H route只做formal sequential推理分布测试。
+4. B与C的正式Camera endpoint均固定EMA `105K`，在同一pure4,053上报告Direct-H、Direct-C、
+   sequential、official metrics、decoded geometry／physical、10,000次paired bootstrap和盲样本。
+5. A对B是Paper A主因果比较；若B质量接近，只能在参数、checkpoint或计算成本实测占优时支持
+   StoryMotion interface优势。A对C只作native full-system comparison，不把差异归因于单个模块。
 
-### 2.3 可选H199接口消融
+### 2.3 当前执行身份
+
+- B Stage1：`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`；
+  无优化器预检已通过，活动训练合同固定`210K`。其后Camera Stage2尚未创建，不能提前写成完成。
+- C Stage2：`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`；
+  exact-length cache与无优化器预检已通过，活动训练合同固定Human／Camera各`105K`。
+- 首个同名无`r2`的C准备任务因引用合同缺少Human／Camera分栏manifest，在optimizer前失败并保留；
+  它没有训练结果。所有run进度与checkpoint只写各自manifest／log，不在vault复制step流水。
+
+### 2.4 可选H199接口消融
 
 `H128 → D_H → H199 → E_H → H128`仍只检验显式Human API round-trip；它不属于本次
-Specialist-Native训练，也不阻塞Paper A。正文不声称latent接口优越时不执行。
+B／C训练，也不阻塞Paper A。正文不声称latent接口优越时不执行。
 
 ## 3. 投稿闭环矩阵
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 scientific core | Pulp Camera文本 | 已定位坐标选择会翻转方位；新caption尚未形成正式版本 | 冻结extrinsic convention、生成`T_C^geo`、保留raw provenance、自动一致性检查、分层人工抽检与directional subset审计 | 否，先审计 | 通过后写版本化factual caption修正 |
-| P0 system control | Independent specialists | v7.33 separate AE的162,760／4,053、non-causal、H199＋C14 parent及hash已闭合；尚无当前ViMoGen specialist Stage2 | exact-length cache后fresh训练Human／Camera各105K；单一LAT objective；三接口pure4,053 formal | 是，仅Stage2 | 完整specialist cascade system comparison；不作Stage2单变量归因 |
+| P0 scientific core | Pulp Camera文本 | `paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`已完成512条无LLM screen；gauge／time-reversal自动检查通过；阈值与raw conflict仍是preliminary | 复核随机／高风险样本，校正阈值与parser；再冻结全量symbolic及short／long realization合同 | 否，先审计 | 通过后写版本化factual caption修正 |
+| P0 system control | Independent Conditional Cascade | B的Human-conditioned Camera64 Stage1合同与无优化器预检已闭合；Stage1训练活动中，Camera Stage2尚未创建 | Stage1 `210K`审计后训练Camera Stage2 `105K`；三接口pure4,053 formal | 是，Camera Stage1＋Stage2 | 与相同冻结Human prior的普通conditional cascade比较relation-aware interface |
+| P0 secondary control | Fully-Separate-Native-LAT | v7.33 Stage1可复用；C的cache与无优化器预检已闭合，Human／Camera Stage2活动中 | 完成两段`105K`及三接口pure4,053 formal | 是，仅Stage2 | 完整H／C分离native system comparison；不作单变量归因 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
 | P1 submission | relation-interface机制 | 结构合同存在；活动ledger没有正式zero／shuffle／route机制表 | 仅在正文需要机制归因时做冻结checkpoint敏感性检查 | 否 | 最多支持接口被使用，不宣称每个Stage1部件必要 |
 | P1 submission | 同协议主表 | C0、C3与PulpMotion pure4,053已有正式行；v9仅first-512；TSA／Auteur无活动formal row | 冻结baseline eligibility、split、N、decoder和指标；补可执行且任务匹配的缺行，不可比字段留空 | 原则上评测；未定义实现不长训 | 只作同协议或显式system-boundary比较 |
@@ -149,7 +159,9 @@ Camera文本修正通过数据审计后，默认只构成数据质量贡献，�
 ### 4.2 必须等实验再决定
 
 - Pulp Camera caption修正能否列为数据贡献；由一致性审计和人工抽检决定。
-- 完整independent specialist cascade是否形成质量、参数或推理成本优势；由预声明LAT单臂决定。
+- StoryMotion相对Independent Conditional Cascade是否形成质量、参数或推理成本优势；由B的
+  预声明LAT单臂决定。
+- fully-separate native system是否构成更强系统边界；由C决定，但不能替代A对B的主因果比较。
 - 是否优于公开baseline、是否有主观优势；由同协议主表、sealed audit与盲评决定。
 
 ### 4.3 可选、不阻塞主张
@@ -161,7 +173,9 @@ Camera文本修正通过数据审计后，默认只构成数据质量贡献，�
 ### 4.4 当前禁止写入摘要或contribution
 
 - “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
-- “共享／关系型Stage1优于完整独立specialist stack”——等待Specialist-Native-LAT正式结果。
+- “relation-aware shared interface优于Independent Conditional Cascade”——等待B正式结果。
+- “StoryMotion优于完全分离系统”——等待C正式结果，且必须注明Human owner与历史Stage1
+  exposure也不同。
 - “LAT与GEO等价”或“GEO优于LAT”。
 - “Stage1每个部件都必要”、全面SOTA、calibrated physical validity或production-ready。
 - 同步joint generation、独立双文本控制、editing、Rect、program transfer或ViGen utility。
@@ -171,14 +185,17 @@ Camera文本修正通过数据审计后，默认只构成数据质量贡献，�
 初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
 和baseline superiority暂留占位符。当前顺序是：
 
-1. 完成Camera convention与caption数据审计；
-2. 复用已审计v7.33 separate AE，完成Specialist-Native-LAT的两套Stage2 `105K`与formal audit；
-3. 冻结同协议baseline表，并按正文实际claim决定是否补最小机制检查；
-4. 冻结所有选择后做sealed audit、盲评与失败分层；
-5. 最后一次性冻结复现包、参数／GPU小时／推理成本和论文表格；
-6. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
+1. 复核无LLM `N=512` Camera geometry screen，冻结Pulp convention、阈值、symbolic schema与
+   raw-conflict判定，再授权全量symbolic／语言化；
+2. 完成Independent Conditional Cascade的Camera Stage1＋Stage2与formal audit；
+3. 完成Fully-Separate-Native-LAT两套Stage2与formal audit，保持secondary system解释；
+4. Camera caption审计通过后，按预声明`raw / canonical-short / canonical-short-long`合同决定
+   是否训练生成增益三臂；Stage1不重训，`T_2`不获得双倍caption exposure；
+5. 冻结同协议baseline表，并按正文实际claim决定是否补matched symmetric joint与最小机制检查；
+6. 冻结所有选择后做sealed audit、盲评、失败分层及复现／成本包；
+7. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
 
-当前不进入critical path：H199 round-trip、caption重训、v10、C1、editing、
+当前不进入critical path：H199 round-trip、v10、C1、editing、
 Camera MAE、Human locality short screen、joint-parallel和DIRECT实验。
 
 ## 6. 历史材料

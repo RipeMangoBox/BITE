@@ -35,7 +35,7 @@ source_papers:
   - "[[analysis/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation]]"
   - "[[analysis/SIGGRAPH_ASIA_2025/Uni3C_Unifying_Precisely_3D-Enhanced_Camera_and_Human_Motion_Controls_for_Video_Generation]]"
 created: 2026-08-02T23:22:47+08:00
-updated: 2026-08-03T15:45:01+08:00
+updated: 2026-08-03T17:32:00+08:00
 ---
 
 # StoryMotion / DIRECT 单仓库双论文边界
@@ -48,8 +48,10 @@ updated: 2026-08-03T15:45:01+08:00
 > 作为冻结backbone，但不能把Paper A的能力保持式非对称框架重新计算为自身贡献。
 
 > [!warning] 成熟度边界
-> Paper A已有完整系统endpoint；唯一剩余核心科学任务是Pulp Camera文本修正。H199
-> decode→re-encode只是可选接口消融，不阻塞能力保持式非对称扩展主张。DIRECT只有独立的问题定义，`RV-25`的source reconstruction
+> Paper A已有完整mainline endpoint；剩余两个核心科学任务是Pulp Camera文本修正与
+> Independent Conditional Cascade对照，另保留fully-separate native variant作为次要系统边界。
+> H199 decode→re-encode只是可选接口消融，不阻塞能力保持式非对称扩展主张。
+> DIRECT只有独立的问题定义，`RV-25`的source reconstruction
 > 仍为`0/25`，当前不能写成已经闭环的方法，也不授权Rect或A-series长训。
 
 > [!warning] 证据边界
