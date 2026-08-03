@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-03T17:32:00+08:00
+updated: 2026-08-03T17:36:00+08:00
 ---
 
 # StoryMotion Paper A ICLR Reliability and Closure Contract
@@ -124,9 +124,12 @@ Stage2与Camera Stage1／Stage2，是完整系统比较。H199 round-trip仍是�
 ### 2.3 当前执行身份
 
 - B Stage1：`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`；
-  无优化器预检已通过，活动训练合同固定`210K`。其后Camera Stage2尚未创建，不能提前写成完成。
+  无优化器预检已通过，活动训练合同固定`210K`。其后Camera Stage2尚未创建；必须同时等待
+  Stage1 endpoint审计与Camera caption选择冻结，不能因GPU空闲自动启动。
 - C Stage2：`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`；
-  exact-length cache与无优化器预检已通过，活动训练合同固定Human／Camera各`105K`。
+  exact-length cache与无优化器预检已通过，活动训练合同固定Human／Camera各`105K`。它使用当前
+  Pulp raw Camera text，只能作为`T_0` raw-caption native-system control；若caption选择不是raw，
+  最终caption-matched C仍需从相同初态按胜出文本另训，当前checkpoint不能冒充该结果。
 - 首个同名无`r2`的C准备任务因引用合同缺少Human／Camera分栏manifest，在optimizer前失败并保留；
   它没有训练结果。所有run进度与checkpoint只写各自manifest／log，不在vault复制step流水。
 

@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T17:32:00+08:00
+updated: 2026-08-03T17:36:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -151,9 +151,11 @@ raw conflict都仍是screen级结果，不能据此启动全量语言化或宣�
    Camera Stage1，即$E_C(H,C)$与$D_C(H,z_C)$。v7.33只有$E_C(C)$／$D_C(z_C)$，且旧任务
    fresh重训Human Stage2，因此不是该主对照。旧任务已按合同不匹配停止并保留；当前GPU1
    运行Independent Conditional Camera64 Stage1，固定exact v9 Human owner，之后只训练
-   Camera Stage2。GPU0并行运行用户另行确认必要的v7.33 fully-separate native variant；它
+   Camera Stage2；该Stage2还必须等待Camera caption选择冻结。GPU0并行运行用户另行确认必要的
+   v7.33 fully-separate native variant；它
    复用已审计Stage1并fresh训练Human／Camera两个Stage2。两者都只用factual GT-H／GT-C
-   positive，正式解释严格分开。完整预声明见
+   positive。当前fully-separate训练使用raw Camera text，是`T_0`系统对照；如果最终caption
+   选择不是raw，仍需matched重训，不能把当前checkpoint当作canonical-text结果。正式解释严格分开。完整预声明见
    [[StoryMotion-iclr-reliability#2. 独立specialist cascade系统对照]]。
 3. **投稿证据闭环。** 冻结PulpMotion同split、同sample count、同指标的主表；Pulp Motion
    与TSA是结构化motion主baseline，Auteur、Uni3C与ActCam按不同任务层级比较。
