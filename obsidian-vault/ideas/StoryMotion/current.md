@@ -5,7 +5,8 @@ hypothesis: |
   Paper A StoryMotion owns the v11 C0-LAT/C0-GEO co-mainline and tests a
   capability-preserving asymmetric Human–Camera extension. The remaining core
   scientific tasks are the versioned correction and audit of Pulp Camera text,
-  plus an Independent Conditional Cascade and a secondary fully-separate system comparison.
+  the matched NoInt-HREL/C1REL representation decision, and the resulting
+  Matched Symmetric factorization control.
 tags:
   - StoryMotion
   - version/v11
@@ -23,7 +24,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T18:05:00+08:00
+updated: 2026-08-03T21:12:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -63,14 +64,15 @@ updated: 2026-08-03T18:05:00+08:00
 > 因而当前Camera representation停止。Human128的naive clamp同样产生root／global-joint
 > 漂移，但N8 mask-local endpoint oracle四格全过，证明当前Human128存在端点闭合headroom。
 > 这只保留为endpoint-existence evidence；为收缩投稿scope，不再安排Human短screen，两轴
-> 均不启动MAE长训，也不形成paper editing claim。分别见
+> 均不启动MAE长训，也不形成paper editing claim。该hard stop只约束temporal editing／MAE轴，
+> 不覆盖`0803-2024`已单独定义的NoInt-HREL与C1REL表示对照。分别见
 > [[archived/experiments/2026-07-31_storymotion-v11-camera-temporal-inpainting-control]]与
 > [[archived/experiments/2026-07-31_storymotion-v11-human-temporal-locality-control]]。
 
 > [!important] v10关闭；Raw-H只作为v9 sibling control
 > 不再补v10 corrected endpoint、176D cache或Stage2。Stage1 observation现为低优先级，
 > 只允许在保留exact v9 Human owner、Camera64 layout与non-causal边界下另建sibling；当前
-> Paper A不启动Raw-H Stage1长训，也不借该历史轴改变matched specialist合同。
+> Paper A不启动Raw-H Stage1长训，也不借该历史轴改变当前matched representation合同。
 
 ## 0. Paper A路由
 
@@ -144,20 +146,21 @@ raw conflict都仍是screen级结果，不能据此启动全量语言化或宣�
 
 1. **Camera文本有效性。** `paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`
    已在不调用LLM的前提下完成首帧相对RDF轨迹、symbolic phases、Pulp临时阈值、全局刚体
-   gauge与时间反转检查。下一步先人工复核随机／高风险子集并校正阈值与raw-text parser，之后
+   gauge与时间反转检查。人工审核cohort固定为完整512条；风险／冲突／阈值筛选只改变顺序，
+   审核事件append-only保存。完成512／512并裁决异常后校正阈值与raw-text parser，之后
    才能冻结全量规则、生成short／long文本并做matched Stage2数据消融。约16万样本不能依赖
    逐条人工修订。
-2. **独立specialist cascade。** `0803-1647`要求的主对照必须有独立且Human-conditioned的
-   Camera Stage1，即$E_C(H,C)$与$D_C(H,z_C)$。v7.33只有$E_C(C)$／$D_C(z_C)$，且旧任务
-   fresh重训Human Stage2，因此不是该主对照。旧任务已按合同不匹配停止并保留；当前GPU1
-   运行Independent Conditional Camera64 Stage1，固定exact v9 Human owner，之后只训练
-   Camera Stage2；该Stage2还必须等待Camera caption选择冻结。GPU0并行运行用户另行确认必要的
-   v7.33 fully-separate native variant；它
-   复用已审计Stage1并fresh训练Human／Camera两个Stage2。两者都只用factual GT-H／GT-C
-   positive。当前fully-separate训练使用raw Camera text，是`T_0`系统对照；如果最终caption
-   选择不是raw，仍需matched重训，不能把当前checkpoint当作canonical-text结果。正式解释严格分开。完整预声明见
-   [[StoryMotion-iclr-reliability#2. 独立specialist cascade系统对照]]。
-3. **投稿证据闭环。** 冻结PulpMotion同split、同sample count、同指标的主表；Pulp Motion
+2. **表示与factorization主对照。** `0803-2024`只保留HREL与C1REL。GPU0运行
+   `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803`，在同v9 schedule／data／
+   exposure下删除显式I16；GPU1运行
+   `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803`，保持H128＋I16＋C48和相同参数量；缓存／
+   生成的C48严格由完整$T_{C1}^{-1}T_{Ct}$在Human／I16 conditioning之前编码，首帧锚点adapter
+   只留在owning decoder侧。两条均seed17、fresh `636K`、non-causal、
+   仅factual GT-H／GT-C positive，preflight已经闭合。Stage1 formal后才冻结HREL／C1REL；所有
+   Stage2等待同一版canonical Camera text，之后才单独训练Matched Symmetric Joint。完整预声明见
+   [[StoryMotion-iclr-reliability#2. `0803-2024`表示因果矩阵]]。
+3. **投稿证据闭环。** canonical text冻结后完成`PulpMotion-Repro-162K`，保持PulpMotion自身
+   representation／model，并冻结同split、同sample count、同指标的主表；PulpMotion
    与TSA是结构化motion主baseline，Auteur、Uni3C与ActCam按不同任务层级比较。
    seed23独立长训与matched repeat audit已闭合，两个seed都不支持单一
    Camera objective胜出；仍需sealed audit、随机／最好／最差可视化和failure taxonomy。
@@ -176,15 +179,16 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
 ## 5. 当前行动边界
 
 - 冻结 C0-LAT 与 C0-GEO 两个 mainline endpoint，不因单个 raw mean 继续选臂。
-- Paper A后续specialist实验若没有另行说明，默认seed17；run ID与contract仍必须显式记录
+- Paper A后续实验若没有另行说明，默认seed17；run ID与contract仍必须显式记录
   `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
-- Paper A当前并行关闭两个核心工作包：Pulp Camera坐标／文本修正，以及Independent
-  Conditional Cascade主对照；fully-separate native variant作为第二系统边界，不替代主对照。
-- Camera text在`N=512` geometry screen之后仍保持“无LLM、未授权全量”；先复核临时阈值、
-  原文冲突判定与高风险样本，再决定全量处理合同。
+- Paper A当前并行关闭两个核心工作包：Pulp Camera坐标／文本修正，以及NoInt-HREL／C1REL
+  matched Stage1表示对照；旧Independent／Fully-Separate specialist不再进入主矩阵。
+- Camera text在`N=512` geometry screen之后仍保持“无LLM、未授权全量”；先完成固定512条人工
+  审核、阈值／phase／原文冲突裁决，再决定全量处理合同。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
-- v10 Camera Stage2、C1、swapped-host replay和当前Camera64 MAE长训均保持关闭。
+- v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
+  C1REL是新建的matched representation arm，不是历史v10/C1队列恢复。
 - Formal editing与learned bounded staging留作投稿后future work，不进入当前queue。
 
 ## 6. Canonical owners

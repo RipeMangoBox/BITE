@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T17:36:00+08:00
+updated: 2026-08-03T21:12:00+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -292,6 +292,8 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-03（双论文内嵌图文档恢复）：** 审计确认完整双论文边界页及两张原始内嵌SVG此前只被移动到`archived/paper-scope/`，并未删除。现将该完整原文恢复为一级canonical `paper-boundary.md`；15:13创建的精简替代页移动为`archived/paper-scope/2026-08-03_paper-boundary-condensed-superseded.md`保留。两张SVG的节点、连线与文本不重画、不压缩；只同步H199接口已降为可选消融、Pulp Camera text为Paper A核心任务的最新claim边界。本事件不改变模型、artifact或正式数值。
 - **2026-08-03（`0803-1647` specialist合同纠偏与Camera geometry screen启动）：** 复核确认v7.33 Camera Stage1实际为$E_C(C)$／$D_C(z_C)$且旧任务fresh重训Human Stage2，不满足主对照要求的$E_C(H,C)$／$D_C(H,z_C)$与同一冻结Human prior；旧run在保留日志后以`stopped_contract_mismatch`关闭。用户明确授权fully-separate variant继续作为secondary system comparison，因此4090双卡改为并行运行`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`与`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`。前者固定exact v9 Human owner并重训独立Human-conditioned Camera64 Stage1，后者复用已审计v7.33 Stage1并fresh训练Human／Camera Stage2；两者均non-causal、只用factual GT-H／GT-C positive、LAT-only。同期`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`完成512条无LLM symbolic screen，gauge与time-reversal自动检查通过；Pulp阈值、raw conflict与语言化仍是screen／pending，不授权全量处理或数据贡献claim。本事件不改变C0-LAT／C0-GEO共同mainline。
 - **2026-08-03（specialist caption gate补充）：** 当前fully-separate Stage2绑定现有Pulp raw Camera text，只拥有`T_0` raw-caption native-system control身份；若Camera text选择不是raw，最终caption-matched C必须另训。Independent Conditional当前只训练text-free Camera Stage1；其Camera Stage2必须同时等待Stage1 endpoint审计与Camera caption选择冻结，不因GPU空闲自动启动。本补充收紧最终比较资格，不停止已授权的两条活动训练。
+- **2026-08-03（`0803-2024`取代specialist主矩阵）：** 用户以`prompts/0803-2024.md`冻结Paper A新优先级：只保留HREL／C1REL，先做NoInt-HREL与parameter-matched C1REL Stage1，表示冻结后才做共享canonical Camera text的最小Stage2、Matched Symmetric Joint及`PulpMotion-Repro-162K`；WORLD删除。审计时`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`已完成，只保off-plan HREL-Camera64 diagnostic；`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`安全停止并保留约Human phase `55K` checkpoint。两者均不得启动后续Stage2或冒充新矩阵。
+- **2026-08-03（Paper A表示Stage1 r2启动与Camera人工审核开放）：** C1REL train-only stats从exact 162,760条Pulp train、19,336,827个有效帧生成，SHA256=`7ca04cba4ff6efe573060eea8382e4dc097a9d17b1ab874c32c998661ad13564`。首轮NoInt／C1REL在TensorBoard step `15,367`停止：C1REL首版把C48再次经过H128＋I16 conditioner，不满足“C48由完整C1REL在任何Human conditioning之前编码”的native ownership；NoInt因共享实现版本同步停止。首轮无required checkpoint，模型与optimizer state均不复用。修正后逐元素单测确认cached C48 exact等于直接$E_C(\mathrm{C1REL}_{14})$；`paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803`与`paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803`分别绑定contract SHA256 `599faf76…77f66`／`745ff16c…e9c2`，重新通过non-causal、Human-invariance、deterministic replay与one-batch overfit preflight，从0 step fresh启动；所有Stage2仍被canonical text gate关闭。同期固定512条no-LLM geometry screen开放Gradio全量人工审核，源records immutable，review事件append-only；风险筛选只改变顺序，不改变cohort。本事件不改变C0-LAT／C0-GEO共同mainline或正式metric ledger。
 
 ## Bug 与 invalidation provenance
 

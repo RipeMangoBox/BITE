@@ -14,7 +14,7 @@ source_notes:
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-07-29T15:38:19+08:00
+updated: 2026-08-03T21:05:00+08:00
 ---
 
 ## 0. 当前裁决
@@ -694,3 +694,27 @@ runs/vis/stage2/
 - Gradio `--validate-only`：`required_files=1452`、`missing=0`、`v10_human_compare_samples=8`；
 - headless Chromium：exact tab label、六个heading、8个sample options、六路媒体HTTP、切换第二样本与同步播放全部通过；page errors=`0`、console errors=`0`、unexpected failed requests=`0`；
 - 当前4090服务PID=`1316999`，监听`0.0.0.0:7865`，HTTP=`200`；日志为`/tmp/storymotion_gradio_7865_v10v9_cfg13_20260729.log`。
+
+## 21. 2026-08-03 Paper A Pulp Camera 512条人工审核
+
+该界面只服务`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`，不调用LLM，
+也不修改source `records.jsonl`或geometry contract。固定cohort为完整512条；风险优先、原文本冲突、
+阈值边界与未审核filter只改变浏览顺序，不改变样本集合。
+
+每条显示raw Camera text、symbolic phases、阈值／confidence、QC reason、C1REL三个正交轨迹投影及
+平移／旋转时序。人工字段包括Camera坐标约定、symbolic verdict、corrected primitives、阈值、
+phase segmentation、raw-text agreement与备注。每次保存向`human_reviews.jsonl`追加独立事件；
+同一reviewer重审不会覆盖旧事件。review contract要求512／512完成，并裁决全部方向／坐标轴错误、
+拒绝项和`无法判断`后，才允许冻结full-data threshold或canonical text。
+
+4090 artifact root：
+
+`runs/artifacts/paperA_camera_recaption/paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803/`
+
+- source records约3.19 MB，512条，LLM calls=`0`，SHA256=
+  `3a9788293e1003cfabf244a3726d18f0db55072e4e309cb9c1568116cfd9843a`；
+- review contract：`human_review_contract.json`，SHA256=
+  `24981e98f43d4e74bc7ae75f5c0b4cd258a230824fd4cfc1acd522668f5fe0d2`；
+- append-only output：`human_reviews.jsonl`；
+- service：PID=`5935`，`0.0.0.0:7868`，HTTP=`200`；
+- SSH转发：`ssh -N -L 7868:127.0.0.1:7868 4090`，浏览器打开`http://127.0.0.1:7868`。
