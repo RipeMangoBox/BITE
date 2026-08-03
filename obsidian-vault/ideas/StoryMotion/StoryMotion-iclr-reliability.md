@@ -50,6 +50,24 @@ seed17与seed23四个Camera endpoint均完成`105K`、Pulp pure4,053三接口、
 decoded geometry／physical diagnostics和10,000次paired bootstrap。24个Camera geometry差异的
 95% CI全部跨零，因此只能写“没有稳健单一objective胜者”；不能写LAT／GEO等价，也不能选择GEO。
 
+### 1.1 Pulp Camera geometry-only screen
+
+`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`从train manifest以
+`sha256(seed:sample_id)`确定性选择512条轨迹，全程`llm_calls=0`。Pulp loader把KITTI矩阵作为
+C2W，并在projection路径取逆后交给OpenCV camera conversion；screen据此冻结输入标识为
+OpenCV right-down-forward，并计算$C_1^{-1}C_t$。每条轨迹最多均匀采样21帧。
+
+- 512／512个随机全局刚体gauge检查通过，relative pose最大绝对误差
+  `7.105427357601002e-15`；512／512个固定坐标基的时间反转symbolic代数检查通过。
+- 输入rotation最大orthogonality误差为`6.425823300126865e-07`，最大determinant偏差为
+  `6.512800068136926e-07`。
+- 小样本log-space双簇得到的临时阈值为每个sampled step `0.0022658727 m`与
+  `0.1305610°`；它们没有复制TriMotion的`0.02 m / 0.3°`，但仍只属于screen calibration。
+- preliminary raw conflict计数为`263 true / 90 false / 159 unknown`，**不能解释成Pulp缺陷率**：
+  当前保守parser主要识别static与truck，而临时阈值又让大量轨迹同时出现正反方向symbolic。
+  下一步必须先复核随机／高风险样本，补齐Pulp的push-in／pull-out／boom词表，并重新校准phase
+  merge与threshold；在此之前不授权全量处理或LLM short／long realization。
+
 ## 2. 独立specialist cascade系统对照
 
 > [!failure] 旧任务不满足`0803-1647`主对照
