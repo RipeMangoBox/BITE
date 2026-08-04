@@ -4,8 +4,8 @@ status: v11_c0_lat_mainline
 hypothesis: |
   StoryMotion uses v11 C0-LAT as the operational mainline and tests a
   capability-preserving asymmetric Human–Camera extension. Camera-text work is
-  paused while the 5090 host is disconnected; the active scientific surface is
-  the preregistration of the remaining C0-LAT-based ablation matrix.
+  paused while the 5090 host is disconnected. NoInt-HREL Stage2 is shelved;
+  C1REL raw-caption Stage2 and C1REL-w/o-Interaction16 Stage1 are active.
 tags:
   - StoryMotion
   - version/v11
@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-04T14:51:40+08:00
+updated: 2026-08-04T16:43:38+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -49,10 +49,19 @@ updated: 2026-08-04T14:51:40+08:00
 > NoInt-HREL与C1REL均从零完成seed17 `636K`，并以exact pure4,053、真实有效长度、owning
 > decoder和10,000次paired bootstrap完成正式审计。两臂都基本守住Human reconstruction；
 > NoInt-HREL的Camera／framing系统性回退，支持I16参与Stage1 reconstruction，但不单独证明
-> Stage2 generation necessity。C1REL的Camera trajectory／rotation回退且projective字段混合，
-> 没有形成可晋升的稳定Pareto。由于Stage1不读取Camera text且此前没有冻结“严重退化”数值阈值，
-> 当前不事后做binary stop，也不授权Stage2；HREL继续作为当前representation owner。正式数值见
+> Stage2 generation necessity。作者据此搁置NoInt-HREL Stage2。C1REL的Camera
+> trajectory／rotation回退且projective字段混合，与v9难分上下；其坐标语义更契合后续
+> Camera text，因此已单独授权raw-caption Stage2诊断，并补严格的
+> `C1REL-w/o-Interaction16` Stage1。HREL与C0-LAT的当前mainline身份不因启动事件改变。正式数值见
 > [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL matched Stage1 audit]]。
+
+> [!warning] C1REL当前是raw-caption诊断，不是最终文本对照
+> GPU0运行`paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`：复用已审计
+> C1REL Stage1及owning decoder／新建C1REL cache与train-only stats，fresh训练Human
+> teacher `105K`，冻结后再训练GT-H-only LAT Camera `105K`。GPU1运行
+> `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`：保留native
+> C1REL-C48，只删除I16，latent为H128＋C48＝176D。前者绑定旧Pulp `T0` Camera
+> caption，canonical text冻结后必须重训才能进入最终caption-matched比较；后者当前只授权Stage1。
 
 > [!important] Scope
 > 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
@@ -158,14 +167,11 @@ symbolic phase或LLM文本升级为canonical，也不支持宣称缺陷比例。
 1. **Camera文本暂停。** 5090当前断链；在用户通知恢复前，不重连、不续跑、不汇总Qwen候选，
    也不推进人工审核或canonical caption冻结。现有geometry／language artifacts保持immutable、
    noncanonical；该暂停不授权以raw caption替代最终caption合同。
-2. **表示与factorization主对照。** `0803-2024`的NoInt-HREL与C1REL均完成seed17 fresh `636K`、
-   pure4,053 exact-length owning-decoder audit和10,000次paired bootstrap。NoInt-HREL在Human基本保持时
-   系统性损害Camera／framing；C1REL守住Human但没有形成Camera／projection稳定Pareto。Stage1不消费
-   Camera text，故本结果只关闭reconstruction gate，不关闭text-conditioned representation选择。
-   当前先以C0-LAT为唯一默认parent冻结剩余ablation的因果合同、参数量、exposure与成本口径；
-   canonical Camera text恢复并冻结前，不建新caption cache、不启动NoInt/C1REL Stage2或Matched
-   Symmetric Joint长训。若要用raw caption先做ablation，必须另行显式授权并标为raw-caption control。
-   完整边界见
+2. **表示与factorization主对照。** NoInt-HREL因Stage1 Camera／framing全线退化且HREL语义可能
+   与后续Camera text冲突，Stage2已搁置。C1REL与v9难分上下，作者已显式授权一条raw-`T0`
+   Stage2诊断及其严格no-I16 Stage1：两条都保持seed17、Pulp factual pair、non-causal和
+   `joint_parallel=false`。raw-`T0`结果只回答当前表示／生成器可行性，不能代替未来
+   canonical caption-matched比较；Matched Symmetric Joint仍未授权。完整边界见
    [[StoryMotion-iclr-reliability#2. `0803-2024`表示因果矩阵]]。
 3. **投稿证据闭环。** canonical text冻结后完成`PulpMotion-Repro-162K`，保持PulpMotion自身
    representation／model，并冻结同split、同sample count、同指标的主表；PulpMotion
@@ -190,8 +196,10 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   不删除其正式结果，也不默认复制后续训练矩阵。
 - StoryMotion后续实验若没有另行说明，默认seed17；run ID与contract仍必须显式记录
   `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
-- NoInt-HREL／C1REL matched Stage1表示对照已经正式闭合；旧Independent／Fully-Separate
-  specialist不自动回到主矩阵。当前P0是冻结C0-LAT-based剩余ablation合同，不因4090空闲启动长训。
+- NoInt-HREL Stage2保持搁置；C1REL只运行已显式授权的raw-`T0` Stage2，且最终canonical
+  Camera text冻结后必须重训。当前不从该授权扩张到Matched Symmetric或其他Stage2矩阵。
+- `C1REL-w/o-Interaction16`只运行严格matched Stage1：H128＋native C1REL-C48、无I16、
+  176D、fresh seed17 `636K`；当前不自动接Stage2。
 - Camera data工作全部暂停到用户通知5090恢复；现有512条与30,000条Qwen输出仍只是
   review-only candidates，不得把已生成数量等同数据闭环。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
