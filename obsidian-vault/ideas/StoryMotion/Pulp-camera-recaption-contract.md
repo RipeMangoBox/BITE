@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T02:40:00+08:00
+updated: 2026-08-05T02:47:07+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -27,11 +27,13 @@ updated: 2026-08-05T02:40:00+08:00
 > 本页评估并收敛`0805-0137`中的Web GPT建议，拥有Pulp Camera recaptioning的算法、
 > calibration、语言化与QC合同。全量候选阈值及其artifact只见
 > [[StoryMotion/StoryMotion-iclr-reliability#1.1 Pulp Camera full-train threshold audit]]。
-> 2026-08-05作者额外授权：保留全部旧标注artifact，以4090四个Qwen实例处理10万条显式新版
-> candidates。该授权不等于H1规则冻结；在512 calibration完成前，输出固定标为
-> `v1p0-H1 / noncanonical`，不得写回训练manifest或冒充sealed evidence。rotation权威表示从
-> Euler改为rotvec，因此先执行一次最终权威CPU signal pass；此后event sweep与10万条语言化只读
-> 新shards，不重复扫描原轨迹。本授权仍不包含canonical写回、Stage2重训或任何模型长训。
+> 2026-08-05作者额外授权：保留全部旧标注artifact，以4090处理10万条显式新版candidates。
+> 部署合同为GPU0两个BF16 worker、GPU1三个逻辑worker；实测GPU1三个Qwen BF16模型同时驻留时
+> 在最后`48 MiB`分配处OOM，当时只余`43.5 MiB`，因此GPU1执行可审计的`2+1`队列，最多两个
+> 模型同时驻留，第三个worker在任一前置worker成功完成后接续。该授权不等于H1规则冻结；在512
+> calibration完成前，输出固定标为`v1p0-H1 / noncanonical`，不得写回训练manifest或冒充sealed
+> evidence。rotation权威表示已从Euler转换为rotvec，后续event sweep与10万条语言化只读新版
+> shards，不重复扫描原轨迹。本授权仍不包含canonical写回、Stage2重训或任何模型长训。
 
 ## 1. 目标、边界与最小原则
 
@@ -135,11 +137,14 @@ $$
 translation单位为m/s；rotation实现内部使用rad/s，写artifact与展示时转换为deg/s。六个正负
 方向名称不从Web GPT文字直接继承，必须由12条纯轴synthetic tests冻结后写入convention ID。
 
-> [!warning] 现有rotation节点不能直接晋升
-> 当前full-train artifact的tilt／pan／roll K3节点来自local rotation的Euler `xyz`分量。
-> 它们可以作为rotvec实现的数量级screen，但不能直接充当rotvec阈值。最终权威CPU pass必须同时
-> 写出local translation、local rotvec、sample offsets及其full-train histograms；translation
-> 节点可复核复用，rotation节点须重新计算。
+> [!important] rotvec权威signal已闭合
+> 旧full-train shards保存的是同一camera-local增量旋转的Euler `xyz` rate，而不是被阈值删除后的
+> labels。首个4,096样本／118,197 steps同时从原轨迹直接计算rotvec，并与
+> `Euler delta → SO(3) → Log`确定性转换逐项比较：translation max-abs为`0.0 m/s`，rotation
+> max-abs为`1.52587890625e-05 deg/s`、p99为`4.76837158203125e-07 deg/s`，通过预声明
+> `2e-05 deg/s`容差。原轨迹全量重读因此以`stopped_superseded_by_audited_euler_to_rotvec_shard_conversion`
+> 关闭；随后从immutable父shards转换exact `162,760`样本／`4,733,272` steps并重新计算rotvec
+> K3节点。转换不复用旧Euler rotation阈值，也不产生LLM调用。
 
 > [!note] C1REL与primitive并不冲突
 > C1REL负责移除任意world gauge；camera-local increment负责在Camera自身当下坐标轴中解释
@@ -415,7 +420,7 @@ Gradio必需显示：
 | phase | 动作 | 计算 | 输出／gate |
 | --- | --- | --- | --- |
 | P0 | body-local rotvec实现、parser修正、synthetic／metamorphic tests | CPU | 全部自动测试通过；未读全量raw |
-| P1 | 一次性重建full-train translation＋rotvec signal shards及K3节点 | CPU | `162,760／162,760`、hash、无LLM |
+| P1 | 由immutable local-delta shards重建full-train translation＋rotvec signal，并以原轨迹subset验证等价 | CPU | 已闭合`162,760／162,760`、hash、无LLM |
 | P2 | 从新shards运行H0／H1、segment statistics并生成512 geometry calibration | CPU／低GPU渲染 | 人工选择唯一rule set |
 | P3 | 冻结geometry／event／parser，生成deterministic sentence plans | CPU | immutable hashes与versioned manifest |
 | P4 | 只跑512 Qwen pilot并完成第二轮language review | 4090或5090 | 冻结prompt、`N_qwen_max`与fallback gate |
@@ -424,16 +429,36 @@ Gradio必需显示：
 | P7 | 写出唯一canonical dataset version | CPU | raw provenance、reason code、hash齐全 |
 | P8 | 单独提交raw／short／short-long matched Stage2合同 | 待授权GPU长训 | 不由本数据合同自动启动 |
 
-P1是采用rotvec后唯一一次权威全量trajectory重读，并必须预先写齐translation／rotation signal、
-sample offsets、histogram与后续event所需字段。P2以后只消费新shards。
+P1原计划执行唯一一次权威全量trajectory重读。实际raw pass在首个4,096样本建立上述等价证据后
+因I/O低效停止；完整P1改由已审计的local-delta shards确定性转换，并写齐translation／rotation
+signal、sample offsets、histogram与后续event所需字段。P2以后只消费新shards。
 
 > [!warning] 10万条provisional例外不改变canonical顺序
-> 作者本轮明确要求在calibration前用四个4090 Qwen实例生成10万条新版候选。执行版本固定为
+> 作者本轮明确要求在calibration前用4090生成10万条新版候选。执行版本固定为
 > `pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`：全轴统一采用H1，输出记录
 > `rule_candidate_status=provisional_not_selected_by_512_calibration`，Qwen只读deterministic
-> sentence plan，single-pass后独立reparse，失败即deterministic fallback。四个25K分片互不重叠；
-> 旧512／30K／40K artifacts不修改。若后续calibration选择H0或更改salience，这10万条只保留为
+> sentence plan，single-pass后独立reparse，失败即deterministic fallback。数据先确定性分为
+> GPU0／GPU1两个互不重叠的50K split；GPU0由两个worker处理，GPU1由三个逻辑worker处理但按
+> 实测显存上限以`2+1`驻留。旧512／30K／40K artifacts不修改。若后续calibration选择H0或更改salience，这10万条只保留为
 > language／throughput provenance并整体失去canonical资格，不能局部混入新版本。
+
+### 9.1 v1p0执行artifact
+
+- rotvec conversion：`paperA_pulp_camera_rotvec_shard_conversion_train162760_stride4_v1p0_seed17_4090cpu_20260805`；
+  contract SHA256=`a99cfc727dc9e7eada3cbf59bbe1a16869e8bdb39ffdc175b193cd5df49282fa`，
+  equivalence SHA256=`1dd01e89e20d1b0c1708a1c11cdd4b3a22879518795e7e3e3acfd9c68fb311a0`。
+- provisional H1 event plan：`paperA_pulp_camera_eventplan_n100000_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
+  contract SHA256=`f7038bddb805a41e4e4270f898261c2dc46e3bb9759446af8051813426444c2c`，
+  共100,000条、842,488个axis events、650,709个required events与19,427条static样本。
+- GPU1三逻辑worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_tri_20260805`；
+  contract SHA256=`65fad244ab4a75d6f38692fcf5fd68d65b0a4bd73a933fd33ac44ae752012b10`。
+  三模型同时加载的OOM日志保留，正式执行采用同一contract下的`2+1`队列，不改模型、精度或prompt。
+- GPU0双worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g0_dual_20260805`；
+  contract SHA256=`676b0b76199ee1c29a6ed9fac210697a3cab7cab7b636bae761ef950cbdd09f4`，
+  在已授权C1REL训练释放GPU0后自动启动。
+- 更改部署合同前的GPU1双worker run保留28条已生成records，不删除、不拼入新run：
+  `paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_dual_20260805`，contract
+  SHA256=`9c44a2b9f587a0cfc7eeffa70ec9566046c00eb545795176338e066990ac3e3e`。
 
 ## 10. Artifact schema与版本纪律
 

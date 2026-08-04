@@ -3,9 +3,9 @@ title: "StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
 status: v11_c0_lat_mainline
 hypothesis: |
   StoryMotion uses v11 C0-LAT as the operational mainline and tests a
-  capability-preserving asymmetric Human–Camera extension. Camera-text work is
-  paused while the 5090 host is disconnected. NoInt-HREL Stage2 is shelved;
-  C1REL raw-caption Stage2 and C1REL-w/o-Interaction16 Stage1 are active.
+  capability-preserving asymmetric Human–Camera extension. NoInt-HREL and
+  C1REL-w/o-Interaction16 Stage2 are closed; C1REL raw-caption Stage2 is the
+  only running model ablation. Versioned noncanonical Camera-text work is active.
 tags:
   - StoryMotion
   - version/v11
@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-04T16:43:38+08:00
+updated: 2026-08-05T02:47:07+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -68,7 +68,16 @@ updated: 2026-08-04T16:43:38+08:00
 > [!important] 当前next experiment
 > 不启动任何C1REL-noI16 Stage2。先让GPU0的C1REL raw-`T0` Stage2完成并按Direct-H／Direct-C／
 > sequential做formal eval；只有它在守住Human的同时提供明确Camera signal，才保留canonical-text
-> retrain资格。GPU1转入版本化Camera-text处理，不用空闲GPU扩张新ablation。
+> retrain资格。按作者最新安排，不在2026-08-05中午前部署下一条ablation；当前run完成后先保留
+> endpoint，GPU0转入已授权的Qwen双worker，formal eval与后续建议在中午后继续处理。
+
+> [!important] Camera recaption v1p0正在执行
+> 旧512／30K／40K及本轮更改部署前产生的28条records全部保留且不拼接。10万条新版固定为
+> `pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805 / noncanonical`，只读rotvec H1 event
+> plan。GPU0负责50K／两个BF16 worker并在当前C1REL训练释放后启动；GPU1负责50K／三个逻辑
+> worker。实测三个BF16模型同时驻留会OOM，因此GPU1采用最多两个模型驻留的`2+1`队列，不改
+> checkpoint、精度、prompt或样本分片。H0／H1 calibration、512人工审核与sealed gate仍阻断
+> canonical写回。完整合同与artifact hash见[[Pulp-camera-recaption-contract]]。
 
 > [!important] Scope
 > 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
@@ -165,20 +174,22 @@ StoryMotion另纳入一项次要数据贡献：固定Pulp Camera convention，�
 新增无歧义caption，同时保留原caption、来源与修订版本。该修正尚未完成，不得提前写成
 已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。首个
 `N=512`、seed17、无LLM的TriMotion-compatible geometry screen已经完成自动检查。用户随后单独
-授权Qwen生成review-only short／long candidates及额外30,000条零重叠扩展；该授权不把临时阈值、
-symbolic phase或LLM文本升级为canonical，也不支持宣称缺陷比例。所有candidate仍须经过人工视频审核、
-阈值／parser裁决和版本化冻结后才能进入Stage2合同。
+授权保留既有review-only short／long candidates，并额外生成10万条显式
+`v1p0-H1 / noncanonical`候选；该授权不把临时阈值、event plan或LLM文本升级为canonical，
+也不支持宣称缺陷比例。所有candidate仍须经过人工视频审核、H0／H1与parser裁决和版本化冻结后
+才能进入Stage2合同。
 
 ## 4. 活跃 blocker
 
-1. **Camera文本暂停。** 5090当前断链；在用户通知恢复前，不重连、不续跑、不汇总Qwen候选，
-   也不推进人工审核或canonical caption冻结。现有geometry／language artifacts保持immutable、
-   noncanonical；该暂停不授权以raw caption替代最终caption合同。
-2. **表示与factorization主对照。** NoInt-HREL因Stage1 Camera／framing全线退化且HREL语义可能
-   与后续Camera text冲突，Stage2已搁置。C1REL与v9难分上下，作者已显式授权一条raw-`T0`
-   Stage2诊断及其严格no-I16 Stage1：两条都保持seed17、Pulp factual pair、non-causal和
-   `joint_parallel=false`。raw-`T0`结果只回答当前表示／生成器可行性，不能代替未来
-   canonical caption-matched比较；Matched Symmetric Joint仍未授权。完整边界见
+1. **Camera文本尚未canonical。** exact train rotvec signal与10万条provisional H1 event plan已闭合，
+   4090 Qwen语言化正在执行；旧artifact保持immutable。H0／H1 calibration、512人工审核、parser
+   gate与sealed 512仍未完成，因此当前输出不得写回训练manifest，也不授权以raw caption或
+   provisional Qwen text替代最终caption合同。
+2. **表示与factorization主对照。** NoInt-HREL与strict C1REL-noI16均因Stage1正式退化关闭
+   Stage2。C1REL与v9难分上下，唯一活动模型run是作者显式授权的raw-`T0` Stage2诊断；它保持
+   seed17、Pulp factual pair、non-causal和`joint_parallel=false`。raw-`T0`结果只回答当前
+   表示／生成器可行性，不能代替未来canonical caption-matched比较；Matched Symmetric Joint
+   仍未授权。完整边界见
    [[StoryMotion-iclr-reliability#2. `0803-2024`表示因果矩阵]]。
 3. **投稿证据闭环。** canonical text冻结后完成`PulpMotion-Repro-162K`，保持PulpMotion自身
    representation／model，并冻结同split、同sample count、同指标的主表；PulpMotion
@@ -205,10 +216,10 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
 - NoInt-HREL Stage2保持搁置；C1REL只运行已显式授权的raw-`T0` Stage2，且最终canonical
   Camera text冻结后必须重训。当前不从该授权扩张到Matched Symmetric或其他Stage2矩阵。
-- `C1REL-w/o-Interaction16`只运行严格matched Stage1：H128＋native C1REL-C48、无I16、
-  176D、fresh seed17 `636K`；当前不自动接Stage2。
-- Camera data工作全部暂停到用户通知5090恢复；现有512条与30,000条Qwen输出仍只是
-  review-only candidates，不得把已生成数量等同数据闭环。
+- `C1REL-w/o-Interaction16`严格matched Stage1已闭合并在formal audit后hard stop；不接Stage2。
+- Camera data使用显式版本`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`处理10万条
+  noncanonical候选；GPU0双worker、GPU1三逻辑worker的运行与旧artifact相互隔离。不得把已生成
+  数量等同数据闭环，也不得在H0／H1 calibration与sealed gate前写回canonical text。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的

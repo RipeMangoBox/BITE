@@ -4,8 +4,8 @@ status: in_progress
 hypothesis: |
   StoryMotion检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
-  C0-LAT是后续唯一operational mainline。NoInt-HREL Stage2已搁置；当前只运行获授权的
-  C1REL raw-caption Stage2与C1REL-w/o-Interaction16 Stage1。
+  C0-LAT是后续唯一operational mainline。NoInt-HREL与C1REL-w/o-Interaction16 Stage2均关闭；
+  当前只保留获授权的C1REL raw-caption Stage2和版本化noncanonical Camera recaptioning。
 tags:
   - StoryMotion
   - reliability
@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-05T01:50:34+08:00
+updated: 2026-08-05T02:47:07+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -78,7 +78,11 @@ $C_t^{-1}C_{t+4}$与TriMotion-compatible first-frame $C_1^{-1}C_t$。40个signal
 表中数字是camera-local、log-space weighted KMeans的cluster-center几何中点，只是候选node。
 first-frame对应节点幅值接近，但复合运动的方向符号可以改变，不能据此宣称两个坐标语义等价。
 若采用[[StoryMotion/Pulp-camera-recaption-contract]]中的rotation-log定义，当前tilt／pan／roll节点
-只保留为Euler-screen，必须在exact train上重算rotvec分布；不得直接改名晋升。
+只保留为Euler-screen，不得直接改名晋升。新版已在4,096样本／118,197 steps上验证
+`Euler delta → SO(3) → Log`与原轨迹rotvec的rotation max-abs为
+`1.52587890625e-05 deg/s`、translation max-abs为`0.0 m/s`，随后转换全部
+`162,760`样本／`4,733,272` steps并重新计算rotvec候选节点；权威contract SHA256=
+`a99cfc727dc9e7eada3cbf59bbe1a16869e8bdb39ffdc175b193cd5df49282fa`。
 Pulp native translation tags给出的弱监督operating points为truck／pedestal／dolly
 `0.023874／0.019765／0.023554 m/s`；原始caption弱锚点为
 `0.048327／0.040709／0.052767 m/s`。前者来自Pulp自身translation-only rule，后者又由
@@ -106,14 +110,15 @@ rotation primitive，41条含zoom／orbit等intrinsics或未支持primitive。�
 受`push-ins／pull-outs`复数词形漏解析影响，只能作为review ordering。
 
 > [!warning] 尚未冻结的标准
-> 在canonical recaption前仍须裁决：camera-local或first-frame的primitive语义；K3 upper与
-> native／raw anchor如何形成on／off hysteresis；dominance／mixed-axis规则；minimum duration、
-> gap merge、并行与先后判据；持续小幅运动的累计幅度；rotation Euler约定；是否把FOV／zoom纳入
-> Camera-only属性；short与long的event保真合同；numeric grouping距离与人工边界样本协议。
+> v1已固定camera-local primitive、rotvec与axis-wise detector，不再重开first-frame、Euler或
+> winner-take-all dominance轴。在canonical recaption前仍须由512 calibration裁决H0／H1、
+> segment salience与sign-consistency；还须完成FOV／zoom隔离、short／long event保真、numeric
+> grouping与人工边界样本协议。
 > Web GPT建议的采纳、降级与拒绝，以及最小v1执行gate，统一由
 > [[StoryMotion/Pulp-camera-recaption-contract]]拥有。
-> 在用户通知恢复前仍不重连5090、不续跑Qwen、不推进Gradio写回。候选threshold与语言artifact
-> 都不得进入canonical Stage2。
+> exact train rotvec转换、重新计算的候选节点及10万条provisional H1 event plan现已闭合；
+> 4090上的版本化Qwen语言化已经启动。该执行授权不替代H0／H1 calibration、512人工审核、
+> parser gate或sealed 512，候选threshold与语言artifact仍不得进入canonical Stage2。
 
 ## 2. `0803-2024`表示因果矩阵
 
@@ -214,7 +219,7 @@ text冻结后重训才有最终比较资格。该例外不授权D的Stage2、Mat
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 data | Pulp Camera文本 | Euler旧512／30K／40K及Qwen artifacts保持noncanonical provenance；full-train阈值审计已闭合 | 运行独立rotvec full-train signal pass；随后以显式`v1p0-H1`版本生成10万条noncanonical Qwen candidates；H0／H1 calibration与sealed gate仍阻断canonical写回 | CPU＋4090 Qwen；无模型长训 | 通过calibration／sealed后才写版本化factual caption修正 |
+| P0 data | Pulp Camera文本 | 旧512／30K／40K artifacts保持noncanonical；rotvec full-train signal、重新计算的候选节点与10万条H1 event plan已闭合 | 完成显式`v1p0-H1`的10万条noncanonical Qwen candidates；随后做H0／H1 calibration、人工审核与sealed gate | CPU＋4090 Qwen；无模型长训 | 通过calibration／sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
 | P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2按fresh Human `105K`＋GT-H LAT Camera `105K`启动 | 训练闭合后按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 是，已授权 | 只回答当前caption下表示／生成器可行性 |
 | closed component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；Human、Camera、FOV与projective所查16项相对C1REL的CI全部回退 | Stage2 hard stop；不再为该分支支付训练预算 | 否 | 支持C1REL下I16对Stage1 owning reconstruction／framing不可删；不外推free-generation necessity |
@@ -259,8 +264,8 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.2 必须等实验再决定
 
 - Pulp Camera caption修正能否列为数据贡献；由自动一致性与完整512条人工审核决定。
-- 显式interaction16是否必要；NoInt-HREL只支持Stage1贡献，严格C1REL-no-I16 Stage1仍在运行；
-  结论不得扩大为“Camera不依赖Human”或generation necessity。
+- 显式interaction16是否对free generation必要；NoInt-HREL与strict C1REL-no-I16只支持Stage1
+  reconstruction／framing贡献，结论不得扩大为“Camera不依赖Human”或generation necessity。
 - HREL还是C1REL作为StoryMotion主表示；raw-`T0`结果不能裁决最终文本版本，C1REL必须在
   canonical text下同时改善Camera control并守住人物构图。
 - protected asymmetric factorization是否优于matched symmetric joint；必须在表示与文本冻结后
@@ -270,7 +275,7 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.3 可选、不阻塞主张
 
 - 若正文不声称latent接口优于显式Human API，则无需运行H199 cascade。
-- `C1REL-w/o-Interaction16`已获一次Stage1-only授权；其结果不自动触发Stage2。
+- `C1REL-w/o-Interaction16`的Stage1-only审计已hard stop；其结果不触发Stage2。
 - 若正文需要更多relation机制归因，再补zero／shuffle／route检查；NoInt目前只支持I16的
   Stage1 reconstruction／framing贡献。
 
@@ -278,7 +283,7 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 
 - “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
 - “interaction16对generation必要”——Stage1只支持其reconstruction／framing贡献；
-  NoInt-HREL Stage2已搁置，C1REL-no-I16当前也只授权Stage1。
+  NoInt-HREL与C1REL-no-I16 Stage2均已关闭。
 - “C1REL优于HREL”——Stage1没有形成稳定Pareto且不读取文本；当前raw-`T0` Stage2不具备
   最终caption-matched资格，仍需canonical text重训及Camera-native adherence／Human-relative
   framing联合证据。
@@ -290,15 +295,14 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ## 5. 本周初稿与实验冻结顺序
 
 初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
-和baseline superiority暂留占位符。Camera data恢复前的当前顺序是：
+和baseline superiority暂留占位符。作者要求下一条ablation等到2026-08-05中午再处理；当前顺序是：
 
 1. C0-LAT保持唯一operational mainline；NoInt-HREL Stage2保持搁置；
-2. 闭合C1REL raw-`T0` Stage2的Human `105K`＋Camera `105K`与三接口formal，但不据此
-   宣布canonical-text胜者；
-3. 闭合strict `C1REL-w/o-Interaction16` Stage1 `636K`及pure4,053 reconstruction／framing
-   audit；不自动接Stage2；
-4. 等用户通知5090恢复后，再核验Qwen artifact并继续视频审核、阈值／phase／parser裁决，冻结唯一
-   symbolic／short／long artifact；
+2. 让已授权C1REL raw-`T0` Stage2完成并保存endpoint；中午前不部署下一条ablation。其三接口
+   formal只回答raw-caption可行性，不宣布canonical-text胜者；
+3. strict `C1REL-w/o-Interaction16` Stage1及formal audit已闭合并hard stop，不接Stage2；
+4. 完成10万条显式`v1p0-H1 / noncanonical` Qwen候选，再继续视频审核、H0／H1与parser裁决，
+   冻结唯一symbolic／short／long artifact；
 5. 冻结canonical text后重训必要的最小caption-matched Stage2，再以Camera-native adherence与
    Human-relative framing裁决HREL／C1REL；
 6. 使用同一canonical text完成获授权representation所需的最小Stage2；Matched Symmetric须另行
