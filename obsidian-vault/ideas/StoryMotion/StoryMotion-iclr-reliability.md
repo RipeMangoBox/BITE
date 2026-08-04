@@ -186,7 +186,7 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 - 两条r2均完成exact pure4,053、true-length owning-decoder geometry／framing audit与10,000次paired
   bootstrap。NoInt-HREL在Human基本保持时系统性回退Camera／framing；C1REL守住Human但Camera
   trajectory／rotation回退、projection字段混合，没有形成可晋升的稳定Pareto。完整数字与hash只见
-  [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL matched Stage1 audit]]。
+  [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit]]。
 - 原始formal evaluator首次启动因多传`velocity_mean/std`在任何eval artifact写入前fail-closed；失败日志
   保留，修正版重新审计后产生上述唯一正式结果。该实现错误不影响checkpoint或正式artifact。
 - C1REL raw-`T0` Stage2：`paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`；
@@ -198,11 +198,14 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 - C1REL-w/o-I16 Stage1：`paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`；
   latent order为`human128+c1relative_camera48`，只移除I16，contract SHA256=
   `fa0a2d11…f588`。500-step preflight ratio=`0.0249956`、Human invariance max-abs=`0.0`，
-  long-run model进入训练前optimizer steps=`0`；当前只授权Stage1。
+  long-run model进入训练前optimizer steps=`0`。该run已完成`636K`及exact pure4,053 formal；相对
+  C1REL的Human 5项、Camera／FOV 7项与projective 4项95% CI全部在零上方，Camera ADE为
+  `1.501675 m`、rotation为`38.977528°`。因此按预声明在Stage1 hard stop，不授权Stage2。
 
 ### 2.4 Stage2文本gate
 
-Stage1 formal闭合不自动授权Stage2，也没有测量Camera text adherence。NoInt-HREL Stage2已因
+Stage1 formal闭合不自动授权Stage2，也没有测量Camera text adherence。NoInt-HREL与
+C1REL-w/o-I16 Stage2均已因
 正式退化与坐标语义风险搁置。C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`
 诊断可以训练，但必须绑定caption版本、split、sample identity与hash，并在canonical short／long
 text冻结后重训才有最终比较资格。该例外不授权D的Stage2、Matched Symmetric或其他矩阵。
@@ -211,10 +214,10 @@ text冻结后重训才有最终比较资格。该例外不授权D的Stage2、Mat
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| paused | Pulp Camera文本 | 512 geometry screen、Qwen review candidates、额外30,000条零重叠noncanonical扩展及视频审核界面已存在；5090当前断链 | 等用户通知后再恢复连接、核验artifact进度并继续视频审核；恢复前不处理 | 否 | 通过后写版本化factual caption修正 |
+| P0 data | Pulp Camera文本 | Euler旧512／30K／40K及Qwen artifacts保持noncanonical provenance；full-train阈值审计已闭合 | 运行独立rotvec full-train signal pass；随后以显式`v1p0-H1`版本生成10万条noncanonical Qwen candidates；H0／H1 calibration与sealed gate仍阻断canonical写回 | CPU＋4090 Qwen；无模型长训 | 通过calibration／sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
 | P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2按fresh Human `105K`＋GT-H LAT Camera `105K`启动 | 训练闭合后按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 是，已授权 | 只回答当前caption下表示／生成器可行性 |
-| P0 component | C1REL-w/o-I16 | strict 176D Stage1已通过preflight并从零启动 | 完成`636K`后做exact pure4,053 owning-decoder与paired bootstrap | 是，仅Stage1 | 检验C1REL表示下I16的Stage1 reconstruction／framing贡献 |
+| closed component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；Human、Camera、FOV与projective所查16项相对C1REL的CI全部回退 | Stage2 hard stop；不再为该分支支付训练预算 | 否 | 支持C1REL下I16对Stage1 owning reconstruction／framing不可删；不外推free-generation necessity |
 | P0 method control | Matched Symmetric Joint | 尚未创建；默认parent已冻结为C0-LAT，必须复用其Stage1、latent target、decoder、数据、exposure与最终canonical text | 先冻结参数／checkpoint／exposure／GPU-hour／inference-cost合同；text恢复前不启动 | 是，仅Stage2；待授权 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
 | P1 external baseline | PulpMotion-Repro-162K | 现有native PulpMotion行不能自动视为exact 162,760 reproduction | canonical text冻结后，按PulpMotion own representation／model在相同split、exposure和评测协议复现 | 是，Stage1＋Stage2 | 外部系统边界；不是StoryMotion组件消融 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |

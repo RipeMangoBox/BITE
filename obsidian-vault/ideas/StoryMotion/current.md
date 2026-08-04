@@ -52,16 +52,23 @@ updated: 2026-08-04T16:43:38+08:00
 > Stage2 generation necessity。作者据此搁置NoInt-HREL Stage2。C1REL的Camera
 > trajectory／rotation回退且projective字段混合，与v9难分上下；其坐标语义更契合后续
 > Camera text，因此已单独授权raw-caption Stage2诊断，并补严格的
-> `C1REL-w/o-Interaction16` Stage1。HREL与C0-LAT的当前mainline身份不因启动事件改变。正式数值见
-> [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL matched Stage1 audit]]。
+> `C1REL-w/o-Interaction16` Stage1。该strict分支现已完成formal：相对C1REL的Human 5项、
+> Camera／FOV 7项和projective 4项95% CI全部回退，故在Stage1 hard stop且不进入Stage2。
+> HREL与C0-LAT的当前mainline身份不变。正式数值见
+> [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit]]。
 
 > [!warning] C1REL当前是raw-caption诊断，不是最终文本对照
 > GPU0运行`paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`：复用已审计
 > C1REL Stage1及owning decoder／新建C1REL cache与train-only stats，fresh训练Human
 > teacher `105K`，冻结后再训练GT-H-only LAT Camera `105K`。GPU1运行
 > `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`：保留native
-> C1REL-C48，只删除I16，latent为H128＋C48＝176D。前者绑定旧Pulp `T0` Camera
-> caption，canonical text冻结后必须重训才能进入最终caption-matched比较；后者当前只授权Stage1。
+> C1REL-C48，只删除I16，latent为H128＋C48＝176D；后者已因formal严重退化关闭。前者绑定旧Pulp
+> `T0` Camera caption，canonical text冻结后必须重训才能进入最终caption-matched比较。
+
+> [!important] 当前next experiment
+> 不启动任何C1REL-noI16 Stage2。先让GPU0的C1REL raw-`T0` Stage2完成并按Direct-H／Direct-C／
+> sequential做formal eval；只有它在守住Human的同时提供明确Camera signal，才保留canonical-text
+> retrain资格。GPU1转入版本化Camera-text处理，不用空闲GPU扩张新ablation。
 
 > [!important] Scope
 > 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera

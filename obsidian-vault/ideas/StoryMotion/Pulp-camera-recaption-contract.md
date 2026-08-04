@@ -1,6 +1,6 @@
 ---
 title: "Pulp Camera Geometry-Grounded Recaptioning Contract"
-status: proposed_precalibration
+status: active_provisional_h1_labeling
 hypothesis: |
   使用冻结的camera-local六轴增量、全训练集候选阈值、轴级事件归并和确定性句子计划，
   可以在不让LLM决定几何真值的前提下，为Pulp构造可审核的Camera short／long text。
@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T01:50:34+08:00
+updated: 2026-08-05T02:40:00+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -27,9 +27,11 @@ updated: 2026-08-05T01:50:34+08:00
 > 本页评估并收敛`0805-0137`中的Web GPT建议，拥有Pulp Camera recaptioning的算法、
 > calibration、语言化与QC合同。全量候选阈值及其artifact只见
 > [[StoryMotion/StoryMotion-iclr-reliability#1.1 Pulp Camera full-train threshold audit]]。
-> 当前只授权CPU规则实现与人工calibration准备；不授权Qwen续跑、canonical写回、Stage2重训
-> 或任何GPU长训。由于rotation权威表示从Euler改为rotvec，仍需一次最终权威CPU signal pass；
-> 此后所有阈值与event sweep只读shards，不重复扫描原轨迹。
+> 2026-08-05作者额外授权：保留全部旧标注artifact，以4090四个Qwen实例处理10万条显式新版
+> candidates。该授权不等于H1规则冻结；在512 calibration完成前，输出固定标为
+> `v1p0-H1 / noncanonical`，不得写回训练manifest或冒充sealed evidence。rotation权威表示从
+> Euler改为rotvec，因此先执行一次最终权威CPU signal pass；此后event sweep与10万条语言化只读
+> 新shards，不重复扫描原轨迹。本授权仍不包含canonical写回、Stage2重训或任何模型长训。
 
 ## 1. 目标、边界与最小原则
 
@@ -416,15 +418,22 @@ Gradio必需显示：
 | P1 | 一次性重建full-train translation＋rotvec signal shards及K3节点 | CPU | `162,760／162,760`、hash、无LLM |
 | P2 | 从新shards运行H0／H1、segment statistics并生成512 geometry calibration | CPU／低GPU渲染 | 人工选择唯一rule set |
 | P3 | 冻结geometry／event／parser，生成deterministic sentence plans | CPU | immutable hashes与versioned manifest |
-| P4 | 5090恢复后只跑512 Qwen pilot并完成第二轮language review | 5090 GPU3 | 冻结prompt、`N_qwen_max`与fallback gate |
-| P5 | 在冻结合同上完成sealed 512 | 5090＋人工审核 | 达到四项最低gate；不反向调参 |
-| P6 | 生成full-train deterministic text与单次Qwen realization | CPU＋5090 | reject自动fallback；不写训练cache |
+| P4 | 只跑512 Qwen pilot并完成第二轮language review | 4090或5090 | 冻结prompt、`N_qwen_max`与fallback gate |
+| P5 | 在冻结合同上完成sealed 512 | GPU＋人工审核 | 达到四项最低gate；不反向调参 |
+| P6 | 生成full-train deterministic text与单次Qwen realization | CPU＋GPU | reject自动fallback；不写训练cache |
 | P7 | 写出唯一canonical dataset version | CPU | raw provenance、reason code、hash齐全 |
 | P8 | 单独提交raw／short／short-long matched Stage2合同 | 待授权GPU长训 | 不由本数据合同自动启动 |
 
 P1是采用rotvec后唯一一次权威全量trajectory重读，并必须预先写齐translation／rotation signal、
-sample offsets、histogram与后续event所需字段。P2以后只消费新shards。5090未恢复时停在P3，
-不会转用4090抢跑Qwen或扩张训练矩阵。
+sample offsets、histogram与后续event所需字段。P2以后只消费新shards。
+
+> [!warning] 10万条provisional例外不改变canonical顺序
+> 作者本轮明确要求在calibration前用四个4090 Qwen实例生成10万条新版候选。执行版本固定为
+> `pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`：全轴统一采用H1，输出记录
+> `rule_candidate_status=provisional_not_selected_by_512_calibration`，Qwen只读deterministic
+> sentence plan，single-pass后独立reparse，失败即deterministic fallback。四个25K分片互不重叠；
+> 旧512／30K／40K artifacts不修改。若后续calibration选择H0或更改salience，这10万条只保留为
+> language／throughput provenance并整体失去canonical资格，不能局部混入新版本。
 
 ## 10. Artifact schema与版本纪律
 

@@ -917,6 +917,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 / [[Storymotion-exp-sha]] | deterministic exact-length owning encoder–decoder round trip；decode batch1 | redesign Pulp [[Storymotion-exp-sha]] | `human_anchor_interaction_residual_199_14_128_16_48_v1`；owning decoder [[Storymotion-exp-sha]] |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 / ordered SHA `a0d7627e…6b93` | deterministic exact-length owning encoder–decoder round trip；decode batch1 | StoryMotion representation evaluator SHA `e6c8fb08…5eb0` | H128＋C48；显式I16删除；owning `D_h/D_c/D_f`；non-causal |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 / ordered SHA `a0d7627e…6b93` | deterministic exact-length owning encoder–decoder round trip；decode batch1 | StoryMotion representation evaluator SHA `e6c8fb08…5eb0` | H128＋I16＋C1REL-C48；owning `D_h/D_c/D_f`恢复world Camera14；non-causal |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 / ordered SHA `a0d7627e…6b93` | deterministic exact-length owning encoder–decoder round trip；decode batch1 | StoryMotion representation evaluator SHA `cd4a4054…0218` | H128＋C1REL-C48；只删除I16；owning `D_h/D_c/D_f`；non-causal |
 | v10 Human-relative Camera old-3-loss Phase B / `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | historical `210K` Camera-only paired reconstruction diagnostic | 4,053 / [[Storymotion-exp-sha]] | deterministic exact-length owning encoder–decoder round trip；GT Human supplies inverse-relative reference | v10 native + canonical historical Stage1 endpoint evaluator [[Storymotion-exp-sha]] | frozen Phase-A Human128 owner + independent relative-Camera48 encoder/decoder；missing framing backprop；non-causal [[Storymotion-exp-sha]] |
 | Redesign HML+Pulp / `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r4_true4053_seed17_5090g2_20260727` | joint paired reconstruction | 4,053 / [[Storymotion-exp-sha]] | deterministic exact-length owning encoder–decoder round trip；decode batch1 | redesign Pulp [[Storymotion-exp-sha]] | same redesigned architecture；owning decoder [[Storymotion-exp-sha]] |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r2_true_hmlval1460_seed17_5090g2_20260727` | HumanML3D Human-only root/local paired reconstruction diagnostic | 1,460 / [[Storymotion-exp-sha]] | deterministic exact-length owning Human encoder–decoder round trip；decode batch1 | redesign HumanML [[Storymotion-exp-sha]] | converted HML root/local under Pulp normalization；rot6D `4:136` prohibited mean-imputed/unobserved；decoder [[Storymotion-exp-sha]] |
@@ -932,6 +933,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / true4053 r4 | joint paired reconstruction | 4,053 | 0.120708 | 0.042136 | 0.100757 | 0.248722 | 10.434 | 18.751 | 20.757 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.120919 | 0.042175 | 0.100965 | 0.249442 | 10.447 | 18.775 | 20.786 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.120705 | 0.042187 | 0.100737 | 0.248654 | 10.452 | 18.877 | 20.897 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 0.129549 | 0.044328 | 0.109197 | 0.262747 | 11.529 | 20.634 | 22.739 |
 | v10 HREL-C old-3-loss Phase-B / final210K diagnostic | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.133869 | 0.044779 | 0.112616 | 0.279547 | 11.897 | 21.218 | 23.622 |
 | Redesign HML+Pulp / true4053 r4 | joint paired reconstruction | 4,053 | 0.718084 | 0.212668 | 0.614757 | 1.136651 | 82.011 | 91.159 | 418.094 |
 
@@ -943,6 +945,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / true4053 r4 | joint paired reconstruction | 4,053 | 0.037654 | 0.043840 | 0.026146 | 0.033668 | 0.575890 | 0.204003 | 0.262347 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.047452 | 0.067396 | 0.037331 | 0.059294 | 0.736642 | 0.230362 | 0.294394 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.044945 | 0.057538 | 0.035511 | 0.049641 | 0.820222 | 0.186437 | 0.307167 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 1.501675 | 1.583464 | 1.500885 | 1.582966 | 38.977528 | 1.167162 | 1.834105 |
 | v10 HREL-C old-3-loss Phase-B / final210K diagnostic | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.121757 | 0.377332 | 0.021567 | 0.173423 | 0.617630 | 2.265990 | 1.462458 |
 | Redesign HML+Pulp / true4053 r4 | joint paired reconstruction | 4,053 | 0.052681 | 0.058489 | 0.026317 | 0.034576 | 0.598872 | 0.197493 | 0.269706 |
 
@@ -952,6 +955,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / true4053 r4 | joint paired reconstruction | 4,053 | 0.160790 | 0.096190 | 0.029678 | 0.039550 | 0.484065 / 0.497732 | 0.023921 / 0.007547 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.180547 | 0.101843 | 0.031005 | 0.041164 | 0.484226 / 0.497732 | 0.023734 / 0.007547 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.157706 | 0.101260 | 0.029883 | 0.040497 | 0.485306 / 0.497732 | 0.024223 / 0.007547 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 4.741876 | 1.157589 | 0.360707 | 0.306611 | 0.227098 / 0.497732 | 0.393948 / 0.007547 |
 | v10 HREL-C old-3-loss Phase-B / final210K diagnostic | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.353564 | 0.107943 | 0.066030 | 0.041602 | 0.497488 / 0.497732 | 0.012102 / 0.007547 |
 | Redesign HML+Pulp / true4053 r4 | joint paired reconstruction | 4,053 | 0.848923 | 0.343268 | 0.132111 | 0.122139 | 0.435095 / 0.497732 | 0.118101 / 0.007547 |
 
@@ -966,6 +970,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / true4053 r4 | joint paired reconstruction | 4,053 | 0.026000 / 0.020484 / 0.050117 | 0.035668 / 0.022309 / 0.079710 | 0.028277 / 0.017335 / 0.062101 | 0.043172 / 0.026360 / 0.094611 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.026001 / 0.020474 / 0.050088 | 0.035671 / 0.022296 / 0.079721 | 0.028280 / 0.017332 / 0.062071 | 0.043178 / 0.026340 / 0.094728 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.026002 / 0.020492 / 0.050089 | 0.035668 / 0.022325 / 0.079727 | 0.028276 / 0.017322 / 0.062056 | 0.043168 / 0.026369 / 0.094644 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 0.024529 / 0.019159 / 0.046883 | 0.035715 / 0.022362 / 0.079895 | 0.028261 / 0.017301 / 0.062335 | 0.043168 / 0.026352 / 0.094779 |
 | v10 HREL-C old-3-loss Phase-B / final210K diagnostic | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.021380 / 0.016591 / 0.041141 | 0.035518 / 0.022162 / 0.079693 | 0.027760 / 0.016814 / 0.061350 | 0.042220 / 0.025519 / 0.093351 |
 | Redesign HML+Pulp / true4053 r4 | joint paired reconstruction | 4,053 | 0.037738 / 0.030727 / 0.069701 | 0.052227 / 0.038916 / 0.104918 | 0.037689 / 0.025133 / 0.080011 | 0.052494 / 0.034237 / 0.111604 |
 
@@ -976,6 +981,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | Redesign Pulp-only / true4053 r4 | joint paired reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069146 | 0.019719 / 0.011587 / 0.043854 | 0.027753 / 0.016438 / 0.061139 | 0.484022 / 0.421053 / 0.999598 | 0.039454 / 0.023312 / 0.082005 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.030293 / 0.017522 / 0.069152 | 0.019722 / 0.011590 / 0.043833 | 0.027757 / 0.016450 / 0.061155 | 0.483933 / 0.421429 / 0.999598 | 0.039482 / 0.023321 / 0.081861 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.030291 / 0.017520 / 0.069149 | 0.019718 / 0.011575 / 0.043866 | 0.027746 / 0.016434 / 0.061189 | 0.483900 / 0.420455 / 0.999598 | 0.039503 / 0.023321 / 0.081758 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 0.030311 / 0.017568 / 0.069343 | 0.019653 / 0.011535 / 0.043463 | 0.027627 / 0.016403 / 0.060805 | 0.485326 / 0.424242 / 0.996774 | 0.039549 / 0.023427 / 0.082139 |
 | v10 HREL-C old-3-loss Phase-B / final210K diagnostic | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.030211 / 0.017454 / 0.069245 | 0.019525 / 0.011400 / 0.043384 | 0.027378 / 0.016122 / 0.060866 | 0.496643 / 0.443182 / 1.000000 | 0.039378 / 0.023089 / 0.082767 |
 | Redesign HML+Pulp / true4053 r4 | joint paired reconstruction | 4,053 | 0.030462 / 0.017899 / 0.069392 | 0.021257 / 0.012494 / 0.046893 | 0.029491 / 0.017673 / 0.063758 | 0.480031 / 0.415730 / 0.986771 | 0.061342 / 0.042012 / 0.127044 |
 
@@ -1015,6 +1021,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | v9 redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_seed17_4090g0_20260726` | Phase A/B/C `636K`；current C0 shared Stage1 owner | 4,053 | 0.120708 / 0.042136 | 0.100757 / 0.248722 | 10.434 | 0.037654 / 0.043840 | 0.026146 / 0.033668 | 0.575890 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched Phase A/B/C `636K` representation ablation | 4,053 | 0.120919 / 0.042175 | 0.100965 / 0.249442 | 10.447 | 0.047452 / 0.067396 | 0.037331 / 0.059294 | 0.736642 |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | parameter-matched Phase A/B/C `636K` representation arm | 4,053 | 0.120705 / 0.042187 | 0.100737 / 0.248654 | 10.452 | 0.044945 / 0.057538 | 0.035511 / 0.049641 | 0.820222 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | strict C1REL component ablation；只删除I16 | 4,053 | 0.129549 / 0.044328 | 0.109197 / 0.262747 | 11.529 | 1.501675 / 1.583464 | 1.500885 / 1.582966 | 38.977528 |
 | v10 HREL-C old-3-loss / `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | Phase A `210K` + frozen-H Phase B `210K` historical diagnostic | 4,053 | 0.133869 / 0.044779 | 0.112616 / 0.279547 | 11.897 | 0.121757 / 0.377332 | 0.021567 / 0.173423 | 0.617630 |
 
 只有C3、v9与v10已在当前canonical projective schema下完整复核；更早版本不以缺失字段补造结果。`raw joint-out occupancy`是描述性占比，不能与paired Out error或Stage2的zero-visible `Out`混用。
@@ -1025,6 +1032,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | v9 redesign Pulp-only / canonical true4053 r4 | 0.160790 | 0.096190 | 0.029678 | 0.039550 | — | 0.484065 / 0.497732 | 0.023921 / 0.007547 | current C0 shared Stage1 owner |
 | NoInt-HREL / formal true4053 | 0.180547 | 0.101843 | 0.031005 | 0.041164 | — | 0.484226 / 0.497732 | 0.023734 / 0.007547 | Stage1 ablation；Stage2未授权 |
 | C1REL / formal true4053 | 0.157706 | 0.101260 | 0.029883 | 0.040497 | — | 0.485306 / 0.497732 | 0.024223 / 0.007547 | Stage1 representation arm；未晋升 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 4.741876 | 1.157589 | 0.360707 | 0.306611 | — | 0.227098 / 0.497732 | 0.393948 / 0.007547 | strict Stage1 component ablation；hard stop，无Stage2 |
 | v10 HREL-C old-3-loss / final210K diagnostic | 0.353564 | 0.107943 | 0.066030 | 0.041602 | 0.500543 native recon | 0.497488 / 0.497732 | 0.012102 / 0.007547 | historical diagnostic；no cache／promotion |
 
 > [!warning] `Out≈0.50` 的语义修正
@@ -1045,9 +1053,9 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 - Pulp 上两臂的 GT-H Camera ADE 几乎相同（`0.026146` vs `0.026317 m`），而 Human/root/projective error 大幅分离；因此 mixed 的主要 Pulp 回退不是 standalone Camera decoder failure。
 - Pulp/HML 数值反转只保留为 retrospective domain diagnostic / no promotion；不得把 HML partial result 写成完整 Human199、Camera、Stage2 或 generation 能力。
 
-### 6.8 NoInt-HREL／C1REL matched Stage1 audit
+### 6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit
 
-本节身份是 **StoryMotion**。reference、NoInt-HREL与C1REL使用相同Pulp pure4,053 ordered IDs、
+本节身份是 **StoryMotion**。reference、NoInt-HREL、C1REL与C1REL-noI16使用相同Pulp pure4,053 ordered IDs、
 真实有效长度、seed17、non-causal边界、deterministic owning encoder–decoder round trip和canonical
 Camera14 raw bridge。paired bootstrap以sample为单位做10,000次重采样，seed `17`；下表cell均为
 `arm − HREL reference [95% CI]`。误差项正值表示回退。
@@ -1056,16 +1064,28 @@ Camera14 raw bridge。paired bootstrap以sample为单位做10,000次重采样，
 | --- | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.000211 [-0.000072, 0.000513] | 0.000039 [-0.000010, 0.000086] | 0.000208 [-0.000077, 0.000506] | 0.000720 [0.000005, 0.001454] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | -0.000002 [-0.000886, 0.000759] | 0.000052 [-0.000072, 0.000170] | -0.000020 [-0.000896, 0.000733] | -0.000069 [-0.002813, 0.002382] |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 0.008842 [0.005645, 0.012002] | 0.002192 [0.001501, 0.002885] | 0.008440 [0.005288, 0.011559] | 0.014025 [0.005111, 0.022876] |
 
 | version / run | joint Cam ADE m | joint Cam FDE m | GT-H Cam ADE m | GT-H Cam FDE m | rotation deg |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.009798 [0.008764, 0.010824] | 0.023556 [0.021871, 0.025231] | 0.011186 [0.010050, 0.012295] | 0.025626 [0.023850, 0.027372] | 0.160751 [0.134838, 0.196613] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | 0.007291 [0.006396, 0.008184] | 0.013697 [0.012359, 0.015063] | 0.009365 [0.008420, 0.010329] | 0.015973 [0.014574, 0.017384] | 0.244332 [0.182620, 0.326526] |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 1.464021 [1.410848, 1.517311] | 1.539623 [1.483981, 1.594844] | 1.474739 [1.421337, 1.527961] | 1.549298 [1.493371, 1.604674] | 38.401637 [37.393106, 39.404047] |
 
 | version / run | joint UV L2 | center L2 | log-scale abs | paired Out error |
 | --- | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.019756 [0.001759, 0.041305] | 0.005653 [0.003732, 0.007953] | 0.001327 [0.000812, 0.001889] | 0.001613 [0.000936, 0.002308] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | -0.003085 [-0.025255, 0.018458] | 0.005069 [0.003204, 0.007278] | 0.000205 [-0.000615, 0.000989] | 0.000947 [0.000379, 0.001525] |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 4.581085 [4.209556, 4.992013] | 1.061399 [1.034197, 1.089261] | 0.331029 [0.321917, 0.340305] | 0.267061 [0.260354, 0.273892] |
+
+严格组件问题的主比较是`C1REL-noI16 − C1REL`，因为它只删除I16。该比较的Human
+global／root-aligned MPJPE、root ADE／FDE与wrapped-yaw mean，Camera joint／GT-H
+ADE／FDE、rotation、FOV-H／FOV-W，以及四项projective error共16项95% CI全部在零上方。
+其中joint Cam ADE差为`1.456730 [1.403823, 1.509794] m`，rotation差为
+`38.157305 [37.161044, 39.148231]°`，joint UV差为
+`4.584170 [4.214516, 4.995502]`。因此D在Stage1形成预声明的严重退化，停止于本层，
+不授权Stage2；该结果支持“I16对C1REL owning reconstruction／framing不可删”，仍不外推为
+free-generation中的单组件必要性。
 
 NoInt-HREL的Human均值基本保持，只有root FDE出现极小的正差；五项Camera geometry和四项projective
 error的CI均在零上方。因此本Stage1证据支持“删除显式I16会损害owning reconstruction／framing”，
@@ -1093,6 +1113,19 @@ C1REL对应SHA256依次为`5af7317fcaea0694b457cecf7a106b5ecd26e8acdfbe47a7bd657
 `b5685a7ee650e248c7da05893e6f73b5c39fba65487463478e454c1ab1cc71d0`、
 `c36afd833e5823cea22e179027763ed0b641af0c738aeca518dcafb089c01e69`、
 `cecf75f6f527cfb39907df7f5d02e1d2e60daebaa7f471af3cab9d5f2d2453b1`。
+
+C1REL-noI16对应SHA256依次为`b8b572d5562f0946896ac9fc6af866d9ea636c9460e461628b81bb2d2329be0b`、
+`fa0a2d1192a9e11e390bd57997031b58bddafafda84c9c68878ee820b799f588`、
+`320580ac1bf0eb5e0cf7593ee3a42459652b66d04b0423d4d7650ae82fe92907`、
+`6113bee975fb7a1e205afc5b497bc23a0a55112be90d4f6cd345493181267823`、
+`5b5555573fc77c84bd47e67b21da11f7e7f4e2c37c1edebda4643dd0bfffc851`、
+`712b9089fd06041f9fd69cf60fbb002422a2172376d9bd0543fa107c8e4c9c37`、
+`563b8fc47c821592e7b1597ccb81373bd355afe4de61c21bde2f4f819331243e`。
+三路paired comparison artifact／manifest SHA256分别为
+`ce21952d67b5f2b5532fdf4be494dcdf9f40d97aa8dd92f3816beb6107792bac`／
+`09a5e8ca807643f4a7a375582024f3197e1b5b99954408c186e62ee598c4cc51`；后者由run root
+`paperA_c1rel_nointeraction16_formal_paired4053_bootstrap10000_seed17_4090cpu_20260805`
+拥有，未授权representation selection或Stage2。
 cross-arm comparison／manifest SHA256为
 `b6fe50d255cd574385f8dcb75bc1eb7692371f8c770bb780674cb84b3afc2bed`／
 `dd89f88bb4fb08dc4cb0bb2dd8d2b126025e33117c983d6e7a20557c9700d254`；formal evaluator与
