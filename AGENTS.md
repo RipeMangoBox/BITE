@@ -38,8 +38,9 @@ claim-isolated paper tracks. Do not create a separate DIRECT repository:
   respectively. Existing run IDs, checkpoints, artifact paths, and historical
   Actor–Director diagnostic names are immutable provenance and are not renamed.
 
-1. The StoryMotion system mainline is the co-equal v11 C0-LAT and C0-GEO
-   `105K` endpoints. They share the exact v9 Pulp-only non-causal Stage1 owner
+1. The StoryMotion operational mainline is v11 C0-LAT at Camera optimizer
+   `105K`; C0-GEO remains an audited objective alternate/control. They share
+   the exact v9 Pulp-only non-causal Stage1 owner
    (`human128 + interaction16 + camera48`), its owning decoder/cache/stats, and
    the frozen v9 Human `105K` teacher; only the Camera objective differs.
    v8.1C C3-25 is the former-mainline system baseline and v7.14 is the older
@@ -80,14 +81,15 @@ claim-isolated paper tracks. Do not create a separate DIRECT repository:
    freezes the exact v9 Stage1 owner and first tests the H199 decode/re-encode
    interface without optimizer steps. A Camera-owned retrained Stage1 is an
    optional native-system comparison and requires separate authorization.
-7. StoryMotion v11 C0-LAT and C0-GEO seed17 are co-mainline Stage2 systems at
-   Camera optimizer `105K`. Their selection is supported by audited pure4,053
-   Direct-H, Direct-C, formal sequential, decoded geometry, physical
-   diagnostics, and matched bootstrap evidence. LAT and GEO remain co-equal
-   because their six Camera geometry confidence intervals cross zero and their
-   semantic/framing fields form a mixed Pareto. Historical run contracts and
-   IDs retain their original diagnostic fields for provenance; promotion does
-   not rewrite immutable artifacts. C3-25 retains its raw diagnostic ledger
+7. StoryMotion v11 C0-LAT seed17 is the default Stage2 system and parent for
+   future ablations at Camera optimizer `105K`; C0-GEO seed17 remains fully
+   audited but is not duplicated into future matrices by default. The author-side
+   operational choice uses the prioritized main-table evidence and LAT's simpler
+   objective/training contract. It does not imply statistically robust objective
+   superiority: all six Camera geometry confidence intervals cross zero and the
+   semantic/framing fields form a mixed Pareto. Historical run contracts and IDs
+   retain their original diagnostic fields for provenance; promotion does not
+   rewrite immutable artifacts. C3-25 retains its raw diagnostic ledger
    values as the former-mainline baseline. On human199, root-aligned MPJPE
    removes root translation but not heading; do not call it local-pose error
    without a yaw-aware attribution.

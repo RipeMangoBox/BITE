@@ -35,7 +35,7 @@ source_papers:
   - "[[analysis/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation]]"
   - "[[analysis/SIGGRAPH_ASIA_2025/Uni3C_Unifying_Precisely_3D-Enhanced_Camera_and_Human_Motion_Controls_for_Video_Generation]]"
 created: 2026-08-02T23:22:47+08:00
-updated: 2026-08-03T17:32:00+08:00
+updated: 2026-08-04T14:51:40+08:00
 ---
 
 # StoryMotion / DIRECT 单仓库双论文边界
@@ -48,8 +48,10 @@ updated: 2026-08-03T17:32:00+08:00
 > 作为冻结backbone，但不能把Paper A的能力保持式非对称框架重新计算为自身贡献。
 
 > [!warning] 成熟度边界
-> Paper A已有完整mainline endpoint；剩余两个核心科学任务是Pulp Camera文本修正与
-> Independent Conditional Cascade对照，另保留fully-separate native variant作为次要系统边界。
+> Paper A已有完整C0-LAT mainline endpoint，C0-GEO保留为audited alternate；剩余核心任务是
+> C0-LAT-based ablation收口与Pulp Camera文本修正。Camera data因5090断链暂时暂停；
+> 当前先冻结protected-H／relation-interface最小机制检查与Matched Symmetric factorization
+> control的参数、exposure及成本合同，不启动旧Independent／Fully-Separate specialist长训。
 > H199 decode→re-encode只是可选接口消融，不阻塞能力保持式非对称扩展主张。
 > DIRECT只有独立的问题定义，`RV-25`的source reconstruction
 > 仍为`0/25`，当前不能写成已经闭环的方法，也不授权Rect或A-series长训。
@@ -101,7 +103,7 @@ Paper A不是“一个新模型同时学会三个任务”，而是一个受保�
 1. 预训练Human branch拥有$p_H(H\mid T_H)$，在Camera扩展中冻结；
 2. 新增的$p_C(C\mid H,T_C)$同时服务observed-H与generated-H；
 3. Direct-H是被精确保留的基础能力，Composition是两个分布的顺序组合，不是第三个generator；
-4. C0-LAT／C0-GEO的正式结果证明三个接口可运行并形成Camera Pareto；H199 round-trip
+4. C0-LAT mainline与C0-GEO alternate的正式结果证明三个接口可运行并形成Camera Pareto；H199 round-trip
    只在正文选择“内部latent接口优于显式Human API”时作为可选消融。
 
 这里的核心问题是：**能否在不污染Human prior的条件下增加Camera composition，并由同一
@@ -325,7 +327,8 @@ Camera模型执行。重点不是“三接口本身”，也不是同步joint de
    无歧义描述；原caption、来源与修订版本全部保留。约16万条数据必须先经过自动几何一致性
    检查，再抽样人工核验。该项是Paper A的次要数据贡献，目前仍是待闭环方案。
 4. **三接口实证。** 在统一split、decoder、sample count与正式指标下报告Direct-H、
-   Direct-C、Composition及C0-LAT／C0-GEO Pareto；两endpoint不得按字段拼成虚构的单模型。
+   Direct-C、Composition、C0-LAT mainline及C0-GEO objective alternate；两endpoint不得按字段
+   拼成虚构的单模型。
 
 Stage1可以作为**系统级架构贡献**，但不应在缺少matched component ablation时声称
 `interaction16`、conditioner与三阶段schedule中的每一个部件都被单独证明必要。
@@ -472,9 +475,9 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 
 ### Paper A：立即收口
 
-- 冻结C0-LAT／C0-GEO共同主线；
+- 冻结C0-LAT为后续唯一operational mainline与默认ablation parent；C0-GEO保留audited alternate；
 - 停止把DIRECT、Rect和ViGen utility当作Paper A hard blocker；
-- 优先完成Pulp Camera坐标／文本修正，再补主表、sealed audit、视觉失败分层和复现包；
+- 5090断链期间暂停Pulp Camera数据处理，先冻结C0-LAT-based ablation合同；恢复后再继续文本修正；
 - H199与最小机制检查只按正文实际claim选择，不进入默认critical path；
 - 标题、摘要与contribution围绕capability-preserving asymmetric extension；
 - sequential写成factorized joint generation，不写同步或双向协同。

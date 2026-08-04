@@ -18,7 +18,7 @@ source_notes:
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
   - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
 created: 2026-07-28T12:03:02+08:00
-updated: 2026-08-03T15:13:03+08:00
+updated: 2026-08-04T14:51:40+08:00
 ---
 
 # StoryMotion Experiment SHA Registry
@@ -367,7 +367,7 @@ endpoint audit是post-training、non-overwriting evaluator；没有构造optimiz
 
 ## 5. v11 four-arm `105K` confirmation and visual
 
-四臂formal数值与checkpoint／result／records／audit SHA由[[StoryMotion-valid-metric-ledger#3.10 v11 four-arm 105K first-512 audited confirmation]]拥有。本节只登记其余eval fixed source、visual与实现identity；四个visual均为相同first-8 ordered sample IDs的GT／Direct-C／formal sequential三联，`joint_parallel=false`。2026-07-31 selection event将C0-LAT与C0-GEO共同设为mainline；C1两臂保留审计身份但不进入系统端点。
+四臂formal数值与checkpoint／result／records／audit SHA由[[StoryMotion-valid-metric-ledger#3.10 v11 four-arm 105K first-512 audited confirmation]]拥有。本节只登记其余eval fixed source、visual与实现identity；四个visual均为相同first-8 ordered sample IDs的GT／Direct-C／formal sequential三联，`joint_parallel=false`。2026-08-04 C0-LAT被指定为后续唯一operational mainline；C0-GEO与C1两臂保留不可改写的审计／visual identity，但不作为默认后续训练parent。
 
 | version / run | fixed samples SHA256 | visual manifest SHA256 |
 | --- | --- | --- |

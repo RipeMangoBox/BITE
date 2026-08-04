@@ -14,7 +14,7 @@ source_notes:
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-08-03T21:05:00+08:00
+updated: 2026-08-04T14:51:40+08:00
 ---
 
 ## 0. 当前裁决
@@ -695,7 +695,11 @@ runs/vis/stage2/
 - headless Chromium：exact tab label、六个heading、8个sample options、六路媒体HTTP、切换第二样本与同步播放全部通过；page errors=`0`、console errors=`0`、unexpected failed requests=`0`；
 - 当前4090服务PID=`1316999`，监听`0.0.0.0:7865`，HTTP=`200`；日志为`/tmp/storymotion_gradio_7865_v10v9_cfg13_20260729.log`。
 
-## 21. 2026-08-03 Paper A Pulp Camera 512条人工审核
+## 21. 2026-08-03 StoryMotion Pulp Camera 512条人工审核
+
+> [!warning] 暂停
+> 5090当前断链；在用户通知恢复前，不处理Camera data、不续接语言生成、不推进本审核队列。
+> 本节只保留既有界面与artifact provenance。
 
 该界面只服务`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`，不调用LLM，
 也不修改source `records.jsonl`或geometry contract。固定cohort为完整512条；风险优先、原文本冲突、

@@ -1,14 +1,13 @@
 ---
-title: "StoryMotion Paper A ICLR Reliability and Closure Contract"
+title: "StoryMotion ICLR Reliability and Closure Contract"
 status: in_progress
 hypothesis: |
-  Paper A检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
+  StoryMotion检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
-  当前先闭环C1REL-derived Pulp Camera text，冻结后才决定最小Stage2表示矩阵与
-  Matched Symmetric Joint。
+  C0-LAT是后续唯一operational mainline。Camera-data工作因5090断链暂停，当前先冻结
+  C0-LAT-based最小机制与factorization ablation合同，不自动启动长训。
 tags:
   - StoryMotion
-  - paper/A
   - reliability
   - submission-closure
   - status/active
@@ -21,13 +20,13 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-04T11:42:15+08:00
+updated: 2026-08-04T14:51:40+08:00
 ---
 
-# StoryMotion Paper A ICLR Reliability and Closure Contract
+# StoryMotion ICLR Reliability and Closure Contract
 
 > [!important] 唯一live范围
-> 本页只拥有Paper A的claim–evidence gap、投稿实验优先级、停止条件和降级措辞。
+> 本页只拥有StoryMotion的claim–evidence gap、投稿实验优先级、停止条件和降级措辞。
 > 正式数字与hash只见[[StoryMotion/StoryMotion-valid-metric-ledger]]；DIRECT状态只见
 > [[DIRECT/current]]。拆分前完整方案已归档，不再授权Rect、HumanML3D跨配对、program
 > solver、Actor–Director数据、ViGen utility、editing或joint-parallel训练。
@@ -38,7 +37,7 @@ $$
 p(H,C\mid T_H,T_C)=p_H(H\mid T_H)p_C(C\mid H,T_C).
 $$
 
-Paper A只报告：
+StoryMotion只报告：
 
 1. Direct-H：$T_H\rightarrow H$；
 2. Direct-C：observed $H+T_C\rightarrow C$；
@@ -48,7 +47,9 @@ Paper A只报告：
 owning decoder／cache／train-only stats及冻结v9 Human `105K` teacher，仅Camera objective不同。
 seed17与seed23四个Camera endpoint均完成`105K`、Pulp pure4,053三接口、official metrics、
 decoded geometry／physical diagnostics和10,000次paired bootstrap。24个Camera geometry差异的
-95% CI全部跨零，因此只能写“没有稳健单一objective胜者”；不能写LAT／GEO等价，也不能选择GEO。
+95% CI全部跨零，因此统计结论仍是“没有稳健单一objective胜者”，不能写LAT／GEO等价。
+2026-08-04作者基于主表指标优先级与更简洁的latent-flow objective，将C0-LAT指定为后续唯一
+operational mainline；C0-GEO保留为audited alternate。该选择不是显著性结论。
 
 ### 1.1 Pulp Camera geometry-only screen
 
@@ -74,12 +75,17 @@ OpenCV right-down-forward，并计算$C_1^{-1}C_t$。每条轨迹最多均匀采
   全量数据闭环。必须完成视频人工审核并裁决方向／坐标轴错误、拒绝项和`无法判断`后，才重新校准
   phase merge、threshold与parser，冻结唯一canonical artifact。
 
+> [!warning] 5090断链暂停
+> 在用户通知恢复前，本轴不重连5090、不续跑、不合并语言candidate、不推进Gradio人工审核，也不
+> 写回canonical数据。现有artifact保持immutable／noncanonical；暂停不等于失败或数据闭环。
+
 ## 2. `0803-2024`表示因果矩阵
 
 > [!important] 当前优先级
-> `NoInt-HREL → C1REL → freeze representation → Matched Symmetric → PulpMotion-Repro-162K`。
-> WORLD不进入正式实验。Stage1不读取文本，可以与512条人工审核并行；任何Stage2必须等待同一版
-> C1REL-derived canonical Camera text冻结。
+> NoInt-HREL／C1REL Stage1已闭合，C0-LAT已选为默认parent。当前顺序改为：冻结C0-LAT-based
+> no-training机制检查合同 → 冻结Matched Symmetric与成本匹配合同 → 等待Camera data恢复。
+> WORLD不进入正式实验。任何依赖新caption cache的Stage2仍等待同一版C1REL-derived canonical
+> Camera text冻结；若要先用raw caption训练，必须单独授权并标为raw-caption control。
 
 此前的Independent Conditional Camera64与Fully-Separate-Native来自`0803-1647`，不回答本轮
 表示问题。前者在审计前已完成`210K`，只保留off-plan HREL-Camera64 diagnostic；后者在约Human
@@ -142,7 +148,7 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 - 两条r2均完成exact pure4,053、true-length owning-decoder geometry／framing audit与10,000次paired
   bootstrap。NoInt-HREL在Human基本保持时系统性回退Camera／framing；C1REL守住Human但Camera
   trajectory／rotation回退、projection字段混合，没有形成可晋升的稳定Pareto。完整数字与hash只见
-  [[StoryMotion-valid-metric-ledger#6.8 Paper A NoInt-HREL／C1REL matched Stage1 audit]]。
+  [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL matched Stage1 audit]]。
 - 原始formal evaluator首次启动因多传`velocity_mean/std`在任何eval artifact写入前fail-closed；失败日志
   保留，修正版重新审计后产生上述唯一正式结果。该实现错误不影响checkpoint或正式artifact。
 
@@ -151,16 +157,17 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 Stage1 formal闭合不自动授权Stage2，也没有测量Camera text adherence。先冻结同一版C1REL-derived
 canonical short／long text、split、sample identity与text artifact hash，再显式裁决最小Stage2矩阵；
 不得默认把NoInt-HREL与C1REL都推进长训。任何使用raw Camera text的历史run只能标为raw-caption
-control，不能冒充caption-matched结果。
+control，不能冒充caption-matched结果。当前可以先写C0-LAT-based合同、参数与exposure审计，但
+不得借4090空闲越过该gate。
 
 ## 3. 投稿闭环矩阵
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 scientific core | Pulp Camera文本 | 512 geometry screen、Qwen review candidates、额外30,000条零重叠noncanonical扩展及视频审核界面已存在；自动gauge／time-reversal通过，阈值与raw conflict仍是preliminary | 完成视频人工审核与异常裁决，校准阈值／phase／parser；冻结全量symbolic及short／long合同 | 否，先审计 | 通过后写版本化factual caption修正 |
+| paused | Pulp Camera文本 | 512 geometry screen、Qwen review candidates、额外30,000条零重叠noncanonical扩展及视频审核界面已存在；5090当前断链 | 等用户通知后再恢复连接、核验artifact进度并继续视频审核；恢复前不处理 | 否 | 通过后写版本化factual caption修正 |
 | P0 representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | canonical text冻结后，预先裁决是否仍需caption-matched Stage2；当前不授权 | 条件性Stage2 | 只能支持Stage1 I16 reconstruction贡献；generation necessity仍待Stage2 |
 | P0 representation | StoryMotion-C1REL | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Human保持、Camera geometry回退、projection混合 | canonical text冻结后先裁决是否值得支付C1REL Stage2预算；当前不晋升 | 条件性Stage2 | 尚未形成Camera-native／framing稳定Pareto |
-| P0 method control | Matched Symmetric Joint | 尚未创建；必须复用冻结后的Stage1、latent target、decoder与canonical text | 表示冻结后只训练matched Stage2；允许Camera loss影响Human | 是，仅Stage2 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
+| P0 method control | Matched Symmetric Joint | 尚未创建；默认parent已冻结为C0-LAT，必须复用其Stage1、latent target、decoder、数据、exposure与最终canonical text | 先冻结参数／checkpoint／exposure／GPU-hour／inference-cost合同；text恢复前不启动 | 是，仅Stage2；待授权 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
 | P1 external baseline | PulpMotion-Repro-162K | 现有native PulpMotion行不能自动视为exact 162,760 reproduction | canonical text冻结后，按PulpMotion own representation／model在相同split、exposure和评测协议复现 | 是，Stage1＋Stage2 | 外部系统边界；不是StoryMotion组件消融 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
 | P1 submission | relation-interface机制 | 结构合同存在；活动ledger没有正式zero／shuffle／route机制表 | 仅在正文需要机制归因时做冻结checkpoint敏感性检查 | 否 | 最多支持接口被使用，不宣称每个Stage1部件必要 |
@@ -168,7 +175,7 @@ control，不能冒充caption-matched结果。
 | P1 submission | Sealed final audit | pure4,053已多次用于开发；seed23复现已闭合 | 冻结方法／指标／prompt taxonomy后，以新sampling seed一次性跑三接口及预注册表 | 否 | 降低selection leakage；不再据sealed结果改模型 |
 | P1 submission | 感知与失败披露 | fixed样例存在；随机／最好／最差分层和盲评未闭合 | 冻结cohort与排序规则，完成基础盲评、failure taxonomy、random／best／worst补充材料 | 否 | 视觉可信度与局限；不承担production claim |
 | P1 submission | 复现与成本 | contracts、hash和正式artifact齐，但论文包未冻结 | clean revision、环境、命令、三接口evaluator、参数量、GPU小时、p50／p95延迟、显存、table generator和最小demo | 否 | 可复现性与计算成本 |
-| P2 optional | H199 interface | C0已是Stage2 specialist decomposition；没有H199 round-trip正式结果 | 只有选择latent-interface优势claim时才做identity guard、pure4,053与paired bootstrap | 否 | 只决定可选接口优势，不决定Paper A主张 |
+| P2 optional | H199 interface | C0已是Stage2 specialist decomposition；没有H199 round-trip正式结果 | 只有选择latent-interface优势claim时才做identity guard、pure4,053与paired bootstrap | 否 | 只决定可选接口优势，不决定StoryMotion主张 |
 
 ### 3.1 Caption训练的条件边界
 
@@ -185,7 +192,7 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 - v9只有first-512，不能伪装成pure4,053 matched row。
 - TSA／Auteur只有在输入、输出、数据和指标能对齐且存在可执行artifact时才进入formal表；
   否则只进入related-work任务边界，不为凑表启动未定义长训。
-- Uni3C、ActCam与ViGen utility不属于Paper A实验门槛。
+- Uni3C、ActCam与ViGen utility不属于StoryMotion实验门槛。
 
 ## 4. Claim冻结表
 
@@ -194,15 +201,16 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 - 方法是能力保持式非对称扩展，不是对称joint generator。
 - Direct-H复用冻结Human prior；Direct-C与sequential复用同一Camera branch。
 - Composition是两个条件分布的顺序组合，`joint_parallel=false`。
-- seed17／23不支持稳健的单一LAT／GEO胜者；两者作为共同mainline报告。
-- Paper A只使用Pulp factual Human–Camera pairs；不构造generated-H与原GT Camera positive。
+- seed17／23不支持稳健的单一LAT／GEO geometry胜者；C0-LAT是后续operational mainline，
+  C0-GEO作为audited alternate完整报告。
+- StoryMotion只使用Pulp factual Human–Camera pairs；不构造generated-H与原GT Camera positive。
 
 ### 4.2 必须等实验再决定
 
 - Pulp Camera caption修正能否列为数据贡献；由自动一致性与完整512条人工审核决定。
 - 显式interaction16是否必要；由matched NoInt-HREL Stage1／Stage2决定，结论不得扩大为
   “Camera不依赖Human”。
-- HREL还是C1REL作为Paper A主表示；C1REL必须同时改善Camera text control并守住人物构图。
+- HREL还是C1REL作为StoryMotion主表示；C1REL必须同时改善Camera text control并守住人物构图。
 - protected asymmetric factorization是否优于matched symmetric joint；必须在表示与文本冻结后
   用同一Stage1／decoder／target比较。
 - 是否优于公开baseline、是否有主观优势；由同协议主表、sealed audit与盲评决定。
@@ -228,19 +236,22 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ## 5. 本周初稿与实验冻结顺序
 
 初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
-和baseline superiority暂留占位符。当前顺序是：
+和baseline superiority暂留占位符。Camera data恢复前的当前顺序是：
 
-1. 对512条及额外30,000条noncanonical Qwen candidates完成Human＋地面＋Camera视频人工审核，
-   裁决阈值、phase merge、parser与raw conflict，再冻结唯一symbolic／short／long artifact；
+1. 冻结C0-LAT为所有后续matched ablation的唯一默认parent，补齐ledger中的LAT上下文与成本身份；
 2. NoInt-HREL与C1REL Stage1 pure4,053 gate已闭合；由于没有预注册数值severe threshold，不做事后
    binary stop，HREL保持当前owner；
-3. 冻结canonical text后先预声明最小Stage2矩阵，再以Camera-native adherence与Human-relative
+3. 预声明C0-LAT-based no-training protected-H／relation-interface检查，以及Matched Symmetric的
+   参数量、checkpoint数、sample exposure、GPU-hour与推理成本口径；不启动未冻结长训；
+4. 等用户通知5090恢复后，再核验Qwen artifact并继续视频审核、阈值／phase／parser裁决，冻结唯一
+   symbolic／short／long artifact；
+5. 冻结canonical text后先预声明最小Stage2矩阵，再以Camera-native adherence与Human-relative
    framing裁决是否需要C1REL；仅当C1REL胜出时补`C1REL-w/o-Interaction16`；
-4. 使用同一canonical text完成获授权representation所需的最小Stage2，并训练Matched Symmetric
+6. 使用同一canonical text完成获授权representation所需的最小Stage2，并训练Matched Symmetric
    Joint；不把表示变化与factorization变化合并；
-5. canonical text冻结后并行完成`PulpMotion-Repro-162K`，再冻结同协议baseline表；
-6. 冻结所有选择后做sealed audit、盲评、失败分层及复现／成本包；
-7. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
+7. canonical text冻结后并行完成`PulpMotion-Repro-162K`，再冻结同协议baseline表；
+8. 冻结所有选择后做sealed audit、盲评、失败分层及复现／成本包；
+9. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
 
 当前不进入critical path：旧Independent／Fully-Separate specialist Stage2、H199 round-trip、v10、
 WORLD、editing、Camera MAE、Human locality short screen、DIRECT实验。`joint_parallel`对v11 mainline
@@ -250,4 +261,4 @@ WORLD、editing、Camera MAE、Human locality short screen、DIRECT实验。`joi
 
 重构前的完整reliability页与拆分前Actor–Director附录保留在
 [[StoryMotion/archived/paper-scope/2026-08-03_storymotion-iclr-reliability-pre-closure-refactor]]。
-它只作provenance，不是当前Paper A训练授权。
+它只作provenance，不是当前StoryMotion训练授权。

@@ -19,7 +19,7 @@ source_notes:
   - "[[archived/evidence/2026-07-11_storymotion-v7.14-corrected-results]]"
   - "[[archived/evidence/2026-07-12_storymotion-v7.17-decoder-cache-contract-execution]]"
 created: 2026-07-09T12:20:00+0800
-updated: 2026-08-03T15:13:03+08:00
+updated: 2026-08-04T14:51:40+08:00
 ---
 
 # StoryMotion Metric Computation IO
@@ -103,7 +103,7 @@ Important distinctions:
   loss is unchanged.
 - The zero-valued first camera velocity frame is a convention, not a learned
   absolute origin. The Stage1 loss masks that frame for the velocity channels.
-- The Paper A C1REL control uses the complete pose
+- The StoryMotion C1REL control uses the complete pose
   $\widetilde T_{C,t}=T_{C,1}^{-1}T_{C,t}$: the three-dimensional translation
   vector and relative rotation are retained, together with relative velocity
   and FOV. A scalar distance is not a valid substitute because it removes
@@ -128,9 +128,9 @@ decoder in the metric ledger.
 | v8.1B | normalized human199 | official camera14 | Same feature contract but residual-AE architecture; non-promotion control. |
 | v8.2 | human200 with its own train-only normalization | official camera14 unchanged | Own human200 inverse plus Pulp camera14 decoder; candidate/control, not a v7.14 cache replacement. |
 | v9 H-ANCHOR-S1 Pulp-only matched control | normalized Pulp human199；the Camera-free `pulp_anchor` role supervises root/yaw/local only，while the `pulp_joint` role supervises full Human199 | official camera14 only in `pulp_joint` batches；the two roles use the same ordered Pulp identities | Exact non-causal checkpoint decoder with per-sample true-length reconstruction；Stage1 representation diagnostic only，not a mainline promotion. |
-| v11 C0-LAT／C0-GEO shared Stage1 | normalized Pulp human199；Human128 owner | official Camera14 through interaction16＋camera48 | Exact v9 Pulp-only non-causal checkpoint and owning `D_h/D_c/D_f`；current co-mainline Stage1 owner. |
-| Paper A HREL-w/o-Interaction16 | normalized Pulp human199；Human128 | v9 HREL Camera14 through Camera48；no interaction16 | Fresh matched 176D Stage1 and its owning decoder；active representation ablation, no formal result yet. |
-| Paper A C1REL | normalized Pulp human199；Human128＋interaction16 relation owner | full first-Camera-frame-relative translation vector／rotation／velocity／FOV through Camera48 | Fresh parameter-matched 192D Stage1；owning joint decoder restores Camera14 initial anchor；active representation control, no formal result yet. |
+| v11 C0-LAT mainline／C0-GEO alternate shared Stage1 | normalized Pulp human199；Human128 owner | official Camera14 through interaction16＋camera48 | Exact v9 Pulp-only non-causal checkpoint and owning `D_h/D_c/D_f`；C0-LAT是后续默认Stage2 parent，C0-GEO保留objective control. |
+| HREL-w/o-Interaction16 | normalized Pulp human199；Human128 | v9 HREL Camera14 through Camera48；no interaction16 | Fresh matched 176D Stage1 and owning decoder；seed17 `636K` formal已闭合，Stage1 Camera／framing回退；Stage2未授权. |
+| C1REL | normalized Pulp human199；Human128＋interaction16 relation owner | full first-Camera-frame-relative translation vector／rotation／velocity／FOV through Camera48 | Fresh parameter-matched 192D Stage1；owning joint decoder restores Camera14 initial anchor；seed17 `636K` formal已闭合，未形成可晋升Pareto. |
 
 Stage2 rule: a cache built from any row above is valid only with that row's
 exact Stage1 checkpoint, representation normalization, latent order, and
