@@ -3,8 +3,8 @@ title: "StoryMotion Paper A ICLR Reliability and Closure Contract"
 status: in_progress
 hypothesis: |
   Paper A检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
-  Direct-H、Direct-C与sequential composition。当前先闭环C1REL-derived Pulp Camera text，
-  同时按0803-2024完成NoInt-HREL／C1REL Stage1表示对照；表示冻结后才授权对应Stage2与
+  Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
+  当前先闭环C1REL-derived Pulp Camera text，冻结后才决定最小Stage2表示矩阵与
   Matched Symmetric Joint。
 tags:
   - StoryMotion
@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-03T21:12:00+08:00
+updated: 2026-08-04T11:42:15+08:00
 ---
 
 # StoryMotion Paper A ICLR Reliability and Closure Contract
@@ -69,9 +69,10 @@ OpenCV right-down-forward，并计算$C_1^{-1}C_t$。每条轨迹最多均匀采
   当前保守parser主要识别static与truck，而临时阈值又让大量轨迹同时出现正反方向symbolic。
   当前人工审核批次固定为完整512条；“风险优先／raw conflict／阈值边界”只改变审核顺序，
   不改变cohort。Gradio读取immutable `records.jsonl`与source contract，审核事件另写
-  append-only `human_reviews.jsonl`。必须完成512／512，并裁决全部方向／坐标轴错误、拒绝项和
-  `无法判断`后，才重新校准phase merge与threshold；在此之前不授权全量处理或LLM short／long
-  realization。
+  append-only `human_reviews.jsonl`。用户随后明确授权Qwen生成review-only short／long candidates及
+  额外30,000条零重叠扩展；扩展沿用512 screen的临时阈值并显式标为noncanonical，不构成阈值冻结或
+  全量数据闭环。必须完成视频人工审核并裁决方向／坐标轴错误、拒绝项和`无法判断`后，才重新校准
+  phase merge、threshold与parser，冻结唯一canonical artifact。
 
 ## 2. `0803-2024`表示因果矩阵
 
@@ -122,11 +123,11 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 ### 2.3 当前执行身份
 
 - B：`paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803`；contract SHA256=
-  `599faf76f1b019d9d64160cab6e6d3c292a4befb5e1165d4bb54e35979877f66`。preflight通过后在4090
-  GPU0从0 step fresh训练。
+  `599faf76f1b019d9d64160cab6e6d3c292a4befb5e1165d4bb54e35979877f66`。4090 GPU0从0 step
+  fresh完成`636K`；最终checkpoint SHA256=`968133147d7e1b1202e5bf9ff5e046ae8ff0c592573361821804a1823562ef75`。
 - C：`paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803`；contract SHA256=
-  `745ff16cc853ce20de6c86690dcc8a9569c2cf4a9a1ce8cb8ab12f959fd0e9c2`。preflight通过后在4090
-  GPU1从0 step fresh训练。
+  `745ff16cc853ce20de6c86690dcc8a9569c2cf4a9a1ce8cb8ab12f959fd0e9c2`。4090 GPU1从0 step
+  fresh完成`636K`；最终checkpoint SHA256=`5af7317fcaea0694b457cecf7a106b5ecd26e8acdfbe47a7bd6571cebc0017f0`。
 - 两条preflight的Human invariance与32-sample repeat max-abs均为`0.0`，500-step overfit ratio
   分别为`0.02673799`与`0.02824479`，且没有把preflight optimizer state带入长训。
 - 两条合同绑定StoryMotion revision
@@ -138,22 +139,27 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
   `stopped_contract_mismatch_c1rel_camera48_conditioned_by_relation`。原因是首版C1REL把C48再次经过
   H128＋I16 conditioner，不满足Camera-native ownership；两条均无required checkpoint，任何模型／
   optimizer state都不复用。共享实现修正后两臂一起从零重启，避免代码版本不匹配。
-- 所有有限step、ETA与checkpoint进度只写run manifest／TensorBoard／driver log。本页不复制
-  running loss；当前只登记合同与授权状态。
+- 两条r2均完成exact pure4,053、true-length owning-decoder geometry／framing audit与10,000次paired
+  bootstrap。NoInt-HREL在Human基本保持时系统性回退Camera／framing；C1REL守住Human但Camera
+  trajectory／rotation回退、projection字段混合，没有形成可晋升的稳定Pareto。完整数字与hash只见
+  [[StoryMotion-valid-metric-ledger#6.8 Paper A NoInt-HREL／C1REL matched Stage1 audit]]。
+- 原始formal evaluator首次启动因多传`velocity_mean/std`在任何eval artifact写入前fail-closed；失败日志
+  保留，修正版重新审计后产生上述唯一正式结果。该实现错误不影响checkpoint或正式artifact。
 
 ### 2.4 Stage2文本gate
 
-Stage1质量通过不自动授权Stage2。先冻结同一版C1REL-derived canonical short／long text、split、
-sample identity与text artifact hash，再按冻结的winning representation决定最小Stage2矩阵。任何使用
-raw Camera text的历史run只能标为raw-caption control，不能冒充caption-matched结果。
+Stage1 formal闭合不自动授权Stage2，也没有测量Camera text adherence。先冻结同一版C1REL-derived
+canonical short／long text、split、sample identity与text artifact hash，再显式裁决最小Stage2矩阵；
+不得默认把NoInt-HREL与C1REL都推进长训。任何使用raw Camera text的历史run只能标为raw-caption
+control，不能冒充caption-matched结果。
 
 ## 3. 投稿闭环矩阵
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 scientific core | Pulp Camera文本 | 固定512条无LLM screen及append-only人工审核界面已存在；自动gauge／time-reversal通过，阈值与raw conflict仍是preliminary | 完成512／512审核与异常裁决，校准阈值／phase／parser；冻结全量symbolic及short／long合同 | 否，先审计 | 通过后写版本化factual caption修正 |
-| P0 representation | HREL-w/o-I16 | 176D matched合同与preflight闭合；seed17 `636K` Stage1活动中 | pure4,053 Stage1 gate；canonical text冻结后才决定Stage2 | 是，Stage1＋条件性Stage2 | 显式I16在HREL Camera48存在时是否必要 |
-| P0 representation | StoryMotion-C1REL | 192D parameter-matched合同、train-only stats与preflight闭合；seed17 `636K` Stage1活动中 | pure4,053同时检查Camera-native与Human-relative framing；再冻结表示 | 是，Stage1＋条件性Stage2 | Camera-native motion与Human-relative relation分开表示是否形成稳定Pareto |
+| P0 scientific core | Pulp Camera文本 | 512 geometry screen、Qwen review candidates、额外30,000条零重叠noncanonical扩展及视频审核界面已存在；自动gauge／time-reversal通过，阈值与raw conflict仍是preliminary | 完成视频人工审核与异常裁决，校准阈值／phase／parser；冻结全量symbolic及short／long合同 | 否，先审计 | 通过后写版本化factual caption修正 |
+| P0 representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | canonical text冻结后，预先裁决是否仍需caption-matched Stage2；当前不授权 | 条件性Stage2 | 只能支持Stage1 I16 reconstruction贡献；generation necessity仍待Stage2 |
+| P0 representation | StoryMotion-C1REL | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Human保持、Camera geometry回退、projection混合 | canonical text冻结后先裁决是否值得支付C1REL Stage2预算；当前不晋升 | 条件性Stage2 | 尚未形成Camera-native／framing稳定Pareto |
 | P0 method control | Matched Symmetric Joint | 尚未创建；必须复用冻结后的Stage1、latent target、decoder与canonical text | 表示冻结后只训练matched Stage2；允许Camera loss影响Human | 是，仅Stage2 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
 | P1 external baseline | PulpMotion-Repro-162K | 现有native PulpMotion行不能自动视为exact 162,760 reproduction | canonical text冻结后，按PulpMotion own representation／model在相同split、exposure和评测协议复现 | 是，Stage1＋Stage2 | 外部系统边界；不是StoryMotion组件消融 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
@@ -210,8 +216,10 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.4 当前禁止写入摘要或contribution
 
 - “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
-- “interaction16必要”——等待NoInt-HREL正式结果；即使通过也不能写成Camera完全依赖Human。
-- “C1REL优于HREL”——等待Camera-native与Human-relative framing两类正式证据及稳定性判断。
+- “interaction16对generation必要”——Stage1只支持其reconstruction／framing贡献；等待获授权的
+  caption-matched NoInt-HREL Stage2，即使通过也不能写成Camera完全依赖Human。
+- “C1REL优于HREL”——Stage1没有形成稳定Pareto且不读取文本；等待canonical text后的明确Stage2
+  授权与Camera-native adherence／Human-relative framing联合证据。
 - “protected asymmetry优于symmetric joint”——等待representation冻结后的matched Stage2。
 - “LAT与GEO等价”或“GEO优于LAT”。
 - “Stage1每个部件都必要”、全面SOTA、calibrated physical validity或production-ready。
@@ -222,12 +230,13 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
 和baseline superiority暂留占位符。当前顺序是：
 
-1. 复核无LLM `N=512` Camera geometry screen，冻结Pulp convention、阈值、symbolic schema与
-   raw-conflict判定，再授权全量symbolic／语言化；
-2. 完成NoInt-HREL与C1REL Stage1 pure4,053 gate；严重退化的臂可降级，不用train loss提前裁决；
-3. 以HREL／C1REL的Camera-native adherence与Human-relative framing冻结主表示；仅当C1REL胜出时
-   补`C1REL-w/o-Interaction16`；
-4. 使用同一canonical text完成winning representation所需的最小Stage2，并训练Matched Symmetric
+1. 对512条及额外30,000条noncanonical Qwen candidates完成Human＋地面＋Camera视频人工审核，
+   裁决阈值、phase merge、parser与raw conflict，再冻结唯一symbolic／short／long artifact；
+2. NoInt-HREL与C1REL Stage1 pure4,053 gate已闭合；由于没有预注册数值severe threshold，不做事后
+   binary stop，HREL保持当前owner；
+3. 冻结canonical text后先预声明最小Stage2矩阵，再以Camera-native adherence与Human-relative
+   framing裁决是否需要C1REL；仅当C1REL胜出时补`C1REL-w/o-Interaction16`；
+4. 使用同一canonical text完成获授权representation所需的最小Stage2，并训练Matched Symmetric
    Joint；不把表示变化与factorization变化合并；
 5. canonical text冻结后并行完成`PulpMotion-Repro-162K`，再冻结同协议baseline表；
 6. 冻结所有选择后做sealed audit、盲评、失败分层及复现／成本包；

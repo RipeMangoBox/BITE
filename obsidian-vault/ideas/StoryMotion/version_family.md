@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-03T21:12:00+08:00
+updated: 2026-08-04T11:42:15+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -294,6 +294,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-03（specialist caption gate补充）：** 当前fully-separate Stage2绑定现有Pulp raw Camera text，只拥有`T_0` raw-caption native-system control身份；若Camera text选择不是raw，最终caption-matched C必须另训。Independent Conditional当前只训练text-free Camera Stage1；其Camera Stage2必须同时等待Stage1 endpoint审计与Camera caption选择冻结，不因GPU空闲自动启动。本补充收紧最终比较资格，不停止已授权的两条活动训练。
 - **2026-08-03（`0803-2024`取代specialist主矩阵）：** 用户以`prompts/0803-2024.md`冻结Paper A新优先级：只保留HREL／C1REL，先做NoInt-HREL与parameter-matched C1REL Stage1，表示冻结后才做共享canonical Camera text的最小Stage2、Matched Symmetric Joint及`PulpMotion-Repro-162K`；WORLD删除。审计时`paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`已完成，只保off-plan HREL-Camera64 diagnostic；`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`安全停止并保留约Human phase `55K` checkpoint。两者均不得启动后续Stage2或冒充新矩阵。
 - **2026-08-03（Paper A表示Stage1 r2启动与Camera人工审核开放）：** C1REL train-only stats从exact 162,760条Pulp train、19,336,827个有效帧生成，SHA256=`7ca04cba4ff6efe573060eea8382e4dc097a9d17b1ab874c32c998661ad13564`。首轮NoInt／C1REL在TensorBoard step `15,367`停止：C1REL首版把C48再次经过H128＋I16 conditioner，不满足“C48由完整C1REL在任何Human conditioning之前编码”的native ownership；NoInt因共享实现版本同步停止。首轮无required checkpoint，模型与optimizer state均不复用。修正后逐元素单测确认cached C48 exact等于直接$E_C(\mathrm{C1REL}_{14})$；`paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803`与`paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803`分别绑定contract SHA256 `599faf76…77f66`／`745ff16c…e9c2`，重新通过non-causal、Human-invariance、deterministic replay与one-batch overfit preflight，从0 step fresh启动；所有Stage2仍被canonical text gate关闭。同期固定512条no-LLM geometry screen开放Gradio全量人工审核，源records immutable，review事件append-only；风险筛选只改变顺序，不改变cohort。本事件不改变C0-LAT／C0-GEO共同mainline或正式metric ledger。
+- **2026-08-04（Paper A NoInt-HREL／C1REL Stage1 formal闭合）：** 两条seed17 r2均从零完成`636K`，随后以exact pure4,053、真实有效长度、owning decoder及10,000次paired bootstrap完成正式审计。两臂均基本保持Human；NoInt-HREL的Camera reconstruction／framing系统性回退，只支持I16对Stage1 owning reconstruction的贡献，不证明Stage2 generation necessity；C1REL的Camera trajectory／rotation回退且projection字段混合，没有形成可晋升的稳定Pareto。Stage1不读取Camera text，且预声明未冻结数值severe-degradation threshold，故不事后发明binary stop、不授权Stage2；HREL继续作为当前representation owner，最小Stage2矩阵等待canonical Camera text冻结后另行预声明。formal evaluator首次启动因多传`velocity_mean/std`而在任何eval artifact写入前fail-closed，失败日志保留；修正版产生唯一正式artifact。完整数值与hash只见[[StoryMotion-valid-metric-ledger#6.8 Paper A NoInt-HREL／C1REL matched Stage1 audit]]。本事件不改变C0-LAT／C0-GEO共同mainline。
 
 ## Bug 与 invalidation provenance
 
