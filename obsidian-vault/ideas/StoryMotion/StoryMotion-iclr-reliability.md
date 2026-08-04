@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-04T16:43:38+08:00
+updated: 2026-08-05T00:06:00+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -51,33 +51,65 @@ decoded geometry／physical diagnostics和10,000次paired bootstrap。24个Camer
 2026-08-04作者基于主表指标优先级与更简洁的latent-flow objective，将C0-LAT指定为后续唯一
 operational mainline；C0-GEO保留为audited alternate。该选择不是显著性结论。
 
-### 1.1 Pulp Camera geometry-only screen
+### 1.1 Pulp Camera full-train threshold audit
 
-`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`从train manifest以
-`sha256(seed:sample_id)`确定性选择512条轨迹，全程`llm_calls=0`。Pulp loader把KITTI矩阵作为
-C2W，并在projection路径取逆后交给OpenCV camera conversion；screen据此冻结输入标识为
-OpenCV right-down-forward，并计算$C_1^{-1}C_t$。每条轨迹最多均匀采样21帧。
+512条`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`只保留为历史geometry
+screen：其gauge／time-reversal检查通过，但均匀压到21 poses导致step时间跨度随clip变化，双簇
+阈值与raw-conflict计数均无calibration资格。其Qwen short／long和零重叠扩展仍是review-only、
+noncanonical，不进入训练。
 
-- 512／512个随机全局刚体gauge检查通过，relative pose最大绝对误差
-  `7.105427357601002e-15`；512／512个固定坐标基的时间反转symbolic代数检查通过。
-- 输入rotation最大orthogonality误差为`6.425823300126865e-07`，最大determinant偏差为
-  `6.512800068136926e-07`。
-- TriMotion官方实现并不从数据估计阈值，而是直接固定每个sampled step `0.02 m`与`0.3°`。
-  本screen另外引入log-space双簇heuristic，得到`0.0022658727 m`与`0.1305610°`后再送入
-  TriMotion-style axis／dominance分类器；因此这两个数**不是TriMotion阈值逻辑的输出**，也没有
-  formal calibration资格。
-- preliminary raw conflict计数为`263 true / 90 false / 159 unknown`，**不能解释成Pulp缺陷率**：
-  当前保守parser主要识别static与truck，而临时阈值又让大量轨迹同时出现正反方向symbolic。
-  当前人工审核批次固定为完整512条；“风险优先／raw conflict／阈值边界”只改变审核顺序，
-  不改变cohort。Gradio读取immutable `records.jsonl`与source contract，审核事件另写
-  append-only `human_reviews.jsonl`。用户随后明确授权Qwen生成review-only short／long candidates及
-  额外30,000条零重叠扩展；扩展沿用512 screen的临时阈值并显式标为noncanonical，不构成阈值冻结或
-  全量数据闭环。必须完成视频人工审核并裁决方向／坐标轴错误、拒绝项和`无法判断`后，才重新校准
-  phase merge、threshold与parser，冻结唯一canonical artifact。
+无LLM的`paperA_pulp_camera_threshold_audit_train162760_stride4_seed17_4090cpu_20260804`
+已经遍历exact StoryMotion train `162,760／162,760`条轨迹，ordered ID SHA256=
+`a0981b6c6223409d656ad8c43cfcf95cae6ec9a28640143b87b6322292c51dc9`。它按25 fps、严格
+stride4生成`4,733,272`个step，同时保留两种视图：camera-local
+$C_t^{-1}C_{t+4}$与TriMotion-compatible first-frame $C_1^{-1}C_t$。40个signal shards保留
+完整六轴rate，后续threshold／duration／hysteresis sweep不需要再次读取Pulp；全程
+`llm_calls=0`，约`601.6 s`。
 
-> [!warning] 5090断链暂停
-> 在用户通知恢复前，本轴不重连5090、不续跑、不合并语言candidate、不推进Gradio人工审核，也不
-> 写回canonical数据。现有artifact保持immutable／noncanonical；暂停不等于失败或数据闭环。
+| axis | unit | frame K2 node | frame K3 lower／upper | sample-balanced K3 lower／upper |
+| --- | --- | ---: | ---: | ---: |
+| truck | m/s | 0.003933 | 0.000628／0.017065 | 0.000671／0.018762 |
+| pedestal | m/s | 0.002200 | 0.000396／0.008918 | 0.000424／0.009961 |
+| dolly | m/s | 0.007110 | 0.001266／0.023299 | 0.001386／0.025952 |
+| tilt | deg/s | 0.185004 | 0.050558／0.584493 | 0.055662／0.663148 |
+| pan | deg/s | 0.252447 | 0.062405／0.901127 | 0.068056／1.007560 |
+| roll | deg/s | 0.219109 | 0.061450／0.600415 | 0.068658／0.686266 |
+
+表中数字是camera-local、log-space weighted KMeans的cluster-center几何中点，只是候选node。
+first-frame对应节点幅值接近，但复合运动的方向符号可以改变，不能据此宣称两个坐标语义等价。
+Pulp native translation tags给出的弱监督operating points为truck／pedestal／dolly
+`0.023874／0.019765／0.023554 m/s`；原始caption弱锚点为
+`0.048327／0.040709／0.052767 m/s`。前者来自Pulp自身translation-only rule，后者又由
+motion-tag-to-LLM链生成，均非独立ground truth。合理解释只限于：K3 lower近似数值噪声边界、
+K3 upper近似弱／显著运动分界、raw-caption anchor近似caption-worthy强运动候选；最终值尚未冻结。
+
+Pulp native source使用camera-local translation、`25 fps`、`0.02 m/s`、dominance差值
+`0.4`、56-frame smoothing和25-frame minimum chunk，且rotation segmentation被注释。
+TriMotion pinned commit `5b203a8`则使用first-frame RDF、最多81 frames／stride4、每sampled
+step固定`0.02 m／0.3°`与dominant ratio `5`，并逐step输出`Time x%`；它不做四阶段压缩。
+因此旧Pulp链的“四阶段summary”是本项目改写，已停止作为canonical结构。新版必须保留可变长
+event intervals，再由Qwen只做short／long surface realization。
+
+训练集最长251 frames，对应63 poses／62 stride4 steps；全Pulp目录180,527条的独立扫描同样
+最长251 frames。full-train mechanical QC没有触发read／parse、intrinsics shape／frame mismatch或
+rotation-quality错误；最大rotation orthogonality与determinant偏差分别为
+`9.776571416875157e-07／8.977835164181158e-07`。这只证明文件与矩阵机械完整，不证明方向语义、
+caption、threshold、primitive或Human–Camera视觉一致。
+
+原始caption共有19,525个exact unique文本，10,867条进入风险审核池；该池不是错误率。
+其中96条有multi-record／prompt contamination，292条有dolly／truck别名冲突，34条混用
+truck／pan，207条只有left／right而没有明确primitive，80条含当前translation-only tags不支持的
+rotation primitive，41条含zoom／orbit等intrinsics或未支持primitive。另有5,784条left／right
+反转或多阶段文本，应保留为合法sequence候选并重点核对顺序。`original_static_*`等parser计数还
+受`push-ins／pull-outs`复数词形漏解析影响，只能作为review ordering。
+
+> [!warning] 尚未冻结的标准
+> 在canonical recaption前仍须裁决：camera-local或first-frame的primitive语义；K3 upper与
+> native／raw anchor如何形成on／off hysteresis；dominance／mixed-axis规则；minimum duration、
+> gap merge、并行与先后判据；持续小幅运动的累计幅度；rotation Euler约定；是否把FOV／zoom纳入
+> Camera-only属性；short与long的event保真合同；numeric grouping距离与人工边界样本协议。
+> 在用户通知恢复前仍不重连5090、不续跑Qwen、不推进Gradio写回。候选threshold与语言artifact
+> 都不得进入canonical Stage2。
 
 ## 2. `0803-2024`表示因果矩阵
 
