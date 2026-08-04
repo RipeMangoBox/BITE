@@ -20,7 +20,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-05T00:06:00+08:00
+updated: 2026-08-05T01:50:34+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -77,6 +77,8 @@ $C_t^{-1}C_{t+4}$与TriMotion-compatible first-frame $C_1^{-1}C_t$。40个signal
 
 表中数字是camera-local、log-space weighted KMeans的cluster-center几何中点，只是候选node。
 first-frame对应节点幅值接近，但复合运动的方向符号可以改变，不能据此宣称两个坐标语义等价。
+若采用[[StoryMotion/Pulp-camera-recaption-contract]]中的rotation-log定义，当前tilt／pan／roll节点
+只保留为Euler-screen，必须在exact train上重算rotvec分布；不得直接改名晋升。
 Pulp native translation tags给出的弱监督operating points为truck／pedestal／dolly
 `0.023874／0.019765／0.023554 m/s`；原始caption弱锚点为
 `0.048327／0.040709／0.052767 m/s`。前者来自Pulp自身translation-only rule，后者又由
@@ -108,6 +110,8 @@ rotation primitive，41条含zoom／orbit等intrinsics或未支持primitive。�
 > native／raw anchor如何形成on／off hysteresis；dominance／mixed-axis规则；minimum duration、
 > gap merge、并行与先后判据；持续小幅运动的累计幅度；rotation Euler约定；是否把FOV／zoom纳入
 > Camera-only属性；short与long的event保真合同；numeric grouping距离与人工边界样本协议。
+> Web GPT建议的采纳、降级与拒绝，以及最小v1执行gate，统一由
+> [[StoryMotion/Pulp-camera-recaption-contract]]拥有。
 > 在用户通知恢复前仍不重连5090、不续跑Qwen、不推进Gradio写回。候选threshold与语言artifact
 > 都不得进入canonical Stage2。
 
