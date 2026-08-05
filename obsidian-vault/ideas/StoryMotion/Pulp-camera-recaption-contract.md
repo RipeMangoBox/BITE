@@ -19,7 +19,7 @@ source_notes:
   - "[[StoryMotion/dont_read/0805-0137]]"
   - "[[StoryMotion/dont_read/0805-2009]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T20:41:25+08:00
+updated: 2026-08-05T20:45:30+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -702,6 +702,11 @@ full-train screen的轴级结果如下；`K_salient`尚未经过跨轴co-tempora
 H0／H1的aggregate差距不足以选边；它们共享enter阈值，故strict-static计数相同，主要差异在退出
 阈值造成的边界与切段。最终选择仍必须依赖Calibration-512的false split／false merge与人工
 salience判断，不能由上表均值直接决定。
+
+本screen已保存start delta、end delta与overlap-ratio的边际分布，但尚未保存三者的逐pair联合表；
+边际p50不能定义“近同步”。下一CPU child artifact必须按sample／candidate保存cross-axis salient
+pair的联合tuple与containment身份，再提出少量grouping候选。该补充不需要重读Pulp或调用LLM，
+但在它完成前不能实现最终`G_geom`。
 
 ### 9.4 尚需敲定的最小标准
 
