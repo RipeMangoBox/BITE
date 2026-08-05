@@ -4,8 +4,9 @@ status: in_progress
 hypothesis: |
   StoryMotion检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
-  C0-LAT是后续唯一operational mainline。NoInt-HREL与C1REL-w/o-Interaction16 Stage2均关闭；
-  当前只保留获授权的C1REL raw-caption Stage2和版本化noncanonical Camera recaptioning。
+  C0-LAT是后续唯一operational mainline。C1REL raw-caption Stage2 endpoint已训练完成；
+  C1REL-w/o-Interaction16 Stage2获后续matched补充授权。版本化noncanonical Camera
+  recaptioning使用两张4090各两个Qwen模型。
 tags:
   - StoryMotion
   - reliability
@@ -20,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-05T02:47:07+08:00
+updated: 2026-08-05T11:51:35+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -125,7 +126,9 @@ rotation primitive，41条含zoom／orbit等intrinsics或未支持primitive。�
 > [!important] 当前优先级
 > NoInt-HREL／C1REL Stage1已闭合，C0-LAT仍是默认mainline。作者已根据现有formal
 > artifact搁置NoInt-HREL Stage2，并单独授权C1REL raw-`T0` Stage2及
-> `C1REL-w/o-Interaction16` Stage1。WORLD与Matched Symmetric不因本次授权进入执行。
+> `C1REL-w/o-Interaction16` Stage1。strict no-I16的广泛退化被作者裁决为Interaction16
+> simple-and-effective的正向Stage1 ablation，并另行授权后续matched Stage2。WORLD与Matched
+> Symmetric不因本次授权进入执行。
 > raw-`T0`结果必须与未来canonical Camera text版本分开，不能进入最终caption-matched裁决。
 
 此前的Independent Conditional Camera64与Fully-Separate-Native来自`0803-1647`，不回答本轮
@@ -137,7 +140,7 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 | A · StoryMotion-HREL | exact v9 Pulp-only owner；owning `D_h/D_c/D_f` | H128＋I16＋C48；official Camera14 relation path | factual GT-H199＋GT-C14 | reference `636K`、batch128、seed17 | current reference；不预设I16必要 |
 | B · HREL-w/o-Interaction16 | fresh Stage1；同v9数据、三阶段schedule、loss与exposure | H128＋C48；conditioner／`D_c`／`D_f`输入192→176；Camera48仍读取v9 HREL Camera14 | factual GT-H199＋GT-C14 | `1,273,657`参数；同`636K`、batch128、seed17 | 只回答“显式I16是否必要”；不回答Camera是否依赖Human |
 | C · StoryMotion-C1REL | fresh Stage1；同v9数据、三阶段schedule、loss与exposure | H128＋I16＋C48；I16继续读取Human-relative framing，C48输入完整$T_{C1}^{-1}T_{Ct}$；owning decoder恢复首帧锚点 | factual GT-H199＋GT-C14 | `1,480,521`参数，与A exact；同`636K`、batch128、seed17 | 只回答Camera-native motion／Human-relative relation分开表示是否形成稳定Pareto |
-| D · C1REL-w/o-Interaction16 | fresh Stage1；相对C只删除I16 | H128＋native C1REL-C48；owning `D_c/D_f`输入192→176 | factual GT-H199＋GT-C14 | `1,273,657`参数；同`636K`、batch128、seed17 | 严格检验C1REL下I16的Stage1贡献；当前不授权Stage2 |
+| D · C1REL-w/o-Interaction16 | fresh Stage1；相对C只删除I16 | H128＋native C1REL-C48；owning `D_c/D_f`输入192→176 | factual GT-H199＋GT-C14 | `1,273,657`参数；同`636K`、batch128、seed17 | Stage1已支持I16有效性；后续matched Stage2检验generation贡献 |
 
 ### 2.1 表示与锚点所有权
 
@@ -163,8 +166,10 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 3. Stage1先做pure4,053 owning-decoder reconstruction、world／relative geometry与framing audit。
    严重退化可按预声明降低对应Stage2优先级，但不能用中间train loss作论文结论。
 4. C1REL Stage1与v9难分上下，且其坐标表示契合后续Camera text。作者因此授权一条raw-`T0`
-   Stage2诊断与D的strict Stage1；这不是C1REL升级事件。只有未来canonical caption下同时改善
-   Camera-native adherence并守住Human-relative projection／framing，才可讨论替换HREL表示。
+   Stage2诊断与D的strict Stage1；这不是C1REL升级事件。D的formal广泛退化支持I16在Stage1
+   simple and effective，作者随后授权未来matched Stage2，但在结果产生前不写generation必要性。
+   只有未来canonical caption下同时改善Camera-native adherence并守住Human-relative
+   projection／framing，才可讨论替换HREL表示。
 5. representation冻结后，才以同一Stage1、latent target、decoder与canonical text训练一个
    Matched Symmetric Joint Stage2；它允许Camera loss影响Human，用于检验protected asymmetric
    factorization，不能与表示变化混在同一run。
@@ -198,22 +203,24 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
   exact C1REL Stage1 checkpoint SHA256=`5af7317f…01f0`，新cache按162,760／4,053 ordered
   IDs重建，fresh Human `105K`后冻结，再训练GT-H-only LAT Camera `105K`。
   contract SHA256=`6e58e9aa…337e`，optimizer-free preflight SHA256=`9a75a49d…349`；
-  `joint_parallel=false`，generated-H只用于sequential inference。该run绑定旧Pulp Camera
-  caption，最终canonical text比较必须另训。
+  `joint_parallel=false`，generated-H只用于sequential inference。该run已完成总step `210K`，
+  Direct-H exact replay max-abs=`0.0`，三接口formal仍待审计。该run绑定旧Pulp Camera caption，
+  最终canonical text比较必须另训。
 - C1REL-w/o-I16 Stage1：`paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`；
   latent order为`human128+c1relative_camera48`，只移除I16，contract SHA256=
   `fa0a2d11…f588`。500-step preflight ratio=`0.0249956`、Human invariance max-abs=`0.0`，
   long-run model进入训练前optimizer steps=`0`。该run已完成`636K`及exact pure4,053 formal；相对
   C1REL的Human 5项、Camera／FOV 7项与projective 4项95% CI全部在零上方，Camera ADE为
-  `1.501675 m`、rotation为`38.977528°`。因此按预声明在Stage1 hard stop，不授权Stage2。
+  `1.501675 m`、rotation为`38.977528°`。该结果正向支持Interaction16对Stage1 owning
+  reconstruction／framing的有效贡献；未来matched Stage2已获授权但尚未创建run。
 
 ### 2.4 Stage2文本gate
 
-Stage1 formal闭合不自动授权Stage2，也没有测量Camera text adherence。NoInt-HREL与
-C1REL-w/o-I16 Stage2均已因
-正式退化与坐标语义风险搁置。C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`
-诊断可以训练，但必须绑定caption版本、split、sample identity与hash，并在canonical short／long
-text冻结后重训才有最终比较资格。该例外不授权D的Stage2、Matched Symmetric或其他矩阵。
+Stage1 formal本身没有测量Camera text adherence或free generation。NoInt-HREL Stage2保持搁置。
+C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可以训练，但必须绑定caption
+版本、split、sample identity与hash，并在canonical short／long text冻结后重训才有最终比较资格。
+作者另行授权D的未来matched Stage2；它必须与C使用同一caption版本、exposure、sampler与评测协议，
+并单独记录参数量／GPU小时。该授权不扩张到Matched Symmetric或其他矩阵。
 
 ## 3. 投稿闭环矩阵
 
@@ -221,8 +228,8 @@ text冻结后重训才有最终比较资格。该例外不授权D的Stage2、Mat
 | --- | --- | --- | --- | --- | --- |
 | P0 data | Pulp Camera文本 | 旧512／30K／40K artifacts保持noncanonical；rotvec full-train signal、重新计算的候选节点与10万条H1 event plan已闭合 | 完成显式`v1p0-H1`的10万条noncanonical Qwen candidates；随后做H0／H1 calibration、人工审核与sealed gate | CPU＋4090 Qwen；无模型长训 | 通过calibration／sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
-| P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2按fresh Human `105K`＋GT-H LAT Camera `105K`启动 | 训练闭合后按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 是，已授权 | 只回答当前caption下表示／生成器可行性 |
-| closed component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；Human、Camera、FOV与projective所查16项相对C1REL的CI全部回退 | Stage2 hard stop；不再为该分支支付训练预算 | 否 | 支持C1REL下I16对Stage1 owning reconstruction／framing不可删；不外推free-generation necessity |
+| P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2已完成fresh Human `105K`＋GT-H LAT Camera `105K` | 按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 训练完成；待评测 | 只回答当前caption下表示／生成器可行性 |
+| deferred component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；所查16项相对C1REL的CI全部回退 | 冻结与C一致的caption、exposure、sampler、参数／成本合同后补Stage2 | 是，后续已授权 | 当前支持Interaction16的Stage1 simple-and-effective；Stage2再检验generation贡献 |
 | P0 method control | Matched Symmetric Joint | 尚未创建；默认parent已冻结为C0-LAT，必须复用其Stage1、latent target、decoder、数据、exposure与最终canonical text | 先冻结参数／checkpoint／exposure／GPU-hour／inference-cost合同；text恢复前不启动 | 是，仅Stage2；待授权 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
 | P1 external baseline | PulpMotion-Repro-162K | 现有native PulpMotion行不能自动视为exact 162,760 reproduction | canonical text冻结后，按PulpMotion own representation／model在相同split、exposure和评测协议复现 | 是，Stage1＋Stage2 | 外部系统边界；不是StoryMotion组件消融 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
@@ -275,7 +282,8 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.3 可选、不阻塞主张
 
 - 若正文不声称latent接口优于显式Human API，则无需运行H199 cascade。
-- `C1REL-w/o-Interaction16`的Stage1-only审计已hard stop；其结果不触发Stage2。
+- `C1REL-w/o-Interaction16`的Stage1审计已形成正向组件证据；matched Stage2后续补充，不阻塞
+  当前初稿。
 - 若正文需要更多relation机制归因，再补zero／shuffle／route检查；NoInt目前只支持I16的
   Stage1 reconstruction／framing贡献。
 
@@ -283,7 +291,7 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 
 - “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
 - “interaction16对generation必要”——Stage1只支持其reconstruction／framing贡献；
-  NoInt-HREL与C1REL-no-I16 Stage2均已关闭。
+  C1REL-no-I16 matched Stage2尚未完成。
 - “C1REL优于HREL”——Stage1没有形成稳定Pareto且不读取文本；当前raw-`T0` Stage2不具备
   最终caption-matched资格，仍需canonical text重训及Camera-native adherence／Human-relative
   framing联合证据。
@@ -295,12 +303,13 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ## 5. 本周初稿与实验冻结顺序
 
 初稿可以立即开始。方法、问题定义、数据边界、现有seed17／23结果和限制可直接成文；数据贡献
-和baseline superiority暂留占位符。作者要求下一条ablation等到2026-08-05中午再处理；当前顺序是：
+和baseline superiority暂留占位符。当前顺序是：
 
 1. C0-LAT保持唯一operational mainline；NoInt-HREL Stage2保持搁置；
-2. 让已授权C1REL raw-`T0` Stage2完成并保存endpoint；中午前不部署下一条ablation。其三接口
-   formal只回答raw-caption可行性，不宣布canonical-text胜者；
-3. strict `C1REL-w/o-Interaction16` Stage1及formal audit已闭合并hard stop，不接Stage2；
+2. C1REL raw-`T0` Stage2 endpoint已完成；先做三接口formal，只回答raw-caption可行性，不宣布
+   canonical-text胜者；
+3. strict `C1REL-w/o-Interaction16` Stage1 formal已形成正向组件证据；后续按matched合同补Stage2，
+   在完成前不写generation必要性；
 4. 完成10万条显式`v1p0-H1 / noncanonical` Qwen候选，再继续视频审核、H0／H1与parser裁决，
    冻结唯一symbolic／short／long artifact；
 5. 冻结canonical text后重训必要的最小caption-matched Stage2，再以Camera-native adherence与

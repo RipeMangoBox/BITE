@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T02:47:07+08:00
+updated: 2026-08-05T11:51:35+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -28,12 +28,12 @@ updated: 2026-08-05T02:47:07+08:00
 > calibration、语言化与QC合同。全量候选阈值及其artifact只见
 > [[StoryMotion/StoryMotion-iclr-reliability#1.1 Pulp Camera full-train threshold audit]]。
 > 2026-08-05作者额外授权：保留全部旧标注artifact，以4090处理10万条显式新版candidates。
-> 部署合同为GPU0两个BF16 worker、GPU1三个逻辑worker；实测GPU1三个Qwen BF16模型同时驻留时
-> 在最后`48 MiB`分配处OOM，当时只余`43.5 MiB`，因此GPU1执行可审计的`2+1`队列，最多两个
-> 模型同时驻留，第三个worker在任一前置worker成功完成后接续。该授权不等于H1规则冻结；在512
-> calibration完成前，输出固定标为`v1p0-H1 / noncanonical`，不得写回训练manifest或冒充sealed
-> evidence。rotation权威表示已从Euler转换为rotvec，后续event sweep与10万条语言化只读新版
-> shards，不重复扫描原轨迹。本授权仍不包含canonical写回、Stage2重训或任何模型长训。
+> 部署固定为GPU0两个、GPU1两个Qwen BF16模型，共四个常驻实例，不使用`2+1`驻留。GPU1三个
+> 模型同时加载的OOM日志保留；原第三分片在没有生成任何record时撤销自动接续，并确定性重排为
+> 后续双worker remainder。该授权不等于H1规则冻结；在512 calibration完成前，输出固定标为
+> `v1p0-H1 / noncanonical`，不得写回训练manifest或冒充sealed evidence。rotation权威表示已从
+> Euler转换为rotvec，后续event sweep与10万条语言化只读新版shards，不重复扫描原轨迹。本授权
+> 仍不包含canonical写回、Stage2重训或任何模型长训。
 
 ## 1. 目标、边界与最小原则
 
@@ -438,9 +438,11 @@ signal、sample offsets、histogram与后续event所需字段。P2以后只消�
 > `pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`：全轴统一采用H1，输出记录
 > `rule_candidate_status=provisional_not_selected_by_512_calibration`，Qwen只读deterministic
 > sentence plan，single-pass后独立reparse，失败即deterministic fallback。数据先确定性分为
-> GPU0／GPU1两个互不重叠的50K split；GPU0由两个worker处理，GPU1由三个逻辑worker处理但按
-> 实测显存上限以`2+1`驻留。旧512／30K／40K artifacts不修改。若后续calibration选择H0或更改salience，这10万条只保留为
-> language／throughput provenance并整体失去canonical资格，不能局部混入新版本。
+> GPU0／GPU1两个互不重叠的50K split。GPU0由两个worker处理；GPU1先由两个worker处理原
+> `source_index mod 3 ∈ {0,1}`的33,334条，再由两个worker处理确定性重排的remainder 16,666条。
+> 因此始终最多四个模型常驻，四个sample集合互斥并覆盖exact 100K。旧512／30K／40K artifacts
+> 不修改。若后续calibration选择H0或更改salience，这10万条只保留为language／throughput
+> provenance并整体失去canonical资格，不能局部混入新版本。
 
 ### 9.1 v1p0执行artifact
 
@@ -452,10 +454,16 @@ signal、sample offsets、histogram与后续event所需字段。P2以后只消�
   共100,000条、842,488个axis events、650,709个required events与19,427条static样本。
 - GPU1三逻辑worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_tri_20260805`；
   contract SHA256=`65fad244ab4a75d6f38692fcf5fd68d65b0a4bd73a933fd33ac44ae752012b10`。
-  三模型同时加载的OOM日志保留，正式执行采用同一contract下的`2+1`队列，不改模型、精度或prompt。
+  三模型同时加载的OOM日志保留；修订后只运行worker0／1，worker2队列在产生record前停止。
+- GPU1 remainder source：`paperA_pulp_camera_eventplan_gpu1_remainder_n16666_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
+  只选择parent `source_index mod 3 = 2`并从零连续reindex，contract SHA256=
+  `8b980cef485cdd670be423169fe56ce2aa63327a52e57bd0cdba9758baf859d0`。
+- GPU1 remainder双worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_gpu1_remainder_n16666_seed17_4090g1_dual_20260805`；
+  contract SHA256=`6185f622176b4aaacd115b478ab966df51f30f9ff3bf325f734e22eca5aeace1`，
+  绑定StoryMotion revision `99145173d02aa1f9184eebf9576cc1023236db41`，仅在前两个GPU1
+  worker成功完成并释放显存后启动两个worker。
 - GPU0双worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g0_dual_20260805`；
-  contract SHA256=`676b0b76199ee1c29a6ed9fac210697a3cab7cab7b636bae761ef950cbdd09f4`，
-  在已授权C1REL训练释放GPU0后自动启动。
+  contract SHA256=`676b0b76199ee1c29a6ed9fac210697a3cab7cab7b636bae761ef950cbdd09f4`。
 - 更改部署合同前的GPU1双worker run保留28条已生成records，不删除、不拼入新run：
   `paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_dual_20260805`，contract
   SHA256=`9c44a2b9f587a0cfc7eeffa70ec9566046c00eb545795176338e066990ac3e3e`。

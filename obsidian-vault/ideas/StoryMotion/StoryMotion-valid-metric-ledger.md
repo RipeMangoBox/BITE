@@ -28,7 +28,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-04T14:51:40+08:00
+updated: 2026-08-05T11:51:35+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1032,7 +1032,7 @@ v9 CFG1的原生diagnostic evaluator没有发出integrated-heading字段；本�
 | v9 redesign Pulp-only / canonical true4053 r4 | 0.160790 | 0.096190 | 0.029678 | 0.039550 | — | 0.484065 / 0.497732 | 0.023921 / 0.007547 | current C0 shared Stage1 owner |
 | NoInt-HREL / formal true4053 | 0.180547 | 0.101843 | 0.031005 | 0.041164 | — | 0.484226 / 0.497732 | 0.023734 / 0.007547 | Stage1 ablation；Stage2未授权 |
 | C1REL / formal true4053 | 0.157706 | 0.101260 | 0.029883 | 0.040497 | — | 0.485306 / 0.497732 | 0.024223 / 0.007547 | Stage1 representation arm；未晋升 |
-| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 4.741876 | 1.157589 | 0.360707 | 0.306611 | — | 0.227098 / 0.497732 | 0.393948 / 0.007547 | strict Stage1 component ablation；hard stop，无Stage2 |
+| C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 4.741876 | 1.157589 | 0.360707 | 0.306611 | — | 0.227098 / 0.497732 | 0.393948 / 0.007547 | strict Stage1 component ablation；Stage2后续matched补充 |
 | v10 HREL-C old-3-loss / final210K diagnostic | 0.353564 | 0.107943 | 0.066030 | 0.041602 | 0.500543 native recon | 0.497488 / 0.497732 | 0.012102 / 0.007547 | historical diagnostic；no cache／promotion |
 
 > [!warning] `Out≈0.50` 的语义修正
@@ -1083,9 +1083,10 @@ global／root-aligned MPJPE、root ADE／FDE与wrapped-yaw mean，Camera joint�
 ADE／FDE、rotation、FOV-H／FOV-W，以及四项projective error共16项95% CI全部在零上方。
 其中joint Cam ADE差为`1.456730 [1.403823, 1.509794] m`，rotation差为
 `38.157305 [37.161044, 39.148231]°`，joint UV差为
-`4.584170 [4.214516, 4.995502]`。因此D在Stage1形成预声明的严重退化，停止于本层，
-不授权Stage2；该结果支持“I16对C1REL owning reconstruction／framing不可删”，仍不外推为
-free-generation中的单组件必要性。
+`4.584170 [4.214516, 4.995502]`。因此D在Stage1形成广泛且量级显著的退化。这是有效的正向
+ablation evidence：在仅删除I16的strict C1REL合同下，简单的Interaction16对owning
+reconstruction／framing有效且不可直接删除。该结果仍不外推为free-generation中的单组件必要性；
+作者已单独决定后续补充matched Stage2，在该结果产生前只写Stage1有效性。
 
 NoInt-HREL的Human均值基本保持，只有root FDE出现极小的正差；五项Camera geometry和四项projective
 error的CI均在零上方。因此本Stage1证据支持“删除显式I16会损害owning reconstruction／framing”，
@@ -1093,9 +1094,10 @@ error的CI均在零上方。因此本Stage1证据支持“删除显式I16会损�
 但五项Camera geometry均回退，projective center／Out也回退，joint UV与scale没有稳健差异；它没有
 形成可晋升的稳定Pareto。Stage1不消费Camera text，不能从本artifact声称C1REL text adherence改善。
 
-预声明只写了“严重退化可降级”，没有冻结数值阈值；因此本次不事后发明binary severe gate，不授权
-Stage2，也不把C1REL直接判为最终失败。HREL继续保持当前representation owner；是否还值得为C1REL
-支付Stage2预算，只能在canonical Camera text冻结后按新的最小合同明确裁决。
+预声明只写了“严重退化可降级”，没有冻结数值阈值；因此formal artifact本身不事后发明binary
+severe gate，也不把C1REL直接判为最终失败。2026-08-05作者在看到完整formal结果后另行授权未来
+C1REL-noI16 matched Stage2；这是新的决策层事件，不回写Stage1 artifact，也不预先宣称generation
+结论。HREL继续保持当前representation owner。
 
 NoInt-HREL checkpoint／training contract／evaluation contract／result／records／fixed-samples／eval-manifest
 SHA256依次为`968133147d7e1b1202e5bf9ff5e046ae8ff0c592573361821804a1823562ef75`、
@@ -1125,7 +1127,7 @@ C1REL-noI16对应SHA256依次为`b8b572d5562f0946896ac9fc6af866d9ea636c9460e4616
 `ce21952d67b5f2b5532fdf4be494dcdf9f40d97aa8dd92f3816beb6107792bac`／
 `09a5e8ca807643f4a7a375582024f3197e1b5b99954408c186e62ee598c4cc51`；后者由run root
 `paperA_c1rel_nointeraction16_formal_paired4053_bootstrap10000_seed17_4090cpu_20260805`
-拥有，未授权representation selection或Stage2。
+拥有。该artifact只提供Stage1证据；未来Stage2授权与结果必须由独立run contract拥有。
 cross-arm comparison／manifest SHA256为
 `b6fe50d255cd574385f8dcb75bc1eb7692371f8c770bb780674cb84b3afc2bed`／
 `dd89f88bb4fb08dc4cb0bb2dd8d2b126025e33117c983d6e7a20557c9700d254`；formal evaluator与
