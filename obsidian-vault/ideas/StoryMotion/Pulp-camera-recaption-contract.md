@@ -1,8 +1,8 @@
 ---
 title: "Pulp Camera Geometry-Grounded Recaptioning Contract"
-status: v2_semantic_grouping_screen_complete_pending_calibration
+status: v2_semantic_hierarchy_screen_complete_pending_calibration
 hypothesis: |
-  使用冻结的camera-local六轴增量、全训练集候选阈值、轴级事件与共时几何事件归并和确定性句子计划，
+  使用冻结的camera-local六轴增量、全训练集候选阈值、轴级事实、语义游程／摄影阶段与确定性句子计划，
   可以在不让LLM决定几何真值的前提下，为Pulp构造三条共享事实的可审核Camera short text。
 tags:
   - StoryMotion
@@ -18,8 +18,9 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
   - "[[StoryMotion/dont_read/0805-2009]]"
+  - "[[StoryMotion/dont_read/0805-2334]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T22:30:23+08:00
+updated: 2026-08-05T23:55:00+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -34,9 +35,9 @@ updated: 2026-08-05T22:30:23+08:00
 > v2版本注册前产生的`v2-pre / noncanonical` provenance。first-20K暴露的是v2-pre语言规划器
 > 缺陷，不是全量rotvec统计失效。现有`event_plan_v2.py`仍从H1历史event records升级文本包，
 > 不能生成H0；因此当前准确状态是“signal与几何基础代码闭合、H0／H1同源重放及semantic
-> grouping候选screen已完成、Calibration-512待执行”，不是“v2实现完成”。S0-B1是primary
-> calibration candidate，S0-B2是更宽的sensitivity，不是已选rule。尚未调用VLM、生成新Qwen文本、
-> 写回canonical manifest或解锁Stage2训练。
+> grouping候选screen及`axis facts → excursion → spine phase → core facts` full-train child screen均已完成，
+> Calibration-512待执行”，不是“v2实现完成”。旧S0-B1／S0-B2降为前置geometry screen，不再是
+> 当前最终rule候选。尚未调用VLM、生成新Qwen文本、写回canonical manifest或解锁Stage2训练。
 
 ## 0. 版本注册与当前显示裁决
 
@@ -44,7 +45,7 @@ updated: 2026-08-05T22:30:23+08:00
 | --- | --- | --- | --- |
 | v1 | 最多21个均匀采样pose；Euler／逐采样step临时阈值；step时长随clip长度变化 | 一条short＋一条long；旧30K／40K及port `7868`页面 | immutable legacy review-only |
 | v2-pre | exact full-train rotvec rate候选节点；H1 provisional event graph | 无界required events、quadratic relations、一条short＋一条long | 历史ID仍含`v1p0`；first-20K后停止 |
-| v2 | H0／H1都从同一immutable step signals重建；`axis-present → co-temporal geometry → salient → text`分层；event budget由统计与人工共同选择 | 同一fact packet的3条enriched short；count-aware parser；whole-triplet same-gate fallback；CLIP／T5仅作诊断 | full-train H0／H1与semantic grouping screen完成；唯一rule／budget／relation planner待校准 |
+| v2 | H0／H1都从同一immutable step signals重建；`axis-present → excursion → spine phase → core fact`分层；完整轴事实与文本核心意图分离；phase／fact budget由统计与人工共同选择 | 同一fact packet的3条enriched short；count-aware parser；whole-triplet same-gate fallback；CLIP／T5仅作诊断 | full-train H0／H1、前置grouping与semantic hierarchy child screens完成；唯一rule／budget／relation planner待校准 |
 
 因此旧页面中的微幅`dolly out／tilt up／tilt down`主要是 **Gradio仍展示v1 artifact**，不是v2
 重新把它们判成显著运动。已核对的9条旧组样本中，v2-pre数值plan有8条不再要求运动文本；唯一
@@ -82,7 +83,8 @@ event统计阶段record固定`camera_attribute_scope=extrinsics6`。含raw zoom�
 
 > [!abstract] v2唯一候选主链
 > `C2W → C1REL → body-local translation＋rotvec rates → H0/H1 axis-present intervals →`
-> `co-temporal geometry events → segment salience → caption fact packet → deterministic clauses →`
+> `signed primitive excursions → spine-based camera phases → minimal core facts／bounded residuals →`
+> `phase＋fact budget → caption fact packet → deterministic clauses →`
 > `three-short realization → count-aware reparse／whole-triplet fallback → CLIP/T5 auxiliary QC`
 
 ## 2. Web GPT建议的采纳裁决
@@ -105,17 +107,21 @@ event统计阶段record固定`camera_attribute_scope=extrinsics6`。含raw zoom�
 | 1,200 calibration＋1,000 sealed | 缩减 | 512 calibration＋512 sealed；其中20%双人复核 |
 | 全量复杂Gradio诊断面板 | 缩减 | video、六轴曲线、interval、文本与审核按钮为必需；3D trail按需显示 |
 | H0／H1从同一step signals重放 | 采纳 | 历史100K H1仅作provenance；H0不能从H1 event graph反推 |
-| 共时轴事件先合为geometry event | 条件采纳 | 只合并近同步、同阶段的跨轴interval；嵌套的短事件不并入长事件；具体容差由全量分布与calibration冻结 |
-| 固定`max_caption_events=3` | 撤回 | 比较3／4／5／6；accepted sample不得遗漏任何salient geometry event，overflow隔离而非静默top-K |
+| camera-local累计游程作为真实位置／角度 | 修改采纳 | 只把同轴同号event的net amplitude和support合成“有符号原语累计代理”；local frame随时间旋转，不能把标量和解释为world position或可交换的SO(3)积分 |
+| 同向multi-burst与微反向修正 | 条件采纳 | 保留完整axis graph；同向段合成带disjoint supports的intermittent excursion；`0.5×／1.0×`幅度尺度是calibration候选，不是已冻结阈值 |
+| spine-based phase grouping | 条件采纳 | modifier只需直接满足spine的support-union IoS；比较预注册的`1.0／0.8`，禁止传递式relation expansion |
+| `G_text=G_core⊂G_nontrivial` | 条件采纳 | residual仍是数值事实且必须报告prominence；不能仅因降低event count而静默省略 |
+| 一个`K_geom`预算 | 撤回 | 分别比较`K_phase∈{3,4}`与`K_fact∈{4,5,6}`；major reversal强制保留 |
 | 区间感知`then／overlap／during／reverses` | 采纳 | 只对有界selected events即时计算，Qwen读取确定性clauses，不自行推断interval |
+| VLM按原始`K>5`自由删改event | 不采纳 | 只在deterministic候选发生语义分歧或预算overflow时选择冻结A／B／uncertain；不得创造primitive或直接写canonical text |
 | CLIP／T5作为P7 gate | 不采纳 | 先测direction-flip等诊断判别力；无效即删除该分数，不阻断canonical发布 |
 | FOV／zoom只靠raw关键词隔离 | 不采纳 | P7前补geometry-based intrinsics audit；当前事件统计仍只处理extrinsics6 |
 
 ### 2.1 明确拒绝的过度复杂化
 
-v2不实现通用change-point clustering、学习式置信度、每轴独立超参数搜索、复杂父子macro节点、
-二次LLM总结或VLM视频判定。这些模块会增加新的阈值与不可验证分支，却不是修正Pulp Camera文本
-的必要条件。
+v2不实现通用change-point clustering、学习式置信度、每轴独立超参数搜索、无界父子macro节点、
+二次LLM总结或自由式VLM geometry编辑。spine phase只保存star-link成员，不物化全图两两关系；
+VLM若在calibration后仍有必要，也只能处理冻结候选分歧。这些边界避免引入新的不可验证分支。
 
 Web GPT提出的通用time-reversal测试也需要收窄。camera-local frame会随Camera旋转；一般轨迹
 反放后，增量应是带frame change的逆变换，不能简单要求六个符号逐项取反。v2只对纯轴synthetic
@@ -218,24 +224,28 @@ records来产生H0。两套候选分别输出完整的axis intervals，再分别
 duration、median rate、net amplitude、path amplitude与sign consistency。该统计不重读Pulp原始
 trajectory，不调用LLM，也不选择最终rule。
 
-v2固定区分四层集合：
+v2固定区分五层对象：
 
 ```text
-E_axis_present  = 通过H0或H1 hysteresis的带符号轴级interval
-G_geom          = 由近同步、同阶段跨轴interval组成的geometry event
-G_salient       = 通过segment salience的geometry event
-G_text          = 被完整写入caption fact packet的salient geometry event
+E_axis_present  = 通过H0或H1 hysteresis的完整带符号轴级interval
+E_excursion     = 同轴同向累计、显式保留support intervals的非平凡语义游程
+P_camera        = 由spine与直接modifier组成的摄影阶段
+F_core          = 满足coverage、reversal与residual安全约束的最小文本事实集
+F_residual      = 真实但未写入short的有界调整；不是noise或被删除target
 ```
 
-必须满足`G_text ⊆ G_salient ⊆ G_geom`，而`G_geom`可追溯到`E_axis_present`。状态另行冻结为：
+必须满足`G_text=F_core ⊆ E_excursion ⊆ E_axis_present`，且每个phase／fact／residual均能回溯到
+原始`event_id`。`segment salience`只决定nontrivial候选，不再等价于“必须逐项写入short”。状态为：
 
 - `strict_static`：`E_axis_present`为空；
-- `weak_motion_only`：存在axis-present event，但`G_salient`为空；
-- `captionable_motion`：`G_salient`非空；
-- `caption_budget_exceeded`：存在salient geometry event，但当前文本预算无法完整覆盖。
+- `weak_motion_only`：存在axis-present event，但`E_excursion`没有nontrivial成员；
+- `captionable_motion`：存在nontrivial excursion和通过安全约束的`F_core`；
+- `semantic_consolidation_ambiguous`：冻结候选对同一sample给出不同core结构；
+- `caption_budget_exceeded`：core仍超过phase／fact预算或residual安全约束失败。
 
 只有`strict_static`可生成stationary。`weak_motion_only`不能因“未入选文本”被重标stationary；在
-Calibration-512裁决前保留为abstain。`caption_budget_exceeded`同样隔离，不允许静默top-K。
+Calibration-512裁决前保留为abstain。`F_residual`必须报告解释质量和最大prominence；
+`caption_budget_exceeded`同样隔离，不允许静默top-K或把真实复杂镜头洗成简单动作。
 
 salience只允许以下两条路径：
 
@@ -269,66 +279,64 @@ $$
 
 其中$S^{\mathrm{rate}}_a／S^{\mathrm{amp}}_a／S^{\kappa}_a$分别来自所选H候选的full-train
 segment节点，与4.1只作抽样锚点的raw-text $R_a$不同；duration、start time与稳定
-`event_id`只作tie-break。历史字段`must_preserve`保留为immutable provenance，但v2不沿用，也不
-新建一个同义的“required”布尔值。只有salient geometry events进入文本；`reverses`只在两个
-salient同轴反向event间成立。若人工认为某个反向partner必须写、rule却判为非salient，应在
-Calibration-512调整全局salience合同，而不是用sample级例外把非salient尾部塞进文本。
+`event_id`只作tie-break。该score只用于判断axis member是否nontrivial，不用于core事实排序；后者
+暂用net amplitude除以每轴train-only amplitude scale，避免“很短但高速”的回调再次因rate被放大。
+历史字段`must_preserve`保留为immutable provenance，但v2不沿用，也不新建一个同义的
+“required”布尔值。`reverses`只在两个nontrivial同轴反向excursion间成立并强制进入core；若人工
+认为某个反向partner应当保留而rule判为weak，应在Calibration-512调整全局合同，而不是加
+sample级例外。
 
-### 4.4 Geometry grouping与数据驱动的caption budget
+### 4.4 Excursion、spine phase与core fact候选
 
-不同轴且开始／结束边界接近、属于同一连续时间阶段的axis intervals可组成一个compound geometry
-event，例如同步truck＋pan。下列情况禁止合并：
+旧`S0／S2／S3 × B0／B1／B2`screen证明固定gap和start／end complete-link只能有限降低长尾，现降为
+前置诊断。新的full-train child screen保持所有axis events不变，只比较以下三层可回退候选。
 
-- 同轴同方向event：由axis detector的gap规则决定是否合并，不由跨轴grouping处理；
-- 长event内部嵌套的短event：两者保持独立，以便表达`during`；
-- 只有部分重叠但不属于同一阶段的event：保留`overlap`关系，不强行合成compound。
+第一层是同轴语义游程：
 
-full-train sweep只比较以下最小候选，尚未冻结唯一rule：
+1. 连续的同轴同号interval合成一个excursion，不要求填平pause；原support以disjoint intervals保存，
+   多段支持写`intermittent=true`；
+2. 对`same-sign → opposite → same-sign`，先合并各自同向burst，再计算中间回调相对两侧的幅度比；
+3. 中间幅度同时小于两侧，且低于`0.5×`或`1.0×`该轴train-only amplitude scale时，分别形成
+   `C05／C10` micro-correction候选；`C0`不删回调；
+4. 未满足该条件的相反方向nontrivial excursion保留为major reversal。完整axis event与被标记的
+   micro correction始终留在record中。
 
-- `S0`：不在hysteresis之后额外stitch；
-- `S2／S3`：只合并同轴、同方向、间隔不超过2／3 steps且gap中不存在反向event的fragment，合并后
-  从原rate signal重算segment feature与full-train salience nodes；
-- `B0／B1／B2`：跨轴salient intervals的start与end边界都相差不超过0／1／2 steps；
-- grouping采用complete-link，合并组内所有pair都必须满足边界条件，且同一axis最多一个member，
-  禁止`A≈B≈C`把不相近的A与C传递性合并。
+这里的累计量只是同一camera-local primitive上的有符号net-amplitude代理。由于local axis会随Camera
+旋转，translation标量和不解释为world displacement，rotvec标量和不解释为完整SO(3)角度。
 
-S2／S3只带来约`0.2—0.4 pp`的captionable top-5增益，却改变约2.9万—4.4万条样本的axis
-segmentation，因此不作为默认修正。`S0-B1`以`0.16 s`边界容差作为primary calibration candidate；
-`S0-B2`以`0.32 s`容差作为aggressive sensitivity。B2的更高覆盖不能替代人工检查异阶段过合并。
-禁止仅为降低event count而继续放宽合并。
+第二层是spine phase。按normalized amplitude mass从大到小选择spine；不同轴、support duration不长于
+spine的excursion，只有在其与spine的support-union IoS达到候选`A100=1.0`或`A080=0.8`时才直接挂载。
+每个modifier必须与spine直接成立，禁止modifier之间的传递合并；同轴反向excursion永不互相挂载。
+这允许长dolly包含先后pan modifier，同时不生成全图两两relation。
 
-预算校准必须同时报告：
+第三层从全部nontrivial excursion中选择达到`E95=0.95`或`E97=0.97` normalized amplitude mass的最小
+core facts。所有major-reversal成员及其phase spine强制进入core。未选事实保留为residual，并报告
+`caption_explained_motion_mass`与`max_residual_prominence`。当前不冻结residual上限；若人工审核显示
+高prominence事实被省略，就应降低压缩或abstain，而不是提高阈值强行降低数量。
 
-```text
-K_axis     = axis-present interval数
-K_geom     = co-temporal grouping后的geometry event数
-K_salient  = salient geometry event数
-K_text     = caption fact packet中的geometry event数
-```
-
-比较`max_caption_events ∈ {3, 4, 5, 6}`。选择最小充分预算时，同时报告全量覆盖率、按长度／
-compound／reversal分层的overflow率，以及人工可读性；数值门槛在首个full-train screen之后、人工
-calibration之前一次性冻结。任何进入canonical dataset的sample必须满足：
+预算因此同时报告：
 
 ```text
-K_text = K_salient
-all_direct_reversals_selected = true
+K_axis       = 完整axis-present interval数
+K_excursion  = nontrivial signed primitive excursion数
+K_phase      = core事实所在摄影阶段数
+K_fact       = short必须表达的primitive-direction事实数
 ```
 
-`K_geom>5`现定义为`vlm_review_required`触发器，不是deterministic truncation。VLM只能在冻结
-candidate events内输出`keep／noise／merge-suggestion／uncertain`及event IDs，不得创造新primitive
-或方向。超出最终预算且未通过审核的复杂尾部写`caption_budget_exceeded`并隔离，不允许以top-K
-形式留下未写入的salient target variation。历史`max_caption_events=3`与
-primary／reversal／overlap selector只作为v2-pre风险screen，不再是v2合同。
+比较`max_core_phases ∈ {3, 4}`与`max_core_facts ∈ {4, 5, 6}`。选择依据是false merge／false split、
+major-reversal recall、explained mass、residual prominence和人工可读性，不是最低event count。
+`semantic_consolidation_ambiguous`、budget overflow或residual gate失败才进入后续per-case审核；VLM若启用，
+只能在冻结候选A／B／uncertain中选择，不得自由创建、删除primitive或直接写canonical text。
 
 ## 5. 最小v2 event与relation schema
 
-canonical graph只保存atomic axis events，不保存易膨胀的语言宏节点：
+canonical record保存完整atomic axis events、可追溯excursions、star-link phases、core与residual；
+不保存易膨胀的全图两两relation：
 
 ```json
 {
   "convention_id": "pulp_c2w_rdf_body_local_rotvec_stride4_v1",
-  "axis_events": [
+  "camera_motion_axis_events_full": [
     {
       "event_id": "e0",
       "primitive": "dolly",
@@ -343,53 +351,39 @@ canonical graph只保存atomic axis events，不保存易膨胀的语言宏节�
       "path_amplitude": 0.123,
       "amplitude_unit": "m",
       "salient": true
-    },
-    {
-      "event_id": "e1",
-      "primitive": "pan",
-      "direction": "right",
-      "start_step": 12,
-      "end_step": 17,
-      "duration_s": 0.96,
-      "median_rate": 1.04,
-      "peak_rate": 1.31,
-      "rate_unit": "deg/s",
-      "net_amplitude": 1.00,
-      "path_amplitude": 1.02,
-      "amplitude_unit": "deg",
-      "salient": true
     }
   ],
-  "geometry_events": [
+  "camera_motion_excursions": [
     {
-      "event_id": "g0",
+      "excursion_id": "x0",
+      "primitive": "dolly",
+      "direction": "in",
       "axis_event_ids": ["e0"],
-      "salient": true
-    },
-    {
-      "event_id": "g1",
-      "axis_event_ids": ["e1"],
-      "salient": true
+      "support_intervals": [[8, 19]],
+      "intermittent": false,
+      "normalized_motion_mass": 2.14
     }
   ],
+  "camera_motion_phases": [
+    {"phase_id": "p0", "spine_id": "x0", "member_ids": ["x0"]}
+  ],
+  "camera_motion_core_fact_ids": ["x0"],
+  "camera_motion_residual_event_ids": [],
+  "caption_explained_motion_mass": 1.0,
+  "max_residual_prominence": 0.0,
+  "major_reversal_recall": 1.0,
   "caption_fact_packet": {
-    "selected_geometry_event_ids": ["g0", "g1"],
-    "max_caption_events": "pending_full_train_budget_selection",
-    "deterministic_clauses": [
-      {
-        "source": "g0",
-        "target": "g1",
-        "type": "during"
-      }
-    ]
+    "selected_excursion_ids": ["x0"],
+    "max_core_phases": "pending_calibration",
+    "max_core_facts": "pending_calibration",
+    "deterministic_clauses": []
   }
 }
 ```
 
-示例为简写；正式record还要保存`axis_event_ids`以从`g*`追溯到`e*`。完整atomic graph不物化
-任意两两relation；interval本身已足够复核。只有最终有界的selected geometry events在
-deterministic planner中即时计算必要关系。即使预算为6，两两候选也至多15对，不需要为了避免
-全图$O(N^2)$而把文本关系压成一条线性链。最小关系集合为：
+示例为简写；每个`x*`必须以`axis_event_ids`追溯到`e*`，phase只保存spine及直接members。完整
+atomic graph不物化任意两两relation；support intervals本身已足够复核。只有最终有界的core facts
+在deterministic planner中即时计算必要关系。最小关系集合为：
 
 - `then`：前一event结束后，后一event再发生；
 - `overlap`：两个event部分重叠，且互不包含；
@@ -397,24 +391,24 @@ deterministic planner中即时计算必要关系。即使预算为6，两两候�
 - `reverses`：同轴、反向且直接或近直接衔接。
 
 `reverses`的最大gap尚需从direct-transition分布与Calibration-512冻结；超过该gap时只表达
-`then`与后续相反方向，不能写成直接反转。`during`保留长dolly中先后两段pan等嵌套事实，避免
-旧线性链漏掉第二段pan仍位于dolly期间。planner把interval确定性转换成clauses；Qwen读取clauses，
-不读取raw interval，也不自行决定几何关系。`repeats／alternates／accelerates`暂不进入ontology。
+`then`与后续相反方向，不能写成直接反转。`during`由phase spine与modifier的直接关系派生；
+planner把有界core结构确定性转换成clauses，Qwen不读取raw interval，也不自行决定几何关系。
+`intermittent`只记录同向多burst事实；`accelerates`暂不进入ontology。
 
 ### 5.1 最长62 steps的处理
 
 压缩发生在event层，不改stride：
 
-stride-4后最长为62 steps。完整event抽取仍按同轴短gap、方向与interval运行，不裁剪输入；语言
+stride-4后最长为62 steps。完整event抽取仍按方向与interval运行，不裁剪输入；语言
 输入只包含有界fact packet，因此不再存在long prompt token超额，也不按长序列分块。QC按
-`N_step／K_axis／K_geom／K_salient／K_text`分层报告，用来检测阈值或grouping是否在长样本上
+`N_step／K_axis／K_excursion／K_phase／K_fact`分层报告，用来检测阈值或semantic consolidation是否在长样本上
 放大噪声，而不是用全图pairwise relations增加文本容量。
 
 ## 6. Deterministic plan与Qwen边界
 
 ### 6.1 三条short的唯一语义身份
 
-每条样本目标输出`camera_text_enriched_shorts[3]`。三条读取完全相同的geometry event IDs与
+每条样本目标输出`camera_text_enriched_shorts[3]`。三条读取完全相同的core excursion IDs与
 deterministic clauses；不设置
 “主动作版／时序版／复合版”等角色，不允许某一条独有`start／midway／late`、幅度、速度或构图
 强调。差异只允许同义动词／名词、主动或名词化句法、以及表达同一必要关系的连接词。v2不设置
@@ -424,7 +418,7 @@ deterministic templates。训练如何抽取三条在Stage2合同中另行冻结
 
 三类对象不得混名：
 
-- `camera_motion_axis_events`与`camera_motion_geometry_events`是可追溯数值事实；
+- `camera_motion_axis_events_full／excursions／phases／residual_events`是可追溯数值事实；
 - `caption_fact_packet`与`camera_text_canonical_template`是确定性语言合同；
 - `camera_text_enriched_shorts[3]`是Qwen受约束的表述增强，不是新的几何标签。
 
@@ -504,22 +498,24 @@ optimizer-free测试至少包含：
 
 | stratum | 数量 | 目的 |
 | --- | ---: | --- |
-| uniform random | 192 | 防止只优化风险样本 |
-| threshold／duration boundary | 192 | 12个signed primitives各16条，覆盖enter／exit／duration／amplitude rescue |
-| compound／overlap | 64 | 检查多轴保留与语言关系 |
-| reversal | 32 | 检查方向与顺序 |
-| raw-text conflict／contamination | 32 | 第二阶段冲突分类 |
+| uniform random | 160 | 全局无偏false merge／false split与可读性 |
+| threshold／weak／static | 80 | H0／H1、salience与stationary边界 |
+| same-direction multi-burst | 80 | continuous与intermittent excursion是否误合／误拆 |
+| micro-correction／true reversal | 64 | `C05／C10`与major-reversal recall |
+| long spine＋nested modifiers | 64 | `A100／A080`、spine与modifier归属 |
+| genuine multi-phase／long overflow | 64 | core压缩是否遗漏真实复杂阶段 |
 
 各stratum内部覆盖六轴、正负方向、长度bin与最长序列。Calibration与sealed按parent source video
 及near-duplicate cluster分组隔离，不能只保证sample ID不重合。P2第一轮隐藏raw text，只看
 human＋ground＋camera video、六轴曲线和event intervals；P4语言pilot才进行第二轮，显示
 raw／deterministic／Qwen文本，减少raw text anchoring。随机选104条双人复核。
 
-calibration只允许作出：H0或H1、segment salience节点、sign consistency阈值、co-temporal grouping
-容差、direct-reversal gap、全局event budget与sentence plan是否通过。所有候选必须在展示人工结果
+calibration只允许作出：H0或H1、segment salience节点、sign consistency、correction候选、spine IoS、
+coverage target、residual安全界、direct-reversal gap、phase／fact budget与sentence plan是否通过。所有候选必须在展示人工结果
 前由full-train screen列出；不得扩张新primitive、逐轴微调规则或逐sample补丁。
 H0／H1比较报告event precision／recall、false split、false merge与按长度bin的event inflation；人工
-标签允许`absent／present-not-salient／salient／uncertain`，不能把`uncertain`强制算成任一候选正确。
+标签除`absent／present-not-salient／salient／uncertain`外，增加`same_core_event／separate_core_event／
+micro_correction／modifier／co_primary／independent_phase`；不能把`uncertain`强制算成任一候选正确。
 
 ### 8.2 Sealed 512
 
@@ -563,8 +559,8 @@ Gradio必需显示：
 | --- | --- | --- | --- |
 | P0 | body-local rotvec实现、parser修正、synthetic／metamorphic tests | CPU | 全部自动测试通过；未读全量raw |
 | P1 | 由immutable local-delta shards重建full-train translation＋rotvec signal，并以原轨迹subset验证等价 | CPU | 已闭合`162,760／162,760`、hash、无LLM |
-| P2 | 从同一新shards直接运行H0／H1、segment statistics、event-count／relation diagnostics并生成512 geometry calibration | CPU／低GPU渲染 | 人工选择唯一hysteresis／salience／grouping rule；历史H1 graph不得作为H0输入 |
-| P3 | 冻结geometry／event／parser、从3／4／5／6选择最小充分budget，生成完整coverage fact packets与deterministic clauses／三条short | CPU | immutable hashes；accepted sample满足`K_text=K_salient`，overflow隔离 |
+| P2 | 从同一shards直接运行H0／H1、salience、excursion／spine／core候选统计并生成512 geometry calibration | CPU／低GPU渲染 | 人工选择唯一hysteresis、correction、attachment、coverage与residual安全合同；历史H1 graph不得作为H0输入 |
+| P3 | 冻结hierarchy／parser，从phase 3／4与fact 4／5／6选择最小充分budget，生成core fact packets与deterministic clauses／三条short | CPU | immutable hashes；accepted sample满足explained-mass、residual与major-reversal gates，overflow隔离 |
 | P4 | 只跑512 Qwen pilot并完成第二轮language review | 4090或5090 | 冻结prompt、three-short与whole-triplet fallback gate |
 | P5 | 在冻结合同上完成sealed 512 | GPU＋人工审核 | 达到四项最低gate；不反向调参 |
 | P6 | 生成full-train deterministic triplet与单次Qwen three-short realization | CPU＋GPU | reject整组fallback；不写训练cache |
@@ -673,7 +669,7 @@ grouping与budget calibration，再过6个原语×3条paired review，才可讨�
 - `event_plan_v2.py`只读immutable v2-pre H1 event records；它可用于历史fixed-top3风险screen，
   不能生成H0，也不再是v2 geometry planner；
 - `language_realization_v2.py`的count-aware parser、三条同事实deterministic short与whole-triplet
-  same-gate fallback继续保留；最终输入需从fixed-top3换成校准后的完整coverage fact packet；
+  same-gate fallback继续保留；最终输入需从fixed-top3换成通过coverage／residual gate的core fact packet；
 - `text_embedding_qc_v2.py`继续分别记录CLIP／T5分数，但阈值不阻断P7；
 - `event_distribution_audit_v2.py`从同一immutable per-step signal shards分别重建H0／H1，第一遍拟合
   各自segment candidate nodes，第二遍报告`K_axis／K_salient`、length bins、预算3／4／5／6覆盖、
@@ -685,8 +681,8 @@ grouping与budget calibration，再过6个原语×3条paired review，才可讨�
   `b87ffa83a5f8d14ad5cfed7a424a4b8445eb93bfe4d957ab4282045dd23e1c10`／
   `61a66bf0c9d3a3c13d8d1e1c5daa290666c1d108978b932b151406667096ab5b`；该结果仍是screen，
   不在metric ledger登记；
-- 当前StoryMotion revision=`6b63cb64fce9513bfad029ad5ab55fae2f093b1c`；相关v1／v2定向单测
-  26项通过。远端分支仍为`paper-a-camera-video-review-20260804`。
+- 当前StoryMotion revision=`28c1c737f7166f1c4e523769b62a358422ac3fb0`；相关v1／v2定向单测
+  33项通过。远端分支仍为`paper-a-camera-video-review-20260804`。
 
 当前没有经calibration选择的v2 event-plan artifact或v2 Qwen输出；“几何基础代码可运行”不得写成
 “v2实现完成”，更不得写成“数据标注完成”。
@@ -720,7 +716,7 @@ salience判断，不能由上表均值直接决定。
 上一screen的边际统计只用于构造候选，不直接定义“近同步”；逐sample complete-link grouping与
 candidate-specific VLM review IDs由下一节的full-train child artifact拥有。
 
-### 9.4 Semantic grouping full-train sweep
+### 9.4 Semantic grouping full-train sweep（已由hierarchy child screen取代）
 
 CPU-only run
 `paperA_pulp_camera_semantic_grouping_sweep_h0h1_fulltrain_v2screen_seed17_4090cpu_20260805`
@@ -748,43 +744,97 @@ S0逐项复现parent H0／H1 salience nodes、`K_axis`与`K_salient` histogram�
 1. semantic grouping将grouping前top-5约`76.1%／76.3%`提高到S0-B1的`83.4%／83.6%`，证明
    cross-axis碎片是主要可修部分；但p95仍为7、max仍为38，不能把尾部视为已闭合；
 2. S2相对S0的B1 top-5只提高`0.30／0.37 pp`，S3也只提高`0.43／0.47 pp`；额外同轴stitch的
-   收益不足以抵消过合并风险，故S0进入primary calibration，S2／S3仅作sensitivity；
+   收益不足以抵消过合并风险。S0曾是该screen的primary候选，现只作为parent no-consolidation
+   comparator，不再与hierarchy候选竞争最终rule；
 3. B2相对B1提高约3 pp且降低max，但容许`0.32 s`边界错位；它只作为aggressive sensitivity，
    不因分布数字更好自动胜出；
 4. S0-B1最长`51—62` steps的captionable top-5覆盖仅约`75.1%／75.2%`，长序列必须进入
    Calibration-512和VLM pilot的风险分层；
-5. H0／H1在所有候选上仍很接近，本screen不选择hysteresis。`K>5` manifests已按candidate写出并
-   核对hash／行数；在B1与B2人工裁决前不启动VLM全量处理。
+5. H0／H1在所有候选上仍很接近，本screen不选择hysteresis。历史`K>5` manifests已按candidate写出
+   并核对hash／行数，但不再是VLM trigger；当前trigger由9.5的frozen-candidate disagreement与
+   phase／fact overflow拥有。
 
-### 9.5 尚需敲定的最小标准
+### 9.5 Semantic hierarchy full-train child screen
+
+CPU-only run
+`paperA_pulp_camera_semantic_hierarchy_h0h1_fulltrain_v3screen_seed17_4090cpu_20260805`
+在StoryMotion revision `28c1c737f7166f1c4e523769b62a358422ac3fb0`完成exact `162,760`
+samples／`4,733,272` steps，耗时`303.60 s`，未调用LLM／VLM。run ID中的`v3screen`仅表示第三代
+统计实现，不新增canonical数据semantic version；目标数据仍是本页定义的v2。contract／summary／
+sample-stats SHA256分别为：
+
+- `62a868eb0b7bfd7b64678cbae4ea7a463ef38e872cc07e3270ea244a5a17a72e`；
+- `65d0f19b0294dfdd5ee1e8af5c9babe431e9db33ee47d0e5675b1ca96a023654`；
+- `2028cdfc684af4d34b066c1194e09a24876f02691dc0885fba6078a6e9ec29e4`。
+
+24个候选逐项复现parent H0／H1的`K_axis／K_salient` histogram，所有candidate的
+`major_reversal_recall_failures=0`。下表p95／max以全部train样本为分母；budget与residual百分比只以
+candidate-specific captionable样本为分母。`C05-A080-E95`只是便于比较的中间screen，不是已选主链。
+
+| candidate | captionable | `K_excursion` p95／max | `K_core_phase` p95／max | `K_core_fact` p95／max | phase≤4 | fact≤6 | residual prominence>1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| H0 C05-A080-E95 | 76,576 | 9／61 | 4／34 | 8／60 | 90.55% | 83.10% | 6.94% |
+| H0 C10-A080-E95 | 76,668 | 8／54 | 4／25 | 8／54 | 91.05% | 84.14% | 5.80% |
+| H0 C05-A080-E97 | 76,576 | 9／61 | 4／34 | 8／60 | 90.34% | 82.30% | 2.11% |
+| H1 C05-A080-E95 | 76,543 | 9／61 | 4／32 | 8／60 | 90.42% | 83.17% | 7.22% |
+| H1 C10-A080-E95 | 76,642 | 8／54 | 4／25 | 8／54 | 90.95% | 84.20% | 6.00% |
+| H1 C05-A080-E97 | 76,543 | 9／61 | 4／32 | 8／60 | 90.23% | 82.40% | 2.25% |
+
+本screen关闭与保留的判断如下：
+
+1. hierarchy有效降低phase复杂度，却没有关闭fact长尾。`C05-A080-E95`仍有H0 `12,943／76,576`
+   （16.90%）与H1 `12,884／76,543`（16.83%）captionable样本超过6 facts；不能用
+   `K_phase≤4`替代事实覆盖，更不能据此恢复Qwen全量；
+2. `A080`相对`A100`把phase≤4从H0 `88.11%`提高到`90.55%`、H1 `87.96%`提高到`90.42%`，
+   但分别改变`11,764／12,161`条sample；是否错误挂载异阶段modifier只能由long-spine人工层裁决；
+3. `C10`相对`C05`只把fact≤6提高约`1.0 pp`，同时candidate structure在H0／H1分别有
+   `10,433／10,564`条不同。C05标记的salient micro corrections为H0 `2,126`、H1 `1,818`，
+   C10增至`5,300／4,664`；低K不能作为选择C10的证据；
+4. `E97`相对`E95`把residual prominence>1从H0 `6.94%`降到`2.11%`、H1 `7.22%`降到
+   `2.25%`，代价是fact≤6约下降`0.8 pp`。这证明coverage与文本预算是显式安全权衡，不能只选
+   更短文本；
+5. 无阈值的同向multi-burst consolidation影响H0 `62,135`、H1 `67,468`条sample，规模远大于
+   correction差异。它必须用保留的parent axis graph作为no-consolidation comparator进入80条
+   multi-burst stratum，不能因属于新架构就默认正确；
+6. 三类frozen-candidate disagreement的union为H0 `20,735`、H1 `21,108`；连同phase／fact overflow
+   的全部trigger union为`28,008／28,298`。这些manifest用于Calibration抽样；不授权约2.8万条逐项
+   VLM标注，更不授权把VLM作为自由geometry planner；
+7. H0／H1 aggregate仍接近，本screen不选hysteresis。C05／C10、A100／A080、E95／E97以及
+   residual gate均保持candidate身份。
+
+### 9.6 尚需敲定的最小标准
 
 以下决定仍未由artifact关闭，不能默认为已解决：
 
 1. Calibration-512在H0／H1中选择唯一hysteresis，并冻结segment salience与sign-consistency；
    “全量统计完成”只证明候选来自完整train，不等于人工边界已经通过；
-2. 在Calibration-512比较primary S0-B1与aggressive S0-B2，冻结start／end容差；重点检查B2是否
-   合并异阶段动作，以及complete-link compound是否保持全部member方向；S2／S3只作false-split
-   sensitivity，不因分布更低自动进入主链；
-3. 根据`K_geom／K_salient`分布和人工可读性，从3／4／5／6冻结最小充分budget及其coverage门槛；
-   accepted sample必须全覆盖，overflow必须隔离；
-4. 冻结direct reversal最大gap与`then／overlap／during／reverses`确定性clause模板；
-5. VLM只在post-group `K_geom>5` stratum进行小规模对照；冻结真实vision checkpoint、render／curve／
-   event-ID输入、`keep／noise／merge-suggestion／uncertain` schema与重复运行稳定性。当前Qwen 3B
-   text-only链不是该VLM；VLM不得直接写canonical text或静默删除target motion；
-6. Qwen exact checkpoint／revision和JSON triplet解析随pilot冻结。三条仅要求归一化后非完全重复、
+2. 用parent axis graph作no-consolidation comparator，裁决无阈值same-direction burst merge，再比较
+   `C05／C10`的micro-correction false merge／false split与major-reversal recall；
+3. 比较`A100／A080`的modifier attachment；重点检查长spine中的异阶段短event，禁止因phase≤4更高
+   自动选择A080；
+4. 比较`E95／E97`并冻结residual安全界。`normalized prominence=1.0`只作为本轮full-train诊断节点，
+   不是看到分布后自动生效的gate；accepted样本必须同时通过explained mass、residual与reversal；
+5. 根据`K_phase／K_fact`和人工可读性，从phase 3／4、fact 4／5／6冻结最小充分budget；当前约
+   16%—18%的fact>6尾部必须显式abstain或另设复杂文本路线，不能静默压缩；
+6. 冻结direct reversal最大gap与`then／overlap／during／reverses`确定性clause模板；
+7. VLM若保留，只在Calibration中抽取的frozen-candidate disagreement做小规模A／B／uncertain对照；
+   冻结真实vision checkpoint、输入与重复稳定性。当前Qwen 3B text-only链不是该VLM；VLM不得直接
+   写canonical text、自由改graph或处理全部约2.8万trigger；
+8. Qwen exact checkpoint／revision和JSON triplet解析随pilot冻结。三条仅要求归一化后非完全重复、
    同一fact gate通过，不再人为设embedding距离或“时序版”等差异角色；
-7. CLIP exact weights／hash及T5 checkpoint／pooling仍需记录；只有受控诊断显示有效的分数才保留，
+9. CLIP exact weights／hash及T5 checkpoint／pooling仍需记录；只有受控诊断显示有效的分数才保留，
    不预设其canonical阈值，也不作为P7 blocker；
-8. Stage2若使用三条short，预声明每个exposure均匀`1/3`采样；若要声称三文本提升鲁棒性，必须有
+10. Stage2若使用三条short，预声明每个exposure均匀`1/3`采样；若要声称三文本提升鲁棒性，必须有
    同一canonical recaption的一条short对照，并分别报告CLIP／T5 encoder，不能把recaption变化与
    augmentation混在一起；
-9. 完成按parent source／near-duplicate隔离、带明确v1／v2标识的calibration Gradio、独立sealed
+11. 完成按parent source／near-duplicate隔离、带明确v1／v2标识的calibration Gradio、独立sealed
    512，以及基于intrinsics数值而非raw关键词的FOV／zoom scope audit。
 
 > [!warning] 落实裁决
-> H0／H1同源统计、semantic grouping sweep与candidate-specific `K>5` manifests已经落实。下一步可
-> 直接构建Calibration-512和小规模VLM对照，但唯一geometry rule、event budget、relation clauses与
-> Qwen输入仍分别被第1—6项的人工标准阻断。该阻断不授权恢复Qwen全量或启动任何Stage2长训。
+> H0／H1同源统计、前置semantic grouping与hierarchy child screen已经落实。下一步是按8.1构建
+> Calibration-512；VLM pilot必须排在人工geometry候选裁决之后，不能与Calibration并行替代它。
+> 唯一hierarchy rule、residual gate、phase／fact budget、relation clauses与Qwen输入仍被第1—8项
+> 阻断。该阻断不授权恢复Qwen全量或启动任何Stage2长训。
 
 ## 10. Artifact schema与版本纪律
 
@@ -795,9 +845,21 @@ sample_id
 camera_text_raw
 camera_pose_convention_id
 camera_attribute_scope
-camera_motion_axis_events
-camera_motion_geometry_events
-motion_state = strict_static | weak_motion_only | captionable_motion | caption_budget_exceeded
+camera_motion_axis_events_full
+camera_motion_excursions
+camera_motion_phases
+camera_motion_core_fact_ids
+camera_motion_residual_events
+axis_event_count
+excursion_count
+phase_count
+core_phase_count
+core_fact_count
+caption_explained_motion_mass
+max_residual_prominence
+major_reversal_recall
+semantic_consolidation_status
+motion_state = strict_static | weak_motion_only | captionable_motion | semantic_consolidation_ambiguous | caption_budget_exceeded
 caption_fact_packet
 camera_text_canonical_template
 camera_text_deterministic_shorts[3]
@@ -811,8 +873,8 @@ source_hashes
 rule_contract_hash
 ```
 
-数据清洗按caption-motion pair quarantine，不删除整条motion。parent manifest不可变；geometry、
-event graph、deterministic text、Qwen output、human review和最终canonical manifest分别保存hash。
+数据清洗按caption-motion pair quarantine，不删除整条motion。parent manifest不可变；axis graph、
+semantic hierarchy、deterministic text、Qwen output、human review和最终canonical manifest分别保存hash。
 旧512／30K／40K Qwen artifacts保持noncanonical provenance，不与新版本拼接。
 
 ## 11. 可写claim与停止条件
@@ -830,7 +892,8 @@ sealed人工证据；下游改善需要后续raw／canonical matched Stage2实�
 - H0／H1不能从同一step signal artifact exact重放，或fresh H1与历史H1同sample不一致：停止geometry
   calibration，先修provenance／实现；
 - H0／H1都无法在512 calibration达到稳定方向与边界：保留deterministic数值artifact，取消文本贡献；
-- 预算内无法完整覆盖salient geometry events：标记`caption_budget_exceeded`并隔离；禁止静默top-K；
+- core无法同时满足explained mass、residual、major reversal或phase／fact预算：标记
+  `caption_budget_exceeded`并隔离；禁止静默top-K；
 - Qwen pilot频繁reparse失败：canonical text使用deterministic template，不继续扩大模型或prompt搜索；
 - fallback不能通过与Qwen相同的parser gate，或event multiplicity／relation graph不可表达：立即暂停
   扩写；先修结构contract并离线重放raw Qwen；
@@ -844,7 +907,7 @@ TriMotion提供first-frame RDF、六轴词表、固定per-step threshold、ratio
 
 1. exact train population上的rate与segment calibration；
 2. camera-local primitive避免首帧轴在大旋转后的语义漂移；
-3. 对最长62 steps的轴级event归并与deterministic coverage；
+3. 对最长62 steps的axis fact／excursion／phase／core分层与deterministic coverage；
 4. raw provenance、fallback、人工sealed audit与matched downstream验证。
 
 这四项只有在对应gate完成后才能进入论文。当前优先级是完成一个小而可证伪的v2 canonical
