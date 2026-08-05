@@ -232,8 +232,9 @@ segment-level节点先由全训练集log-K3产生，再由512 calibration裁决�
 3. 再优先保留与primary重叠的最强不同轴event；
 4. 仍有空位时按归一化salience补齐。
 
-完整graph不删除任何检测结果；未进入文本的event记录`omitted_from_caption_packet`，不是被重新判为
-static。`max_caption_events=3`是当前v2实现常数，需由calibration 512确认；若失败，只能整体重开
+完整graph不删除任何检测结果；未进入文本的event记录`caption_selected=false`与
+`caption_omission_reason=outside_bounded_fact_packet`，不是被重新判为static。
+`max_caption_events=3`是当前v2实现常数，需由calibration 512确认；若失败，只能整体重开
 fact-budget合同，不能对个别sample手工扩容。
 
 ## 5. 最小v2 event与relation schema
@@ -281,11 +282,11 @@ canonical graph只保存atomic axis events，不保存易膨胀的语言宏节�
     "selected_event_ids": ["e0", "e1"],
     "max_caption_events": 3,
     "relations": [
-    {
-      "source": "e0",
-      "target": "e1",
-      "type": "overlap"
-    }
+      {
+        "source": "e0",
+        "target": "e1",
+        "type": "overlap"
+      }
     ]
   }
 }
