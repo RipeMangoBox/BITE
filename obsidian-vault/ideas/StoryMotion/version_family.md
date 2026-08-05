@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-05T11:56:12+08:00
+updated: 2026-08-05T14:19:56+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -301,6 +301,7 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-05（rotvec v1p0执行闭合与Qwen部署更正）：** raw rotvec reread在首个4,096样本／118,197 steps建立等价证据后因I/O低效停止；`Euler delta → SO(3) → Log`相对原轨迹的rotation max-abs为`1.52587890625e-05 deg/s`、translation max-abs为`0.0 m/s`。随后从immutable local-delta shards转换exact 162,760样本／4,733,272 steps并重新计算rotvec候选节点，10万条H1 event plan按GPU0／GPU1各50K落盘，版本仍为`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805 / noncanonical`。作者将部署合同改为GPU0两个、GPU1三个逻辑Qwen worker；GPU1三个BF16模型同时加载时实测OOM，只余`43.5 MiB`且仍需分配`48 MiB`，故不改checkpoint／精度而采用最多两个驻留的`2+1`队列。更改前GPU1双worker产生的28条records与全部旧artifact原样保留，不拼入新run。GPU0在当前C1REL训练释放后进入双worker；2026-08-05中午前不部署下一条ablation。
 - **2026-08-05（Interaction16解释与Stage2后补授权）：** 作者在C1REL-noI16 Stage1 formal全线回退闭合后，将其裁决为Interaction16组件的正向消融：在只删除I16的strict matched合同下，简单模块显著改善owning reconstruction／framing，可支持Stage1层面的`simple and effective`表述。此前的Stage1 hard stop保留为当时执行决策，不回写artifact；作者现另行授权未来补充matched C1REL-noI16 Stage2，但尚未创建run。该Stage2必须与C1REL arm冻结相同caption版本、exposure、sampler和评测协议；完成前不得外推Interaction16对free generation必要。C1REL raw-`T0` Stage2已完成Human `105K`＋Camera `105K` endpoint，三接口formal仍待审计。
 - **2026-08-05（Qwen固定四实例与GPU1 remainder重排）：** 作者取消GPU1的`2+1`驻留，部署固定为GPU0两个＋GPU1两个Qwen BF16实例。原GPU1 worker2自动接续在产生任何record前停止；其parent `source_index mod 3 = 2`的16,666条确定性重排为`paperA_pulp_camera_eventplan_gpu1_remainder_n16666_rotvec_h1_v1p0_seed17_4090cpu_20260805`，source contract SHA256=`8b980cef485cdd670be423169fe56ce2aa63327a52e57bd0cdba9758baf859d0`。后续双worker run为`paperA_pulp_qwen3_4b_recaption_v1p0_h1_gpu1_remainder_n16666_seed17_4090g1_dual_20260805`，contract SHA256=`6185f622176b4aaacd115b478ab966df51f30f9ff3bf325f734e22eca5aeace1`，绑定StoryMotion revision `99145173d02aa1f9184eebf9576cc1023236db41`；它只在当前GPU1两个worker成功结束并释放显存后启动。GPU0 50,000条、GPU1当前33,334条与remainder 16,666条互斥并覆盖exact 100,000；更改前28条records继续隔离保存，不计入本批。
+- **2026-08-05（Camera recaption first-20K architecture stop与paired review）：** v1p0两个活动run的最早20,000条与旧512／30K／40K完成exact sample match 5,324条并在同一rotvec H1 event plan下审计。新版raw Qwen在primitive-direction mechanical proxy上明显优于旧版，但发现三个categorical contract failure：deterministic short词元粘连、set-based parser折叠重复primitive-direction、fallback未重新通过拒绝Qwen的同一gate；relation graph P99=`153`、max=`329`进一步表明复杂事实预算失控。该结果满足作者允许暂停的重大架构问题，故先停GPU1 remainder watcher，再安全停止GPU0／GPU1四个Qwen；新版records停在9,661＋11,397=`21,058`，全部raw text保留用于离线reparse。六个primary primitive各选择一个固定direction／length stratum，并按duration／median rate／net amplitude／event count构建3条数值近邻；18个Human＋ground＋Camera视频、六轴rate／event interval图及旧／新并排Gradio已在4090 port `7869`通过浏览器切组smoke。修复必须另起版本，C0-LAT与模型实验裁决不变。正式QC数字只见[[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]。
 
 ## Bug 与 invalidation provenance
 

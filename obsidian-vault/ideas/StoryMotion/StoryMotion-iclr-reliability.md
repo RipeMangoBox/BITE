@@ -5,8 +5,8 @@ hypothesis: |
   StoryMotion检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
   C0-LAT是后续唯一operational mainline。C1REL raw-caption Stage2 endpoint已训练完成；
-  C1REL-w/o-Interaction16 Stage2获后续matched补充授权。版本化noncanonical Camera
-  recaptioning使用两张4090各两个Qwen模型。
+  C1REL-w/o-Interaction16 Stage2获后续matched补充授权。Camera recaption v1p0在
+  first-20K QC发现event-plan/parser/fallback architecture failure后暂停。
 tags:
   - StoryMotion
   - reliability
@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-05T11:51:35+08:00
+updated: 2026-08-05T14:19:56+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -226,7 +226,7 @@ C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 data | Pulp Camera文本 | 旧512／30K／40K artifacts保持noncanonical；rotvec full-train signal、重新计算的候选节点与10万条H1 event plan已闭合 | 完成显式`v1p0-H1`的10万条noncanonical Qwen candidates；随后做H0／H1 calibration、人工审核与sealed gate | CPU＋4090 Qwen；无模型长训 | 通过calibration／sealed后才写版本化factual caption修正 |
+| P0 data | Pulp Camera文本 | rotvec full-train signal与10万条H1 event plan已闭合；first-20K QC确认新版raw Qwen优于旧版proxy，但event multiplicity、relation graph、parser与fallback合同失败，四个Qwen已停 | 新版本修正保序parser、relation sparsification、deterministic grammar与same-gate fallback；先离线reparse现有raw输出并复审6×3，再决定是否恢复队列 | 当前只需CPU／人工审核；不恢复Qwen或模型长训 | 通过结构修复、calibration与sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
 | P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2已完成fresh Human `105K`＋GT-H LAT Camera `105K` | 按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 训练完成；待评测 | 只回答当前caption下表示／生成器可行性 |
 | deferred component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；所查16项相对C1REL的CI全部回退 | 冻结与C一致的caption、exposure、sampler、参数／成本合同后补Stage2 | 是，后续已授权 | 当前支持Interaction16的Stage1 simple-and-effective；Stage2再检验generation贡献 |
@@ -310,8 +310,8 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
    canonical-text胜者；
 3. strict `C1REL-w/o-Interaction16` Stage1 formal已形成正向组件证据；后续按matched合同补Stage2，
    在完成前不写generation必要性；
-4. 完成10万条显式`v1p0-H1 / noncanonical` Qwen候选，再继续视频审核、H0／H1与parser裁决，
-   冻结唯一symbolic／short／long artifact；
+4. 保持v1p0扩写暂停；先修复first-20K确认的event-plan/parser/fallback结构问题，离线reparse已保存
+   raw Qwen并完成6×3旧／新paired review；通过后才提交是否恢复剩余队列的新版本合同；
 5. 冻结canonical text后重训必要的最小caption-matched Stage2，再以Camera-native adherence与
    Human-relative framing裁决HREL／C1REL；
 6. 使用同一canonical text完成获授权representation所需的最小Stage2；Matched Symmetric须另行

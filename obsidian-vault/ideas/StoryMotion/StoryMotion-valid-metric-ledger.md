@@ -28,7 +28,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-05T11:51:35+08:00
+updated: 2026-08-05T14:19:56+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1133,6 +1133,58 @@ cross-arm comparison／manifest SHA256为
 `dd89f88bb4fb08dc4cb0bb2dd8d2b126025e33117c983d6e7a20557c9700d254`；formal evaluator与
 comparison evaluator SHA256为`e6c8fb08f830b24dd2d36bedd4a3942065e807029149d073a67e14fb5e625eb0`／
 `c577b1d81d00200cdc24964994c15e7c1a62c53f49a43bf2dbbdfbc273c83e95`。
+
+## 6A. Pulp Camera recaption first-20K quality audit
+
+本节是noncanonical data-QC，不是模型生成指标或Camera text最终质量claim。cohort固定为两个v1p0
+run按`created_at`排序的最早20,000条，范围`2026-08-05T02:43:22+0800`至
+`2026-08-05T13:23:27+0800`；与旧512／30K／40K exact sample交集为5,324条。新旧文本统一对照
+同一rotvec H1 event plan。自动分数只计算count-aware primitive-direction实例与relation marker，
+不替代人工对具体event interval、语言自然度和训练可用性的裁决。
+
+### Full first-20K architecture screen
+
+| version / run | text role | geometry recall | geometry precision | geometry pass | temporal-marker proxy pass | training-ready proxy |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| v1p0 / first20K | Qwen raw short | 0.910140 | 0.994794 | 76.20% | 54.30% | 53.31% |
+| v1p0 / first20K | Qwen raw long | 0.758818 | 0.775319 | 43.77% | 95.04% | 42.11% |
+| v1p0 / first20K | selected short after fallback | 0.577014 | 1.000000 | 50.84% | 50.84% | 50.84% |
+| v1p0 / first20K | selected long after fallback | 0.999944 | 0.986751 | 97.22% | 47.90% | 44.40% |
+
+### Exact 5,324 matched old／new comparison
+
+| version / run | text role | geometry recall | geometry precision | geometry pass | temporal-marker proxy pass | training-ready proxy |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| v1p0 / matched5324 | Qwen raw short | 0.907289 | 0.993802 | 76.31% | 53.96% | 52.82% |
+| legacy / matched5324 | old short | 0.276899 | 0.443889 | 11.04% | 43.26% | 10.99% |
+| v1p0 / matched5324 | Qwen raw long | 0.762345 | 0.772331 | 43.82% | 94.83% | 41.90% |
+| legacy / matched5324 | old long | 0.652011 | 0.374399 | 10.86% | 45.32% | 10.84% |
+
+| version / run | caption | new-only ready | old-only ready | both ready | neither ready |
+| --- | --- | ---: | ---: | ---: | ---: |
+| v1p0 raw Qwen vs legacy / matched5324 | short | 2,227 | 0 | 585 | 2,512 |
+| v1p0 raw Qwen vs legacy / matched5324 | long | 1,654 | 0 | 577 | 3,093 |
+
+新版raw Qwen相对旧版在同一几何参照上形成明显的mechanical improvement，但这不能挽救当前
+`selected_text`合同。20K中11,256条deterministic short存在`rightthen`类粘连，7,698条required
+sequence含重复primitive-direction；set-based parser无法表达其multiplicity。最终40,000个
+short／long selected captions中20,952个未通过本次count-aware training-ready proxy。
+
+| version / run | all events | required events | relevant relations |
+| --- | ---: | ---: | ---: |
+| v1p0 / first20K mean | 8.4233 | 6.5104 | 17.5741 |
+| v1p0 / first20K median | 6 | 3 | 2 |
+| v1p0 / first20K P90 | 21 | 19 | 57 |
+| v1p0 / first20K P99 | 42 | 40 | 153 |
+| v1p0 / first20K max | 78 | 75 | 329 |
+
+因此停止100K扩写是architecture stop，不是“新版语言不如旧版”的结论。raw Qwen输出逐条保留，
+允许修复后离线reparse；现有fallback／selected fields禁止canonical写回。cohort contract SHA256=
+`a3a4a78eb53ca0c4d9b367f9b039f09bf70259e6d5c0443d503e302374ea133b`；QC contract／summary／
+per-sample SHA256=`03aecfba2aa8a58fb5dfbb3c47861f44fe6985a4a38608e78ab8546b91514f2d`／
+`3b325cf10a421b7ac1a159232cccef9cb141585cb7182a09a99c45bcac3b8e03`／
+`bbd19ec821c7b0b962f7ce52ba08ed69e48fc9ea9696bff9fa99498a7104ed87`。implementation revision=
+`fa6361c1`。
 
 ## 7. Task-sliced mechanism evidence
 

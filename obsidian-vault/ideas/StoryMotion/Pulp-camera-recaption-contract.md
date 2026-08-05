@@ -18,7 +18,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
 created: 2026-08-05T01:44:13+08:00
-updated: 2026-08-05T11:51:35+08:00
+updated: 2026-08-05T14:19:56+08:00
 ---
 
 # Pulp Camera Geometry-Grounded Recaptioning Contract
@@ -468,6 +468,56 @@ signal、sample offsets、histogram与后续event所需字段。P2以后只消�
   `paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_dual_20260805`，contract
   SHA256=`9c44a2b9f587a0cfc7eeffa70ec9566046c00eb545795176338e066990ac3e3e`。
 
+### 9.2 first-20K v1p0 quality audit与停止裁决
+
+> [!failure] v1p0不得继续扩写
+> exact first-completed 20,000条审计发现的不是普通文风问题，而是event-plan、parser与fallback
+> 合同冲突。2026-08-05 13:53 +08:00已先停止remainder watcher，再向四个Qwen worker发出
+> `SIGTERM`；四进程均正常退出。GPU0／GPU1分别保留9,661／11,397条新版records，共21,058条；
+> 旧28条仍隔离，不计入新版。所有Qwen raw text保持逐条immutable，后续修复只做离线reparse，
+> 不因本次停止丢失已支付的LLM输出。
+
+评估维度与人工标准冻结为：
+
+| dimension | 合格标准 | 自动检查边界 |
+| --- | --- | --- |
+| primitive／direction | 不漏主动作、不写反方向、不增加plan外动作 | count-aware primitive-direction recall／precision；重复实例不折叠 |
+| temporal structure | 先后、并行、包含与方向反转均与event interval一致 | marker只作proxy；重复同类event的具体配对由人工看interval裁决 |
+| short | 一至两句；覆盖主动作与唯一反转；不以冗余换覆盖 | sentence count、required-event coverage与词元粘连 |
+| long | 单个连贯段落；覆盖全部required events；不是short的多次改写 | paragraph、coverage、event-ID leak；完整时序仍需人工 |
+| fluency | 无粘连、截断、event ID、病句与重复句 | grammar artifact与token-cap flags；不以LLM自评代替人工 |
+| training readiness | 前五项同时可接受，无需人工改写即可入库 | mechanical proxy只用于筛查；最终由sealed review决定 |
+
+公平比较只在exact sample identity上进行。first-20K与旧512／30K／40K候选的交集为5,324条；
+旧版与新版文本都以新版rotvec H1 event plan为同一参照。正式数字和边界只见
+[[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]。
+
+结构性失败包括：
+
+1. deterministic short把连接词拼成`rightthen`一类词元，不能被同一closed parser读取；
+2. set-based parser只保留每个primitive-direction第一次出现，无法表示
+   `right → left → right`的multiplicity与两个reversal；
+3. relation graph在复杂样本上组合膨胀，超出一个caption可可靠表达的事实预算；
+4. Qwen被拒绝后使用的deterministic fallback没有重新通过同一gate，故`selected_text`并不满足
+   “fail-safe”语义。
+
+修复必须是新版本，最小范围仅包括：保序的event-instance parser、基于interval transitive
+reduction的relation sparsification、带空格／标点测试的deterministic grammar、以及fallback
+same-gate assertion。不得在当前v1p0 artifact内原地覆盖文本。修正版本先对本20K离线reparse，
+再过6个原语×3条paired旧／新Gradio；只有结构contract与人工review同时通过才可讨论恢复余下队列。
+
+审计artifact：
+
+- cohort：`paperA_pulp_camera_recaption_v1p0_first20k_qc_cohort_seed17_4090cpu_20260805`；
+  contract SHA256=`a3a4a78eb53ca0c4d9b367f9b039f09bf70259e6d5c0443d503e302374ea133b`；
+- comparison：`paperA_pulp_camera_recaption_v1p0_vs_legacy_first20k_qc_seed17_4090cpu_20260805`；
+  contract／summary SHA256=`03aecfba2aa8a58fb5dfbb3c47861f44fe6985a4a38608e78ab8546b91514f2d`／
+  `3b325cf10a421b7ac1a159232cccef9cb141585cb7182a09a99c45bcac3b8e03`；
+- review：`paperA_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805`；
+  build contract／manifest SHA256=`c8b9ac20bd564a2b80a347a28869243dc4d8d5220a383b402ca0fa761a5ca1dd`／
+  `401d2c05fcead399f66419922a10f7fc379ccb3070aaf31feb049a0ed1ffce1f`；
+- implementation：StoryMotion revision `fa6361c1`；24项相关unittest通过。
+
 ## 10. Artifact schema与版本纪律
 
 每条canonical record至少保存：
@@ -507,6 +557,8 @@ sealed人工证据；下游改善需要后续raw／canonical matched Stage2实�
 - body-local primitive在synthetic或round-trip测试失败：停止，不进入人工审核；
 - H0／H1都无法在512 calibration达到稳定方向与边界：保留deterministic数值artifact，取消文本贡献；
 - Qwen pilot频繁reparse失败：canonical text使用deterministic template，不继续扩大模型或prompt搜索；
+- fallback不能通过与Qwen相同的parser gate，或event multiplicity／relation graph不可表达：立即暂停
+  扩写；先修结构contract并离线重放raw Qwen；
 - sealed gate失败：只作为内部数据清洗，不列论文贡献；
 - matched Stage2没有在raw-conflict stratum产生定向改善：只写数据有效性修正，不写生成收益。
 

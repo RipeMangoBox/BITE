@@ -14,7 +14,7 @@ source_notes:
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-08-04T14:51:40+08:00
+updated: 2026-08-05T14:19:56+08:00
 ---
 
 ## 0. 当前裁决
@@ -722,3 +722,35 @@ phase segmentation、raw-text agreement与备注。每次保存向`human_reviews
 - append-only output：`human_reviews.jsonl`；
 - service：PID=`5935`，`0.0.0.0:7868`，HTTP=`200`；
 - SSH转发：`ssh -N -L 7868:127.0.0.1:7868 4090`，浏览器打开`http://127.0.0.1:7868`。
+
+## 22. 2026-08-05 Camera recaption first-20K旧／新paired QC
+
+本页对应first-completed 20,000条v1p0 noncanonical outputs及其与旧512／30K／40K的exact
+sample match。Gradio不按文本聚类：每个camera primary primitive先固定direction与length bin，
+再以duration、median rate、net amplitude和required event count选择一个medoid及两个来自不同
+source video的最近邻。最终固定6组×3条：truck-right、pedestal-up、dolly-in、pan-right、
+tilt-up与roll-clockwise；每组恰好3条且全部拥有旧／新paired captions。
+
+每条显示：
+
+- Human skeleton＋ground grid＋owning Camera center／trail／frustum视频；
+- rotvec六轴rate曲线及event interval色块；
+- Pulp original、deterministic plan、旧short／long、新Qwen raw short／long与新selected text；
+- 新raw、新selected与旧版在统一event plan下的mechanical recall／precision和training-ready proxy；
+- geometry、temporal、short、long、fluency与training readiness六项人工比较，以及总体
+  `新版更好／旧版更好／相当／均不合格／无法判断`、问题sample多选和description。
+
+artifact root：
+
+`runs/artifacts/paperA_camera_recaption/paperA_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805/`
+
+- build contract SHA256=`c8b9ac20bd564a2b80a347a28869243dc4d8d5220a383b402ca0fa761a5ca1dd`；
+- manifest SHA256=`401d2c05fcead399f66419922a10f7fc379ccb3070aaf31feb049a0ed1ffce1f`；
+- 18／18 MP4与18／18 signal PNG通过逐文件SHA，全部MP4的frames与duration大于零；
+- headless Chromium加载旧／新文本、点击`跳到下一组`从组1切到组2，console errors=`0`；
+- 4090 service PID=`2768501`，监听`0.0.0.0:7869`；
+- SSH转发：`ssh -N -L 7869:127.0.0.1:7869 4090`，浏览器打开`http://127.0.0.1:7869`。
+
+该页面用于定位v1p0架构错误和比较旧／新候选，不授权canonical text或恢复100K扩写。正式QC数字只见
+[[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]；评估标准只见
+[[Pulp-camera-recaption-contract#9.2 first-20K v1p0 quality audit与停止裁决]]。
