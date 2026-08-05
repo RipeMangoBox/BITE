@@ -688,7 +688,7 @@ full-train screen的轴级结果如下；`K_salient`尚未经过跨轴co-tempora
 该screen关闭四个判断：
 
 1. fresh H1在历史100K同sample上的`K_axis`与`K_salient`均为`100,000／100,000` exact match，
-   证明同源replay与历史H1一致；但H0／H1完整geometry graph只在79,034／162,760（48.56%）样本
+   证明同源replay与历史H1一致；但H0／H1完整axis-interval graph只在79,034／162,760（48.56%）样本
    exact一致，H0在21,334条（13.11%）产生更少axis events，故H0不能从H1 records反推；
 2. 两候选都有约35.4%的`weak_motion_only`，所以“没有caption-selected event即stationary”会造成
    大规模语义误标，必须按4.3分层或abstain；
