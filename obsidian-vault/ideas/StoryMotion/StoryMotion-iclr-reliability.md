@@ -5,8 +5,8 @@ hypothesis: |
   StoryMotion检验在冻结Human prior及其输出路径时，非对称Human–Camera扩展能否支持
   Direct-H、Direct-C与sequential composition。NoInt-HREL／C1REL Stage1表示审计已闭合；
   C0-LAT是后续唯一operational mainline。C1REL raw-caption Stage2 endpoint已训练完成；
-  C1REL-w/o-Interaction16 Stage2获后续matched补充授权。Camera recaption v1p0在
-  first-20K QC发现event-plan/parser/fallback architecture failure后暂停。
+  C1REL-w/o-Interaction16 Stage2获后续matched补充授权。Camera recaption v2已完成
+  bounded three-short结构修复，等待calibration与sealed审核。
 tags:
   - StoryMotion
   - reliability
@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-05T14:19:56+08:00
+updated: 2026-08-05T16:45:00+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -56,7 +56,7 @@ operational mainline；C0-GEO保留为audited alternate。该选择不是显著�
 
 512条`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`只保留为历史geometry
 screen：其gauge／time-reversal检查通过，但均匀压到21 poses导致step时间跨度随clip变化，双簇
-阈值与raw-conflict计数均无calibration资格。其Qwen short／long和零重叠扩展仍是review-only、
+阈值与raw-conflict计数均无calibration资格。其v1 Qwen short／long和零重叠扩展仍是review-only、
 noncanonical，不进入训练。
 
 无LLM的`paperA_pulp_camera_threshold_audit_train162760_stride4_seed17_4090cpu_20260804`
@@ -94,8 +94,9 @@ Pulp native source使用camera-local translation、`25 fps`、`0.02 m/s`、domin
 `0.4`、56-frame smoothing和25-frame minimum chunk，且rotation segmentation被注释。
 TriMotion pinned commit `5b203a8`则使用first-frame RDF、最多81 frames／stride4、每sampled
 step固定`0.02 m／0.3°`与dominant ratio `5`，并逐step输出`Time x%`；它不做四阶段压缩。
-因此旧Pulp链的“四阶段summary”是本项目改写，已停止作为canonical结构。新版必须保留可变长
-event intervals，再由Qwen只做short／long surface realization。
+因此旧Pulp链的“四阶段summary”是本项目改写，已停止作为canonical结构。v2保留可变长
+event intervals，但只把最多3个caption-worthy events及最多2条relations送给Qwen生成三条short；
+完整event graph不做两两关系组合。
 
 训练集最长251 frames，对应63 poses／62 stride4 steps；全Pulp目录180,527条的独立扫描同样
 最长251 frames。full-train mechanical QC没有触发read／parse、intrinsics shape／frame mismatch或
@@ -111,15 +112,15 @@ rotation primitive，41条含zoom／orbit等intrinsics或未支持primitive。�
 受`push-ins／pull-outs`复数词形漏解析影响，只能作为review ordering。
 
 > [!warning] 尚未冻结的标准
-> v1已固定camera-local primitive、rotvec与axis-wise detector，不再重开first-frame、Euler或
+> v2已固定camera-local primitive、rotvec与axis-wise detector，不再重开first-frame、Euler或
 > winner-take-all dominance轴。在canonical recaption前仍须由512 calibration裁决H0／H1、
-> segment salience与sign-consistency；还须完成FOV／zoom隔离、short／long event保真、numeric
-> grouping与人工边界样本协议。
-> Web GPT建议的采纳、降级与拒绝，以及最小v1执行gate，统一由
+> segment salience与sign-consistency；还须确认3-event fact budget、FOV／zoom隔离、CLIP／T5
+> checkpoint／pooling／辅助阈值、numeric grouping与人工边界样本协议。
+> Web GPT建议的采纳、降级与拒绝，以及最小v2执行gate，统一由
 > [[StoryMotion/Pulp-camera-recaption-contract]]拥有。
-> exact train rotvec转换、重新计算的候选节点及10万条provisional H1 event plan现已闭合；
-> 4090上的版本化Qwen语言化已经启动。该执行授权不替代H0／H1 calibration、512人工审核、
-> parser gate或sealed 512，候选threshold与语言artifact仍不得进入canonical Stage2。
+> exact train rotvec转换、重新计算的候选节点及10万条v2-pre H1 event plan现已闭合；历史Qwen
+> 已停。v2结构实现完成不替代H0／H1 calibration、512人工审核、parser gate或sealed 512，
+> 候选threshold与语言artifact仍不得进入canonical Stage2。
 
 ## 2. `0803-2024`表示因果矩阵
 
@@ -218,7 +219,7 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
 
 Stage1 formal本身没有测量Camera text adherence或free generation。NoInt-HREL Stage2保持搁置。
 C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可以训练，但必须绑定caption
-版本、split、sample identity与hash，并在canonical short／long text冻结后重训才有最终比较资格。
+版本、split、sample identity与hash，并在canonical three-short text冻结后重训才有最终比较资格。
 作者另行授权D的未来matched Stage2；它必须与C使用同一caption版本、exposure、sampler与评测协议，
 并单独记录参数量／GPU小时。该授权不扩张到Matched Symmetric或其他矩阵。
 
@@ -226,7 +227,7 @@ C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可
 
 | 优先级 | 闭环单元 | 当前artifact事实 | 最小剩余动作 | 是否训练 | 关闭后的claim |
 | --- | --- | --- | --- | --- | --- |
-| P0 data | Pulp Camera文本 | rotvec full-train signal与10万条H1 event plan已闭合；first-20K QC确认新版raw Qwen优于旧版proxy，但event multiplicity、relation graph、parser与fallback合同失败，四个Qwen已停 | 新版本修正保序parser、relation sparsification、deterministic grammar与same-gate fallback；先离线reparse现有raw输出并复审6×3，再决定是否恢复队列 | 当前只需CPU／人工审核；不恢复Qwen或模型长训 | 通过结构修复、calibration与sealed后才写版本化factual caption修正 |
+| P0 data | Pulp Camera文本 | full-train rotvec signal与10万条v2-pre H1 event plan已闭合；first-20K定位语言结构失败；v2 bounded fact packet、3-short、count-aware parser、same-gate fallback及CLIP/T5辅助QC实现已通过定向测试 | 生成新v2 artifact；calibration 512冻结H0／H1、salience、3-event预算与encoder阈值；复审6×3并完成sealed 512后才恢复全量语言化 | 当前只需CPU／人工审核；未授权Qwen恢复或模型长训 | 通过calibration与sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
 | P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2已完成fresh Human `105K`＋GT-H LAT Camera `105K` | 按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 训练完成；待评测 | 只回答当前caption下表示／生成器可行性 |
 | deferred component | C1REL-w/o-I16 | strict 176D Stage1已完成`636K`、pure4,053与10,000次paired bootstrap；所查16项相对C1REL的CI全部回退 | 冻结与C一致的caption、exposure、sampler、参数／成本合同后补Stage2 | 是，后续已授权 | 当前支持Interaction16的Stage1 simple-and-effective；Stage2再检验generation贡献 |
@@ -310,8 +311,9 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
    canonical-text胜者；
 3. strict `C1REL-w/o-Interaction16` Stage1 formal已形成正向组件证据；后续按matched合同补Stage2，
    在完成前不写generation必要性；
-4. 保持v1p0扩写暂停；先修复first-20K确认的event-plan/parser/fallback结构问题，离线reparse已保存
-   raw Qwen并完成6×3旧／新paired review；通过后才提交是否恢复剩余队列的新版本合同；
+4. 历史v2-pre扩写保持暂停；v2结构修复已完成，下一步先生成新CPU artifact并在calibration 512
+   确认H0／H1、salience、3-event事实预算和CLIP／T5辅助阈值，再做6×3 paired review；通过后才
+   提交是否恢复剩余Qwen队列的新版本合同；
 5. 冻结canonical text后重训必要的最小caption-matched Stage2，再以Camera-native adherence与
    Human-relative framing裁决HREL／C1REL；
 6. 使用同一canonical text完成获授权representation所需的最小Stage2；Matched Symmetric须另行

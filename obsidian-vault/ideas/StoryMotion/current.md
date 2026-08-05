@@ -6,8 +6,8 @@ hypothesis: |
   capability-preserving asymmetric Human–Camera extension. NoInt-HREL and
   C1REL-w/o-Interaction16 Stage1 audits are complete. The raw-caption C1REL
   Stage2 endpoint is trained, while its no-Interaction16 Stage2 is authorized
-  for a later matched run. Camera recaption v1p0 is paused after its first-20K
-  QC exposed an event-plan/parser/fallback contract failure.
+  for a later matched run. Camera recaption v2 has completed its bounded
+  three-short implementation after v2-pre first-20K exposed a language-contract failure.
 tags:
   - StoryMotion
   - version/v11
@@ -25,7 +25,7 @@ source_notes:
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-05T14:19:56+08:00
+updated: 2026-08-05T16:45:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -77,14 +77,15 @@ updated: 2026-08-05T14:19:56+08:00
 > C1REL-noI16 Stage2冻结同caption、exposure、sampler、参数与成本合同并补训。该未来Stage2回答
 > end-to-end generation贡献，不改变当前Stage1已成立的simple-and-effective结论。
 
-> [!failure] Camera recaption v1p0在first-20K QC后暂停
-> 旧512／30K／40K及本轮全部新版records保持immutable。first-20K审计确认新版Qwen raw text在
-> exact matched旧版样本上的几何proxy明显更好，但当前event plan、set-based parser与
-> deterministic fallback不自洽：重复primitive-direction无法保序、short plan存在词元粘连，且
-> fallback没有重新通过同一gate。四个Qwen与remainder watcher已安全停止；已生成raw Qwen文本可在
-> 修正后离线reparse，不需要重跑。当前不得恢复10万条扩写，也不得写回canonical text。正式数字见
+> [!warning] Camera recaption v2实现已修正，数据仍未canonical
+> 旧512/Euler链统一登记为v1；全量rotvec统计链登记为v2。历史ID中的`v1p0`不改名，它们是
+> v2注册前的v2-pre provenance。旧`dolly out／tilt up／tilt down`页面主要仍在显示v1 artifact；
+> v2-pre数值plan已使核对的9条中8条不再要求运动文本。first-20K停止根因位于后续语言层：无界
+> fact budget、quadratic relations、set parser和未复验fallback。v2现改为最多3个event／2条relation、
+> 三条共享同一fact packet的short、count-aware parser、whole-triplet same-gate fallback及CLIP/T5
+> 辅助QC。尚未重启Qwen或写回canonical text。正式历史数字见
 > [[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]，标准与修复边界见
-> [[Pulp-camera-recaption-contract#9.2 first-20K v1p0 quality audit与停止裁决]]。
+> [[Pulp-camera-recaption-contract#9.2 first-20K v2-pre quality audit与停止裁决]]。
 
 > [!important] Scope
 > 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
@@ -181,18 +182,17 @@ StoryMotion另纳入一项次要数据贡献：固定Pulp Camera convention，�
 新增无歧义caption，同时保留原caption、来源与修订版本。该修正尚未完成，不得提前写成
 已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。首个
 `N=512`、seed17、无LLM的TriMotion-compatible geometry screen已经完成自动检查。用户随后单独
-授权保留既有review-only short／long candidates，并额外生成10万条显式
-`v1p0-H1 / noncanonical`候选；该授权不把临时阈值、event plan或LLM文本升级为canonical，
+授权保留既有review-only v1 short／long candidates，并额外生成10万条历史
+`v2-pre-H1 / noncanonical`候选；不可改名run ID仍含`v1p0`。该授权不把临时阈值、event plan或LLM文本升级为canonical，
 也不支持宣称缺陷比例。所有candidate仍须经过人工视频审核、H0／H1与parser裁决和版本化冻结后
 才能进入Stage2合同。
 
 ## 4. 活跃 blocker
 
-1. **Camera文本尚未canonical。** exact train rotvec signal与10万条provisional H1 event plan已闭合，
-   但first-20K QC已触发event-plan/parser/fallback architecture stop；4090 Qwen不再执行。下一步只
-   修正event multiplicity、relation sparsification、deterministic grammar和same-gate fallback，再对
-   已保存raw Qwen离线reparse并复审6×3 Gradio。H0／H1 calibration、512人工审核与sealed 512仍未
-   完成，任何当前文本不得写回训练manifest。
+1. **Camera文本尚未canonical。** exact train rotvec signal与10万条v2-pre H1 event plan已闭合；
+   v2结构实现和单测已完成，不再把长序列完整关系送给Qwen。下一步生成独立v2 artifact并在
+   calibration 512上确认H0／H1、salience与`max_caption_events=3`，同时冻结CLIP／T5 checkpoint、
+   pooling与辅助阈值；随后复审6×3 Gradio和sealed 512。任何当前文本不得写回训练manifest。
 2. **表示与factorization主对照。** NoInt-HREL Stage2保持搁置；strict C1REL-noI16的Stage1广泛
    退化支持Interaction16的simple-and-effective组件价值，作者已授权后续补matched Stage2。
    C1REL raw-`T0` endpoint已训练完成但尚未formal；所有Stage2保持seed17、Pulp factual pair、
@@ -226,9 +226,9 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   Camera text冻结后必须重训。当前不从该授权扩张到Matched Symmetric或其他Stage2矩阵。
 - `C1REL-w/o-Interaction16`严格matched Stage1已闭合；广泛退化作为Interaction16的正向组件
   ablation。后续补matched Stage2，但必须先提交独立合同，不由当前结果自动启动。
-- Camera data的`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`停止扩写；两张4090上的
-  四个Qwen及GPU1 remainder watcher均已停止。先修复first-20K确认的结构问题并离线重放同一raw
-  Qwen输出；未经新版本合同、测试与人工复审，不恢复100K队列。
+- 历史`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`现登记为v2-pre并保持immutable；
+  两张4090上的四个Qwen及GPU1 remainder watcher均已停止。v2代码修复不复用旧short／long作为
+  canonical输出；未经新artifact、calibration与人工复审，不恢复100K队列。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的

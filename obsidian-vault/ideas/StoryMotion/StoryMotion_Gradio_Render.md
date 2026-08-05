@@ -14,7 +14,7 @@ source_notes:
   - "[[2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder]]"
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
 created: 2026-07-01T14:30:00+0800
-updated: 2026-08-05T14:19:56+08:00
+updated: 2026-08-05T16:45:00+08:00
 ---
 
 ## 0. 当前裁决
@@ -697,9 +697,10 @@ runs/vis/stage2/
 
 ## 21. 2026-08-03 StoryMotion Pulp Camera 512条人工审核
 
-> [!warning] 暂停
-> 5090当前断链；在用户通知恢复前，不处理Camera data、不续接语言生成、不推进本审核队列。
-> 本节只保留既有界面与artifact provenance。
+> [!warning] semantic v1历史页面
+> 本页使用最多21个均匀采样pose及旧symbolic阈值，现统一标为 **v1 / legacy review-only**。
+> 它不代表full-train rotvec v2，也不能用其中的微幅`dolly out／tilt up／tilt down`组判断v2阈值。
+> 本节只保留既有界面与artifact provenance；页面若继续运行，标题必须显示该版本警告。
 
 该界面只服务`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`，不调用LLM，
 也不修改source `records.jsonl`或geometry contract。固定cohort为完整512条；风险优先、原文本冲突、
@@ -720,13 +721,14 @@ phase segmentation、raw-text agreement与备注。每次保存向`human_reviews
 - review contract：`human_review_contract.json`，SHA256=
   `24981e98f43d4e74bc7ae75f5c0b4cd258a230824fd4cfc1acd522668f5fe0d2`；
 - append-only output：`human_reviews.jsonl`；
-- service：PID=`5935`，`0.0.0.0:7868`，HTTP=`200`；
+- language-group service：PID=`324915`，`0.0.0.0:7868`，HTTP=`200`；semantic v1；
+- numeric6d-group service：PID=`349389`，`0.0.0.0:7870`，HTTP=`200`；同样读取旧512 records，semantic v1；
 - SSH转发：`ssh -N -L 7868:127.0.0.1:7868 4090`，浏览器打开`http://127.0.0.1:7868`。
 
-## 22. 2026-08-05 Camera recaption first-20K旧／新paired QC
+## 22. 2026-08-05 Camera recaption v1／v2-pre first-20K paired QC
 
-本页对应first-completed 20,000条v1p0 noncanonical outputs及其与旧512／30K／40K的exact
-sample match。Gradio不按文本聚类：每个camera primary primitive先固定direction与length bin，
+本页对应first-completed 20,000条v2-pre noncanonical outputs及其与v1旧512／30K／40K的exact
+sample match；不可改名artifact ID仍含`v1p0`。它不是修正后的v2 three-short页面。Gradio不按文本聚类：每个camera primary primitive先固定direction与length bin，
 再以duration、median rate、net amplitude和required event count选择一个medoid及两个来自不同
 source video的最近邻。最终固定6组×3条：truck-right、pedestal-up、dolly-in、pan-right、
 tilt-up与roll-clockwise；每组恰好3条且全部拥有旧／新paired captions。
@@ -735,8 +737,8 @@ tilt-up与roll-clockwise；每组恰好3条且全部拥有旧／新paired captio
 
 - Human skeleton＋ground grid＋owning Camera center／trail／frustum视频；
 - rotvec六轴rate曲线及event interval色块；
-- Pulp original、deterministic plan、旧short／long、新Qwen raw short／long与新selected text；
-- 新raw、新selected与旧版在统一event plan下的mechanical recall／precision和training-ready proxy；
+- Pulp original、v2-pre deterministic plan、v1 short／long、v2-pre Qwen raw short／long与selected text；
+- v2-pre raw／selected与v1在统一event plan下的mechanical recall／precision和training-ready proxy；
 - geometry、temporal、short、long、fluency与training readiness六项人工比较，以及总体
   `新版更好／旧版更好／相当／均不合格／无法判断`、问题sample多选和description。
 
@@ -751,6 +753,8 @@ artifact root：
 - 4090 service PID=`2768501`，监听`0.0.0.0:7869`；
 - SSH转发：`ssh -N -L 7869:127.0.0.1:7869 4090`，浏览器打开`http://127.0.0.1:7869`。
 
-该页面用于定位v1p0架构错误和比较旧／新候选，不授权canonical text或恢复100K扩写。正式QC数字只见
+该页面用于定位v2-pre架构错误和比较v1／v2-pre候选，不授权canonical text或恢复100K扩写。
+修正后的v2页面必须显示三条同事实short、fact packet event IDs、最多2条relations及CLIP／T5
+辅助分数，并使用新的manifest／service identity，不能只换页面标题。正式QC数字只见
 [[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]；评估标准只见
-[[Pulp-camera-recaption-contract#9.2 first-20K v1p0 quality audit与停止裁决]]。
+[[Pulp-camera-recaption-contract#9.2 first-20K v2-pre quality audit与停止裁决]]。
