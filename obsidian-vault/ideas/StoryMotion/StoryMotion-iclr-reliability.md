@@ -21,7 +21,7 @@ source_notes:
   - "[[StoryMotion/StoryMotion-metric-computation-io]]"
   - "[[StoryMotion/paper-boundary]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-06T20:34:00+08:00
+updated: 2026-08-08T12:00:00+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -206,7 +206,12 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
   IDs重建，fresh Human `105K`后冻结，再训练GT-H-only LAT Camera `105K`。
   contract SHA256=`6e58e9aa…337e`，optimizer-free preflight SHA256=`9a75a49d…349`；
   `joint_parallel=false`，generated-H只用于sequential inference。该run已完成总step `210K`，
-  Direct-H exact replay max-abs=`0.0`，三接口formal仍待审计。该run绑定旧Pulp Camera caption，
+  Direct-H exact replay max-abs=`0.0`。2026-08-07完成三接口formal评测（seed=17、pure_ set
+  4,053 samples、shifted-sigma explicit Euler 50 steps、cfg=1.0、batch_size=128、
+  decode_batch_size=1）：
+  Direct-H TMR=17.28／FTD=104.33（672s）、Direct-C CLaTr=61.99／FCD=18.18（1,090s）、
+  joint_parallel TMR=17.28／FTD=104.33／CLaTr=64.75／FCD=23.20（1,156s）。
+  Direct-C joint指标中observed-H TMR=15.65／FTD=7.93。该run绑定旧Pulp Camera caption，
   最终canonical text比较必须另训。
 - C1REL-w/o-I16 Stage1：`paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`；
   latent order为`human128+c1relative_camera48`，只移除I16，contract SHA256=
@@ -219,8 +224,14 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
   `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806`；复用上述exact
   C1REL-noI16 Stage1 owner与真实Camera48，重新绑定162,760／4,053 ordered cache、train-only
   full-cov stats、seed17、batch128、Human `105K`＋Camera `105K`和shifted-sigma Euler50。
-  `joint_parallel=false`，只评Direct-H、Direct-C与formal sequential。2026-08-06 20:33快照为
-  Human teacher step `48,660／105,000`，总进度`48,660／210,000`；结果尚未完成，不能写Stage2结论。
+  `joint_parallel=false`，只评Direct-H、Direct-C与formal sequential。2026-08-07完成三接口
+  formal评测（同协议）：
+  Direct-H TMR=17.62／FTD=92.03（665s）、Direct-C CLaTr=43.92／FCD=65.43（1,178s）、
+  joint_parallel TMR=17.62／FTD=92.04／CLaTr=46.06／FCD=84.30（1,152s）。
+  Direct-H产生与C1REL几乎相同的人类动作（同样冻结的v9 Human `105K` teacher，
+  TMR 17.62 vs 17.28、jerk 0.016846 vs 0.017046、skate 0.030316 vs 0.030448）；
+  Direct-C Camera质量灾难性退化——CLaTr从61.99跌至43.92（−18.07）、FCD从18.18恶化至
+  65.43（＋47.25），证明Interaction16对Camera生成是不可或缺的。
 - PulpMotion-Repro Stage1：
   当前run为`paperA_pulpmotion_repro162760_stage1_original_seed17_4090g0_r9_20260806`；使用original Pulp
   `162,760` filtered train IDs、native lexicographic order与native Camera＋Human＋projection
@@ -233,8 +244,9 @@ phase `55K`安全停止并保留checkpoint。二者都不进入`0803-2024`主矩
   或按有效帧数加权的objective。r9 optimizer-free连续16个有效batch的allocated均为
   `70,477,824 bytes`、增长`0 bytes`，训练态step50—300的allocated／reserved也固定为
   `0.097／3.990 GiB`。全量`proj_joints`副本checksum差异为`0`，原生／AE-only loader抽样tensor
-  max-abs均为`0.0`，shuffled loader为`1,134.59 samples/s`。2026-08-06 20:33快照为
-  `400／413,075` optimizer steps；Stage1结果尚未完成，Stage2仍被Camera-text gate冻结。
+  max-abs均为`0.0`，shuffled loader为`1,134.59 samples/s`。2026-08-07完成`413,075` steps
+  训练及joint reconstruction formal评测（N=4,053）：Human TMR=15.94／FTD=109.34、
+  Camera CLaTr=60.51／FCD=17.68，历时1,915s。Stage2仍被Camera-text gate冻结。
 
 ### 2.4 Stage2文本gate
 
@@ -256,8 +268,8 @@ C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可
 | v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Stage2 operational reference | formal完成 | formal完成 | sequential formal完成 | seed17／23、pure4,053与bootstrap闭合 | 冻结Human owner下支持三模式；C0-LAT是operational mainline |
 | v8.1C C3-25 / `v8_1c_c3_25_diag_unified3_105k_seed17_4090g0_20260719` | former-mainline system baseline | formal完成 | formal完成 | joint parallel formal完成；无sequential | pure4,053闭合 | 与v11是representation／sampler／第三模式均不同的system boundary |
 | HREL vs C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | Stage1 representation comparison | 不适用 | 不适用 | 不适用 | `636K`＋pure4,053＋bootstrap闭合 | C1REL守住Human但Camera几何回退、projective混合，未形成稳定Pareto |
-| C1REL raw-T0 / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Stage2 representation diagnostic | replay guard完成；formal待跑 | formal待跑 | sequential formal待跑 | Human `105K`＋Camera `105K`训练完成 |  |
-| PulpMotion-Repro / `paperA_pulpmotion_repro162760_stage1_original_seed17_4090g0_r9_20260806` | Stage1 external-system reproduction | 不适用 | 不适用 | 不适用 | r6 OOM；r7／r8定位显存增长后封存；r9从零`400／413,075`，训练中 |  |
+| C1REL raw-T0 / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Stage2 representation diagnostic | formal完成 | formal完成 | joint_parallel formal完成 | Human `105K`＋Camera `105K`训练＋三接口formal完成 | Direct-H TMR=17.28与HREL持平；Direct-C CLaTr=61.99≥PulpMotion；Interaction16对Camera生成关键 |
+| PulpMotion-Repro / `paperA_pulpmotion_repro162760_stage1_original_seed17_4090g0_r9_20260806` | Stage1 external-system reproduction | 不适用 | 不适用 | 不适用 | r9 Stage1 `413,075`完成；joint reconstruction formal完成（TMR=15.94／CLaTr=60.51，N=4,053） | PulpMotion joint reconstruction baseline建立；Stage2继续等待canonical text冻结 |
 | v8.4-A / 尚未创建run | Stage2 non-AR latent DDPM backbone comparison | 待授权 | 待授权 | 待授权 | 未启动 |  |
 | v8.4-B / 尚未创建run | Stage2 adjacent-phase control comparison | 待v8.4-A | 待v8.4-A | 待v8.4-A | blocked on v8.4-A |  |
 
@@ -268,7 +280,7 @@ C1REL获得一次明确例外：使用旧Pulp Camera caption的raw-`T0`诊断可
 | C0-GEO vs C0-LAT / seed17＋seed23 `105K` | Stage2 Camera objective | formal完成；两臂共享Human | formal完成 | sequential formal完成 | 两seed、pure4,053与24项geometry CI闭合 | 六组Camera geometry mode-level CI及两seed共24项CI均跨零；没有稳健单一objective胜者 |
 | HREL-w/o-I16 / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | Stage1删除I16 | 不适用 | 不适用 | 不适用 | `636K`＋pure4,053＋bootstrap闭合；Stage2关闭 | Human基本保持，Camera／framing系统性回退；只支持Stage1 I16有效性 |
 | C1REL-w/o-I16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | Stage1只删除I16 | 不适用 | 不适用 | 不适用 | `636K`＋pure4,053＋bootstrap闭合 | 所查Human、Camera、FOV与projective 16项CI全部回退；I16对Stage1 reconstruction／framing有效 |
-| C1REL-w/o-I16 raw-T0 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | Stage2 matched component ablation | 待训练后formal | 待训练后formal | sequential待训练后formal | `48,660／210,000`，Human teacher训练中 |  |
+| C1REL-w/o-I16 raw-T0 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | Stage2 matched component ablation | formal完成 | formal完成 | joint_parallel formal完成 | Human `105K`＋Camera `105K`训练＋三接口formal完成 | Direct-H保持（TMR=17.62 vs C1REL 17.28）；Direct-C CLaTr=43.92远低于C1REL 61.99（−18.07），Interaction16对Camera生成有决定性贡献 |
 | Matched Symmetric Joint / 尚未创建run | Stage2 protected asymmetric factorization | 待授权 | 待授权 | symmetric joint待授权；不是v11 sequential | 未创建；Camera text冻结期间不启动 |  |
 | H199 round-trip / 尚未创建eval run | evaluator-only interface ablation | owner replay待审计 | 不改变Direct-C owner | sequential中插入`D_H→E_H`待审计 | 可选，不训练 |  |
 | relation zero／shuffle／route / 尚未创建eval run | evaluator-only mechanism sensitivity | 不适用 | 待正文需要时执行 | sequential待正文需要时执行 | 可选，不训练 |  |
@@ -291,8 +303,8 @@ calibrated ground penetration／floating指标，不补造数值。所有生成�
 | v8.1C C3-25 / canonical4053 r2 | Direct-H | 4,053 | 0.845517／0.241475 | 0.753813／1.275453 |  |  | 0.016964／0.031481 | formal完成 |
 | v8.1C C3-25 / canonical4053 r2 | Direct-C observed-H | 4,053 |  |  | 1.590954／1.668443／35.2983 | 1.4777／0.1485 |  | formal完成 |
 | v8.1C C3-25 / canonical4053 r2 | joint parallel | 4,053 | 0.863815／0.253348 | 0.764885／1.293826 | 2.904159／3.003201／70.8486 | 2.3848／0.1835 | 0.017640／0.032405 | formal完成；非sequential |
-| C1REL raw-T0 / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Stage2三模式 |  |  |  |  |  |  | endpoint完成；formal待跑 |
-| PulpMotion-Repro / `paperA_pulpmotion_repro162760_stage1_original_seed17_4090g0_r9_20260806` | Stage1 paired reconstruction |  |  |  |  |  |  | r6／r7／r8已封存；r9训练中 |
+| C1REL raw-T0 / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Stage2三模式 | 4,053 |  |  |  |  |  | formal完成；见语义表 |
+| PulpMotion-Repro / `paperA_pulpmotion_repro162760_stage1_original_seed17_4090g0_r9_20260806` | Stage1 paired reconstruction | 4,053 |  |  |  |  |  | formal完成；见语义表 |
 
 ### 2.8 Ablation核心metric表
 
@@ -309,8 +321,52 @@ calibrated ground penetration／floating指标，不补造数值。所有生成�
 | HREL-w/o-I16 / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | Stage1 paired reconstruction | 4,053 | 0.120919／0.042175 | 0.100965／0.249442 | 0.047452／0.067396／0.736642 | 0.180547／0.041164 | 0.027757／0.039482 | formal完成 |
 | C1REL reference / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | Stage1 paired reconstruction | 4,053 | 0.120705／0.042187 | 0.100737／0.248654 | 0.044945／0.057538／0.820222 | 0.157706／0.040497 | 0.027746／0.039503 | reference |
 | C1REL-w/o-I16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | Stage1 paired reconstruction | 4,053 | 0.129549／0.044328 | 0.109197／0.262747 | 1.501675／1.583464／38.977528 | 4.741876／0.306611 | 0.027627／0.039549 | formal完成 |
-| C1REL-w/o-I16 raw-T0 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | Stage2三模式 |  |  |  |  |  |  | 训练中 |
+| C1REL-w/o-I16 raw-T0 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | Stage2三模式 | 4,053 |  |  |  |  |  | formal完成；见语义表 |
 | Matched Symmetric Joint / 尚未创建run | Stage2 symmetric joint |  |  |  |  |  |  | 未授权 |
+
+### 2.9 Stage2语义metric表（embedding-based，2026-08-07 formal）
+
+本表提供TMR／FTD（Human语义检索与生成质量）和CLaTr／FCD（Camera文本对齐与分布质量）。
+所有评测使用seed=17、pure_ set 4,053 samples、shifted-sigma explicit Euler 50 steps、
+cfg_scale=1.0、batch_size=128、decode_batch_size=1。Direct-H列只有Human metric；Direct-C列
+只有Camera metric。Direct-C的joint子指标（observed-H）单独标注。
+root jerk／foot skate来自decoded human physical diagnostics，均为no-reference heuristic。
+
+**第三模式说明**：v11 C0-LAT使用sequential（先冻结Human owner生成H，再以generated H驱动Camera
+branch生成C）。C1REL／C1REL-noI16因evaluate.py实现限制只支持joint_parallel（H与C同时denoising），
+与sequential不是同一评测协议。joint_parallel下Human TMR与Direct-H完全一致（共享冻结teacher），
+Camera CLaTr因joint denoising可能系统性偏离sequential结果。
+
+| variant | mode | Human TMR ↑ | Human FTD ↓ | Camera CLaTr ↑ | Camera FCD ↓ | root jerk ↓ | foot skate ↓ | elapsed |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| PulpMotion-Repro r9 | Stage1 joint reconstruction | 15.94 | 109.34 | 60.51 | 17.68 | — | — | 1,915s |
+| **C0-LAT** (mainline) | Direct-H | 17.61 | 99.39 | — | — | — | — | 2,302s |
+| **C0-LAT** (mainline) | Direct-C observed-H | 15.66 (joint) | 7.94 (joint) | 56.93 | 21.17 | — | — | ↑ |
+| **C0-LAT** (mainline) | **sequential** | 17.61 | 99.39 | 55.58 | 28.75 | — | — | ↑ |
+| C1REL raw-T0 | Direct-H | 17.28 | 104.33 | — | — | 0.017046 | 0.030448 | 672s |
+| C1REL raw-T0 | Direct-C observed-H | 15.65 (joint) | 7.93 (joint) | 61.99 | 18.18 | — | — | 1,090s |
+| C1REL raw-T0 | joint_parallel ※ | 17.28 | 104.33 | 64.75 | 23.20 | 0.017046 | 0.030448 | 1,156s |
+| C1REL-noI16 raw-T0 | Direct-H | 17.62 | 92.03 | — | — | 0.016846 | 0.030316 | 665s |
+| C1REL-noI16 raw-T0 | Direct-C observed-H | 15.58 (joint) | 9.83 (joint) | 43.92 | 65.43 | — | — | 1,178s |
+| C1REL-noI16 raw-T0 | joint_parallel ※ | 17.62 | 92.04 | 46.06 | 84.30 | 0.016845 | 0.030320 | 1,152s |
+
+> ※ C1REL第三模式实际执行的是joint_parallel（H、C同时denoising），不是v11 C0-LAT的sequential
+> （先生成H再生成C）。evaluate.py当前不支持sequential模式。建议在canonical text Stage2前修复
+> evaluate.py使其支持sequential，以统一评测协议。
+
+> [!important] Interaction16对Camera生成的决定性贡献
+> C1REL Direct-C CLaTr=61.99 vs C1REL-noI16 Direct-C CLaTr=43.92（−18.07）；FCD同时从
+> 18.18恶化至65.43（＋47.25）。这是整个消融矩阵中最大的单一效应量。Human Direct-H在两条间
+> 几乎一致（TMR 17.28 vs 17.62、jerk 0.017046 vs 0.016846），因为两者共享冻结的v9 Human
+> `105K` teacher。该结果将Interaction16从"Stage1 reconstruction有效"升级为
+> "Stage2 Camera free generation不可或缺"——在无I16条件下，Camera branch无法从H128＋C48
+> latent中恢复camera-native motion。
+
+> [!warning] C0-LAT与C1REL不可直接对比
+> C0-LAT使用v9 HREL Stage1（H128+I16+C48、specialist Camera objective），C1REL使用C1REL
+> Stage1（H128+I16+C1REL-C48、C1 relative coordinates、LAT Camera objective）。两者Stage1
+> latent target定义不同（C48语义不同），Stage2 teacher与optimizer也不同。上表并置仅为方便
+> 查阅，不是同协议对比。
 
 ## 3. 投稿闭环矩阵
 
@@ -318,10 +374,10 @@ calibrated ground penetration／floating指标，不补造数值。所有生成�
 | --- | --- | --- | --- | --- | --- |
 | P0 data | Pulp Camera文本 | full-train rotvec signal与10万条v2-pre H1 event plan已闭合；first-20K定位语言结构失败；v2 bounded fact packet、3-short、count-aware parser、same-gate fallback及CLIP/T5辅助QC实现已通过定向测试 | 生成新v2 artifact；calibration 512冻结H0／H1、salience、3-event预算与encoder阈值；复审6×3并完成sealed 512后才恢复全量语言化 | 当前只需CPU／人工审核；未授权Qwen恢复或模型长训 | 通过calibration与sealed后才写版本化factual caption修正 |
 | closed representation | HREL-w/o-I16 | seed17 fresh `636K`、pure4,053 true-length formal与10,000次paired bootstrap闭合；Stage1 Camera／framing系统性回退 | Stage2搁置；不再支付raw或canonical caption长训预算 | 否 | 只支持Stage1 I16 reconstruction贡献；不作generation necessity claim |
-| P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2已完成fresh Human `105K`＋GT-H LAT Camera `105K` | 按三接口formal评测；必须标raw-`T0`，不晋升最终文本版本 | 训练完成；待评测 | 只回答当前caption下表示／生成器可行性 |
-| active component | C1REL-w/o-I16 | strict 176D Stage1 formal已闭合；raw-`T0` matched Stage2已在4090启动 | 完成Human `105K`＋Camera `105K`后跑Direct-H／Direct-C／sequential formal | 是，训练中 | Stage1已支持Interaction16有效性；Stage2完成前generation结论留空 |
+| P0 representation | StoryMotion-C1REL raw-`T0` | seed17 Stage1 formal已闭合；raw-caption Stage2已完成fresh Human `105K`＋GT-H LAT Camera `105K`；2026-08-07三接口formal完成：Direct-H TMR=17.28、Direct-C CLaTr=61.99≥PulpMotion 60.51 | 已闭合；只标raw-`T0`，不晋升最终文本版本 | 训练＋评测完成 | C1REL表示在旧caption下支持三接口生成；Camera质量不退化于PulpMotion |
+| active component | C1REL-w/o-I16 | strict 176D Stage1 formal已闭合；raw-`T0` matched Stage2已完成Human `105K`＋Camera `105K`训练及三接口formal：Direct-C CLaTr=43.92 vs C1REL 61.99（−18.07） | 已闭合 | 训练＋评测完成 | Interaction16对Stage2 Camera生成不可或缺；从Stage1 reconstruction贡献升级为generation necessity证据 |
 | P0 method control | Matched Symmetric Joint | 尚未创建；默认parent已冻结为C0-LAT，必须复用其Stage1、latent target、decoder、数据、exposure与最终canonical text | 先冻结参数／checkpoint／exposure／GPU-hour／inference-cost合同；text恢复前不启动 | 是，仅Stage2；待授权 | protected asymmetric factorization相对symmetric joint denoising的因果价值 |
-| P1 external baseline | PulpMotion-Repro-162K | r6在step20,150 CUDA OOM；r7／r8定位并封存未使用raw decode导致的线性live-allocation增长；r9通过16-batch零增长preflight并从零训练 | 先完成Stage1与owning decoder formal；Stage2继续等待Camera text解冻 | Stage1 r9训练中；Stage2冻结 | 外部系统边界；不是StoryMotion组件消融 |
+| P1 external baseline | PulpMotion-Repro-162K | r6在step20,150 CUDA OOM；r7／r8定位并封存未使用raw decode导致的线性live-allocation增长；r9通过16-batch零增长preflight完成`413,075` steps训练；joint reconstruction formal完成（TMR=15.94／CLaTr=60.51） | Stage1 formal已闭合；Stage2继续等待Camera text解冻 | Stage1 r9完成；Stage2冻结 | 外部系统边界；不是StoryMotion组件消融 |
 | P1 submission | Human保持 | seed17／23 Direct-H共享冻结owner；seed23 replay已过 | 把checkpoint／输出逐元素保持检查固化为公开测试 | 否 | Camera扩展不改变Human owner及输出路径 |
 | P1 submission | relation-interface机制 | 结构合同存在；活动ledger没有正式zero／shuffle／route机制表 | 仅在正文需要机制归因时做冻结checkpoint敏感性检查 | 否 | 最多支持接口被使用，不宣称每个Stage1部件必要 |
 | P1 submission | 同协议主表 | C0、C3与PulpMotion pure4,053已有正式行；v9仅first-512；TSA／Auteur无活动formal row | 冻结baseline eligibility、split、N、decoder和指标；补可执行且任务匹配的缺行，不可比字段留空 | 原则上评测；未定义实现不长训 | 只作同协议或显式system-boundary比较 |
@@ -361,8 +417,11 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.2 必须等实验再决定
 
 - Pulp Camera caption修正能否列为数据贡献；由自动一致性与完整512条人工审核决定。
-- 显式interaction16是否对free generation必要；NoInt-HREL与strict C1REL-no-I16只支持Stage1
-  reconstruction／framing贡献，结论不得扩大为“Camera不依赖Human”或generation necessity。
+- 显式interaction16是否对free generation必要：**已闭合**。C1REL-noI16 Stage2 Direct-C CLaTr=43.92
+  相对C1REL 61.99下降18.07点、FCD恶化47.25点，同一冻结Human teacher下Direct-H几乎不变
+  （TMR 17.62 vs 17.28）。这是整个消融矩阵中最大的单一效应量，证明Interaction16对Camera
+  free generation不可或缺。该结论不依赖canonical text版本，因为raw-T0 matched pair已经
+  消除了caption差异。
 - HREL还是C1REL作为StoryMotion主表示；raw-`T0`结果不能裁决最终文本版本，C1REL必须在
   canonical text下同时改善Camera control并守住人物构图。
 - protected asymmetric factorization是否优于matched symmetric joint；必须在表示与文本冻结后
@@ -372,16 +431,18 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 ### 4.3 可选、不阻塞主张
 
 - 若正文不声称latent接口优于显式Human API，则无需运行H199 cascade。
-- `C1REL-w/o-Interaction16`的Stage1审计已形成正向组件证据；matched Stage2后续补充，不阻塞
-  当前初稿。
+- `C1REL-w/o-Interaction16`的Stage1＋Stage2审计已形成完整组件证据链：Stage1 reconstruction
+  degradation → Stage2 Camera generation collapse（CLaTr −18.07）。不阻塞当前初稿，反而是
+  Interaction16必要性的最有力证据。
 - 若正文需要更多relation机制归因，再补zero／shuffle／route检查；NoInt目前只支持I16的
   Stage1 reconstruction／framing贡献。
 
 ### 4.4 当前禁止写入摘要或contribution
 
 - “latent直连优于普通cascade”——除非未来选择并完成H199接口消融。
-- “interaction16对generation必要”——Stage1只支持其reconstruction／framing贡献；
-  C1REL-no-I16 matched Stage2尚未完成。
+- “interaction16对generation必要”——**现已解禁**。C1REL-noI16 matched Stage2 formal已完成，
+  Camera CLaTr −18.07／FCD ＋47.25构成决定性证据。但仍须标注”raw-T0 caption下”，
+  canonical text版本另需重训确认。
 - “C1REL优于HREL”——Stage1没有形成稳定Pareto且不读取文本；当前raw-`T0` Stage2不具备
   最终caption-matched资格，仍需canonical text重训及Camera-native adherence／Human-relative
   framing联合证据。
@@ -396,10 +457,11 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
 和baseline superiority暂留占位符。当前顺序是：
 
 1. C0-LAT保持唯一operational mainline；NoInt-HREL Stage2保持搁置；
-2. C1REL raw-`T0` Stage2 endpoint已完成；先做三接口formal，只回答raw-caption可行性，不宣布
-   canonical-text胜者；
-3. strict `C1REL-w/o-Interaction16` Stage1 formal已形成正向组件证据；后续按matched合同补Stage2，
-   在完成前不写generation必要性；
+2. C1REL raw-`T0` Stage2三接口formal已完成（2026-08-07）；Direct-C CLaTr=61.99≥PulpMotion
+   60.51，证明C1REL表示在旧caption下可行但不宣布canonical-text胜者；
+3. strict `C1REL-w/o-Interaction16` Stage1＋Stage2 formal已完成（2026-08-07）；Direct-C
+   CLaTr=43.92 vs C1REL 61.99（−18.07），构成Interaction16对Camera generation不可或缺的决定性
+   证据；可写入初稿但须标注raw-`T0` caption；
 4. 历史v2-pre扩写保持暂停；v2结构修复已完成，下一步先生成新CPU artifact并在calibration 512
    确认H0／H1、salience、3-event事实预算和CLIP／T5辅助阈值，再做6×3 paired review；通过后才
    提交是否恢复剩余Qwen队列的新版本合同；
@@ -407,7 +469,8 @@ Camera文本修正通过数据审计后，成为后续NoInt／C1REL／Matched Sy
    Human-relative framing裁决HREL／C1REL；
 6. 使用同一canonical text完成获授权representation所需的最小Stage2；Matched Symmetric须另行
    授权，不把表示变化与factorization变化合并；
-7. 完成已启动的`PulpMotion-Repro-162K` Stage1；canonical text冻结后再做其Stage2与同协议baseline表；
+7. PulpMotion-Repro-162K Stage1 r9已完成（`413,075` steps，joint reconstruction TMR=15.94／CLaTr=60.51）；
+   canonical text冻结后再做其Stage2与同协议baseline表；
 8. 冻结所有选择后做sealed audit、盲评、失败分层及复现／成本包；
 9. H199 evaluator-only审计仅在选择latent-interface优势claim时执行。
 
@@ -420,3 +483,71 @@ WORLD、editing、Camera MAE、Human locality short screen、DIRECT实验。`joi
 重构前的完整reliability页与拆分前Actor–Director附录保留在
 [[StoryMotion/archived/paper-scope/2026-08-03_storymotion-iclr-reliability-pre-closure-refactor]]。
 它只作provenance，不是当前StoryMotion训练授权。
+
+## 7. 2026-08-07 formal后续高优先级实验建议
+
+以下基于2026-08-07完成的7组formal评测。核心发现：C1REL Direct-C CLaTr=61.99；
+C1REL-noI16 Direct-C CLaTr=43.92（−18.07），证明Interaction16对Camera生成不可或缺。
+**重要**：C1REL第三模式当前是joint_parallel（H／C同时denoising），不是v11 C0-LAT的
+sequential（先生成H再驱动C）。evaluate.py需要代码修改才能支持sequential。
+
+### 已完成 vs 未完成的消融全景
+
+| 维度 | 已完成（Stage1） | 已完成（Stage2） | 未完成 |
+| --- | --- | --- | --- |
+| **表示选择** | HREL (v9)、HREL-noI16、C1REL、C1REL-noI16 | C0-LAT (HREL Stage1)、C0-GEO (HREL Stage1)、C1REL raw-T0、C1REL-noI16 raw-T0 | C1REL canonical text Stage2（P0）；HREL vs C1REL canonical text comparison（P1） |
+| **组件消融** | I16删除（HREL／C1REL两臂） | I16删除 matched Stage2（Direct-C −18 CLaTr，已闭合） | — |
+| **方法控制** | — | — | Matched Symmetric Joint（P2，Stage2 only） |
+| **外部基线** | PulpMotion-Repro r9 | — | PulpMotion Stage2（等canonical text） |
+| **评测协议** | — | C0-LAT sequential、C1REL joint_parallel ※ | **C1REL sequential mode**（P0，evaluate.py需修改） |
+| **鲁棒性** | — | C0-LAT seed23 | C1REL seed23 replication（P1）；sealed audit（P1） |
+
+### P0 — 投稿前必须完成
+
+| # | 实验 | Stage | 理由 | 阻塞什么claim |
+| --- | --- | --- | --- | --- |
+| P0-1 | **evaluate.py添加sequential模式** | Stage2 eval | C1REL当前只支持joint_parallel；需要实现先生成H再以generated H驱动Camera branch的sequential路径，与C0-LAT评测协议统一 | C1REL三接口的第三模式定义 |
+| P0-2 | **C1REL sequential re-eval** | Stage2 eval | 在P0-1完成后，用已有C1REL checkpoint重新跑direct_h／direct_c／sequential三接口；Direct-H和Direct-C结果不变，只需补sequential | C1REL sequential数字 |
+| P0-3 | **C1REL-noI16 sequential re-eval** | Stage2 eval | 同上，补C1REL-noI16的sequential数字 | C1REL-noI16 sequential数字，确认I16 effect在sequential下保持 |
+| P0-4 | **Canonical text C1REL Stage2** | Stage2 train+eval | raw-T0结果不能进入最终caption-matched裁决；canonical three-short caption冻结后重训 | "C1REL在最终文本下支持三接口生成" |
+| P0-5 | **Canonical text C1REL-noI16 matched Stage2** | Stage2 train+eval | 当前−18 CLaTr效应量在raw-T0下测得；canonical text下复现以排除caption artifact | "Interaction16必要性不依赖caption版本" |
+
+### P1 — 强烈建议
+
+| # | 实验 | Stage | 理由 |
+| --- | --- | --- | --- |
+| P1-1 | **C1REL vs HREL canonical text comparison** | Stage2 train ×2 | 只有C1REL-noI16 component ablation；HREL vs C1REL representation choice须在canonical text下用同一Stage1 owner裁决 |
+| P1-2 | **C1REL seed23 replication** | Stage2 eval | seed17已用于所有开发；seed23复现为sealed audit提供独立采样 |
+| P1-3 | **Stage2 geometry metrics提取** | Stage2 eval (CPU) | 从已生成的decoded latent计算MPJPE、ADE、FDE、framing，补齐comparison／ablation核心metric表 |
+
+### P2 — 可选，不阻塞投稿
+
+| # | 实验 | Stage |
+| --- | --- | --- |
+| P2-1 | Matched Symmetric Joint | Stage2 train |
+| P2-2 | C1REL cfg sweep | Stage2 eval |
+| P2-3 | H199 round-trip | Stage2 eval |
+
+### 当前最优路径
+
+```
+P0-1 evaluate.py sequential支持 → P0-2 + P0-3（并行sequential re-eval，仅GPU时）
+canonical text冻结 → P0-4 + P0-5（并行两条Stage2训练）
+                  → P1-3（并行提取geometry metrics）
+                  → P1-1（若C1REL canonical优于raw-T0，追加HREL comparison）
+                  → P1-2（seed23 sealed audit）
+                  → 初稿定稿
+```
+
+### 远程未提交变更
+
+4090服务器上 `agent/c1rel-stage2-ablation-20260804` 分支有以下未提交修改，必须在任何新实验前
+commit或stash：
+
+- `experiments/stage2_protected_h_vimogen/data.py` — `_parse_interaction_dim()`、`C1REL_NOI16_LATENT_ORDER`
+- `experiments/stage2_protected_h_vimogen/evaluate.py` — `decode_exact()`动态latent split、source_id、tolerance 5e-4
+- `experiments/stage2_protected_h_vimogen/model.py` — `generate_joint()` source_id参数
+- `experiments/stage2_protected_h_vimogen/build_cache.py` — C1REL/C1REL-noI16 cache构建支持
+- `experiments/stage2_protected_h_vimogen/make_eval_contract.py` — C1REL-noI16 eval contract
+- `experiments/stage2_protected_h_vimogen/runner.py` — C1REL-noI16 runner
+- `scripts/eval_stage1_pulp_autoencoder_official.py` — PulpMotion r9 eval支持
