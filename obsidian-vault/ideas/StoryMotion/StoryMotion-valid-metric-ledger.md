@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-10T15:54:31+0800
+updated: 2026-08-10T21:26:13+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -125,6 +125,66 @@ Direct-C的physical row同样只是observed-H经同一Stage1 owner的重建；�
 `bone CV=2.467e−7`、`joint speed/accel/jerk=0.037159/0.030219/0.046381`、
 `root speed/accel/jerk=0.030292/0.019720/0.027753`、`contact/skate=0.49199/0.041857`。
 因此这些字段验证Human路径未被Camera设计改变，不用于给三种Camera方案排序。
+
+### 4.2 Interface-specific external baselines
+
+本节把已经重新核验的外部／operator baselines迁回当前投稿比较。`v9+`限制适用于
+StoryMotion自身版本排名，不排除在同一pure-test `N=4,053`上完成正式评测的外部系统。
+这些行共享Pulp test identity，但representation、owning decoder、sampler与训练预算并不都匹配；
+因此只能作system-level comparison，不能解释为StoryMotion组件的单变量消融。
+
+#### Direct-H: Human text → Human motion
+
+| version / run | role and training boundary | N | FDTMR ↓ | TMR ↑ | HCov ↑ | root-aligned / global MPJPE ↓ mm | root ADE / FDE ↓ mm | comparison boundary |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | frozen canonical Human `105K` teacher；v9 H128 owning decoder；Euler50/CFG4 | 4,053 | 99.391 | 17.608 | 71.58% | 228.751 / 842.760 | 758.772 / 1,283.039 | StoryMotion operational mainline；system-level reference |
+| MotionLab-MFT / `baseline_motionlab_mft_v714_human_seed17_4090g0_20260716` | MotionLab MFT operator adapted to Pulp v7.14 latent/decoder；human-only；RF50/CFG2.5；`30K×512=15.36M` exposures | 4,053 | 156.350 | 18.172 | 59.19% | 250.782 / 951.380 | 857.640 / 1,436.396 | formal representation-matched operator peer；不是未经修改的官方MotionLab |
+| MoMask-Pulp native / `momask_pulp_human_native_seed17_5090g3_stage1matched_20260716` | native non-causal RVQ-VAE `159K`＋Mask/Residual Transformer各`240K`；native owning decoder | 4,053 | 219.553 | 27.347 | 45.50% | 316.113 / 1,160.494 | 998.888 / 1,610.472 | formal native-system peer；第二次4,053-record replay byte-exact |
+
+MoLingo-derived v7.45暂不进入上面的formal comparison。其完整4,053 screen为
+`FDTMR=149.163↓`、`TMR=17.729↑`、`HCov=49.86%↑`、root-aligned/global
+`MPJPE=242.502/1,249.134 mm↓`、root `ADE/FDE=1,164.249/2,007.279 mm↓`；但result自身仍为
+`metric_status=run`并写明promotion需要contract audit，缺独立audit artifact，且现存训练源码
+SHA与result记录不一致。它只能称为“MoLingo-derived provisional operator screen”，不能称为
+官方MoLingo或audited formal baseline。
+
+MotionStreamer-Pulp当前只有native causal TAE的Stage1 pure4,053 reconstruction，尚无
+text→motion Stage2 generation result，故不填入Direct-H数值表。其Stage1 overall
+root-aligned/global MPJPE为`79.937 / 281.524 mm`，只能作为owning-tokenizer reconstruction
+diagnostic；owner checkpoint SHA256为
+`825b15e3946bc511fa560ae9f7b34a76d1d19458d01aad0ec36be15a1b57016d`。native Stage2必须
+继续使用MotionStreamer的causal tokenizer与decoder，并保持在StoryMotion Stage1/Stage2合同
+之外。当前4090副本缺官方loader与Pulp199 sequence-level latent exporter，故本轮没有创建
+Stage2 run，不能把“尚未实现”写成失败结果。
+
+#### Direct-C: observed Human + Camera text → Camera motion
+
+| version / run | role and observed-H boundary | N | FDCLaTr ↓ | CLaTr ↑ | CCov ↑ | caption P / R / F1 ↑ | Camera R1 / R2 / R3 ↑ | precision / recall / density ↑ | MM distance ↓ | comparison boundary |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | --- |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | v9 observed-H latent＋Camera text；C0-LAT Camera64；Euler50 | 4,053 | 21.171379 | 56.933498 | 83.0257% | 0.785682 / 0.700022 / 0.737150 | 0.234888 / 0.395756 / 0.509252 | 0.915614 / 0.556641 / 1.093173 | 23.4027 | StoryMotion operational mainline；decoded geometry见§4A |
+| Director-C native / `director_c_pure_matched_seed17_5090g3_20260716` | corrected E.T./DIRECTOR endpoint；GT pelvis trajectory＋raw Camera text；native direct 9D C2W、EDM10/CFG1.4 | 4,053 | 32.436531 | 52.661713 | 81.4944% | 0.752748 / 0.647030 / 0.688359 | 0.128053 / 0.229213 / 0.310141 | 0.899821 / 0.569958 / 1.050549 | 24.2063 | valid native external baseline；不存在StoryMotion tokenizer／decoder；decoded Camera geometry未审计 |
+| CCD-Pulp / `ccd_pulp_camera_completion_v714_seed17_4090g1_20260716` | Cinematographic Camera Diffusion adapter；GT-H v7.14 latent＋Camera text；DDIM50/CFG2 | 4,053 | 101.026993 | 33.094883 | 59.9061% | — / — / 0.441915 | 0.222304 / 0.364915 / 0.472736 | 0.828761 / 0.393054 / 0.866654 | — | contract-complete task peer；fixed 60K endpoint、完整IDs与records可核验，但无独立audit artifact；非v11表示且无decoded geometry |
+
+Director-C训练集为162,760条、94 epochs／239,136 optimizer steps，实际exposure为
+15,299,440（epoch rounding导致不是名义15.36M）；checkpoint不是test selection。CCD-Pulp为
+`60K×256=15.36M` exposures。两者均只在已有semantic/distribution字段比较；缺失的decoded
+Camera center／rotation geometry保持空白。
+
+#### Native joint: Human–Camera joint generation
+
+| version / run | native mode | N | Human FDTMR ↓ / TMR ↑ / coverage ↑ | Camera FDCLaTr ↓ / CLaTr ↑ / coverage ↑ | caption F1 ↑ | outscreen ↓ / projection error ↓ / r-FPD ↓ | comparison boundary |
+| --- | --- | ---: | --- | --- | ---: | --- | --- |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | asymmetric sequential Human→Camera | 4,053 | 99.391 / 17.608 / 71.58% | 28.754 / 55.579 / 77.35% | 0.6935 | 7.73% / — / 0.5082 | StoryMotion sequential reference；与native joint任务不等价，不作单变量胜负 |
+| PulpMotion native / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | native joint only；fresh `210K`；matched available-data cohort | 4,053 | 375.383148 / 15.332323 / 21.2433% | 275.958374 / 14.281564 / 31.8780% | 0.174287 | 54.2279% / 1.893503 / 11.336928 | valid negative system boundary；不是Direct-H、Direct-C或sequential；无decoded StoryMotion geometry |
+
+| version / run | checkpoint SHA-256 | contract SHA-256 | result SHA-256 | records / audit SHA-256 |
+| --- | --- | --- | --- | --- |
+| MoLingo-derived provisional / `v7_45_molingo_offline_masked_ar_human240k_seed17_4090g0_20260717` | `4669a56fb6c9a4adafc2cfedef39b27c060cd00949a7407c86c68cc9fa30200d` | `34544e1588a5af63614a1b04c50e2481c6f73ed97e21cfc3ab93ba657a2d163a` | `445695958ba86c11831cbc8f931939c71f72135453b21ca6b6d5e2f170b6f685` | records `6edb7d5f9e54a61540b175028cad6911d5b573d4290e7dc95edc7e6fce122a9c`; no independent audit |
+| MotionLab-MFT / `baseline_motionlab_mft_v714_human_seed17_4090g0_20260716` | `45477134830f25c58b6db2ea54cfdce4cadd8f0e84c0e9312f1ead73bce468dd` | `a2f4d063bad486075084d9a66d06084a430f012d28356f42a4b161f8eaef8002` | semantic `bd8eba338960f3be71bf6f97d269e3c85183766ae1a2c93f83b7f4cd80633bcb`; geometry re-audit `f1a45654d740d8937152c96b75f88a53a765bc37977719d6628ccef6c36d79ba` | records `2b6d42544e75ad330e01091e4a3a294a67e02f2fe0db17ba14fc12e5afdca765` |
+| MoMask-Pulp native / `momask_pulp_human_native_seed17_5090g3_stage1matched_20260716` | VQ `e21d42684e4441b67782b8951e1a5e6c9e5c25bbd1bc460aa7fda138ea348664`; Mask `037871329eaf980e320961445f5492c7a79ad85d60e9e2b79640678dfabeff3c`; Residual `89faab30ffb62d185a789a814ae7c061ed5f5375f9ce5128dc4764756c43e0b1` | `94a217f900e26212e523dd1f0444fbbba5e6392a7c424e0441bab19c02238901` | `3a133b834bfac8203a9bfb92cea55e0127f50369bc51c68a53bb3b0d877baf70` | records `6545ab1a4e17bc13b73663aafd983b439ccae664b016251640dcc22a0e067ed8`; audit `71bd4b1d31409a8e70e991715ee7a09ee1706384df39831ea575e9f4a2ff3232` |
+| Director-C native / `director_c_pure_matched_seed17_5090g3_20260716` | `ad27564052465ff11f5264c5606473f2daacaaf74abbf45adc7b563328b5e823` | `3a3635be17fa1c6cc155fa8e5ad7339d46e446c55195ec9ca1b350390addcaa1` | `f9693592d62780dd2a4ed330dc2b102b88b775a839e459c6adefc6eb2bd97b15` | records `e0734d76e316dc5f66149214e2daf7cbdd42adaeec17c796a1897e88dfaf2e4a` |
+| CCD-Pulp / `ccd_pulp_camera_completion_v714_seed17_4090g1_20260716` | `8014b120c218a7ce8bd7d6f6c3e381cc009939950926da847c4dc2597f6603da` | `bb1818fb9703035d34bc691bdbffe82a3c9447c9c68a3b6010cd3387e5b93039` | `f016ba46250c1bb4895aed14b447088852658c9ca025f2118244b0ff9a144e5b` | records `19354e7949d004af4057269f432b47b6f33392a8ceb1da376b1e2a05c64ba9c0` |
+| PulpMotion native / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | final `877c6b1a6fc78c6bcb20d936aaddde30a1c7a2d8b9729135c3d1cdd7573a4bd0`; halfway `c03f1f5dd12e72db9969f18fd6f7bb853cf77e4f41888db4396c23c018a66d47` | train `d6af214b7c5bf396ee30ce0f84909ef95b6c8127a4e008125b2ca4a1b91d941c`; eval `b47f75f4fdefb46658a4d5ea961bc64dfd6640d73b19f109fff0c47c9fd6142c` | `8da8d60e1faf3bf02c5a2e969893dbd4c3f295f04f558b00d0fd69e77772618a` | audit `5e2b629d330192650c2f09f46631935b46a78fd0a4f4e6f437d50598861c7d8a` |
 
 ## 4A. v9+ Stage2 audited detail tables
 
