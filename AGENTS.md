@@ -4,19 +4,23 @@ Public agent-facing usage starts from [README.md](README.md) and
 [.claude/skills/README.md](.claude/skills/README.md). Internal deployment notes
 stay under `_private/`.
 
-BITE is a local-first research workflow for structured paper analysis.
-Its goal is to turn academic PDFs into machine-actionable evidence notes,
-retrieval indexes, and downstream idea or review artifacts. PaperBite acts as
-the upstream public evidence layer: it provides reusable structured paper
-assets, while BITE focuses on local analysis, retrieval, comparison, idea
-generation, and research decision support.
+## Conditional Local Paper-KB Instructions
 
-## Working Surface
+Read `.agent-guides/local-paper-kb.md` only when the user prompt explicitly
+contains `本地知识库`, explicitly invokes `$research-brainstorm-from-kb`,
+`$papers-query-knowledge-base`, another local-paper-KB skill, or a corresponding
+`research-workflow` stage. Otherwise do not read that file.
 
-- `obsidian-vault/paperPDFs/` stores source PDFs.
-- `obsidian-vault/analysis/` stores structured local analysis notes.
-- `obsidian-vault/index/` stores generated indexes and Obsidian navigation.
-- `obsidian-vault/ideas/` stores local idea, focus, and review notes.
+## Conditional Agent Delegation
+
+The following is a conditional rule and does not change behavior for other
+model or reasoning configurations. Only when the current agent is
+`gpt-5.6-sol` with `reasoning_effort` set to `xhigh` or `max`, it owns
+high-level work such as decisions, supervision, and review. Delegate concrete
+work, including code writing and execution, to `gpt-5.6-luna` with
+`reasoning_effort=max`, and inspect each delegated result. If obvious errors or
+major direction problems remain after two inspection rounds and requested
+corrections, the `gpt-5.6-sol` agent must handle the work itself.
 
 ## StoryMotion Tasks
 
@@ -97,6 +101,22 @@ claim-isolated paper tracks. Do not create a separate DIRECT repository:
    rather than deleting a whole motion when only one caption is wrong, retain
    immutable parent manifests and reason codes, and test cleaning separately
    from representation and generator changes.
+9. The current matched available-data cohort Pulp Stage2 baseline uses the same
+   complete materializable train/eval ID sets as StoryMotion Stage2
+   (`162760/4053`); it is not a smaller experimental subset. It must declare
+   `total_optimizer_steps=210000`, `halfway_checkpoint_step=105000`, and a
+   concrete total exposure budget equal to optimizer steps times effective batch
+   size. Progress heartbeats must record global step, epoch, exposures,
+   throughput, ETA, data-wait/H2D/compute/checkpoint timing, GPU utilization,
+   and memory so an I/O bottleneck is claimed only when measured data wait
+   dominates while the GPU is idle. At the exact optimizer boundary 105000,
+   atomically save an immutable checkpoint and reload-verify it. It must contain
+   model and optimizer state, plus scheduler, scaler, or EMA state when used,
+   RNG and sampler state, and contract/config/data/cache/code/host/device
+   provenance. If configuration is wrong, progress is stalled, or the required
+   halfway checkpoint is absent, preserve the old run as invalid provenance;
+   create a new run ID and retrain from step zero. Do not patch or resume that
+   run.
 
 ## StoryMotion / DIRECT Documentation Routing
 
@@ -153,21 +173,6 @@ The scope includes `obsidian-vault/ideas/StoryMotion/`,
 `obsidian-vault/ideas/DIRECT/`,
 `_private/*storymotion*`, and StoryMotion run directories on remote machines.
 
-## Local Pipeline
-
-```text
-collect candidate papers / import local PDFs
-  -> download when needed
-  -> integrated analysis chain
-     (MinerU parse/reuse -> structured analysis -> vault export)
-  -> optional index refresh
-  -> query / ideate / focus / review / export
-```
-
-Paper state advances as `Wait → Downloaded → analysised → checked`:
-`analysised` means that the structured note and deterministic export validation
-exist, while `checked` is reserved for a later content-quality review.
-
 ## Branch Sync Policy
 
 This branch is the canonical place for changes that should later appear in the
@@ -177,6 +182,7 @@ public workflow updates here first, then sync them to `main` after review.
 Keep branch-specific and local-development material out of `main`:
 
 - `_private/` local notes, archives, deployment notes, and operation history
+- `.agent-guides/local-paper-kb.md` branch-specific local paper-KB instructions
 - Obsidian workspace/runtime state
 - provider-specific defaults or private model choices
 - internal branch/worktree coordination notes
@@ -185,23 +191,7 @@ Keep branch-specific and local-development material out of `main`:
 `main`; the public `main` copy should contain only project background and
 public agent-facing guidance.
 
-## Rules
+## General Artifact Hygiene
 
-1. Treat the local vault paths above as the current working surface.
-2. Write only through the skill that owns the target output path.
-3. Analysis language defaults to `zh` unless the request overrides it.
-4. Pipeline steps are idempotent; already-completed steps should be skipped.
-5. Planned analysis batches must declare goal, source, selection rule, budget,
-   and output target before agents run.
-6. Agents must preserve source anchors in notes, logs, and generated outputs.
-7. Reports and profiles must be generated from available evidence, not new
-   unsupported claims.
-8. When prose needs to mention Markdown or Obsidian reserved characters such as
-   `*`, `[`, `]`, `|`, or `#`, escape them with backslashes or wrap them in
-   inline code so reading view does not reinterpret the text.
-9. In Markdown tables, aliased Obsidian wikilinks are allowed only when the
-   alias separator is escaped as `[[full/path\|abbr]]`; an unescaped `|`
-   splits table columns. Outside tables, normal `[[full/path|abbr]]` links are
-   fine.
-10. Generated exports, snapshots, backups, local storage, and symlinks stay out
-   of Git.
+Generated exports, snapshots, backups, local storage, and symlinks stay out of
+Git.

@@ -4,10 +4,12 @@ status: v11_c0_lat_mainline
 hypothesis: |
   StoryMotion uses v11 C0-LAT as the operational mainline and tests a
   capability-preserving asymmetric Human–Camera extension. NoInt-HREL and
-  C1REL-w/o-Interaction16 Stage1 audits are complete. The raw-caption C1REL
-  Stage2 endpoint is trained, while its no-Interaction16 Stage2 is authorized
-  for a later matched run. Camera recaption v2 has completed its bounded
-  three-short implementation after v2-pre first-20K exposed a language-contract failure.
+  C1REL-w/o-Interaction16 Stage1 audits and both C1REL Stage2 sequential
+  formal artifacts are complete. The exact HREL-vs-C1REL Stage2 comparison is
+  now formal but mixed-Pareto: HREL is stronger on Camera geometry while C1REL
+  has higher Camera semantic aggregates; Human geometry has no clear winner.
+  Original Pulp captions are authoritative and recaption is not a current
+  evidence gate.
 tags:
   - StoryMotion
   - version/v11
@@ -24,8 +26,9 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[StoryMotion-iclr-reliability]]"
   - "[[paper-boundary]]"
+  - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-05T16:45:00+08:00
+updated: 2026-08-10T12:45:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -53,39 +56,76 @@ updated: 2026-08-05T16:45:00+08:00
 > NoInt-HREL的Camera／framing系统性回退，支持I16参与Stage1 reconstruction，但不单独证明
 > Stage2 generation necessity。作者据此搁置NoInt-HREL Stage2。C1REL的Camera
 > trajectory／rotation回退且projective字段混合，与v9难分上下；其坐标语义更契合后续
-> Camera text，因此已单独授权raw-caption Stage2诊断，并补严格的
-> `C1REL-w/o-Interaction16` Stage1。该strict分支现已完成formal：相对C1REL的Human 5项、
-> Camera／FOV 7项和projective 4项95% CI全部回退。这是有用的正向ablation evidence：只删除
-> I16即广泛损害owning reconstruction／framing，支持Interaction16在Stage1中simple and effective。
-> 作者决定后续再补matched Stage2；在其结果产生前不外推generation necessity。HREL与C0-LAT的
-> 当前mainline身份不变。正式数值见
+> Camera text。C1REL与`C1REL-w/o-Interaction16` Stage2现均有原始Pulp caption下的
+> pure4,053 sequential formal；只删除I16即广泛损害owning reconstruction／framing，
+> 并在Camera生成中造成显著退化。这是有用的正向ablation evidence。C1REL seed23 的
+> Direct-H／Direct-C／sequential 已完成 4,053 条 repeat audit；它仍是 raw-caption `T0`
+> diagnostic-only、不可promotion的 cross-seed repeat，不替代最终 caption-matched retraining。
+> 数值与 paired geometry uncertainty 只见
+> [[StoryMotion-valid-metric-ledger#3.17 C1REL seed23 raw-T0 Stage2 repeat audit]]。
+> HREL与C0-LAT的当前mainline身份不变。正式数值见
 > [[StoryMotion-valid-metric-ledger#6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit]]。
 
-> [!warning] C1REL当前是raw-caption诊断，不是最终文本对照
+> [!important] HREL matched Stage2 formal已闭合
+> HREL matched Stage2三接口均以pure `N=4,053`完成并通过artifact/hash、ordered-ID、
+> non-causal与Direct-H teacher gate。与C1REL的exact ordered comparison是mixed Pareto：
+> HREL的Direct-C三项Camera geometry及sequential ADE/FDE显著更强，rotation CI跨零；C1REL的
+> Camera semantic aggregate更高，但semantic/framing没有逐样本paired unit，不能声称显著；
+> Human geometry CI均跨零。完整数字与protocol exception只见
+> [[StoryMotion-valid-metric-ledger#3.16 HREL matched Stage2 pure4,053 formal]]。
+
+> [!important] C1REL Stage2 formal与caption边界
 > GPU0运行`paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`：复用已审计
 > C1REL Stage1及owning decoder／新建C1REL cache与train-only stats，fresh训练Human
-> teacher `105K`，冻结后再训练GT-H-only LAT Camera `105K`；该run已到达总step `210K`，正式
-> 三接口评测尚未写入ledger。GPU1运行
+> teacher `105K`，冻结后再训练GT-H-only LAT Camera `105K`；该run已到达总step `210K`，并完成
+> Direct-H、Direct-C与sequential pure4,053 formal。`rawt0`只属于immutable run identity；原始
+> Pulp captions是authoritative text，不存在当前recaption依赖。GPU1运行
 > `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`：保留native
-> C1REL-C48，只删除I16，latent为H128＋C48＝176D。前者绑定旧Pulp`T0` Camera caption，
-> canonical text冻结后必须重训才能进入最终caption-matched比较；后者的Stage2留作后续matched
-> ablation，不由GPU空闲自动启动。
+> C1REL-C48，只删除I16，latent为H128＋C48＝176D；其matched Stage2也已完成同一原始
+> caption、exposure与sequential formal protocol。完整证据与剩余 queue 见
+> [[StoryMotion-iclr-reliability#8.1 Evidence closure matrix]]。
 
-> [!important] 当前next experiment
-> 先对已训练完成的C1REL raw-`T0` endpoint做Direct-H／Direct-C／sequential formal eval；只有它
-> 在守住Human的同时提供明确Camera signal，才保留canonical-text retrain资格。随后再为
-> C1REL-noI16 Stage2冻结同caption、exposure、sampler、参数与成本合同并补训。该未来Stage2回答
-> end-to-end generation贡献，不改变当前Stage1已成立的simple-and-effective结论。
+> [!note] C1REL seed23 repeat boundary
+> `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` 的三模式 artifact/hash、样本顺序、
+> non-causal 与 checkpoint／decoder identity 已闭合；Direct-H=`17.455219 / 102.077736`，
+> Direct-C Camera=`61.610401 / 20.361712`，sequential Camera=`60.909504 / 18.602613`。
+> seed17↔seed23 的逐样本 geometry 95% CI 全部跨零；aggregate TMR/CLaTr 没有逐样本 semantic
+> bootstrap 单位，不能写成显著性结果。审计 JSON 及 SHA 只见 ledger §3.17。
 
-> [!warning] Camera recaption v2实现已修正，数据仍未canonical
-> 旧512/Euler链统一登记为v1；全量rotvec统计链登记为v2。历史ID中的`v1p0`不改名，它们是
-> v2注册前的v2-pre provenance。旧`dolly out／tilt up／tilt down`页面主要仍在显示v1 artifact；
-> v2-pre数值plan已使核对的9条中8条不再要求运动文本。first-20K停止根因位于后续语言层：无界
-> fact budget、quadratic relations、set parser和未复验fallback。v2现改为最多3个event／2条relation、
-> 三条共享同一fact packet的short、count-aware parser、whole-triplet same-gate fallback及CLIP/T5
-> 辅助QC。尚未重启Qwen或写回canonical text。正式历史数字见
-> [[StoryMotion-valid-metric-ledger#6A. Pulp Camera recaption first-20K quality audit]]，标准与修复边界见
-> [[Pulp-camera-recaption-contract#9.2 first-20K v2-pre quality audit与停止裁决]]。
+> [!important] 当前长训与评测边界
+> PulpMotion native Stage2
+> `paperA_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809`
+> 已完成210K训练、105K／210K full-state checkpoint与4,053 native-joint formal audit；它与StoryMotion
+> 的train/eval ID集exact匹配为`162,760/4,053`，不是StoryMotion的更小训练子集。结果有效但很弱，
+> 且representation／decoder／mode不同，只作system-boundary negative result。true-P2 fresh symmetric
+> 已完成105K joint endpoint及pure4,053三接口formal；结果是Human／sequential geometry改善、Direct-C
+> 与sequential semantic／framing回退的mixed Pareto。P1 HREL仅作同evaluator secondary control，严格
+> factorization比较仍需同初始化C0-LAT reference rerun。正式结果见
+> [[StoryMotion-valid-metric-ledger#3.19 True-P2 matched symmetric Stage2 pure4,053 formal]]。
+> no-I16 seed23仍是唯一未完成的active长训。
+> step与ETA只见各自`runs/`，本页不重复。
+
+> [!warning] ICLR QA status
+> 必要投稿证据仍未全部完成：true-P2本身已formal，但exact-initialization C0-LAT同evaluator paired
+> audit与sealed blind audit仍在pending。PulpMotion native
+> Stage2 已闭合为有效弱system-boundary result，不再是执行缺口。C1REL seed23 的 raw-caption repeat audit 已闭合，但仍是
+> diagnostic-only，不能当作最终 caption-matched evidence。exact HREL-vs-C1REL Stage2缺口已经关闭，
+> 但结论是mixed Pareto；缺少的正式结果不能写成已完成的rebuttal。
+
+> [!note] Caption boundary
+> 当前StoryMotion正式证据冻结使用原始Pulp captions；历史recaption/v2-pre artifacts只保留为
+> provenance，不写回当前training manifest，也不阻塞投稿。若投稿后继续做caption curation，
+> 必须另建版本化数据合同，不改写本轮formal run。
+
+> [!note] Compositional utility边界
+> StoryMotion的核心仍是human-preserving sequential generation，不把自由编辑升格为第二主贡献。
+> 当前只预声明optimizer-free `edit_aux` stress test：参考
+> [[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing|Dynamic Motion Blending for Versatile Motion Editing]]，
+> 以A的lower body／root／global trajectory／Camera和B的upper body构造raw H–C pair，目标部位hard
+> replacement、肩／脊柱边界SLERP，再用exact v9 owner重编码并重算pair-dependent Interaction16。
+> 它只检验同一Camera branch在受控composite Human下是否稳健；没有paired target的任意Human／Camera
+> 交叉只作unpaired probe，不报告ADE／FDE，也不声称任意自由替换。完整gate见
+> [[StoryMotion-iclr-reliability#4.5 Compositional utility边界]]。
 
 > [!important] Scope
 > 本页只服务 **StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera
@@ -178,39 +218,32 @@ denoising。Direct-H是被保留的基础能力，不写成Camera扩展带来的
 消融与主表默认使用C0-LAT；C0-GEO作为同方法objective alternate保留完整数值、视觉与
 统计边界，不跨endpoint摘取单列最优。DIRECT的可迁移摄影program属于第二篇，不再覆盖本主张。
 
-StoryMotion另纳入一项次要数据贡献：固定Pulp Camera convention，根据实际Camera参数变化
-新增无歧义caption，同时保留原caption、来源与修订版本。该修正尚未完成，不得提前写成
-已发布数据集或已证实增益；它只修复factual监督，不产生Rect或跨Human positive。首个
-`N=512`、seed17、无LLM的TriMotion-compatible geometry screen已经完成自动检查。用户随后单独
-授权保留既有review-only v1 short／long candidates，并额外生成10万条历史
-`v2-pre-H1 / noncanonical`候选；不可改名run ID仍含`v1p0`。该授权不把临时阈值、event plan或LLM文本升级为canonical，
-也不支持宣称缺陷比例。所有candidate仍须经过人工视频审核、H0／H1与parser裁决和版本化冻结后
-才能进入Stage2合同。
+本轮StoryMotion正式证据继续使用原始Pulp captions；历史recaption候选与caption curation不属于
+当前方法贡献或实验门槛。若未来将数据修订写成独立贡献，必须保留原caption、来源和版本化合同，
+并单独证明其增益；本轮不把它与C1REL Stage2或任何baseline superiority claim绑定。
 
 ## 4. 活跃 blocker
 
-1. **Camera文本尚未canonical。** exact train rotvec signal与10万条v2-pre H1 event plan已闭合；
-   v2结构实现和单测已完成，不再把长序列完整关系送给Qwen。下一步生成独立v2 artifact并在
-   calibration 512上确认H0／H1、salience与`max_caption_events=3`，同时冻结CLIP／T5 checkpoint、
-   pooling与辅助阈值；随后复审6×3 Gradio和sealed 512。任何当前文本不得写回训练manifest。
-2. **表示与factorization主对照。** NoInt-HREL Stage2保持搁置；strict C1REL-noI16的Stage1广泛
-   退化支持Interaction16的simple-and-effective组件价值，作者已授权后续补matched Stage2。
-   C1REL raw-`T0` endpoint已训练完成但尚未formal；所有Stage2保持seed17、Pulp factual pair、
-   non-causal和`joint_parallel=false`。raw-`T0`结果不能代替未来canonical caption-matched比较；
-   Matched Symmetric Joint仍未授权。完整边界见
+1. **表示与factorization主对照。** NoInt-HREL Stage2保持搁置；strict C1REL-noI16的Stage1与
+   matched Stage2 formal已闭合，支持Interaction16的simple-and-effective组件价值。exact
+   HREL-vs-C1REL Stage2已formal闭合，但为mixed Pareto，不支持单边representation superiority。
+   full-C1REL seed23 raw-T0 repeat audit与true-P2三接口formal均已闭合；true-P2仍需同初始化
+   C0-LAT reference paired audit，新部署的C1REL-noI16 seed23 Stage2仍需formal train/eval与sealed
+   audit。完整边界见
    [[StoryMotion-iclr-reliability#2. `0803-2024`表示因果矩阵]]。
-3. **投稿证据闭环。** canonical text冻结后完成`PulpMotion-Repro-162K`，保持PulpMotion自身
-   representation／model，并冻结同split、同sample count、同指标的主表；PulpMotion
-   与TSA是结构化motion主baseline，Auteur、Uni3C与ActCam按不同任务层级比较。
-   seed23独立长训与matched repeat audit已闭合，两个seed都不支持单一
+2. **投稿证据闭环。** PulpMotion native Stage2 已在matched available-data cohort上formal闭合；
+   保持PulpMotion自身representation／decoder／native-joint mode，结果只作system boundary，不与
+   StoryMotion三模式伪装成单变量对照。PulpMotion与TSA是结构化motion主baseline，Auteur、Uni3C与
+   ActCam按不同任务层级比较。
+   C0 seed23独立长训与matched repeat audit已闭合，两个C0 seed都不支持单一
    Camera objective胜出；仍需sealed audit、随机／最好／最差可视化和failure taxonomy。
    基础盲评只用于可信度。最终还需冻结论文代码、配置、三接口evaluator、checkpoint／decoder身份、
    参数量、GPU小时、推理成本与最小复现实验包。
-4. **可选接口消融，不阻塞主张。** current sequential直接把Human generator的H128交给
-   Camera。H199 cascade只是在两者之间插入`D_H`与`E_H`，检验显式Human API的round-trip
-   误差；它不改变Human owner、Camera branch或概率分解。只有正文准备声称“latent直连优于
-   普通串行接口”时才做该evaluator-only对照，不重训Stage1／Stage2。
-5. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
+3. **可选接口消融，不阻塞主张。** current sequential直接把Human generator的H128交给
+   Camera。H199是no-training的`D_H→E_H`接口审计，不等同独立双模型cascade；若正文保留
+   “latent直连优于cascade”，还需同一v9 Stage1 owner下独立Human／Camera Stage2
+   weights、optimizers与checkpoints的paired comparison。否则不为该optional claim启动训练。
+4. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
    controllability；生产可用性、Rect与program transfer全部留给DIRECT。
 
 RV、Rect、HumanML3D、Director ownership与ViGen utility均由
@@ -222,13 +255,19 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   不删除其正式结果，也不默认复制后续训练矩阵。
 - StoryMotion后续实验若没有另行说明，默认seed17；run ID与contract仍必须显式记录
   `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
-- NoInt-HREL Stage2保持搁置；C1REL只运行已显式授权的raw-`T0` Stage2，且最终canonical
-  Camera text冻结后必须重训。当前不从该授权扩张到Matched Symmetric或其他Stage2矩阵。
-- `C1REL-w/o-Interaction16`严格matched Stage1已闭合；广泛退化作为Interaction16的正向组件
-  ablation。后续补matched Stage2，但必须先提交独立合同，不由当前结果自动启动。
+- NoInt-HREL Stage2保持搁置；C1REL与`C1REL-w/o-Interaction16` Stage2 sequential formal
+  均已完成并使用原始Pulp captions。full-C1REL seed23 raw-T0 repeat audit已闭合；新部署的
+  `paperA_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` 是 no-I16 seed23 replication，
+  仍在running且尚无结果。PulpMotion Stage2已formal闭合为有效弱system-boundary result；true-P2
+  fresh Matched Symmetric已完成训练endpoint及三接口formal，保留mixed-Pareto与P1初始化不匹配边界。
+  exact HREL-vs-C1REL Stage2已闭合并保留mixed-Pareto边界，
+  不由当前结果自动扩张其他Stage2矩阵。
+- `C1REL-w/o-Interaction16`严格matched Stage1与Stage2均已闭合；广泛退化作为Interaction16的
+  正向组件ablation。当前仅继续运行上述 no-I16 seed23 replication，不预先宣称结果，不重写既有
+  artifact；HREL matched comparison已在上方 formal closure 中闭合。
 - 历史`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`现登记为v2-pre并保持immutable；
-  两张4090上的四个Qwen及GPU1 remainder watcher均已停止。v2代码修复不复用旧short／long作为
-  canonical输出；未经新artifact、calibration与人工复审，不恢复100K队列。
+  recaption不属于当前formal evidence gate，也不恢复旧100K队列；任何未来数据修订都必须另建
+  版本化合同与人工复审。
 - H199 decode→re-encode只保留为可选接口消融，不在当前critical path；不为它启动任何训练。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
