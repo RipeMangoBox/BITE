@@ -314,6 +314,9 @@ Camera模型执行两种Human来源。** “三接口”是系统结果，不单
 非对称接口增加observed-H与generated-H两种Camera generation，并由同一个关系感知
 Camera模型执行。重点不是“三接口本身”，也不是同步joint denoising。
 
+MotionRemix／MotionCutMix式组合只属于Paper A的secondary utility extension：它服务于构造组合式
+H–C pairs、打破一对一pair correlation，不把上／下半身Human增广或任意free editing升格为主贡献。
+
 ### 4.2 建议的主贡献
 
 1. **能力保持式非对称分解。** 用
@@ -327,8 +330,8 @@ Camera模型执行。重点不是“三接口本身”，也不是同步joint de
    无歧义描述；原caption、来源与修订版本全部保留。约16万条数据必须先经过自动几何一致性
    检查，再抽样人工核验。该项是Paper A的次要数据贡献，目前仍是待闭环方案。
 4. **三接口实证。** 在统一split、decoder、sample count与正式指标下报告Direct-H、
-   Direct-C、Composition、C0-LAT mainline及C0-GEO objective alternate；两endpoint不得按字段
-   拼成虚构的单模型。
+   Direct-C、sequential Human→Camera、C0-LAT mainline及C0-GEO objective alternate；两endpoint不得
+   按字段拼成虚构的单模型。组合式H–C utility只有通过独立data／Stage1 support gate后才可作为次要扩展。
 
 Stage1可以作为**系统级架构贡献**，但不应在缺少matched component ablation时声称
 `interaction16`、conditioner与三阶段schedule中的每一个部件都被单独证明必要。
@@ -382,7 +385,7 @@ checkpoint、sampler与评测协议下，把sequential的Human接口替换为
 | --- | --- | --- | --- |
 | StoryMotion Paper A | Human／Camera文字，可选observed Human motion | 显式3D Human motion与6-DoF Camera motion | 结构化motion质量、语义、几何、构图与三接口统一性 |
 | Uni3C／ActCam类ViGen control | 参考图像／视频加已给定或已构造的Camera、pose、depth等控制 | 像素视频 | 视频保真度、身份保持、Camera／pose控制精度 |
-| Auteur | 已知Human行为加摄影语言／DSL | human-relative Camera plan，再驱动视频生成 | 摄影语言、构图与Camera对Human的响应 |
+| Auteur | Human trajectory anchors Camera trajectory for downstream ViGen | StoryMotion works on Human motion generation and capability-preserving Human–Camera generation | 上游结构化motion generation vs 下游ViGen Camera trajectory anchoring |
 | Pulp Motion／TSA | Human与Camera运动或其联合分布 | 结构化Human–Camera motion | 多模态一致性、联合运动与构图 |
 
 Uni3C通过对齐点云与SMPL-X控制冻结ViGen，ActCam通过camera-aligned depth／pose做
@@ -392,8 +395,9 @@ zero-shot联合控制；它们已经证明ViGen可以消费强3D Camera／Human�
 > ViGen control主要研究**如何遵循给定的控制信号生成视频**；StoryMotion研究
 > **如何从语言生成可独立检查、可复用的结构化Human／Camera motion资产**。
 
-Auteur比Uni3C／ActCam更接近DIRECT问题，因为它已经以actor-relative
-摄影参数化和DSL生成Camera plan。Pulp Motion与TSA则是Paper A更直接的结构化
+Auteur uses Human trajectory to anchor Camera trajectory for downstream ViGen；StoryMotion works on
+Human motion generation and capability-preserving Human–Camera generation。Auteur比Uni3C／ActCam更接近
+DIRECT问题；Pulp Motion与TSA则是Paper A更直接的结构化
 Human–Camera generation基线，必须进入相关工作与主表。
 
 ### 6.2 Paper A的防守边界

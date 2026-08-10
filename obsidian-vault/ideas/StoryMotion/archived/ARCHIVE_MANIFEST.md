@@ -7,7 +7,7 @@ tags:
   - provenance
   - status/active
 created: 2026-07-12T12:35:00+0800
-updated: 2026-08-03T15:45:01+08:00
+updated: 2026-08-10T15:00:00+08:00
 ---
 
 # StoryMotion Archive Manifest
@@ -63,6 +63,13 @@ updated: 2026-08-03T15:45:01+08:00
 - [[StoryMotion-metric-computation-io]]
 - [[Storymotion-exp-sha]]
 - [[StoryMotion_Gradio_Render]]
+
+## 2026-08-10 metric-ledger evidence split
+
+| source | archived path | evidence status | reason |
+| --- | --- | --- | --- |
+| pre-v9 formal ledger | `metrics/2026-07-24_StoryMotion-valid-metric-ledger_pre-human-first-orthogonalization.md` | immutable pre-v9 numeric owner | StoryMotion active ledger starts from the v9 owner |
+| ordinary non-full generation rows | `metrics/2026-08-10_StoryMotion-valid-metric-ledger_pre-v9-and-nonfull.md` | provenance index only | first-512/N512 and intermediate generation screens no longer participate in active ranking; allowed special diagnostics remain explicitly labeled |
 
 ## 2026-08-03 Paper A root-surface cleanup
 

@@ -18,6 +18,10 @@ modality-wise performance。StoryMotion 的目标不是再次证明“联合比�
 “如何在耦合 Camera 的同时，不损伤 Human generation”这一 quality–coherence trade-off。
 [Pulp Motion][1]
 
+与Auteur的核心边界必须逐字保持清楚：Auteur uses Human trajectory to anchor Camera trajectory
+for downstream ViGen；StoryMotion works on Human motion generation and capability-preserving
+Human–Camera generation。StoryMotion不把Camera planning或ViGen controller当作Paper A主问题。
+
 True-P2 matched symmetric formal使这个动机需要更精确：不能再写成“Camera supervision经验上必然
 损害Human指标”。允许Camera loss更新Human后，P2的Direct-H与sequential Human geometry反而改善，
 但Direct-C以及sequential Camera semantic／framing显著回退。因而StoryMotion更可信的价值是提供
@@ -162,13 +166,22 @@ Pulp++ 的可信度不能只依赖 CLaTr-Score。原始 evaluator 可能无法�
 
 只要三层不混在同一张无说明的表里，数据双重变化不会成为硬伤；相反，$2\times2$ 因果拆分会让实验设计显得很严谨。
 
-自由编辑不建议加入正式contribution列表。最稳妥的定位是一个optimizer-free compositional utility
-stress test：参考[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing|MotionCutMix]]，
-在raw motion中用hard replacement＋边界SLERP构造上／下半身组合，
-只保留经kinematic和view-space framing检查后仍与原Camera有效配对的样本，再重算pair-dependent
-Interaction16。它回答“Camera branch能否处理受控composite Human”，而不是宣称任意Human text与
-Camera text都可自由替换。若该screen失败，再单独授权冻结Human的Camera-branch augmentation；在此之前
-把editing写成主贡献会稀释human-preserving sequential generation的核心定位。
+自由编辑不建议加入正式contribution列表。核心仍是capability-preserving human-motion generation
+与sequential Human→Camera；composition/editing只是secondary utility extension。MotionRemix／MotionCutMix
+借用的是raw Human composition operator，目的不是上／下半身Human增广本身，而是构造组合式H–C训练pairs、
+打破原始一对一Human–Camera pair correlation。
+
+新pair必须在raw motion层完整生成：将独立Camera program／trajectory retarget或re-solve到composite
+Human，重新生成Camera14、projection、framing并重算pair-dependent Interaction16／Camera48，再按
+kinematic、seam、view-space与framing一致性过滤。不得直接保留失效的$C_A$，也不得拼接旧latent。
+数据必须是many-to-many（每个Human对应多个Camera program、每个program对应多个Human），manifest记录
+source／operator／retarget或re-solve／filter／split，且使用composition-disjoint eval。
+
+由于v9 Stage1已在Camera14、I16、C48及$D_c/D_f$处耦合H–C，实验顺序只能是：先做frozen Stage1
+support audit；优先冻结$E_H/D_H$，finetune pair-side encoder／decoder／framing并混合factual replay；
+若support失败，才授权fresh Stage1全训并生成新的checkpoint、cache、stats与decoder，完整复验Human
+prior后才能进入Camera Stage2。当前不能直接部署长训；任一data／Stage1／Human-retention gate失败，
+就将该utility留作future work，不写free editing或任意Human／Camera替换能力。
 
 5）第四条 `StoryMotion achieves consistent SOTA on PulpMotion benchmark for ...` 目前也需要降一档表述。PulpMotion 原论文主要把任务定义为 $p(H,C\mid c)$ 的联合生成，并把 human-conditioned camera generation 作为比较基线之一，而不是正式宣布 Human-only、Observed-H Camera、Joint 三个官方 benchmark tracks。[Pulp Motion][1] 因此应写：
 

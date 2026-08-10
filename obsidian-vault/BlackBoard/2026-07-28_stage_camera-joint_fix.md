@@ -113,7 +113,7 @@ outscreen或interaction16／camera48分量级loss。
   Human的Direct-C失败。
 
 完整loss／tag语义查
-[[ideas/StoryMotion/StoryMotion-metric-computation-io#7. Current Stage1 / Stage2 training-objective I/O]]。
+[[ideas/StoryMotion/StoryMotion-metric-computation-io#6. Current v11 C0-LAT Stage2 objective IO]]。
 
 ## 4. Camera curriculum、BS与optimizer
 
