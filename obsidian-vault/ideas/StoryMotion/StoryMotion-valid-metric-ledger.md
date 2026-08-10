@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-10T18:00:00+0800
+updated: 2026-08-10T15:54:31+0800
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -50,12 +50,12 @@ updated: 2026-08-10T18:00:00+0800
 | Human semantic | FDTMR↓, TMR↑, coverage/density/precision/recall↑, R1/R2/R3↑, MM distance↓ | text-motion/distribution space |
 | Human paired | global/root-aligned MPJPE↓, root ADE/FDE↓, integrated yaw↓ | paired diagnostic; root-aligned removes translation but not heading |
 | Camera semantic | FDCLaTr↓, CLaTr↑, coverage/density/precision/recall↑, R1/R2/R3↑, MM distance↓ | text-camera/distribution space |
-| Camera caption | caption P / R / F1↑ | weighted Camera movement segment classification |
+| Camera caption | caption P / R / F1 ↑ | weighted Camera movement segment classification |
 | Camera geometry | Camera center ADE/FDE↓, rotation↓ | decoded paired trajectory error |
-| projection | projective joint UV L2, r-FPD↓, zero-visible Out↓ | generated Human reprojected through generated Camera |
-| physical | bone CV, speed/acceleration/jerk, contact/skate heuristic | no-reference decoded diagnostics; not calibrated physical validity |
+| projection | projective joint UV L2↓, r-FPD↓, zero-visible Out↓ | generated Human reprojected through generated Camera |
+| physical | bone CV ↓, speed/acceleration/jerk ↔ reference, contact heuristic ↔ reference, skate heuristic ↓ | no-reference decoded diagnostics; arrows are reporting conventions, not calibrated physical validity |
 
-Definitions and callback keys are canonical in [[StoryMotion-metric-computation-io]]. Disabled zero-valued projection PRDC/error fields are excluded from all conclusions.
+Definitions and callback keys are canonical in [[StoryMotion-metric-computation-io]]. Disabled zero-valued projection PRDC/error fields are excluded from all conclusions. For no-reference physical/kinematic fields, `↔ reference` means compare the same-cohort distribution rather than optimize monotonically; static collapse and contact inflation are not improvements.
 
 ## 3. Active full-cohort Stage1 owner
 
@@ -72,11 +72,12 @@ The active Stage2 headline is v11 C0-LAT at Camera optimizer `105K`; C0-GEO, HT-
 
 This compact reviewer-facing snapshot uses only complete pure4,053 formal rows already owned by this ledger. Every non-`—` cell in a row comes from the same run; the columns show the corresponding inference mode rather than a cross-mode composite. Direct-C Human fields are observed-H diagnostics. `FDTMR/TMR`, `FDCLaTr/CLaTr`, and `ADE/FDE` follow the metric directions in §2.
 
-| version / run | cohort / protocol | Direct-H Human FDTMR ↓ / TMR ↑ | Direct-C Camera FDCLaTr ↓ / CLaTr ↑ | Direct-C Cam ADE / FDE ↓ m / rotation ↓ deg | sequential Camera FDCLaTr ↓ / CLaTr ↑ | sequential caption F1 ↑ | sequential Cam ADE / FDE ↓ m / rotation ↓ deg | comparison boundary |
+| display ID / exact run ID | cohort / protocol | Direct-H Human FDTMR ↓ / TMR ↑ | Direct-C Camera FDCLaTr ↓ / CLaTr ↑ | Direct-C Cam ADE / FDE ↓ m / rotation ↓ deg | sequential Camera FDCLaTr ↓ / CLaTr ↑ | sequential caption F1 ↑ | sequential Cam ADE / FDE ↓ m / rotation ↓ deg | comparison boundary |
 | --- | --- | --- | --- | --- | --- | ---: | --- | --- |
 | v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | pure4,053; v9 owner; three active modes | 99.391 / 17.608 | 21.171 / 56.933 | 1.4125 / 1.4985 / 29.922 | 28.754 / 55.579 | 0.6935 | 2.9428 / 3.0422 / 71.435 | operational mainline |
 | v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | pure4,053; same v9 owner; objective alternate | 99.391 / 17.608 | 20.540 / 57.574 | 1.3860 / 1.4711 / 29.800 | 29.505 / 56.103 | 0.7007 | 2.9368 / 3.0395 / 71.507 | audited objective alternate; no single-winner claim |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | pure4,053; HREL owner; three active modes | 100.254402 / 17.354467 | 22.199497 / 57.238335 | 1.424767 / 1.510033 / 30.037865 | 30.147327 / 55.586891 | 0.701713 | 2.893823 / 3.000069 / 71.159801 | representation/decoder control; mixed-Pareto comparison |
+| v11 HT-DR / `v11_ht_dr_fresh105k_seed17_4090g0_r2_20260801` | pure4,053; C0-GEO-matched Human-text Camera control | 99.391 / 17.608 | 17.586 / 58.840 | 1.4141 / 1.5014 / 29.572 | 24.564 / 58.145 | 0.7436 | 2.9460 / 3.0473 / 71.162 | semantic/caption-leading control; not a global winner |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | pure4,053; HREL owner; three active modes | 100.254402 / 17.354467 | 22.199497 / 57.238335 | 1.424767 / 1.510033 / 30.037865 | 30.147327 / 55.586891 | 0.701713 | 2.893823 / 3.000069 / 71.159801 | representation/decoder control; mixed-Pareto comparison |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | pure4,053; C1REL owner; three-interface formal | 104.331841 / 17.276762 | 18.183035 / 61.985516 | 1.709340 / 1.785491 / 35.901068 | 17.322052 / 61.360668 | — | 2.990472 / 3.093771 / 71.352258 | representation control; no semantic paired-unit significance claim |
 | C1REL-noI16 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | pure4,053; Interaction16 removed; three-interface formal | 92.033676 / 17.619104 | 65.427673 / 43.920853 | 1.665444 / 1.777655 / 41.145027 | 89.051743 / 41.235523 | — | 2.646307 / 2.745572 / 67.081549 | matched component ablation; not a universal necessity claim |
 | True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | pure4,053; symmetric-joint diagnostic; three active modes | 97.553619 / 18.013281 | 131.628693 / 37.851692 | 2.025185 / 2.145800 / 49.877689 | 104.280891 / 40.078587 | 0.499214 | 2.476393 / 2.583847 / 64.814241 | fresh symmetric joint; diagnostic-only, not causal rank |
@@ -84,11 +85,25 @@ This compact reviewer-facing snapshot uses only complete pure4,053 formal rows a
 
 The table is a protocol-aware snapshot, not a single leaderboard: representation, owning decoder, objective, initialization, and native-joint versus asymmetric mode differences remain explicit. Exact fields, artifact identities, hashes, and uncertainty boundaries are retained in the detailed Stage2 sections below.
 
+No scalar aggregate or preregistered utility weighting defines “overall best.” HT-DR leads the listed
+Camera semantic/caption fields, but its six Camera geometry CIs against C0-GEO cross zero and its
+Direct-C r-FPD/Out regress; it is therefore a conditional semantic/caption winner rather than an
+unqualified replacement for C0-LAT.
+
 ## 4A. v9+ Stage2 audited detail tables
 
-Original §§3.11–3.19 are retained below with complete pure4053 numeric fields, run IDs, artifact hashes and protocol exception boundaries. Direct-C observed-H fields are explicitly labeled and are not free-Human generation.
+Original §§3.11–3.19 are retained below with complete pure4053 numeric fields, run IDs, artifact hashes and protocol exception boundaries. Tables use short display IDs; any backticked `paperA_...` string is the immutable exact run ID/provenance, not a renamed folder. Direct-C observed-H fields are explicitly labeled and are not free-Human generation.
 
 ### Audited detail — original §3.11 v11 four-arm `105K` pure4,053 formal audit
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C0-LAT | `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | v9 owner; Camera latent objective; Human frozen at `105K` | operational asymmetric mainline |
+| C0-GEO | `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | same v9 owner and frozen Human; decoded Camera/framing geometry objective | audited objective alternate |
+| C1-LAT | `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730` | C1 representation; Camera latent objective | representation/objective control |
+| C1-GEO | `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | C1 representation; decoded Camera/framing geometry objective | representation/objective control |
+
+每一行对应一个 experiment arm；后续 metric rows 的 display ID 与 exact run ID 保持一一对应。
 
 正式cross-arm audit root位于4090：
 
@@ -109,7 +124,7 @@ cross-arm `matrix_audit.json` SHA-256为`96464d35fbb69dc6befa5121153543e64b29f39
 
 四臂使用同一冻结Human teacher；5090两臂逐字段exact，跨4090只有受审计约束的GPU roundoff。root-aligned MPJPE只去除root translation，仍保留heading error。
 
-| version / run | N | FDTMR ↓ | TMR ↑ | HCov / density / precision / recall ↑ | R1 / R2 / R3 ↑ | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean / final / unwrapped final ↓ deg |
+| display ID / exact run ID | N | FDTMR ↓ | TMR ↑ | HCov / density / precision / recall ↑ | R1 / R2 / R3 ↑ | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean / final / unwrapped final ↓ deg |
 | --- | ---: | ---: | ---: | --- | --- | --- | --- | --- |
 | v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 4,053 | 99.391 | 17.608 | 0.7158 / 0.8079 / 0.8283 / 0.6531 | 0.1559 / 0.2556 / 0.3388 | 0.842760 / 0.228751 | 0.758772 / 1.283039 | 47.239 / 66.123 / 239.357 |
 | v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 4,053 | 99.391 | 17.608 | 0.7158 / 0.8079 / 0.8283 / 0.6531 | 0.1559 / 0.2556 / 0.3388 | 0.842760 / 0.228751 | 0.758772 / 1.283039 | 47.239 / 66.123 / 239.357 |
@@ -120,7 +135,7 @@ cross-arm `matrix_audit.json` SHA-256为`96464d35fbb69dc6befa5121153543e64b29f39
 
 Direct-C的Human列是GT-H经v9 owning decoder的重建诊断，不是自由Human生成。
 
-| version / run | FDCLaTr ↓ | CLaTr ↑ | CCov / density / precision / recall ↑ | caption P / R / F1 ↑ | Cam ADE / FDE ↓ m | rotation ↓ deg | r-FPD / Out ↓ | observed-H global / root-aligned MPJPE ↓ m |
+| display ID / exact run ID | FDCLaTr ↓ | CLaTr ↑ | CCov / density / precision / recall ↑ | caption P / R / F1 ↑ | Cam ADE / FDE ↓ m | rotation ↓ deg | r-FPD / Out ↓ | observed-H global / root-aligned MPJPE ↓ m |
 | --- | ---: | ---: | --- | --- | --- | ---: | --- | --- |
 | v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 21.171 | 56.933 | 0.8303 / 1.0932 / 0.9156 / 0.5566 | 0.7857 / 0.7000 / 0.7372 | 1.4125 / 1.4985 | 29.922 | 0.8465 / 0.1052 | 0.125466 / 0.048796 |
 | v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 20.540 | 57.574 | 0.8236 / 1.0604 / 0.9062 / 0.5589 | 0.7900 / 0.7075 / 0.7442 | 1.3860 / 1.4711 | 29.800 | 0.8514 / 0.1017 | 0.125466 / 0.048796 |
@@ -129,7 +144,7 @@ Direct-C的Human列是GT-H经v9 owning decoder的重建诊断，不是自由Huma
 
 #### Formal sequential Human→Camera complete joint system
 
-| version / run | Camera FDCLaTr ↓ / CLaTr ↑ | Camera coverage / density / precision / recall ↑ | caption F1 ↑ | r-FPD / Out ↓ | H global / root-aligned MPJPE ↓ m | Cam ADE / FDE ↓ m | Cam rotation ↓ deg |
+| display ID / exact run ID | Camera FDCLaTr ↓ / CLaTr ↑ | Camera coverage / density / precision / recall ↑ | caption F1 ↑ | r-FPD / Out ↓ | H global / root-aligned MPJPE ↓ m | Cam ADE / FDE ↓ m | Cam rotation ↓ deg |
 | --- | --- | --- | ---: | --- | --- | --- | ---: |
 | v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 28.754 / 55.579 | 0.7735 / 1.0100 / 0.8949 / 0.5241 | 0.6935 | 0.5082 / 0.0773 | 0.842760 / 0.228751 | 2.9428 / 3.0422 | 71.435 |
 | v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 29.505 / 56.103 | 0.7626 / 1.0042 / 0.8939 / 0.5164 | 0.7007 | 0.5098 / 0.0768 | 0.842760 / 0.228751 | 2.9368 / 3.0395 | 71.507 |
@@ -140,27 +155,35 @@ Direct-C的Human列是GT-H经v9 owning decoder的重建诊断，不是自由Huma
 
 每个cell是`mean / median / p90`。单位与[[StoryMotion-metric-computation-io]]一致；bone CV无量纲，dynamics为decoded coordinate / frameⁿ，contact为fraction。它们是no-reference heuristic diagnostics，不是calibrated physical-validity或ground penetration／floating指标。Direct-H与sequential共享同一冻结Human输出；Direct-C是observed-H reconstruction。
 
-| version / run | mode | N | bone CV | joint speed | joint acceleration | joint jerk |
+| display ID / exact run ID | mode | N | bone CV ↓ | joint speed ↔ reference | joint acceleration ↔ reference | joint jerk ↔ reference |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | Dataset reference / v11 pure4053 | reference | 4,053 | 2.414e-7 / 2.194e-7 / 3.085e-7 | 0.035336 / 0.021716 / 0.080298 | 0.026611 / 0.015280 / 0.060480 | 0.041110 / 0.023375 / 0.093897 |
-| v11 C0-LAT+C0-GEO / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730`; `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.280e-7 / 2.220e-7 / 2.622e-7 | 0.025358 / 0.017674 / 0.053936 | 0.023125 / 0.016563 / 0.048184 | 0.036800 / 0.026027 / 0.076142 |
-| v11 C1-LAT+C1-GEO / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730`; `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
-| v11 C0-LAT+C0-GEO / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730`; `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.468e-7 / 2.253e-7 / 3.127e-7 | 0.037159 / 0.023331 / 0.083145 | 0.030219 / 0.018391 / 0.066288 | 0.046381 / 0.027816 / 0.099293 |
-| v11 C1-LAT+C1-GEO / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730`; `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.280e-7 / 2.220e-7 / 2.622e-7 | 0.025358 / 0.017674 / 0.053936 | 0.023125 / 0.016563 / 0.048184 | 0.036800 / 0.026027 / 0.076142 |
+| v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.280e-7 / 2.220e-7 / 2.622e-7 | 0.025358 / 0.017674 / 0.053936 | 0.023125 / 0.016563 / 0.048184 | 0.036800 / 0.026027 / 0.076142 |
+| v11 C1-LAT / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
+| v11 C1-GEO / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-H = sequential Human | 4,053 | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.468e-7 / 2.253e-7 / 3.127e-7 | 0.037159 / 0.023331 / 0.083145 | 0.030219 / 0.018391 / 0.066288 | 0.046381 / 0.027816 / 0.099293 |
+| v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.468e-7 / 2.253e-7 / 3.127e-7 | 0.037159 / 0.023331 / 0.083145 | 0.030219 / 0.018391 / 0.066288 | 0.046381 / 0.027816 / 0.099293 |
+| v11 C1-LAT / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
+| v11 C1-GEO / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
 
-| version / run | mode | N | root speed | root acceleration | root jerk | contact heuristic | foot skate heuristic |
+| display ID / exact run ID | mode | N | root speed ↔ reference | root acceleration ↔ reference | root jerk ↔ reference | contact heuristic ↔ reference | foot skate heuristic ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Dataset reference / v11 pure4053 | reference | 4,053 | 0.029456 / 0.016709 / 0.067934 | 0.017055 / 0.009513 / 0.039636 | 0.023314 / 0.013070 / 0.053262 | 0.489381 / 0.425000 / 1.000000 | 0.039985 / 0.021858 / 0.080741 |
-| v11 C0-LAT+C0-GEO / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730`; `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010156 / 0.041565 | 0.011937 / 0.007418 / 0.026801 | 0.016892 / 0.010376 / 0.037602 | 0.596160 / 0.595745 / 1.000000 | 0.030608 / 0.019470 / 0.063224 |
-| v11 C1-LAT+C1-GEO / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730`; `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
-| v11 C0-LAT+C0-GEO / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730`; `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011575 / 0.043850 | 0.027753 / 0.016435 / 0.061084 | 0.491982 / 0.437500 / 1.000000 | 0.041858 / 0.024370 / 0.085571 |
-| v11 C1-LAT+C1-GEO / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730`; `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010156 / 0.041565 | 0.011937 / 0.007418 / 0.026801 | 0.016892 / 0.010376 / 0.037602 | 0.596160 / 0.595745 / 1.000000 | 0.030608 / 0.019470 / 0.063224 |
+| v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010156 / 0.041565 | 0.011937 / 0.007418 / 0.026801 | 0.016892 / 0.010376 / 0.037602 | 0.596160 / 0.595745 / 1.000000 | 0.030608 / 0.019470 / 0.063224 |
+| v11 C1-LAT / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
+| v11 C1-GEO / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-H = sequential Human | 4,053 | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
+| v11 C0-LAT / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011575 / 0.043850 | 0.027753 / 0.016435 / 0.061084 | 0.491982 / 0.437500 / 1.000000 | 0.041858 / 0.024370 / 0.085571 |
+| v11 C0-GEO / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011575 / 0.043850 | 0.027753 / 0.016435 / 0.061084 | 0.491982 / 0.437500 / 1.000000 | 0.041858 / 0.024370 / 0.085571 |
+| v11 C1-LAT / `v11_c1_lat_fixedh_gt64_tf64_35to105k_seed17_4090g0_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
+| v11 C1-GEO / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` | Direct-C observed-H reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
 
 #### Four-arm paired geometry bootstrap
 
 10,000次resample，seed `260730`，unit为matched sample；差值均为前者减后者。
 
-| version / comparison | mode | Δ ADE m（95% CI） | Δ FDE m（95% CI） | Δ rotation deg（95% CI） |
+| version / comparison | mode | Δ Camera ADE ↓ m（95% CI; A−B） | Δ Camera FDE ↓ m（95% CI; A−B） | Δ Camera rotation ↓ deg（95% CI; A−B） |
 | --- | --- | --- | --- | --- |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` − `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-C | -0.0265 [-0.0651, 0.0121] | -0.0274 [-0.0667, 0.0113] | -0.1218 [-1.0660, 0.8289] |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` − `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | sequential | -0.0060 [-0.0362, 0.0231] | -0.0027 [-0.0333, 0.0271] | +0.0725 [-0.9431, 1.0655] |
@@ -171,11 +194,39 @@ Direct-C的Human列是GT-H经v9 owning decoder的重建诊断，不是自由Huma
 | v11 / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` − `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C | +0.2316 [0.1936, 0.2705] | +0.2426 [0.2037, 0.2823] | +3.9765 [2.9520, 4.9841] |
 | v11 / `v11_c1_geo_fixedh_gt64_tf64_35to105k_seed17_4090g1_r2_20260730` − `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | sequential | +0.1129 [0.0552, 0.1713] | +0.1116 [0.0534, 0.1709] | +0.8910 [-0.7611, 2.5541] |
 
+#### Four-arm distributional／semantic and decoded-Human delta supplement
+
+下表中的 distributional／semantic 项是对应 official `results.json` 的 cohort arithmetic
+delta（前者减后者），没有 per-sample semantic unit，故不提供 semantic CI。physical 项来自
+同一 matrix audit 的 nested decoded-Human records；`↔` 是 no-reference diagnostic，不能按
+正负号宣称优劣。geometry CI 与 hash/provenance 仍以上表及其 audit artifact 为准。
+
+| comparison | mode | distributional／semantic aggregate Δ (A−B; no CI) | decoded-Human physical／kinematic mean Δ [95% CI] (diagnostic-only) |
+| --- | --- | --- | --- |
+| C0-GEO − C0-LAT | Direct-C | `CLaTr↑ +0.640221; FDCLaTr↓ −0.631561; cov↑ −0.006660; dens↑ −0.032725; prec↑ −0.009371; rec↑ +0.002231; R1↑ +0.001480; R2↑ +0.006415; R3↑ +0.010116; MM↓ −0.160486; caption P/R/F1↑ +0.004275/+0.007459/+0.007017; r-FPD↓ +0.004919; Out↓ −0.003503` | all 9 fields `0 [0, 0]` |
+| C0-GEO − C0-LAT | sequential Human→Camera | `CLaTr↑ +0.524597; FDCLaTr↓ +0.751535; cov↑ −0.010863; dens↑ −0.005778; prec↑ −0.001002; rec↑ −0.007658; R1↑ −0.001727; R2↑ +0.001974; R3↑ +0.001974; MM↓ −0.131036; caption P/R/F1↑ +0.009501/+0.006522/+0.007161; r-FPD↓ +0.001553; Out↓ −0.000490` | all 9 fields `0 [0, 0]` |
+| C1-GEO − C1-LAT | Direct-C | `CLaTr↑ −0.002304; FDCLaTr↓ +1.401524; cov↑ −0.012598; dens↑ −0.036601; prec↑ −0.004678; rec↑ −0.005178; R1↑ +0.003208; R2↑ −0.003454; R3↑ −0.001727; MM↓ −0.004053; caption P/R/F1↑ +0.001231/+0.001800/+0.001265; r-FPD↓ +0.023953; Out↓ −0.000225` | all 9 fields `0 [0, 0]` |
+| C1-GEO − C1-LAT | sequential Human→Camera | `CLaTr↑ +0.170410; FDCLaTr↓ +2.224155; cov↑ −0.015303; dens↑ −0.047447; prec↑ −0.013078; rec↑ −0.001736; R1↑ −0.004194; R2↑ +0.003701; R3↑ +0.009623; MM↓ −0.039469; caption P/R/F1↑ +0.004385/+0.005548/+0.006042; r-FPD↓ −0.046390; Out↓ −0.003498` | all 9 fields `0 [0, 0]` |
+| C1-LAT − C0-LAT | Direct-C | `CLaTr↑ −0.244499; FDCLaTr↓ +1.290079; cov↑ −0.009372; dens↑ +0.005914; prec↑ −0.002963; rec↑ −0.011346; R1↑ −0.006908; R2↑ −0.004194; R3↑ −0.001974; MM↓ +0.100048; caption P/R/F1↑ −0.008665/−0.005910/−0.007823; r-FPD↓ +0.267546; Out↓ +0.019362` | `bone-CV↔ −1.789e−10 [−4.562e−10,+9.314e−11]; joint speed↔ −2.451e−08 [−9.450e−08,+4.512e−08]; joint accel↔ −9.693e−08 [−2.635e−07,+6.411e−08]; joint jerk↔ −1.304e−07 [−4.676e−07,+2.052e−07]; root speed↔ −1.049e−08 [−5.878e−08,+3.820e−08]; root accel↔ −2.086e−08 [−1.582e−07,+1.185e−07]; root jerk↔ −6.423e−08 [−3.781e−07,+2.505e−07]; contact↔ +1.486e−05 [−2.097e−05,+5.957e−05]; skate↔ −1.049e−06 [−3.555e−06,+1.364e−06]` |
+| C1-LAT − C0-LAT | sequential Human→Camera | `TMR↑ −0.000055; FDTMR↓ +0.000023; H cov↑ +0.000001; H dens↑ +0.000082; H prec↑ 0; H rec↑ −0.000247; H R1↑ +0.000247; H R2↑ +0.000247; H R3↑ 0; H MM↓ +0.000062; CLaTr↑ −2.344086; FDCLaTr↓ +6.488459; C cov↑ −0.027138; C dens↑ +0.002447; C prec↑ −0.008647; C rec↑ −0.036032; C R1↑ +0.005428; C R2↑ −0.008636; C R3↑ −0.016531; C MM↓ +0.668083; caption P/R/F1↑ −0.006386/−0.031101/−0.015616; r-FPD↓ +0.749500; Out↓ +0.061146` | `bone-CV↔ −1.138e−10 [−3.498e−10,+1.248e−10]; joint speed↔ +4.834e−09 [−5.261e−08,+6.170e−08]; joint accel↔ +5.698e−08 [−7.109e−08,+1.829e−07]; joint jerk↔ +6.747e−08 [−2.055e−07,+3.377e−07]; root speed↔ +1.216e−08 [−3.668e−08,+5.949e−08]; root accel↔ +5.811e−08 [−7.430e−08,+1.863e−07]; root jerk↔ +6.324e−08 [−2.362e−07,+3.578e−07]; contact↔ +9.939e−06 [−1.270e−05,+3.320e−05]; skate↔ +2.837e−06 [−3.949e−07,+6.334e−06]` |
+| C1-GEO − C0-GEO | Direct-C | `CLaTr↑ −0.887024; FDCLaTr↓ +3.323164; cov↑ −0.015310; dens↑ +0.002038; prec↑ +0.001729; rec↑ −0.018755; R1↑ −0.005181; R2↑ −0.014064; R3↑ −0.013817; MM↓ +0.256481; caption P/R/F1↑ −0.011710/−0.011569/−0.013575; r-FPD↓ +0.286581; Out↓ +0.022640` | `bone-CV↔ −1.789e−10 [−4.571e−10,+1.028e−10]; joint speed↔ −2.451e−08 [−9.506e−08,+4.601e−08]; joint accel↔ −9.693e−08 [−2.645e−07,+6.862e−08]; joint jerk↔ −1.304e−07 [−4.702e−07,+2.097e−07]; root speed↔ −1.049e−08 [−6.027e−08,+3.836e−08]; root accel↔ −2.086e−08 [−1.649e−07,+1.176e−07]; root jerk↔ −6.423e−08 [−3.808e−07,+2.475e−07]; contact↔ +1.486e−05 [−2.129e−05,+5.921e−05]; skate↔ −1.049e−06 [−3.583e−06,+1.353e−06]` |
+| C1-GEO − C0-GEO | sequential Human→Camera | `TMR↑ −0.000055; FDTMR↓ +0.000023; H cov↑ +0.000001; H dens↑ +0.000082; H prec↑ 0; H rec↑ −0.000247; H R1↑ +0.000247; H R2↑ +0.000247; H R3↑ 0; H MM↓ +0.000062; CLaTr↑ −2.698273; FDCLaTr↓ +7.961079; C cov↑ −0.031578; C dens↑ −0.039222; C prec↑ −0.020722; C rec↑ −0.030111; C R1↑ +0.002961; C R2↑ −0.006908; C R3↑ −0.008882; C MM↓ +0.759650; caption P/R/F1↑ −0.011502/−0.032075/−0.016735; r-FPD↓ +0.701558; Out↓ +0.058138` | `bone-CV↔ −1.138e−10 [−3.500e−10,+1.276e−10]; joint speed↔ +4.834e−09 [−5.163e−08,+5.973e−08]; joint accel↔ +5.698e−08 [−6.999e−08,+1.848e−07]; joint jerk↔ +6.747e−08 [−2.049e−07,+3.361e−07]; root speed↔ +1.216e−08 [−3.607e−08,+6.047e−08]; root accel↔ +5.811e−08 [−7.411e−08,+1.919e−07]; root jerk↔ +6.324e−08 [−2.341e−07,+3.620e−07]; contact↔ +9.939e−06 [−1.277e−05,+3.302e−05]; skate↔ +2.837e−06 [−3.390e−07,+6.413e−06]` |
+
 #### Mainline competition boundary
 
 C0-LAT/C0-GEO, HT controls and representation/factorization controls are compared only within their declared pure4053 protocol. The former C3-25 and v9 short-cohort rows are not active numeric evidence; their complete pre-v9 or non-full provenance is routed by the archive index above. Cross-system capability/protocol slots are defined in [[StoryMotion-metric-computation-io#7. Competition protocol slots]].
 
 ### Audited detail — original §3.13 v11 Human-text Camera fresh `105K` pure4,053 formal audit
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C0-LAT | `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | frozen Human; latent Camera objective | operational mainline context |
+| C0-GEO | `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | frozen Human; decoded Camera/framing geometry objective | matched no-Human-text parent |
+| HT-FILM | `v11_ht_film_fresh105k_seed17_4090g0q_r2_20260801` | pooled scale/shift Human observation injected into Camera | test pooled Human-text conditioning |
+| HT-HX | `v11_ht_hx_fresh105k_seed17_4090g1_r2_20260801` | temporal Human-token cross-attention | test token-level Human-text conditioning |
+| HT-DR | `v11_ht_dr_fresh105k_seed17_4090g0_r2_20260801` | direct Camera-velocity residual from Human observation | test velocity-residual conditioning |
+
+每一行是一个独立 experiment arm；C0-LAT/C0-GEO 是上下文或 parent，不与三个 HT arm 合并成一行。
 
 本节比较exact matched C0-GEO与三种Human-text Camera注入设计。三条处理臂都从与
 C0-GEO相同的Camera初始状态fresh训练完整Camera分支与对应Human-text模块到optimizer
@@ -196,7 +247,7 @@ SHA256 `6d75cbf5d22b4a9f0a39d79fa8cfb900708a4095725b7ff62e7bf11ca4d2b80f`与Eule
 
 #### Direct-H frozen-owner replay
 
-| version / run | FDTMR ↓ | TMR ↑ | coverage ↑ | root-aligned MPJPE ↓ m | global MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean ↓ deg |
+| display ID / exact run ID | FDTMR ↓ | TMR ↑ | coverage ↑ | root-aligned MPJPE ↓ m | global MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean ↓ deg |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 99.391 | 17.608 | 0.7158 | 0.228751 | 0.842760 | 0.758772 / 1.283039 | 47.239 |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 99.391 | 17.608 | 0.7158 | 0.228751 | 0.842760 | 0.758772 / 1.283039 | 47.239 |
@@ -210,7 +261,7 @@ translation而保留heading，不能解释成local-pose error。
 
 #### Direct-C observed-Human Camera
 
-| version / run | FDCLaTr ↓ | CLaTr ↑ | coverage ↑ | caption F1 ↑ | r-FPD ↓ | Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg |
+| display ID / exact run ID | FDCLaTr ↓ | CLaTr ↑ | coverage ↑ | caption F1 ↑ | r-FPD ↓ | Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 21.171 | 56.933 | 0.8303 | 0.7372 | 0.8465 | 0.1052 | 1.412472 / 1.498528 | 29.922 |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 20.540 | 57.574 | 0.8236 | 0.7442 | 0.8514 | 0.1017 | 1.385987 / 1.471145 | 29.800 |
@@ -220,7 +271,7 @@ translation而保留heading，不能解释成local-pose error。
 
 #### Formal sequential Human→Camera
 
-| version / run | FDCLaTr ↓ | CLaTr ↑ | caption F1 ↑ | FDTMR / TMR | r-FPD / Out ↓ | Human global / root ADE ↓ m | Camera ADE / FDE ↓ m | rotation ↓ deg |
+| display ID / exact run ID | FDCLaTr ↓ | CLaTr ↑ | caption F1 ↑ | FDTMR ↓ / TMR ↑ | r-FPD ↓ / Out ↓ | Human global / root ADE ↓ m | Camera ADE / FDE ↓ m | rotation ↓ deg |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 28.754 | 55.579 | 0.6935 | 99.391 / 17.608 | 0.5082 / 0.0773 | 0.842760 / 0.758772 | 2.942785 / 3.042185 | 71.435 |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 29.505 | 56.103 | 0.7007 | 99.391 / 17.608 | 0.5098 / 0.0768 | 0.842760 / 0.758772 | 2.936792 / 3.039527 | 71.507 |
@@ -230,7 +281,7 @@ translation而保留heading，不能解释成local-pose error。
 
 #### Decoded-Human physical and kinematic diagnostics
 
-| mode | version / run | Bone CV | Joint speed | Joint accel | Joint jerk | Root speed | Root accel | Root jerk | Contact† | Skate† |
+| mode | display ID / exact run ID | Bone CV ↓ | Joint speed ↔ reference | Joint accel ↔ reference | Joint jerk ↔ reference | Root speed ↔ reference | Root accel ↔ reference | Root jerk ↔ reference | Contact† ↔ reference | Skate† ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Direct-H | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | 2.28027e-07 | 0.025358 | 0.0231249 | 0.0368002 | 0.0178026 | 0.0119371 | 0.0168918 | 0.59616 | 0.030608 |
 | Direct-H | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | 2.28027e-07 | 0.025358 | 0.0231249 | 0.0368002 | 0.0178026 | 0.0119371 | 0.0168918 | 0.59616 | 0.030608 |
@@ -257,7 +308,7 @@ translation而保留heading，不能解释成local-pose error。
 下表是处理臂减C0-GEO，单位依次为米／米／度；负值表示误差降低。每个cell给出
 `mean delta [95% CI]`，重采样单位为相同sample，seed `260802`，共`10,000`次。
 
-| version / run comparison | mode | Camera ADE delta | Camera FDE delta | rotation delta |
+| version / run comparison | mode | Camera ADE ↓ delta (A−B) | Camera FDE ↓ delta (A−B) | rotation ↓ delta (A−B) |
 | --- | --- | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` − `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C | +0.02648 [-0.01245, +0.06529] | +0.02738 [-0.01240, +0.06681] | +0.12178 [-0.80951, +1.08853] |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` − `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | sequential | +0.00600 [-0.02330, +0.03600] | +0.00266 [-0.02676, +0.03219] | -0.07250 [-1.08543, +0.91249] |
@@ -275,6 +326,22 @@ fresh evaluator为`306e5d3e503195d9273521a26b29fec41ca553fa95645bcf48d77d8cf816c
 SHA256为`eeeff66c6e91d998e88213e582778a9e2c0a2a8125b2cf3dad67f0a997914edc`。C0-LAT只补入
 同协议numeric context与现有paired bootstrap，不冒充该GEO-parent visual panel成员。
 
+#### HT − C0-GEO distributional／semantic and decoded-Human delta supplement
+
+distributional／semantic 项为 official aggregate 的算术差值（处理臂减 C0-GEO），没有
+per-sample semantic/framing unit，故 CI unavailable。physical 项来自同一 `matrix_audit.json`
+的逐样本 decoded-Human records，给出 matched bootstrap CI；`↔` 仍是 no-reference diagnostic，
+不赋予单调质量方向。
+
+| comparison | mode | distributional／semantic aggregate Δ (A−B; no CI) | decoded-Human physical／kinematic mean Δ [95% CI] (diagnostic-only) |
+| --- | --- | --- | --- |
+| HT-FILM − C0-GEO | Direct-C | `CLaTr↑ −0.321911; FDCLaTr↓ −1.186733; cov↑ +0.003945; dens↑ +0.035354; prec↑ +0.002464; rec↑ +0.011588; R1↑ −0.009622; R2↑ −0.010363; R3↑ −0.009376; MM↓ +0.057609; caption P/R/F1↑ +0.005518/+0.008076/+0.007228; r-FPD↓ −0.058473; Out↓ −0.001639` | `bone-CV↔ −1.789e−10 [−4.563e−10,+9.295e−11]; joint speed↔ −2.451e−08 [−9.694e−08,+4.608e−08]; joint accel↔ −9.693e−08 [−2.653e−07,+6.699e−08]; joint jerk↔ −1.304e−07 [−4.784e−07,+2.088e−07]; root speed↔ −1.049e−08 [−6.006e−08,+3.851e−08]; root accel↔ −2.086e−08 [−1.620e−07,+1.179e−07]; root jerk↔ −6.423e−08 [−3.829e−07,+2.523e−07]; contact↔ +1.486e−05 [−2.227e−05,+5.975e−05]; skate↔ −1.049e−06 [−3.549e−06,+1.388e−06]` |
+| HT-FILM − C0-GEO | sequential Human→Camera | `TMR↑ −0.000055; FDTMR↓ +0.000023; CLaTr↑ −0.014519; FDCLaTr↓ +2.601112; cov↑ −0.014321; dens↑ −0.016919; prec↑ −0.015533; rec↑ +0.010116; R1↑ +0.002714; R2↑ +0.003701; R3↑ +0.000493; MM↓ −0.007414; caption P/R/F1↑ +0.008291/+0.012156/+0.012105; r-FPD↓ −0.030315; Out↓ −0.003886` | `bone-CV↔ −1.138e−10 [−3.490e−10,+1.276e−10]; joint speed↔ +4.834e−09 [−5.088e−08,+5.972e−08]; joint accel↔ +5.698e−08 [−6.507e−08,+1.855e−07]; joint jerk↔ +6.747e−08 [−1.942e−07,+3.392e−07]; root speed↔ +1.216e−08 [−3.556e−08,+5.975e−08]; root accel↔ +5.811e−08 [−7.354e−08,+1.900e−07]; root jerk↔ +6.324e−08 [−2.322e−07,+3.562e−07]; contact↔ +9.939e−06 [−1.292e−05,+3.275e−05]; skate↔ +2.837e−06 [−3.123e−07,+6.276e−06]` |
+| HT-HX − C0-GEO | Direct-C | `CLaTr↑ −0.154949; FDCLaTr↓ −1.140621; cov↑ +0.013567; dens↑ +0.011911; prec↑ −0.001240; rec↑ +0.007151; R1↑ −0.004441; R2↑ −0.009129; R3↑ −0.010856; MM↓ +0.009440; caption P/R/F1↑ +0.003323/+0.001405/+0.002585; r-FPD↓ −0.066864; Out↓ −0.002903` | `bone-CV↔ −1.789e−10 [−4.545e−10,+1.001e−10]; joint speed↔ −2.451e−08 [−9.482e−08,+4.508e−08]; joint accel↔ −9.693e−08 [−2.602e−07,+6.501e−08]; joint jerk↔ −1.304e−07 [−4.653e−07,+2.020e−07]; root speed↔ −1.049e−08 [−5.881e−08,+3.906e−08]; root accel↔ −2.086e−08 [−1.589e−07,+1.202e−07]; root jerk↔ −6.423e−08 [−3.856e−07,+2.499e−07]; contact↔ +1.486e−05 [−2.211e−05,+5.913e−05]; skate↔ −1.049e−06 [−3.518e−06,+1.344e−06]` |
+| HT-HX − C0-GEO | sequential Human→Camera | `TMR↑ −0.000055; FDTMR↓ +0.000023; CLaTr↑ −2.048119; FDCLaTr↓ +14.139170; cov↑ −0.053779; dens↑ −0.046634; prec↑ −0.031332; rec↑ +0.012352; R1↑ −0.007649; R2↑ −0.021959; R3↑ −0.028621; MM↓ +0.573638; caption P/R/F1↑ −0.012225/−0.014458/−0.019696; r-FPD↓ +0.003128; Out↓ −0.004245` | `bone-CV↔ −1.138e−10 [−3.473e−10,+1.232e−10]; joint speed↔ +4.834e−09 [−5.098e−08,+6.082e−08]; joint accel↔ +5.698e−08 [−6.693e−08,+1.834e−07]; joint jerk↔ +6.747e−08 [−1.983e−07,+3.399e−07]; root speed↔ +1.216e−08 [−3.494e−08,+5.986e−08]; root accel↔ +5.811e−08 [−7.135e−08,+1.877e−07]; root jerk↔ +6.324e−08 [−2.221e−07,+3.596e−07]; contact↔ +9.939e−06 [−1.262e−05,+3.347e−05]; skate↔ +2.837e−06 [−3.690e−07,+6.278e−06]` |
+| HT-DR − C0-GEO | Direct-C | `CLaTr↑ +1.266689; FDCLaTr↓ −2.954306; cov↑ +0.014065; dens↑ +0.038160; prec↑ +0.002220; rec↑ +0.016525; R1↑ −0.001234; R2↑ 0; R3↑ +0.005181; MM↓ −0.356856; caption P/R/F1↑ +0.027717/+0.026395/+0.026949; r-FPD↓ +0.018412; Out↓ +0.005787` | `bone-CV↔ −1.789e−10 [−4.551e−10,+8.968e−11]; joint speed↔ −2.451e−08 [−9.547e−08,+4.512e−08]; joint accel↔ −9.693e−08 [−2.666e−07,+6.434e−08]; joint jerk↔ −1.304e−07 [−4.743e−07,+2.020e−07]; root speed↔ −1.049e−08 [−5.941e−08,+3.831e−08]; root accel↔ −2.086e−08 [−1.586e−07,+1.203e−07]; root jerk↔ −6.423e−08 [−3.748e−07,+2.504e−07]; contact↔ +1.486e−05 [−2.150e−05,+6.023e−05]; skate↔ −1.049e−06 [−3.617e−06,+1.358e−06]` |
+| HT-DR − C0-GEO | sequential Human→Camera | `TMR↑ −0.000055; FDTMR↓ +0.000023; CLaTr↑ +2.041756; FDCLaTr↓ −4.940895; cov↑ +0.017767; dens↑ −0.007403; prec↑ −0.016521; rec↑ +0.034790; R1↑ +0.016778; R2↑ +0.014557; R3↑ +0.012583; MM↓ −0.585448; caption P/R/F1↑ +0.039473/+0.041072/+0.042893; r-FPD↓ −0.015463; Out↓ +0.001277` | `bone-CV↔ −1.138e−10 [−3.519e−10,+1.276e−10]; joint speed↔ +4.834e−09 [−5.120e−08,+6.040e−08]; joint accel↔ +5.698e−08 [−6.838e−08,+1.829e−07]; joint jerk↔ +6.747e−08 [−2.034e−07,+3.334e−07]; root speed↔ +1.216e−08 [−3.492e−08,+5.858e−08]; root accel↔ +5.811e−08 [−7.492e−08,+1.910e−07]; root jerk↔ +6.324e−08 [−2.331e−07,+3.548e−07]; contact↔ +9.939e−06 [−1.263e−05,+3.302e−05]; skate↔ +2.837e−06 [−3.975e−07,+6.281e−06]` |
+
 审计裁决：三臂形成明确Pareto。HT-HX的Camera geometry最强，但sequential语义与
 caption明显回退；HT-DR的Direct-C与sequential Camera semantic／caption最强，但相对
 C0-GEO的六项Camera geometry CI全跨零，且Direct-C r-FPD／Out回退；HT-FILM在
@@ -285,6 +352,13 @@ sequential geometry、caption与projective framing上较均衡，但FDCLaTr不�
 
 
 ### Audited detail — original §3.14 v11 C0 seed23 `105K` pure4,053 matched repeat
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C0-LAT-seed23 | `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | fresh seed23 continuation; C0-LAT objective; frozen v9 Human owner | cross-seed repeatability of the latent objective |
+| C0-GEO-seed23 | `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | fresh seed23 continuation; C0-GEO objective; frozen v9 Human owner | cross-seed repeatability of the geometry objective |
+
+每一行是一个 experiment arm；seed17 C0-LAT/C0-GEO 仅作为已审计 reference，不与 seed23 arm 合并。
 
 两臂均以训练seed `23`从零启动，在各自fresh parent的full-state `30K`边界恢复并连续训练
 至Camera optimizer step `105K`；恢复包含model、optimizer、scheduler与RNG state，不是
@@ -317,20 +391,21 @@ bootstrap。LAT／GEO的`fixed_samples.pt` SHA256分别为
 两臂的Direct-H official metrics与paired geometry逐字段一致，并与seed17 owner replay通过
 预注册的逐样本／cohort守卫。root-aligned MPJPE只移除root translation，仍保留heading。
 
-| version / run | N | FDTMR ↓ / TMR ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean / final / unwrapped final ↓ deg |
+| display ID / exact run ID | N | FDTMR ↓ / TMR ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean / final / unwrapped final ↓ deg |
 | --- | ---: | --- | --- | --- | ---: | --- | --- | --- |
-| v11 C0-LAT+C0-GEO seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`; `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | 4,053 | 99.391 / 17.608 | 0.7158 / 0.8079 / 0.8283 / 0.6528 | 0.1562 / 0.2559 / 0.3388 | 49.705 | 0.842762 / 0.228751 | 0.758774 / 1.283042 | 47.239 / 66.123 / 239.356 |
+| v11 C0-LAT-seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | 4,053 | 99.391 / 17.608 | 0.7158 / 0.8079 / 0.8283 / 0.6528 | 0.1562 / 0.2559 / 0.3388 | 49.705 | 0.842762 / 0.228751 | 0.758774 / 1.283042 | 47.239 / 66.123 / 239.356 |
+| v11 C0-GEO-seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | 4,053 | 99.391 / 17.608 | 0.7158 / 0.8079 / 0.8283 / 0.6528 | 0.1562 / 0.2559 / 0.3388 | 49.705 | 0.842762 / 0.228751 | 0.758774 / 1.283042 | 47.239 / 66.123 / 239.356 |
 
 #### Direct-C observed-Human Camera
 
-| version / run | FDCLaTr ↓ / CLaTr ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | caption P / R / F1 ↑ | r-FPD / Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg | observed-H global / root-aligned MPJPE ↓ m |
+| display ID / exact run ID | FDCLaTr ↓ / CLaTr ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | caption P / R / F1 ↑ | r-FPD ↓ / Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg | observed-H global / root-aligned MPJPE ↓ m |
 | --- | --- | --- | --- | ---: | --- | --- | --- | ---: | --- |
 | v11 C0-LAT seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | 20.852 / 56.931 | 0.8278 / 1.0895 / 0.9134 / 0.5581 | 0.2297 / 0.3943 / 0.5105 | 23.409 | 0.7801 / 0.6984 / 0.7339 | 0.8139 / 0.1010 | 1.398343 / 1.489706 | 29.922 | 0.125455 / 0.048795 |
 | v11 C0-GEO seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | 20.303 / 58.058 | 0.8362 / 1.0620 / 0.9050 / 0.5690 | 0.2388 / 0.3997 / 0.5191 | 23.085 | 0.7952 / 0.7151 / 0.7509 | 0.8586 / 0.1035 | 1.384952 / 1.471736 | 29.255 | 0.125455 / 0.048795 |
 
 #### Formal sequential Human→Camera
 
-| version / run | FDCLaTr ↓ / CLaTr ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | caption P / R / F1 ↑ | r-FPD / Out ↓ | H FDTMR / TMR | H global / root-aligned MPJPE ↓ m | Camera ADE / FDE ↓ m | rotation ↓ deg |
+| display ID / exact run ID | FDCLaTr ↓ / CLaTr ↑ | coverage / density / precision / recall ↑ | R1 / R2 / R3 ↑ | MM distance ↓ | caption P / R / F1 ↑ | r-FPD ↓ / Out ↓ | H FDTMR ↓ / TMR ↑ | H global / root-aligned MPJPE ↓ m | Camera ADE / FDE ↓ m | rotation ↓ deg |
 | --- | --- | --- | --- | ---: | --- | --- | --- | --- | --- | ---: |
 | v11 C0-LAT seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | 28.333 / 56.174 | 0.7752 / 0.9994 / 0.8868 / 0.5283 | 0.2189 / 0.3795 / 0.4999 | 23.636 | 0.7618 / 0.6783 / 0.7074 | 0.5130 / 0.0773 | 99.391 / 17.608 | 0.842762 / 0.228751 | 2.929020 / 3.029515 | 71.339 |
 | v11 C0-GEO seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | 27.449 / 57.057 | 0.7804 / 0.9928 / 0.8934 / 0.5260 | 0.2226 / 0.3847 / 0.5078 | 23.378 | 0.7712 / 0.6877 / 0.7170 | 0.4826 / 0.0758 | 99.391 / 17.608 | 0.842762 / 0.228751 | 2.934441 / 3.035767 | 71.202 |
@@ -342,22 +417,26 @@ Camera physical metric，也不能解释成ground penetration／floating等calib
 Direct-H与sequential共享同一冻结Human输出；Direct-C是observed-H reconstruction。两条
 Camera objective的Human物理字段逐字段一致。
 
-| version / run | mode | bone CV | joint speed | joint acceleration | joint jerk |
+| display ID / exact run ID | mode | bone CV ↓ | joint speed ↔ reference | joint acceleration ↔ reference | joint jerk ↔ reference |
 | --- | --- | --- | --- | --- | --- |
-| v11 C0-LAT+C0-GEO seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`; `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-H = sequential Human | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
-| v11 C0-LAT+C0-GEO seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`; `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-C observed-H reconstruction | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
+| v11 C0-LAT-seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | Direct-H = sequential Human | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
+| v11 C0-GEO-seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-H = sequential Human | 2.279e-7 / 2.220e-7 / 2.626e-7 | 0.025358 / 0.017675 / 0.053936 | 0.023125 / 0.016568 / 0.048186 | 0.036800 / 0.026036 / 0.076142 |
+| v11 C0-LAT-seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | Direct-C observed-H reconstruction | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
+| v11 C0-GEO-seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-C observed-H reconstruction | 2.467e-7 / 2.250e-7 / 3.131e-7 | 0.037159 / 0.023330 / 0.083141 | 0.030219 / 0.018382 / 0.066291 | 0.046381 / 0.027812 / 0.099302 |
 
-| version / run | mode | root speed | root acceleration | root jerk | contact heuristic | foot skate heuristic |
+| display ID / exact run ID | mode | root speed ↔ reference | root acceleration ↔ reference | root jerk ↔ reference | contact heuristic ↔ reference | foot skate heuristic ↓ |
 | --- | --- | --- | --- | --- | --- | --- |
-| v11 C0-LAT+C0-GEO seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`; `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-H = sequential Human | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
-| v11 C0-LAT+C0-GEO seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803`; `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-C observed-H reconstruction | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
+| v11 C0-LAT-seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | Direct-H = sequential Human | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
+| v11 C0-GEO-seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-H = sequential Human | 0.017803 / 0.010157 / 0.041564 | 0.011937 / 0.007417 / 0.026799 | 0.016892 / 0.010380 / 0.037599 | 0.596170 / 0.595745 / 1.000000 | 0.030611 / 0.019465 / 0.063216 |
+| v11 C0-LAT-seed23 / `paperA_v11_c0_lat_30to105k_seed23_4090g0_r2_20260803` | Direct-C observed-H reconstruction | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
+| v11 C0-GEO-seed23 / `paperA_v11_c0_geo_30to105k_seed23_4090g1_r2_20260803` | Direct-C observed-H reconstruction | 0.030292 / 0.017515 / 0.069143 | 0.019720 / 0.011576 / 0.043855 | 0.027753 / 0.016443 / 0.061077 | 0.491997 / 0.437500 / 1.000000 | 0.041857 / 0.024370 / 0.085574 |
 
 #### Two-seed matched Camera geometry bootstrap
 
 下表差值均为前者减后者；每个cell为`mean delta [95% CI]`，使用相同sample执行10,000次
 paired resample。八个mode-level comparison共24个Camera geometry CI，全部跨零。
 
-| version / comparison | mode | Δ ADE m（95% CI） | Δ FDE m（95% CI） | Δ rotation deg（95% CI） |
+| version / comparison | mode | Δ Camera ADE ↓ m（95% CI; A−B） | Δ Camera FDE ↓ m（95% CI; A−B） | Δ Camera rotation ↓ deg（95% CI; A−B） |
 | --- | --- | --- | --- | --- |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` − `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-C | -0.02648 [-0.06529, +0.01245] | -0.02738 [-0.06681, +0.01240] | -0.12178 [-1.08853, +0.80951] |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` − `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | sequential | -0.00600 [-0.03600, +0.02330] | -0.00266 [-0.03219, +0.02676] | +0.07250 [-0.91249, +1.08543] |
@@ -377,13 +456,20 @@ C0-GEO保留为audited alternate。本轮关闭独立训练seed缺口，但不�
 分层或matched cascade。
 
 
-### Audited detail — original §3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 sequential formal
+### Audited detail — original §3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 three-interface formal
 
-本节回填两条已经存在的 Stage2 formal artifact，不启动新训练或 evaluator。两条 run 均为
-`mode=sequential`（先生成并固定 Human，再生成 Camera），N=`4,053`，ordered-ID SHA-256
-为`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`，且合同明确
-`joint_parallel=false`。同目录下的 `joint_parallel` 结果保留为历史 provenance；它们不是本节
-的 v11 formal 第三模式，也没有被改名。
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C1REL-rawT0 | `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | C1REL-C48 with raw-T0 Camera text; I16 retained; three-interface formal, `joint_parallel=false` | evaluate the C1REL representation/control interface |
+| C1REL-noI16-rawT0 | `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | same raw-T0 C1REL-C48; Interaction16 removed; three-interface formal, `joint_parallel=false` | isolate the Interaction16 ablation |
+
+每一行是一个 experiment arm；同目录中的 historical `joint_parallel` artifact 仅保留 provenance，不属于本组 formal 指标。
+
+本节回填两条已经存在的 Stage2 formal artifact，不启动新训练或 evaluator。两条 run 的正式报告
+包含 Direct-H、Direct-C observed-H 与 sequential Human→Camera 接口，N=`4,053`，ordered-ID
+SHA-256 为`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`，且合同明确
+`joint_parallel=false`。同目录下的 `joint_parallel` 结果保留为历史 provenance；它们不属于本节
+formal 接口，也没有被改名。
 
 | version / run | mode | N | evaluation contract SHA-256 | result SHA-256 | records SHA-256 | fixed samples SHA-256 | manifest SHA-256 |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
@@ -396,7 +482,7 @@ C0-GEO保留为audited alternate。本轮关闭独立训练seed缺口，但不�
 projection callback 语义。Direct-C 的 Human 数值是 observed-H 子指标，不能与 Direct-H
 自由 Human 结果混为一项。
 
-| version / run | mode | Human TMR ↑ | Human FDTMR ↓ | Camera CLaTr ↑ | Camera FDCLaTr ↓ | observed-H TMR / FDTMR | r-FPD / Out ↓ |
+| display ID / exact run ID | mode | Human TMR ↑ | Human FDTMR ↓ | Camera CLaTr ↑ | Camera FDCLaTr ↓ | observed-H TMR ↑ / FDTMR ↓ | r-FPD ↓ / Out ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | 17.276762 | 104.331841 | — | — | — | — |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C observed-H | — | — | 61.985516 | 18.183035 | 15.653248 / 7.931718 | 1.259693 / 0.131841 |
@@ -412,7 +498,7 @@ the complete Stage1 schema in §6.1–§6.4 (which additionally contains integra
 full projective fields). Stage1 full-field rows for HREL, NoInt-HREL, C1REL and C1REL-noI16 remain
 the canonical entries in §6.2–§6.4; no rerun is needed.
 
-| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| display ID / exact run ID | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
 | --- | --- | --- | --- | --- | ---: |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | 0.844060 / 0.232308 | 0.757307 / 1.266741 | — | — |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C observed-H | — | — | 1.709340 / 1.785491 | 35.901068 |
@@ -426,7 +512,7 @@ the canonical entries in §6.2–§6.4; no rerun is needed.
 每个 cell 为 `mean / median / p90`；这些是 no-reference decoded-Human heuristics，不是
 calibrated physical-validity 分数。两条 sequential 与各自 Direct-H 共享同一 Human 输出。
 
-| version / run | mode | bone CV | joint speed | joint acceleration | joint jerk | root speed | root acceleration | root jerk | contact | skate |
+| display ID / exact run ID | mode | bone CV ↓ | joint speed ↔ reference | joint acceleration ↔ reference | joint jerk ↔ reference | root speed ↔ reference | root acceleration ↔ reference | root jerk ↔ reference | contact ↔ reference | skate ↓ |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | C1REL / `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | 2.284e-7 / 2.214e-7 / 2.605e-7 | 0.025801 / 0.017677 / 0.054646 | 0.023425 / 0.016651 / 0.048673 | 0.037175 / 0.026313 / 0.077194 | 0.018116 / 0.010321 / 0.042993 | 0.012080 / 0.007464 / 0.026990 | 0.017046 / 0.010386 / 0.038141 | 0.599366 / 0.600917 / 1.000000 | 0.030448 / 0.018859 / 0.063656 |
 | C1REL-noI16 / `paperA_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | sequential | 2.285e-7 / 2.216e-7 / 2.621e-7 | 0.025357 / 0.017363 / 0.054974 | 0.022670 / 0.016144 / 0.047586 | 0.035787 / 0.025314 / 0.074766 | 0.018010 / 0.010190 / 0.042527 | 0.011954 / 0.007312 / 0.027177 | 0.016846 / 0.010189 / 0.038298 | 0.594181 / 0.592369 / 1.000000 | 0.030316 / 0.018301 / 0.063004 |
@@ -438,6 +524,13 @@ canonical Stage1 数字。
 
 
 ### Audited detail — original §3.16 HREL matched Stage2 pure4,053 formal
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| HREL | `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | HREL representation owner; frozen Human teacher; three active asymmetric modes | test the matched HREL Stage2 owner under the actual `128/1` evaluator protocol |
+| C1REL-rawT0 reference | `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | C1REL representation/control from §3.15; same ordered-ID comparison boundary | paired reference for field-wise HREL-minus-C1REL audit |
+
+每一行是一个 named arm/reference；HREL 的 exact run ID 保留在 provenance 列中，短 display ID 用于正文。
 
 本节登记 HREL matched Stage2 的唯一正式三模式结果。run
 `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` 使用 exact v9
@@ -463,9 +556,9 @@ SHA-256 为`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`。
 
 | version / run | mode | evaluation contract SHA-256 | fixed samples SHA-256 | result SHA-256 | records SHA-256 | manifest SHA-256 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `040965e1ec792cba0b97582d837c3e9f14b028c887a98b5a1a3b34d9bbba9cd9` | `e06ef5454de05c12ad68fa96515fab0aba3656cceba585e3df088e1d119624a0` | `393af19a3124aee9478cc9e94eb9cc7eaafed5839c8d77ff4cd586ce6e80abf9` | `1971a08f39503889ff675c82ecafd48bec42e53451248480f64a156c523518fd` | `eb9327d7c1cec1861c6023775dd82618d3b4cd8258d11b0dcf4920e64edc5cff` |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | `ec390274f66547ffd94918903ea50b7a6d164c4d7648b3c4c77451f00994b259` | `8b0a7eb0715d2d1ed482af46989385a9a20c95f456691f637fe2203a65448872` | `5433a1304668bf767d72fa65b7e676619e54eec06d9eb515a2ff46f826f1debe` | `1b5147ce64cc7315fc81f513b3e084ffdca52af3bff9b8a1050ea02c3c65273e` | `ceb231aad6524116def3808b7a1d444409f3a57f2f3d06b947f74900783b34fc` |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | `7b9fd7ab3bb39a90eacf7f8cfd66dba053f0386bbb7ca81db8209f1c1fc0f05b` | `146eac209ba228fce0b7ac1ecd0c33f0b4ea12dd210342d38e49d66f77115480` | `37e1b8744eabdf6245775c0b3dd5d8859fa9a74355d00a78a8323c806239c555` | `45bd6dbd0c8609edf861730256d5bf46dc408294ceb436ae17fbc61357a720ec` | `b140a69cf9fe3787a71c82c66ad3d47d0293ccb753ae310b8dd746968d067bf7` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `040965e1ec792cba0b97582d837c3e9f14b028c887a98b5a1a3b34d9bbba9cd9` | `e06ef5454de05c12ad68fa96515fab0aba3656cceba585e3df088e1d119624a0` | `393af19a3124aee9478cc9e94eb9cc7eaafed5839c8d77ff4cd586ce6e80abf9` | `1971a08f39503889ff675c82ecafd48bec42e53451248480f64a156c523518fd` | `eb9327d7c1cec1861c6023775dd82618d3b4cd8258d11b0dcf4920e64edc5cff` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | `ec390274f66547ffd94918903ea50b7a6d164c4d7648b3c4c77451f00994b259` | `8b0a7eb0715d2d1ed482af46989385a9a20c95f456691f637fe2203a65448872` | `5433a1304668bf767d72fa65b7e676619e54eec06d9eb515a2ff46f826f1debe` | `1b5147ce64cc7315fc81f513b3e084ffdca52af3bff9b8a1050ea02c3c65273e` | `ceb231aad6524116def3808b7a1d444409f3a57f2f3d06b947f74900783b34fc` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | `7b9fd7ab3bb39a90eacf7f8cfd66dba053f0386bbb7ca81db8209f1c1fc0f05b` | `146eac209ba228fce0b7ac1ecd0c33f0b4ea12dd210342d38e49d66f77115480` | `37e1b8744eabdf6245775c0b3dd5d8859fa9a74355d00a78a8323c806239c555` | `45bd6dbd0c8609edf861730256d5bf46dc408294ceb436ae17fbc61357a720ec` | `b140a69cf9fe3787a71c82c66ad3d47d0293ccb753ae310b8dd746968d067bf7` |
 
 #### Semantic and framing aggregates
 
@@ -473,11 +566,11 @@ SHA-256 为`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`。
 自由 Human 指标不是同一 completion condition；projection callback 的恒零字段仍保留为
 原始 aggregate，不解释为额外质量证据。
 
-| version / run | mode | Human TMR / FDTMR | Camera CLaTr / FDCLaTr | observed-H TMR / FDTMR | caption P / R / F1 | r-FPD / Out |
+| display ID / exact run ID | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | observed-H TMR ↑ / FDTMR ↓ | caption P / R / F1 ↑ | r-FPD ↓ / Out ↓ |
 | --- | --- | --- | --- | --- | --- | --- |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `17.354467 / 100.254402` | — | — | — | — |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C observed-H | — | `57.238335 / 22.199497` | `15.659584 / 7.944044` | `0.792642 / 0.698820 / 0.740582` | `0.889080 / 0.104959` |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential Human→Camera | `17.354467 / 100.254402` | `55.586891 / 30.147327` | — | `0.757394 / 0.670500 / 0.701713` | `0.506346 / 0.076670` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `17.354467 / 100.254402` | — | — | — | — |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C observed-H | — | `57.238335 / 22.199497` | `15.659584 / 7.944044` | `0.792642 / 0.698820 / 0.740582` | `0.889080 / 0.104959` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential Human→Camera | `17.354467 / 100.254402` | `55.586891 / 30.147327` | — | `0.757394 / 0.670500 / 0.701713` | `0.506346 / 0.076670` |
 
 Direct-H Human retrieval为`R1/R2/R3=0.063163/0.097952/0.136442`、coverage/density/precision/recall
 为`0.701195/0.825495/0.845053/0.650871`、MM distance=`49.808089`。Direct-C Camera retrieval
@@ -492,11 +585,11 @@ Direct-H相同。Direct-C projection aggregate 的其余字段 `coverage/density
 
 #### Paired geometry aggregates
 
-| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| display ID / exact run ID | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
 | --- | --- | --- | --- | --- | ---: |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `0.848565 / 0.230946` | `0.762336 / 1.278247` | — | — |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C observed-H | — | — | `1.424767 / 1.510033` | `30.037865` |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential Human→Camera | `0.848565 / 0.230946` | `0.762336 / 1.278247` | `2.893823 / 3.000069` | `71.159801` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | `0.848565 / 0.230946` | `0.762336 / 1.278247` | — | — |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C observed-H | — | — | `1.424767 / 1.510033` | `30.037865` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential Human→Camera | `0.848565 / 0.230946` | `0.762336 / 1.278247` | `2.893823 / 3.000069` | `71.159801` |
 
 Direct-H exact teacher regression max-abs=`6.7711e-05`，通过 frozen-owner gate；sequential Human
 branch复用同一生成Human，因此Human geometry相同。
@@ -507,10 +600,10 @@ branch复用同一生成Human，因此Human geometry相同。
 physical-validity 分数。Direct-H与sequential Human共享同一输出；Direct-C没有单独的
 decoded-Human physical aggregate（`null`）。
 
-| version / run | mode | bone CV | joint speed | joint acceleration | joint jerk | root speed | root acceleration | root jerk | contact | skate |
+| display ID / exact run ID | mode | bone CV ↓ | joint speed ↔ reference | joint acceleration ↔ reference | joint jerk ↔ reference | root speed ↔ reference | root acceleration ↔ reference | root jerk ↔ reference | contact ↔ reference | skate ↓ |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | dataset reference | `2.414e-7 / 2.195e-7 / 3.080e-7` | `0.035336 / 0.021716 / 0.080298` | `0.026611 / 0.015280 / 0.060480` | `0.041110 / 0.023375 / 0.093897` | `0.029456 / 0.016709 / 0.067934` | `0.017055 / 0.009513 / 0.039636` | `0.023314 / 0.013070 / 0.053262` | `0.489381 / 0.425000 / 1.000000` | `0.039985 / 0.021858 / 0.080741` |
-| Paper A HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H = sequential Human | `2.290e-7 / 2.214e-7 / 2.629e-7` | `0.025784 / 0.017563 / 0.055609` | `0.023378 / 0.016493 / 0.048864` | `0.037092 / 0.025973 / 0.076024` | `0.018118 / 0.010202 / 0.042848` | `0.012078 / 0.007469 / 0.027795` | `0.017053 / 0.010474 / 0.038711` | `0.601517 / 0.602649 / 1.000000` | `0.030490 / 0.018605 / 0.063476` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | dataset reference | `2.414e-7 / 2.195e-7 / 3.080e-7` | `0.035336 / 0.021716 / 0.080298` | `0.026611 / 0.015280 / 0.060480` | `0.041110 / 0.023375 / 0.093897` | `0.029456 / 0.016709 / 0.067934` | `0.017055 / 0.009513 / 0.039636` | `0.023314 / 0.013070 / 0.053262` | `0.489381 / 0.425000 / 1.000000` | `0.039985 / 0.021858 / 0.080741` |
+| HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H = sequential Human | `2.290e-7 / 2.214e-7 / 2.629e-7` | `0.025784 / 0.017563 / 0.055609` | `0.023378 / 0.016493 / 0.048864` | `0.037092 / 0.025973 / 0.076024` | `0.018118 / 0.010202 / 0.042848` | `0.012078 / 0.007469 / 0.027795` | `0.017053 / 0.010474 / 0.038711` | `0.601517 / 0.602649 / 1.000000` | `0.030490 / 0.018605 / 0.063476` |
 
 #### HREL minus C1REL exact ordered paired bootstrap
 
@@ -521,18 +614,18 @@ ordered IDs、10,000 resamples、seed=`260730`；差值定义为`HREL − C1REL`
 存在的逐样本 geometry 计算。C1REL reference为 §3.15 的
 `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`。
 
-| version / run | mode | metric | mean delta | 95% CI |
+| version / run | mode | metric (direction) | mean delta (A−B) | 95% CI |
 | --- | --- | --- | ---: | --- |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | global MPJPE | `+0.004504` | `[-0.002439, +0.011316]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root ADE | `+0.005029` | `[-0.001792, +0.011706]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root-aligned MPJPE | `-0.001362` | `[-0.002883, +0.000143]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root FDE | `+0.011506` | `[-0.004050, +0.026671]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera ADE | `-0.284573` | `[-0.333422, -0.236861]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera FDE | `-0.275457` | `[-0.325246, -0.226620]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera rotation | `-5.863202` | `[-7.021823, -4.698981]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera ADE | `-0.096648` | `[-0.142145, -0.052241]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera FDE | `-0.093702` | `[-0.140213, -0.047547]` |
-| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera rotation | `-0.192457` | `[-1.510332, +1.083402]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | global MPJPE ↓ | `+0.004504` | `[-0.002439, +0.011316]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root ADE ↓ | `+0.005029` | `[-0.001792, +0.011706]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root-aligned MPJPE ↓ | `-0.001362` | `[-0.002883, +0.000143]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root FDE ↓ | `+0.011506` | `[-0.004050, +0.026671]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera ADE ↓ | `-0.284573` | `[-0.333422, -0.236861]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera FDE ↓ | `-0.275457` | `[-0.325246, -0.226620]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera rotation ↓ | `-5.863202` | `[-7.021823, -4.698981]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera ADE ↓ | `-0.096648` | `[-0.142145, -0.052241]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera FDE ↓ | `-0.093702` | `[-0.140213, -0.047547]` |
+| HREL − C1REL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` vs `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera rotation ↓ | `-0.192457` | `[-1.510332, +1.083402]` |
 
 Direct-C 三项 Camera geometry 的 CI 均不跨零；sequential 的 ADE/FDE CI 不跨零而 rotation
 CI 跨零；Human 四项 geometry CI 均跨零。`records.jsonl` 没有逐样本 semantic/framing 字段，
@@ -540,9 +633,22 @@ CI 跨零；Human 四项 geometry CI 均跨零。`records.jsonl` 没有逐样本
 bootstrap 标记为 blocked，不能声称显著性。C1REL 的 Camera semantic aggregate 高于 HREL，
 但没有逐样本 semantic/framing paired unit，故不能把该 aggregate 趋势升级为单边 superiority。
 
+#### HREL − C1REL distributional／semantic and decoded-Human delta supplement
+
+下表补齐同一 `results.json` cohort aggregate 的算术差值，均为前者减后者；指标箭头只表示
+单项指标的预注册方向，不把 aggregate delta 当作显著性。`records.jsonl` 仅含 geometry，故
+distributional／semantic 与 decoded-Human physical／kinematic 均为 `CI unavailable`；后者的
+`↔` 字段明确不赋予“更优”方向。
+
+| comparison | mode | distributional／semantic aggregate Δ (A−B; no CI) | decoded-Human physical／kinematic aggregate Δ (A−B; mean / median / p90; no CI) |
+| --- | --- | --- | --- |
+| HREL − C1REL | Direct-H | `TMR↑ +0.077705; FDTMR↓ −4.077438; cov↑ −0.008399; dens↑ −0.005040; prec↑ +0.006149; rec↑ +0.007150; R1↑ +0.003207; R2↑ −0.002714; R3↑ 0; MM↓ −0.022152` | `bone-CV↔ +5.497e−10/+1.977e−11/+2.467e−09; joint speed↔ −1.716e−05/−1.141e−04/+9.628e−04; joint accel↔ −4.666e−05/−1.582e−04/+1.912e−04; joint jerk↔ −8.318e−05/−3.392e−04/−1.170e−03; root speed↔ +1.706e−06/−1.194e−04/−1.448e−04; root accel↔ −1.618e−06/+4.994e−06/+8.051e−04; root jerk↔ +6.996e−06/+8.793e−05/+5.699e−04; contact↔ +0.002151/+0.001732/0; skate↔ +4.154e−05/−2.536e−04/−1.798e−04` |
+| HREL − C1REL | Direct-C observed-H | `CLaTr↑ −4.747181; FDCLaTr↓ +4.016462; cov↑ −0.004686; dens↑ +0.054950; prec↑ +0.013087; rec↑ −0.050831; R1↑ −0.004935; R2↑ −0.007895; R3↑ −0.011103; MM↓ +1.317759; caption P/R/F1↑ −0.030678/−0.050919/−0.035253; r-FPD↓ −0.370613; Out↓ −0.026882` | `—` (`decoded_human_physical=null` in both Direct-C results) |
+| HREL − C1REL | sequential Human→Camera | `TMR↑ +0.077705; FDTMR↓ −4.077438; cov↑ −0.008399; dens↑ −0.005040; prec↑ +0.006149; rec↑ +0.007150; R1↑ +0.003207; R2↑ −0.002714; R3↑ 0; MM↓ −0.022152; CLaTr↑ −5.773777; FDCLaTr↓ +12.825280; cov↑ −0.019238; dens↑ +0.046574; prec↑ +0.012089; rec↑ −0.046376; R1↑ −0.002961; R2↑ −0.012090; R3↑ −0.015791; MM↓ +1.576873; caption P/R/F1↑ −0.039857/−0.067448/−0.060786; r-FPD↓ −0.181351; Out↓ −0.015214` | `bone-CV↔ +5.497e−10/+1.977e−11/+2.467e−09; joint speed↔ −1.716e−05/−1.141e−04/+9.628e−04; joint accel↔ −4.666e−05/−1.582e−04/+1.912e−04; joint jerk↔ −8.318e−05/−3.392e−04/−1.170e−03; root speed↔ +1.706e−06/−1.194e−04/−1.448e−04; root accel↔ −1.618e−06/+4.994e−06/+8.051e−04; root jerk↔ +6.996e−06/+8.793e−05/+5.699e−04; contact↔ +0.002151/+0.001732/0; skate↔ +4.154e−05/−2.536e−04/−1.798e−04` |
+
 #### Claim boundary
 
-HREL 继续作为 Paper A 的 representation owner；本节支持的是 actual `128/1` formal protocol
+HREL 继续作为当前 StoryMotion representation owner；本节支持的是 actual `128/1` formal protocol
 下的 matched Stage2 mixed-Pareto comparison：HREL 在 Direct-C geometry 以及 sequential
 Camera ADE/FDE 上显著更强，C1REL 的 Camera semantic aggregate 更高，Human geometry 没有明确差异。
 不把 C1REL 升格为 owner，不把 actual eval `128/1` 写成 training decode64 matched，也不把
@@ -550,6 +656,13 @@ semantic aggregate 或 no-reference physical diagnostics写成 calibrated validi
 
 
 ### Audited detail — original §3.17 C1REL seed23 raw-T0 Stage2 repeat audit
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C1REL-rawT0-seed23 | `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | fresh seed23 C1REL endpoint; raw-T0 Camera text; same evaluator boundary as seed17 | cross-seed repeatability only |
+| C1REL-rawT0-seed17 reference | `paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | seed17 formal reference from §3.15 | paired reference; not a new arm in this repeat |
+
+每一行是一个 named run/reference；本节的结论是 repeatability evidence，不是方法干预的因果排名。
 
 `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809`完成 fresh Stage2 `210K` endpoint 后，
 在同一 pure-test `N=4,053`、ordered-ID SHA-256
@@ -577,7 +690,7 @@ SHA-256=`89246b01674a3e8682d74eaa0c38356f47d70e937d2df934e8a6888c2c46b0a5`；使
 这些数值直接来自三种 mode 的 `results.json`；seed17 数值仍由 §3.15 作为 reference 保存。它们
 不是 semantic significance test，且 raw Pulp Camera captions 保持为 T0 boundary。
 
-| version / run | mode | Human TMR / FDTMR | Camera CLaTr / FDCLaTr | observed-H TMR / FDTMR | caption F1 | r-FPD / Out |
+| display ID / exact run ID | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | observed-H TMR ↑ / FDTMR ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
 | --- | --- | --- | --- | --- | ---: | --- |
 | C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-H | `17.455219 / 102.077736` | — | — | — | — |
 | C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-C observed-H | — | `61.610401 / 20.361712` | `15.653248 / 7.931718` | `0.772358` | — |
@@ -585,28 +698,40 @@ SHA-256=`89246b01674a3e8682d74eaa0c38356f47d70e937d2df934e8a6888c2c46b0a5`；使
 
 #### Paired geometry aggregates and cross-seed uncertainty
 
-| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| display ID / exact run ID | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
 | --- | --- | --- | --- | --- | ---: |
 | C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-H | `0.851383 / 0.231334` | `0.764674 / 1.278857` | — | — |
 | C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-C observed-H | — | — | `1.680650 / 1.750830` | `35.489959` |
 | C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | sequential Human→Camera | `0.851383 / 0.231334` | `0.764674 / 1.278857` | `2.988533 / 3.088894` | `71.501466` |
 
-| comparison | mode | metric | seed23 − seed17 mean delta | 95% CI |
+| comparison | mode | metric (direction) | seed23 − seed17 mean delta (A−B) | 95% CI |
 | --- | --- | --- | ---: | --- |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | global MPJPE | `+0.007323` | `[-0.002722, +0.017260]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root ADE | `+0.007367` | `[-0.002356, +0.017262]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root-aligned MPJPE | `-0.000974` | `[-0.002982, +0.000998]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root FDE | `+0.012117` | `[-0.008465, +0.033353]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera ADE | `-0.028690` | `[-0.066201, +0.007895]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera FDE | `-0.034661` | `[-0.073829, +0.003691]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera rotation | `-0.411108` | `[-1.374512, +0.537709]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human global MPJPE | `+0.007323` | `[-0.002544, +0.017585]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root ADE | `+0.007367` | `[-0.002262, +0.017228]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root-aligned MPJPE | `-0.000974` | `[-0.002958, +0.000970]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root FDE | `+0.012117` | `[-0.008529, +0.032887]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera ADE | `-0.001939` | `[-0.042527, +0.038016]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera FDE | `-0.004877` | `[-0.046033, +0.035224]` |
-| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera rotation | `+0.149207` | `[-0.994513, +1.282847]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | global MPJPE ↓ | `+0.007323` | `[-0.002722, +0.017260]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root ADE ↓ | `+0.007367` | `[-0.002356, +0.017262]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root-aligned MPJPE ↓ | `-0.000974` | `[-0.002982, +0.000998]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-H | root FDE ↓ | `+0.012117` | `[-0.008465, +0.033353]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera ADE ↓ | `-0.028690` | `[-0.066201, +0.007895]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera FDE ↓ | `-0.034661` | `[-0.073829, +0.003691]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | Direct-C | Camera rotation ↓ | `-0.411108` | `[-1.374512, +0.537709]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human global MPJPE ↓ | `+0.007323` | `[-0.002544, +0.017585]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root ADE ↓ | `+0.007367` | `[-0.002262, +0.017228]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root-aligned MPJPE ↓ | `-0.000974` | `[-0.002958, +0.000970]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Human root FDE ↓ | `+0.012117` | `[-0.008529, +0.032887]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera ADE ↓ | `-0.001939` | `[-0.042527, +0.038016]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera FDE ↓ | `-0.004877` | `[-0.046033, +0.035224]` |
+| C1REL / `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` − `C1REL / paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | sequential | Camera rotation ↓ | `+0.149207` | `[-0.994513, +1.282847]` |
+
+#### C1REL seed23 − seed17 distributional／semantic and decoded-Human delta supplement
+
+这些是 `results.json` cohort aggregate 的算术差值（前者减后者），不是 semantic significance
+test。seed-repeat `records.jsonl` 仅有 geometry 字段；因此所有 distributional／semantic 与
+decoded-Human physical／kinematic 的 CI 均 unavailable，不能把 raw delta 升级为显著性或质量排名。
+
+| comparison | mode | distributional／semantic aggregate Δ (A−B; no CI) | decoded-Human physical／kinematic aggregate Δ (A−B; mean / median / p90; no CI) |
+| --- | --- | --- | --- |
+| seed23 − seed17 | Direct-H | `TMR↑ +0.178457; FDTMR↓ −2.254105; cov↑ −0.011344; dens↑ −0.033663; prec↑ −0.009138; rec↑ +0.003945; R1↑ +0.000247; R2↑ +0.000987; R3↑ −0.004194; MM↓ −0.042379` | `bone-CV↔ +3.983e−10/−4.361e−11/+9.155e−10; joint speed↔ −1.882e−04/+5.933e−05/−4.063e−04; joint accel↔ −2.528e−04/−1.309e−04/+1.143e−04; joint jerk↔ −4.903e−04/−4.566e−04/−6.750e−04; root speed↔ −1.042e−04/−1.611e−04/+5.930e−04; root accel↔ −7.510e−05/−1.392e−04/+4.647e−04; root jerk↔ −1.343e−04/−1.448e−04/+3.131e−04; contact↔ +0.005235/+0.020578/0; skate↔ +4.215e−04/−1.534e−04/−1.219e−04` |
+| seed23 − seed17 | Direct-C observed-H | `CLaTr↑ −0.375114; FDCLaTr↓ +2.178677; cov↑ −0.000002; dens↑ +0.009643; prec↑ −0.005922; rec↑ +0.000237; R1↑ −0.003454; R2↑ −0.001974; R3↑ −0.004688; MM↓ +0.108103; caption P/R/F1↑ +0.003062/−0.004659/−0.003476` | `—` (seed-repeat records do not contain decoded-Human physical fields) |
+| seed23 − seed17 | sequential Human→Camera | `TMR↑ +0.178457; FDTMR↓ −2.254105; cov↑ −0.011344; dens↑ −0.033663; prec↑ −0.009138; rec↑ +0.003945; R1↑ +0.000247; R2↑ +0.000987; R3↑ −0.004194; MM↓ −0.042379; CLaTr↑ −0.451164; FDCLaTr↓ +1.280561; cov↑ +0.008897; dens↑ +0.033458; prec↑ −0.000501; rec↑ −0.006158; R1↑ +0.001480; R2↑ −0.003208; R3↑ +0.004688; MM↓ +0.149190; caption P/R/F1↑ +0.006958/+0.002385/+0.003849; r-FPD↓ −0.016820; Out↓ +0.000691` | `bone-CV↔ +3.983e−10/−4.361e−11/+9.155e−10; joint speed↔ −1.882e−04/+5.933e−05/−4.063e−04; joint accel↔ −2.528e−04/−1.309e−04/+1.143e−04; joint jerk↔ −4.903e−04/−4.566e−04/−6.750e−04; root speed↔ −1.042e−04/−1.611e−04/+5.930e−04; root accel↔ −7.510e−05/−1.392e−04/+4.647e−04; root jerk↔ −1.343e−04/−1.448e−04/+3.131e−04; contact↔ +0.005235/+0.020578/0; skate↔ +4.215e−04/−1.534e−04/−1.219e−04` |
 
 审计裁决：三种 mode 的 cross-seed geometry CI 全部跨零，seed23 只提供 repeatability evidence，
 不支持单 seed 的稳定 superiority。两次 run 都保持 `diagnostic_only=true`、
@@ -615,6 +740,13 @@ SHA-256=`89246b01674a3e8682d74eaa0c38356f47d70e937d2df934e8a6888c2c46b0a5`；使
 
 
 ### Audited detail — original §3.18 PulpMotion native Stage2 matched available-data cohort
+
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| Pulp-native-210K | `paperA_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | native PulpMotion joint path; matched available-data cohort `162,760/4,053`; `210K` steps | external system-boundary comparator, not a StoryMotion mode-equivalent arm |
+| Pulp-native-step92,950 | `dit-xy-ddpm-p2ee3dj7 step92,950` | historical native Pulp checkpoint and official decoder | protocol-sanity provenance only |
+
+每一行对应一个 native checkpoint boundary；Pulp 的 joint callback 不拆写成 StoryMotion Direct-H/Direct-C/sequential。
 
 `paperA_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809`
 是外部 PulpMotion native-system boundary，不是 StoryMotion 组件消融。Pulp native pipeline 与
@@ -641,7 +773,7 @@ Halfway checkpoint SHA-256 为
 为`e2c00e8f407b16785714ffd851c7994b778d303166d7ba0802600c13215dfb03`，formal order SHA-256
 为`a6414865d9ab330fd559f6cf8a62bab7dc1ce4e4ba0dc4f301194c2c71f0eb21`。
 
-| version / run | TMR ↑ / FDTMR ↓ | CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ | projection error ↓ / g-FPD ↓ |
+| display ID / exact run ID | TMR ↑ / FDTMR ↓ | CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ | projection error ↓ / g-FPD ↓ |
 | --- | --- | --- | ---: | --- | --- |
 | PulpMotion native / `paperA_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | `15.332323 / 375.383148` | `14.281564 / 275.958374` | `0.174287` | `11.336928 / 0.542279` | `1.893503 / 3.540139` |
 
@@ -664,7 +796,7 @@ system-boundary comparison，不支持把 StoryMotion 三模式与该行写成�
 
 The original §3.11 boundary also recorded this full-cohort native PulpMotion checkpoint. It is retained for provenance and is not a StoryMotion Direct-H/Direct-C/sequential ranking row.
 
-| version / run | mode | N | F-distance ↓ / alignment ↑ | coverage / precision / recall ↑ | caption F1 ↑ | H global / root-aligned MPJPE ↓ m | Cam ADE / FDE ↓ m | Cam rotation ↓ deg | r-FPD / Out ↓ |
+| display ID / exact run ID | mode | N | F-distance ↓ / alignment ↑ | coverage / precision / recall ↑ | caption F1 ↑ | H global / root-aligned MPJPE ↓ m | Cam ADE / FDE ↓ m | Cam rotation ↓ deg | r-FPD ↓ / Out ↓ |
 | --- | --- | ---: | --- | --- | ---: | --- | --- | ---: | --- |
 | PulpMotion official / `dit-xy-ddpm-p2ee3dj7 step92,950` | native joint no-aux | 4,053 | 94.842 / 35.691 | 0.4833 / 0.6740 / 0.4431 | 0.4905 | — | — | — | 7.4040 / 0.3954 |
 | PulpMotion official / `dit-xy-ddpm-p2ee3dj7 step92,950` | native joint aux | 4,053 | 93.269 / 37.777 | 0.4481 / 0.6442 / 0.4752 | 0.5127 | — | — | — | 5.8933 / 0.2847 |
@@ -673,6 +805,13 @@ The original render summary SHA-256 is `44dfa0a9a18fdc6eed492dc220cfae9606bc9f31
 
 ### Audited detail — original §3.19 True-P2 matched symmetric Stage2 pure4,053 formal
 
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| True-P2-symmetric | `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | start from canonical Human teacher `105K` plus C0-LAT Camera initialization; jointly update Human+Camera for an additional `105K` steps | diagnostic factorization control; test whether relaxing Human freeze changes the Human/Camera trade-off |
+| HREL-secondary-reference | `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | evaluator-matched HREL reference on the same ordered IDs | secondary field-wise reference only; not an exact initialization match |
+
+每一行是一个 named run/reference；True-P2 remains `diagnostic_only` and `promotion_eligible=false`。
+
 `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809`
 是允许Camera loss更新Human参数的fresh symmetric-joint factorization control。它从与C0-LAT相同的
 canonical Human `105K` teacher、Camera initialization、v9 non-causal Stage1 owner、cache、text、
@@ -680,6 +819,14 @@ model config和train/eval IDs出发，再共同更新Human与Camera `105,000` op
 checkpoint同时拥有Human与Camera EMA，`human_frozen_after_teacher=false`。本节只报告预注册的
 Direct-H、Direct-C和sequential；`joint_parallel=false`、`is_causal=false`、
 `diagnostic_only=true`、`promotion_eligible=false`。
+
+这里的 `symmetric` 指两条独立的 Human／Camera denoising flow 共同优化
+`L_H + L_C^HC`，不是把 `h latent、c latent、I latent` concat 后交给一个 joint denoiser，
+也没有重新开放 `joint_parallel`。训练时 HC Camera-loss route 只接收 predicted-clean Human；
+formal Camera generation 却设置 `observed_human=true`，因此训练与评测 route 并不完全相同。
+step-20 的 Camera-only gradient probe 为 `||∇_H L_C||₂=0.002785`、
+`||∇_C L_C||₂=0.485446`，只能证明 Camera loss 可达两组参数，不能证明发生了 gradient stealing；
+teacher under-convergence、梯度竞争等具体原因目前均未被该 probe 单独证实。
 
 训练contract SHA-256=`b57ef7103a23aca806a61f9ea50d4ff585a117e46b32278000e8e0950a59aa51`，
 GPU preflight SHA-256=`e55731e20eb2ac27f0e79e32035f1f13f7f724765245ce06c819f85c2cef3f9f`，
@@ -698,7 +845,7 @@ SHA-256=`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`。
 
 #### Aggregate metrics
 
-| version / run | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| display ID / exact run ID | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
 | --- | --- | --- | --- | ---: | --- |
 | True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | Direct-H | `18.013281 / 97.553619` | — | — | — |
 | True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | Direct-C observed-H | observed-H `15.659584 / 7.944044` | `37.851692 / 131.628693` | `0.451288` | `3.188230 / 0.225102` |
@@ -706,7 +853,7 @@ SHA-256=`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`。
 
 #### Paired geometry and decoded-Human diagnostics
 
-| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| display ID / exact run ID | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
 | --- | --- | --- | --- | --- | ---: |
 | True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | Direct-H | `0.827778 / 0.222009` | `0.746442 / 1.252167` | — | — |
 | True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | Direct-C observed-H | — | — | `2.025185 / 2.145800` | `49.877689` |
@@ -726,26 +873,39 @@ reference，对逐样本geometry做10,000次paired bootstrap，差值定义为`P
 SHA-256=`01cfc929e8c06416d94e68bb2c7d68800fee37ec4000ac95520d3e23ee7a4af1`；审计实现
 SHA-256=`f0962f69397b6bc1690b6b52b1e2dc7ce1d2f8941807cb00fb61ad3c810665bd`。
 
-| version / comparison | mode | metric | mean delta | 95% CI |
+| version / comparison | mode | metric (direction) | mean delta (A−B) | 95% CI |
 | --- | --- | --- | ---: | --- |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | global MPJPE | `-0.020787` | `[-0.031423, -0.010182]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root ADE | `-0.015894` | `[-0.026291, -0.005231]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root-aligned MPJPE | `-0.008937` | `[-0.010776, -0.007107]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root FDE | `-0.026080` | `[-0.048353, -0.003876]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera ADE | `+0.600418` | `[+0.546570, +0.653915]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera FDE | `+0.635766` | `[+0.577747, +0.693091]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera rotation | `+19.839824` | `[+18.439271, +21.248590]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera ADE | `-0.417430` | `[-0.461591, -0.373619]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera FDE | `-0.416222` | `[-0.462050, -0.371399]` |
-| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera rotation | `-6.345560` | `[-7.741426, -4.946408]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | global MPJPE ↓ | `-0.020787` | `[-0.031423, -0.010182]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root ADE ↓ | `-0.015894` | `[-0.026291, -0.005231]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root-aligned MPJPE ↓ | `-0.008937` | `[-0.010776, -0.007107]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-H | root FDE ↓ | `-0.026080` | `[-0.048353, -0.003876]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera ADE ↓ | `+0.600418` | `[+0.546570, +0.653915]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera FDE ↓ | `+0.635766` | `[+0.577747, +0.693091]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | Direct-C | Camera rotation ↓ | `+19.839824` | `[+18.439271, +21.248590]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera ADE ↓ | `-0.417430` | `[-0.461591, -0.373619]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera FDE ↓ | `-0.416222` | `[-0.462050, -0.371399]` |
+| True-P2 / `paperA_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − P1 HREL / `paperA_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | sequential | Camera rotation ↓ | `-6.345560` | `[-7.741426, -4.946408]` |
+
+#### True-P2 − P1 HREL distributional／semantic and decoded-Human delta supplement
+
+这些是两份 `results.json` 的 cohort aggregate 算术差值（P2 − P1），不是 paired semantic test。
+P1/P2 audit records 仅有 geometry，故 distributional／semantic 与 decoded-Human physical／kinematic
+均标为 `CI unavailable`；physical／contact／skate 的 `↔` 仅表示 no-reference diagnostic，
+不表示更优方向。
+
+| comparison | mode | distributional／semantic aggregate Δ (A−B; no CI) | decoded-Human physical／kinematic aggregate Δ (A−B; mean / median / p90; no CI) |
+| --- | --- | --- | --- |
+| True-P2 − P1 HREL | Direct-H | `TMR↑ +0.658814; FDTMR↓ −2.700783; cov↑ +0.019254; dens↑ +0.001386; prec↑ −0.010858; rec↑ −0.001965; R1↑ −0.004935; R2↑ 0; R3↑ −0.003208; MM↓ −0.189736` | `bone-CV↔ −1.093e−09/+5.621e−10/−3.468e−09; joint speed↔ −0.001764/−0.000492/−0.004523; joint accel↔ −0.002335/−0.001295/−0.006576; joint jerk↔ −0.003952/−0.002102/−0.009715; root speed↔ −0.000811/+0.000176/−0.002399; root accel↔ −0.000591/−0.000098/−0.002095; root jerk↔ −0.000773/−0.000099/−0.002281; contact↔ −0.005283/−0.008054/0; skate↔ −0.002785/−0.000929/−0.006704` |
+| True-P2 − P1 HREL | Direct-C observed-H | `CLaTr↑ −19.386640; FDCLaTr↓ +109.429200; cov↑ −0.294076; dens↑ −0.250741; prec↑ −0.081655; rec↑ −0.169995; R1↑ −0.023439; R2↑ −0.049593; R3↑ −0.070812; MM↓ +5.317184; caption P/R/F1↑ −0.197904/−0.278120/−0.289294; r-FPD↓ +2.299150; Out↓ +0.120143` | `—` (`decoded_human_physical=null` for Direct-C) |
+| True-P2 − P1 HREL | sequential Human→Camera | `TMR↑ +0.658814; FDTMR↓ −2.700783; cov↑ +0.019254; dens↑ +0.001386; prec↑ −0.010858; rec↑ −0.001965; R1↑ −0.004935; R2↑ 0; R3↑ −0.003208; MM↓ −0.189736; CLaTr↑ −15.508300; FDCLaTr↓ +74.133560; cov↑ −0.202545; dens↑ −0.203207; prec↑ −0.068328; rec↑ −0.154705; R1↑ −0.022946; R2↑ −0.039230; R3↑ −0.053294; MM↓ +4.290628; caption P/R/F1↑ −0.163090/−0.210109/−0.202499; r-FPD↓ +1.517728; Out↓ +0.081151` | `bone-CV↔ −1.093e−09/+5.621e−10/−3.468e−09; joint speed↔ −0.001764/−0.000492/−0.004523; joint accel↔ −0.002335/−0.001295/−0.006576; joint jerk↔ −0.003952/−0.002102/−0.009715; root speed↔ −0.000811/+0.000176/−0.002399; root accel↔ −0.000591/−0.000098/−0.002095; root jerk↔ −0.000773/−0.000099/−0.002281; contact↔ −0.005283/−0.008054/0; skate↔ −0.002785/−0.000929/−0.006704` |
 
 P1 HREL使用不同的Human teacher／Stage2 checkpoint初始化，因此以上paired CI只说明在同一评测器
 与采样协议下的field-wise差异，**不是**严格的factorization因果效应。与P2 exact初始化相同的
 C0-LAT才是训练干预reference；在它通过同一`128/1` evaluator/noise合同并形成paired audit前，
-不得把本节压缩为“protected asymmetry全面优于symmetric joint”。当前可报告的结论是mixed
-Pareto：P2没有损害Human质量，且sequential Camera geometry更低；但Direct-C Camera geometry、
-Direct-C／sequential Camera semantic和framing显著更差，说明symmetric joint没有形成更可用的
-Camera interface。
+不得把本节压缩为“protected asymmetry全面优于symmetric joint”。当前只能描述为mixed Pareto：
+相对P1 secondary reference，P2的Human与sequential Camera paired geometry更低；Direct-C Camera
+geometry更高，Direct-C／sequential Camera semantic与framing cohort aggregate回退。这个结果
+说明symmetric joint尚未形成更可用的Camera interface，但不识别唯一退化机制。
 
 
 ## 4B. v9+ Stage1 audited detail tables
@@ -753,6 +913,24 @@ Camera interface。
 Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 fields, projective diagnostics and matched audit hashes. Pre-v9 C3 rows are excluded and remain owned by the pre-v9 archive.
 
 ### Audited detail — original §6 Stage1 true-length paired reconstruction
+
+| display ID | immutable provenance ID(s) | setting | goal |
+| --- | --- | --- | --- |
+| Pulp-only-v9 | owner `stage1_hanchor_pulp_only_matched_r3_636k_seed17_4090g0_20260726`; formal eval artifact `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | v9 Pulp-only non-causal owner; `H128+I16+C48`; exact-length round trip | canonical full-cohort Stage1 owner |
+| NoInt-HREL | `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | HREL-derived owner with Interaction16 removed; `H128+C48` | test the interaction-token ablation |
+| C1REL-Stage1 | `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | C1REL-C48 with `H128+I16`; world Camera14 decoder bridge | test the C1REL representation interface |
+| C1REL-noI16-Stage1 | `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | C1REL-C48 with I16 removed | isolate the C1REL interaction-token ablation |
+| HREL-C-old3loss | `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | frozen Phase-A Human plus independent relative Camera48; historical `210K` | retain old Camera-only diagnostic boundary |
+| HML+Pulp-v9 | `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r4_true4053_seed17_5090g2_20260727` | joint Pulp paired reconstruction with HML root/local branch | cross-domain/architecture diagnostic, not owner |
+| Pulp-only-HML-val | `stage1_hanchor_pulp_only_matched_r3_636k_eval_r2_true_hmlval1460_seed17_5090g2_20260727` | HumanML3D `N=1,460` root/local Human-only round trip | cross-domain Human reconstruction diagnostic |
+| HML+Pulp-HML-val | `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r2_true_hmlval1460_seed17_5090g2_20260727` | HumanML3D `N=1,460` root/local branch under Pulp normalization | cross-domain architecture diagnostic |
+
+每一行是一个 distinct Stage1 run；HML3D rows 与 Pulp pure4,053 rows 的 cohort 和 reference distribution 不可互排名。
+
+`Pulp-only-v9` 的 formal eval artifact就是C0-LAT／C0-GEO共同Stage1 owner的 deterministic
+reconstruction floor。C0-LAT和C0-GEO只改变Stage2 Camera objective，不产生新的Stage1 checkpoint
+或owning decoder，因此§6.2–§6.4不会再列一条“C0-LAT Stage1”。它与前述Stage2章节共享owner
+provenance，但回答的是representation round-trip误差，而不是text-conditioned generation质量。
 
 本节是 Stage1 deterministic encoder–decoder round trip，**不是** text-conditioned generation。所有样本先裁到自身 exact valid length，再进入 non-causal tokenizer；不存在固定首 `64` 帧裁切，也不让 future batch padding 进入 encoder。Pulp 与 HumanML3D 使用不同 cohort、观测字段和 reference distribution，禁止跨表排名。
 
@@ -782,7 +960,7 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 
 #### Audited detail — original §6.2 Pulp pure4,053 complete Human reconstruction
 
-| version / run | mode | N | global MPJPE ↓ m | root-aligned MPJPE ↓ m | root ADE ↓ m | root FDE ↓ m | wrapped yaw mean ↓ deg | wrapped yaw final ↓ deg | unwrapped yaw final ↓ deg |
+| display ID / exact run ID | mode | N | global MPJPE ↓ m | root-aligned MPJPE ↓ m | root ADE ↓ m | root FDE ↓ m | wrapped yaw mean ↓ deg | wrapped yaw final ↓ deg | unwrapped yaw final ↓ deg |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 | 0.120708 | 0.042136 | 0.100757 | 0.248722 | 10.434 | 18.751 | 20.757 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.120919 | 0.042175 | 0.100965 | 0.249442 | 10.447 | 18.775 | 20.786 |
@@ -794,7 +972,7 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 
 #### Audited detail — original §6.3 Pulp pure4,053 complete Camera and projective reconstruction
 
-| version / run | mode | N | joint Cam ADE ↓ m | joint Cam FDE ↓ m | GT-H Cam ADE ↓ m | GT-H Cam FDE ↓ m | rotation ↓ deg | FOV-H ↓ deg | FOV-W ↓ deg |
+| display ID / exact run ID | mode | N | joint Cam ADE ↓ m | joint Cam FDE ↓ m | GT-H Cam ADE ↓ m | GT-H Cam FDE ↓ m | rotation ↓ deg | FOV-H ↓ deg | FOV-W ↓ deg |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 | 0.037654 | 0.043840 | 0.026146 | 0.033668 | 0.575890 | 0.204003 | 0.262347 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.047452 | 0.067396 | 0.037331 | 0.059294 | 0.736642 | 0.230362 | 0.294394 |
@@ -803,7 +981,7 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 | v10 HREL-C old-3-loss Phase-B / `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.121757 | 0.377332 | 0.021567 | 0.173423 | 0.617630 | 2.265990 | 1.462458 |
 | Redesign HML+Pulp / `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r4_true4053_seed17_5090g2_20260727` | joint paired reconstruction | 4,053 | 0.052681 | 0.058489 | 0.026317 | 0.034576 | 0.598872 | 0.197493 | 0.269706 |
 
-| version / run | mode | N | joint UV L2 ↓ | center L2 ↓ | log-scale abs ↓ | out-ratio abs ↓ | visible recon / ref | zero-visible recon / ref ↓ |
+| display ID / exact run ID | mode | N | joint UV L2 ↓ | center L2 ↓ | log-scale abs ↓ | out-ratio abs ↓ | visible recon / ref ↔ reference | zero-visible recon / ref ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 | 0.160790 | 0.096190 | 0.029678 | 0.039550 | 0.484065 / 0.497732 | 0.023921 / 0.007547 |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | matched joint paired reconstruction | 4,053 | 0.180547 | 0.101843 | 0.031005 | 0.041164 | 0.484226 / 0.497732 | 0.023734 / 0.007547 |
@@ -817,7 +995,7 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 
 每个 cell 是 `mean / median / p90`。这些是 reconstruction output，不是 free generation；contact/skate 使用 own-motion floor heuristic，不是 calibrated ground metric。
 
-| version / run | mode | N | bone CV | joint speed | joint acceleration | joint jerk |
+| display ID / exact run ID | mode | N | bone CV ↓ | joint speed ↔ reference | joint acceleration ↔ reference | joint jerk ↔ reference |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | Pulp dataset reference / pure4053 | reference | 4,053 | 2.677e-7 / 2.376e-7 / 3.423e-7 | 0.034022 / 0.020797 / 0.078097 | 0.024906 / 0.014389 / 0.056310 | 0.038199 / 0.021969 / 0.087722 |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 | 0.026000 / 0.020484 / 0.050117 | 0.035668 / 0.022309 / 0.079710 | 0.028277 / 0.017335 / 0.062101 | 0.043172 / 0.026360 / 0.094611 |
@@ -827,7 +1005,7 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 | v10 HREL-C old-3-loss Phase-B / `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.021380 / 0.016591 / 0.041141 | 0.035518 / 0.022162 / 0.079693 | 0.027760 / 0.016814 / 0.061350 | 0.042220 / 0.025519 / 0.093351 |
 | Redesign HML+Pulp / `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r4_true4053_seed17_5090g2_20260727` | joint paired reconstruction | 4,053 | 0.037738 / 0.030727 / 0.069701 | 0.052227 / 0.038916 / 0.104918 | 0.037689 / 0.025133 / 0.080011 | 0.052494 / 0.034237 / 0.111604 |
 
-| version / run | mode | N | root speed | root acceleration | root jerk | contact heuristic | foot skate heuristic |
+| display ID / exact run ID | mode | N | root speed ↔ reference | root acceleration ↔ reference | root jerk ↔ reference | contact heuristic ↔ reference | foot skate heuristic ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Pulp dataset reference / pure4053 | reference | 4,053 | 0.029456 / 0.016709 / 0.067934 | 0.017055 / 0.009513 / 0.039636 | 0.023314 / 0.013070 / 0.053262 | 0.492193 / 0.428571 / 1.000000 | 0.039121 / 0.021590 / 0.079352 |
 | Redesign Pulp-only / `stage1_hanchor_pulp_only_matched_r3_636k_eval_r4_true4053_seed17_4090g0_20260727` | joint paired reconstruction | 4,053 | 0.030292 / 0.017515 / 0.069146 | 0.019719 / 0.011587 / 0.043854 | 0.027753 / 0.016438 / 0.061139 | 0.484022 / 0.421053 / 0.999598 | 0.039454 / 0.023312 / 0.082005 |
@@ -840,24 +1018,24 @@ Original §§6.2–6.4 and §6.8 are retained below with complete v9+ pure4053 f
 
 #### Audited detail — original §6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit
 
-本节身份是 **StoryMotion**。reference、NoInt-HREL、C1REL与C1REL-noI16使用相同Pulp pure4,053 ordered IDs、
+reference、NoInt-HREL、C1REL与C1REL-noI16使用相同Pulp pure4,053 ordered IDs、
 真实有效长度、seed17、non-causal边界、deterministic owning encoder–decoder round trip和canonical
 Camera14 raw bridge。paired bootstrap以sample为单位做10,000次重采样，seed `17`；下表cell均为
 `arm − HREL reference [95% CI]`。误差项正值表示回退。
 
-| version / run | global MPJPE m | root-aligned MPJPE m | root ADE m | root FDE m |
+| version / run | global MPJPE ↓ m | root-aligned MPJPE ↓ m | root ADE ↓ m | root FDE ↓ m |
 | --- | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.000211 [-0.000072, 0.000513] | 0.000039 [-0.000010, 0.000086] | 0.000208 [-0.000077, 0.000506] | 0.000720 [0.000005, 0.001454] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | -0.000002 [-0.000886, 0.000759] | 0.000052 [-0.000072, 0.000170] | -0.000020 [-0.000896, 0.000733] | -0.000069 [-0.002813, 0.002382] |
 | C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 0.008842 [0.005645, 0.012002] | 0.002192 [0.001501, 0.002885] | 0.008440 [0.005288, 0.011559] | 0.014025 [0.005111, 0.022876] |
 
-| version / run | joint Cam ADE m | joint Cam FDE m | GT-H Cam ADE m | GT-H Cam FDE m | rotation deg |
+| version / run | joint Cam ADE ↓ m | joint Cam FDE ↓ m | GT-H Cam ADE ↓ m | GT-H Cam FDE ↓ m | rotation ↓ deg |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.009798 [0.008764, 0.010824] | 0.023556 [0.021871, 0.025231] | 0.011186 [0.010050, 0.012295] | 0.025626 [0.023850, 0.027372] | 0.160751 [0.134838, 0.196613] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | 0.007291 [0.006396, 0.008184] | 0.013697 [0.012359, 0.015063] | 0.009365 [0.008420, 0.010329] | 0.015973 [0.014574, 0.017384] | 0.244332 [0.182620, 0.326526] |
 | C1REL-noI16 / `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | 1.464021 [1.410848, 1.517311] | 1.539623 [1.483981, 1.594844] | 1.474739 [1.421337, 1.527961] | 1.549298 [1.493371, 1.604674] | 38.401637 [37.393106, 39.404047] |
 
-| version / run | joint UV L2 | center L2 | log-scale abs | paired Out error |
+| version / run | joint UV L2 ↓ | center L2 ↓ | log-scale abs ↓ | paired Out error ↓ |
 | --- | ---: | ---: | ---: | ---: |
 | NoInt-HREL / `paperA_hrel_nointeraction16_stage1_636k_seed17_4090g0_r2_20260803` | 0.019756 [0.001759, 0.041305] | 0.005653 [0.003732, 0.007953] | 0.001327 [0.000812, 0.001889] | 0.001613 [0.000936, 0.002308] |
 | C1REL / `paperA_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | -0.003085 [-0.025255, 0.018458] | 0.005069 [0.003204, 0.007278] | 0.000205 [-0.000615, 0.000989] | 0.000947 [0.000379, 0.001525] |
@@ -926,13 +1104,22 @@ The original §3.12 framing-control run is retained as a special diagnostic, not
 
 ### Audited diagnostic — original §3.12 v11 explicit framing-control `30K` pure4,053 formal
 
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| C0-LAT-reference | `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | operational mainline context; not the CF-4 training parent | same-protocol system-quality reference |
+| C0-GEO-CF4-parent | `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | frozen-Camera parent for the CF-4 adapter | exact parent and absent-control boundary |
+| CF4-screen2K | `v11_f_cf4_framing_screen2k_seed17_4090g1_20260731` | zero-init CF-4 framing adapter, N64 screen | small-cohort adherence screen |
+| CF4-30K | `v11_f_cf4_framing_long30k_seed17_4090g0_20260731` | zero-init CF-4 framing adapter trained for `30K`; target and swap diagnostics | formal full-cohort framing-control diagnostic; no promotion |
+
+每一行是一个 distinct run boundary；`CF4-screen2K` 只属于 N64 screen，`CF4-30K` 才有 formal `N=4,053` rows。
+
 本节只比较 exact C0-GEO parent 与其 frozen-Camera 上的 zero-init CF-4 framing
 adapter。两行使用相同 pure-test `N=4,053` ordered IDs、official inputs、Euler50、
 seed17、eval batch `32`、noise schedule、non-causal Stage1／decoder／stats 与
 Human owner；唯一变化是 framing adapter。Direct-H exact 继承 parent，未重复生成；
 `joint_parallel=false`。N64 screen 的 batch `8` 不用于 formal 数值。
 
-| version / run | role | N / identity | formal modes | claim boundary |
+| display ID / exact run ID | role | N / identity | formal modes | claim boundary |
 | --- | --- | --- | --- | --- |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | C0-LAT operational mainline reference | 4,053 / `a0d7627e…6b93` | Direct-C；sequential H→C | 不是CF-4训练parent；只补同协议system-quality上下文 |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | exact C0-GEO CF-4 parent；audited alternate | 4,053 / `a0d7627e…6b93` | Direct-C；sequential H→C | 无 explicit numeric framing condition |
@@ -940,7 +1127,7 @@ Human owner；唯一变化是 framing adapter。Direct-H exact 继承 parent，�
 
 #### Formal system quality
 
-| version / run | mode | N | FDCLaTr ↓ | CLaTr ↑ | coverage ↑ | caption F1 ↑ | Cam ADE / FDE ↓ m | rotation ↓ deg | r-FPD / Out ↓ |
+| display ID / exact run ID | mode | N | FDCLaTr ↓ | CLaTr ↑ | coverage ↑ | caption F1 ↑ | Cam ADE / FDE ↓ m | rotation ↓ deg | r-FPD ↓ / Out ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | Direct-C mainline reference | 4,053 | 21.171 | 56.933 | 0.8303 | 0.7372 | 1.4125 / 1.4985 | 29.922 | 0.8465 / 0.1052 |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | Direct-C parent | 4,053 | 20.540 | 57.574 | 0.8236 | 0.7442 | 1.3860 / 1.4711 | 29.800 | 0.8514 / 0.1017 |
@@ -956,7 +1143,7 @@ Human owner；唯一变化是 framing adapter。Direct-H exact 继承 parent，�
 endpoint screen；N4,053 才是完整 cohort。swapped rows 是控制响应诊断，不是对原 GT
 的语义质量排名。
 
-| version / run | evidence role | N | screen-x ↓ | screen-y ↓ | log-scale ↓ | out-of-frame ↓ |
+| display ID / exact run ID | evidence role | N | screen-x ↓ | screen-y ↓ | log-scale ↓ | out-of-frame ↓ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | C0-LAT未进入冻结的GEO-parent CF-4 adherence合同 | — | — | — | — | — |
 | v11 / `v11_c0_geo_fixedh_35to105k_seed17_5090g3_r2_20260730` | parent → own target | 64 | 0.2630 | 0.3548 | 0.1092 | 0.0631 |
@@ -1019,12 +1206,18 @@ All ordinary non-pure4053 generation rows, including first-512, N512, N64 and in
 
 ### 5.6 v9／v10 Human teacher owner非等价审计
 
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| v9-PhaseC636K ↔ v10-PhaseA210K | `phase_a210k_vs_phase_c636k_human` | paired owner-identity audit of the Phase-C `636K` and Phase-A `210K` Human-teacher endpoints | establish whether same-shaped Human latents are interchangeable |
+
+每一行是一个 teacher-owner boundary；comparison artifact 只出现一次，本表审计 latent identity，不提供 generation-performance ranking。
+
 这是明确的fixed-cohort owner-identity special diagnostic，不是generation ranking。两条teacher的
 `ViMoGenLightFlow`拓扑、71,870,080参数规模、shifted-flow objective、batch128、AdamW、LR
 schedule、EMA与`105K`预算相同；本表只审计它们是否拥有同一个Human latent坐标系。cohort为相同
 ordered pure-test first128，比较raw Human128有效元素。
 
-| version / run | N | Human state changed tensors | fixed latent exact | nonzero / valid elements | mean abs | max abs | decision |
+| display ID / exact run ID | N | Human state changed tensors | fixed latent exact | nonzero / valid elements | mean abs | max abs | decision |
 | --- | ---: | ---: | --- | ---: | ---: | ---: | --- |
 | v9 Phase-C636K ↔ v10 Phase-A210K / `phase_a210k_vs_phase_c636k_human` | 128 | 10 / 10 | false | 371,712 / 371,712 | 0.216329 | 2.286326 | raw cache与train-only statistics不等价；v10 teacher必须fresh训练 |
 
@@ -1034,6 +1227,14 @@ statistics身份见 [[Storymotion-exp-sha]]。
 
 ## 6A. Pulp Camera recaption first-20K quality audit
 
+| display ID | exact immutable run ID | setting | goal |
+| --- | --- | --- | --- |
+| v1p0-Qwen-raw | `v1p0` | Qwen raw short/long captions on the earliest first20K records | screen geometry/event-marker coverage before any canonical write-back |
+| legacy-caption | `legacy` | old short/long captions on the same matched5324 records | matched old/new data-QC comparator |
+| v1p0-selected | `v1p0-selected` | fallback-selected short/long captions | verify why selected-text remains blocked |
+
+每一行是一个 caption/data-QC condition；这些 proxy 结果不属于 generation metric 或 Camera text 最终质量 claim。
+
 本节是noncanonical data-QC，不是模型生成指标或Camera text最终质量claim。cohort固定为两个v1p0
 run按`created_at`排序的最早20,000条，范围`2026-08-05T02:43:22+0800`至
 `2026-08-05T13:23:27+0800`；与旧512／30K／40K exact sample交集为5,324条。新旧文本统一对照
@@ -1042,7 +1243,7 @@ run按`created_at`排序的最早20,000条，范围`2026-08-05T02:43:22+0800`至
 
 ### Full first-20K architecture screen
 
-| version / run | text role | geometry recall | geometry precision | geometry pass | temporal-marker proxy pass | training-ready proxy |
+| display ID / exact run ID | text role | geometry recall ↑ | geometry precision ↑ | geometry pass ↑ | temporal-marker proxy pass ↑ | training-ready proxy ↑ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | v1p0 / first20K | Qwen raw short | 0.910140 | 0.994794 | 76.20% | 54.30% | 53.31% |
 | v1p0 / first20K | Qwen raw long | 0.758818 | 0.775319 | 43.77% | 95.04% | 42.11% |
@@ -1051,7 +1252,7 @@ run按`created_at`排序的最早20,000条，范围`2026-08-05T02:43:22+0800`至
 
 ### Exact 5,324 matched old／new comparison
 
-| version / run | text role | geometry recall | geometry precision | geometry pass | temporal-marker proxy pass | training-ready proxy |
+| display ID / exact run ID | text role | geometry recall ↑ | geometry precision ↑ | geometry pass ↑ | temporal-marker proxy pass ↑ | training-ready proxy ↑ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | v1p0 / matched5324 | Qwen raw short | 0.907289 | 0.993802 | 76.31% | 53.96% | 52.82% |
 | legacy / matched5324 | old short | 0.276899 | 0.443889 | 11.04% | 43.26% | 10.99% |
@@ -1121,9 +1322,9 @@ Optional control summary: [[#Audited detail — original §3.13 v11 Human-text C
 
 Repeatability summary: [[#Audited detail — original §3.14 v11 C0 seed23 `105K` pure4,053 matched repeat]].
 
-### 3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 sequential formal
+### 3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 three-interface formal
 
-Current representation-control summary: [[#Audited detail — original §3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 sequential formal]].
+Current representation-control summary: [[#Audited detail — original §3.15 C1REL／C1REL-noI16 matched Stage2 pure4,053 three-interface formal]].
 
 ### 3.16 HREL matched Stage2 pure4,053 formal
 
