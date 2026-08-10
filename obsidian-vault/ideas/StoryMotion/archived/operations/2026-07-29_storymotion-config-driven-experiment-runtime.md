@@ -19,7 +19,7 @@ updated: 2026-07-29T23:10:22+08:00
 
 ## 目标与非目标
 
-本页定义跨 4090、5090 与 3090 BITE 工作面的 durable runtime contract。它不拥有研究结论、运行进度或指标：当前主线仍由 [[ideas/StoryMotion/current|StoryMotion current]] 管理，正式数值仍由 [[ideas/StoryMotion/StoryMotion-valid-metric-ledger|valid metric ledger]] 管理，指标语义仍由 [[ideas/StoryMotion/StoryMotion-metric-computation-io|metric computation I/O]] 管理。
+本页定义跨 4090、5090 与 3090 BITE 工作面的 durable runtime contract。它不拥有研究结论、运行进度或指标：当前主线仍由 [[ideas/StoryMotion/current|StoryMotion current]] 管理，正式数值仍由 [[ideas/StoryMotion-valid-metric-ledger|valid metric ledger]] 管理，指标语义仍由 [[ideas/StoryMotion-metric-computation-io|metric computation I/O]] 管理。
 
 目标：
 

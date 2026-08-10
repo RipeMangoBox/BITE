@@ -31,16 +31,20 @@ codebase:
 The project uses one code repository, `linkedCodebases/StoryMotion/`, for two
 claim-isolated paper tracks. Do not create a separate DIRECT repository:
 
-- Paper A is **StoryMotion: Preserving Human Motion Priors in Asymmetric
+- StoryMotion is **StoryMotion: Preserving Human Motion Priors in Asymmetric
   Human–Camera Generation**.
-- Paper B is **DIRECT: Dual-Frame Cinematographic Intent Transfer across
+- DIRECT is **DIRECT: Dual-Frame Cinematographic Intent Transfer across
   Articulated Human Motions**.
 - Shared Stage1, decoders, evaluators, run harnesses, and metric infrastructure
   remain in StoryMotion. Paper questions, positive definitions, training
   authorization, artifact interpretation, tables, and claims remain separate.
-- New Paper A and Paper B run IDs use `paperA_` and `direct_` prefixes,
-  respectively. Existing run IDs, checkpoints, artifact paths, and historical
-  Actor–Director diagnostic names are immutable provenance and are not renamed.
+- New StoryMotion and DIRECT run IDs use `sm_` and `direct_` prefixes,
+  respectively. The one-time legacy namespace migration is owned by
+  `obsidian-vault/ideas/StoryMotion/StoryMotion-folder-rename-map.md`: regular
+  Markdown uses the mapped `sm_` identity, while that mapping retains old IDs,
+  paths, hashes, and host migration state. Existing run IDs, checkpoints,
+  artifact paths, historical artifact contents, and Actor–Director diagnostic
+  semantics remain immutable and are not physically renamed.
 
 1. The StoryMotion operational mainline is v11 C0-LAT at Camera optimizer
    `105K`; C0-GEO remains an audited objective alternate/control. They share
@@ -79,7 +83,7 @@ claim-isolated paper tracks. Do not create a separate DIRECT repository:
 6. A specialist result is valid only as a task-sliced diagnostic of the same
    branch implementation used by Unified-3, or when its weights are explicitly
    transferred and verified. Do not train unrelated specialists as a gate for
-   a different three-mode model. For the Paper A matched cascade, specialist
+   a different three-mode model. For the StoryMotion matched cascade, specialist
    independence means separate Stage2 weights, optimizers, and checkpoints; it
    does not authorize retraining Human/Camera-separate Stage1. The matched arm
    freezes the exact v9 Stage1 owner and first tests the H199 decode/re-encode
@@ -122,22 +126,22 @@ claim-isolated paper tracks. Do not create a separate DIRECT repository:
 
 One claim, metric, run state, or execution event has one canonical Markdown
 owner. Links may summarize an owner, but may not reproduce a second table,
-running log, or competing conclusion. Paper A notes live under
+running log, or competing conclusion. StoryMotion notes live under
 `obsidian-vault/ideas/StoryMotion/`; Paper B notes live under
 `obsidian-vault/ideas/DIRECT/`. Check the owner before creating a new note.
 
 | Canonical target | Sole responsibility | Do not put here |
 | --- | --- | --- |
-| `obsidian-vault/ideas/StoryMotion/current.md` | Paper A current mainline, active decisions, blockers, and links to each evidence owner | DIRECT queue, per-step progress, stale ETA, full metric tables, historical narrative |
-| `obsidian-vault/ideas/DIRECT/current.md` | Paper B DIRECT current state, blockers, and links to its evidence owners | Paper A mainline selection, duplicate shared metrics, or StoryMotion code ownership |
-| `obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md` | The single repository-level owner for audited numeric results, with explicit Paper A, DIRECT, or shared-baseline identity, plus artifact/checkpoint/record hashes and uncertainty | A second DIRECT ledger, unaudited runner messages, speculative root causes, deployment diary |
+| `obsidian-vault/ideas/StoryMotion/current.md` | StoryMotion current mainline, active decisions, blockers, and links to each evidence owner | DIRECT queue, per-step progress, stale ETA, full metric tables, historical narrative |
+| `obsidian-vault/ideas/DIRECT/current.md` | Paper B DIRECT current state, blockers, and links to its evidence owners | StoryMotion mainline selection, duplicate shared metrics, or StoryMotion code ownership |
+| `obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md` | The single repository-level owner for audited numeric results, with explicit StoryMotion, DIRECT, or shared-baseline identity, plus artifact/checkpoint/record hashes and uncertainty | A second DIRECT ledger, unaudited runner messages, speculative root causes, deployment diary |
 | `obsidian-vault/ideas/StoryMotion/version_family.md` | Version-family names, causal questions, unique interventions, completed Stage/steps, finalized milestones, invalidations, and bug provenance | Live priority, queue state, or a duplicate current-version matrix |
 | `obsidian-vault/ideas/StoryMotion/paper-boundary.md` | Formal paper titles, single-repository policy, contribution boundary, cross-paper reuse, and anti-crosswire rules | Run progress, metric tables, or paper-specific experiment queues |
-| `obsidian-vault/ideas/StoryMotion/StoryMotion-iclr-reliability.md` | Paper A StoryMotion claim-evidence gaps, matched specialist contract, reliability priorities, and stop/degrade conditions | DIRECT program transfer, Rect/HumanML3D queues, or DIRECT training authorization |
-| `obsidian-vault/ideas/DIRECT/2026-08-01_storymotion-multipair-data-training-plan.md` | Paper B DIRECT program recovery, multi-pair construction, training order, gates, and degrade conditions | Paper A mainline selection or capability-preserving framework claims |
+| `obsidian-vault/ideas/StoryMotion/StoryMotion-iclr-reliability.md` | StoryMotion claim-evidence gaps, matched specialist contract, reliability priorities, and stop/degrade conditions | DIRECT program transfer, Rect/HumanML3D queues, or DIRECT training authorization |
+| `obsidian-vault/ideas/DIRECT/2026-08-01_storymotion-multipair-data-training-plan.md` | Paper B DIRECT program recovery, multi-pair construction, training order, gates, and degrade conditions | StoryMotion mainline selection or capability-preserving framework claims |
 | `obsidian-vault/ideas/StoryMotion/StoryMotion-metric-computation-io.md` | Metric definitions, evaluator/decoder semantics, and I/O contracts | Run-specific outcome tables or policy decisions |
 | `obsidian-vault/ideas/StoryMotion/archived/data/2026-07-17_storymotion-v8-2333-data-curation-plan.md` | Read-only v8.2333 curation contract, gate state, counters, manifest lineage, and curation provenance | New training authorization, live progress, or representation conclusions |
-| `obsidian-vault/ideas/StoryMotion/archived/diagnostics/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder.md` | Read-only representation-generatability diagnostics and closed C3-25 selection provenance | Current Paper A queue or formal result tables |
+| `obsidian-vault/ideas/StoryMotion/archived/diagnostics/2026-07-18_storymotion-latent-generatability-stage2-diagnostic-ladder.md` | Read-only representation-generatability diagnostics and closed C3-25 selection provenance | Current StoryMotion queue or formal result tables |
 
 Route incremental information in this order:
 

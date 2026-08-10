@@ -13,7 +13,7 @@ source_notes:
   - "[[StoryMotion/current]]"
   - "[[version_family]]"
   - "[[StoryMotion-valid-metric-ledger]]"
-  - "[[StoryMotion/StoryMotion-iclr-reliability]]"
+  - "[[StoryMotion-iclr-reliability]]"
 created: 2026-07-09T12:20:00+0800
 updated: 2026-08-10T18:00:00+0800
 ---

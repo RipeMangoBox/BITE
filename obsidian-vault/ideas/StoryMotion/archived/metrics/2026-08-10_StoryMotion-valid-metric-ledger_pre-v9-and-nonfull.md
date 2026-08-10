@@ -24,7 +24,7 @@ superseded_by: "[[StoryMotion-valid-metric-ledger]]"
 
 | item | value |
 | --- | --- |
-| source file before refactor | `obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md` |
+| source file before refactor | `obsidian-vault/ideas/StoryMotion-valid-metric-ledger.md` |
 | source SHA-256 before refactor | `3d12000baaf268fe7fbdde3de9b0d46870d1a6ebf19d418a94102b7c0e74ebcc` |
 | source Git commit | `fabb4ba09f6add539c773f871fbd6ac3925ace83` |
 | pre-v9 full owner | [[archived/metrics/2026-07-24_StoryMotion-valid-metric-ledger_pre-human-first-orthogonalization]] |

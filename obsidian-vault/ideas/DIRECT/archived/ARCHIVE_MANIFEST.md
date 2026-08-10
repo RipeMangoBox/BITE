@@ -14,7 +14,7 @@ updated: 2026-08-03T14:30:39+08:00
 
 > [!abstract] Scope
 > 本页只登记Paper B DIRECT的历史设计。当前状态见[[DIRECT/current]]；共享正式数字仍只见
-> [[StoryMotion/StoryMotion-valid-metric-ledger]]。
+> [[StoryMotion-valid-metric-ledger]]。
 
 ## Archived designs
 
@@ -34,4 +34,4 @@ updated: 2026-08-03T14:30:39+08:00
 ## Interpretation rule
 
 历史note中的数字只保留原contract语义；若与共享canonical ledger冲突，以
-[[StoryMotion/StoryMotion-valid-metric-ledger]]及对应immutable artifact为准。
+[[StoryMotion-valid-metric-ledger]]及对应immutable artifact为准。

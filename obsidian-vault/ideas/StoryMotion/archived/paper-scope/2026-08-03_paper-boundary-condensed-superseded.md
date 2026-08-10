@@ -15,7 +15,7 @@ aliases:
 source_notes:
   - "[[StoryMotion/current]]"
   - "[[DIRECT/current]]"
-  - "[[StoryMotion/StoryMotion-valid-metric-ledger]]"
+  - "[[StoryMotion-valid-metric-ledger]]"
 created: 2026-08-03T15:13:03+08:00
 updated: 2026-08-03T15:13:03+08:00
 ---
@@ -24,29 +24,29 @@ updated: 2026-08-03T15:13:03+08:00
 
 ## 固定身份
 
-- Paper A：**StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation**。
+- StoryMotion：**StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation**。
 - Paper B：**DIRECT: Dual-Frame Cinematographic Intent Transfer across Articulated Human Motions**。
 - 代码只使用`linkedCodebases/StoryMotion/`；不创建DIRECT代码仓库。
-- Paper A文档位于`obsidian-vault/ideas/StoryMotion/`；Paper B文档位于
+- StoryMotion文档位于`obsidian-vault/ideas/StoryMotion/`；Paper B文档位于
   `obsidian-vault/ideas/DIRECT/`。
-- 正式数字继续由[[StoryMotion/StoryMotion-valid-metric-ledger]]唯一维护，每条新证据必须标明
-  `Paper A StoryMotion`、`Paper B DIRECT`或`shared baseline`。
+- 正式数字继续由[[StoryMotion-valid-metric-ledger]]唯一维护，每条新证据必须标明
+  `StoryMotion`、`Paper B DIRECT`或`shared baseline`。
 
-## Paper A边界
+## StoryMotion边界
 
-Paper A研究能力保持式非对称扩展：
+StoryMotion研究能力保持式非对称扩展：
 
 $$
 p(H,C\mid T_H,T_C)=p_H(H\mid T_H)p_C(C\mid H,T_C).
 $$
 
 它只包含Direct-H、Direct-C和先固定Human再生成Camera的sequential composition。
-Composition是两个条件分布的顺序调用，不是同步joint generator。Paper A可以包含Pulp Camera
+Composition是两个条件分布的顺序调用，不是同步joint generator。StoryMotion可以包含Pulp Camera
 坐标／文本修正作为次要数据贡献，但不包含Rect、HumanML3D跨配对、Camera program solver、
 Actor–Director数据贡献或ViGen utility。
 
 当前状态、实验闭环和可写claim分别见[[StoryMotion/current]]与
-[[StoryMotion/StoryMotion-iclr-reliability]]。
+[[StoryMotion-iclr-reliability]]。
 
 ## Paper B边界
 

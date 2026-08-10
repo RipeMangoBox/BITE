@@ -702,7 +702,7 @@ runs/vis/stage2/
 > 它不代表full-train rotvec v2，也不能用其中的微幅`dolly out／tilt up／tilt down`组判断v2阈值。
 > 本节只保留既有界面与artifact provenance；页面若继续运行，标题必须显示该版本警告。
 
-该界面只服务`paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803`，不调用LLM，
+该界面只服务`sm_pulp_trimotion_geometry_screen_n512_seed17_20260803`，不调用LLM，
 也不修改source `records.jsonl`或geometry contract。固定cohort为完整512条；风险优先、原文本冲突、
 阈值边界与未审核filter只改变浏览顺序，不改变样本集合。
 
@@ -714,7 +714,7 @@ phase segmentation、raw-text agreement与备注。每次保存向`human_reviews
 
 4090 artifact root：
 
-`runs/artifacts/paperA_camera_recaption/paperA_pulp_trimotion_geometry_screen_n512_seed17_20260803/`
+canonical alias `sm_camera_recaption/sm_pulp_trimotion_geometry_screen_n512_seed17_20260803`（exact immutable path见[[StoryMotion-folder-rename-map]]）
 
 - source records约3.19 MB，512条，LLM calls=`0`，SHA256=
   `3a9788293e1003cfabf244a3726d18f0db55072e4e309cb9c1568116cfd9843a`；
@@ -744,7 +744,7 @@ tilt-up与roll-clockwise；每组恰好3条且全部拥有旧／新paired captio
 
 artifact root：
 
-`runs/artifacts/paperA_camera_recaption/paperA_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805/`
+canonical alias `sm_camera_recaption/sm_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805`（exact immutable path见[[StoryMotion-folder-rename-map]]）
 
 - build contract SHA256=`c8b9ac20bd564a2b80a347a28869243dc4d8d5220a383b402ca0fa761a5ca1dd`；
 - manifest SHA256=`401d2c05fcead399f66419922a10f7fc379ccb3070aaf31feb049a0ed1ffce1f`；

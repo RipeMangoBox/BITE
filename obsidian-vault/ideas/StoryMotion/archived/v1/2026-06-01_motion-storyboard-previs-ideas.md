@@ -12,14 +12,14 @@ tags:
   - motion_inbetweening
   - scene_aware_motion
 source_papers:
-  - "[[paperAnalysis/Image_Video_Generation/arXiv_2026/2026_STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative]]"
-  - "[[paperAnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation]]"
-  - "[[paperAnalysis/Human_Interaction/ICLR_2025/2025_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes]]"
-  - "[[paperAnalysis/Motion_Generation/CVPR_2026/2026_ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning]]"
-  - "[[paperAnalysis/Motion_Generation/arXiv_2026/2026_PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition]]"
-  - "[[paperAnalysis/Human_Interaction/arXiv_2025/2025_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes]]"
-  - "[[paperAnalysis/Motion_Generation/ICCV_2025/2025_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing]]"
-  - "[[paperAnalysis/Motion_Generation/ICLR_2026/2026_ViMoGen_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation]]"
+  - "[[StoryMotionnalysis/Image_Video_Generation/arXiv_2026/2026_STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative]]"
+  - "[[StoryMotionnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation]]"
+  - "[[StoryMotionnalysis/Human_Interaction/ICLR_2025/2025_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes]]"
+  - "[[StoryMotionnalysis/Motion_Generation/CVPR_2026/2026_ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning]]"
+  - "[[StoryMotionnalysis/Motion_Generation/arXiv_2026/2026_PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition]]"
+  - "[[StoryMotionnalysis/Human_Interaction/arXiv_2025/2025_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes]]"
+  - "[[StoryMotionnalysis/Motion_Generation/ICCV_2025/2025_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annotation_for_Fine_grained_Motion_Generation_and_Editing]]"
+  - "[[StoryMotionnalysis/Motion_Generation/ICLR_2026/2026_ViMoGen_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation]]"
 ---
 # 2026-06-01 Motion Storyboard Previsualization Ideas
 
@@ -54,11 +54,11 @@ source_papers:
 
 ### 1.2 Related Work Anchors
 
-- [[paperAnalysis/Image_Video_Generation/arXiv_2026/2026_STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative|STAGE]]：证明 storyboard / shot-level start-end anchors / memory pack 对多镜头叙事有效，但输出是视频，不是标准 3D motion。
-- [[paperAnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]：提供 sketch keypose + trajectory -> 3D animation 的直接参考，但更像单人动作草图串联，不是完整空间分镜预演。
-- [[paperAnalysis/Human_Interaction/ICLR_2025/2025_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes|Sitcom-Crafter]]：能做 plot-driven stage-wise scene motion，但依赖 LLM 自由分解，缺少可编辑 storyboard / blocking pose 接口。
-- [[paperAnalysis/Human_Interaction/arXiv_2025/2025_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes|UniHM]]：`continuous 6DoF waypoint + discrete local token` 是强支撑，说明全局空间摆放不应强行离散化，局部身体动作可以 token 化。
-- [[paperAnalysis/Motion_Generation/arXiv_2026/2026_PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition|PRISM]] 和 [[paperAnalysis/Motion_Generation/CVPR_2026/2026_ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning|ActionPlan]]：证明 long / streaming / editing 正在变成 motion 主战场，但它们没有显式处理 storyboard、scene object anchor 和跨 shot 状态记忆。
+- [[StoryMotionnalysis/Image_Video_Generation/arXiv_2026/2026_STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative|STAGE]]：证明 storyboard / shot-level start-end anchors / memory pack 对多镜头叙事有效，但输出是视频，不是标准 3D motion。
+- [[StoryMotionnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]：提供 sketch keypose + trajectory -> 3D animation 的直接参考，但更像单人动作草图串联，不是完整空间分镜预演。
+- [[StoryMotionnalysis/Human_Interaction/ICLR_2025/2025_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes|Sitcom-Crafter]]：能做 plot-driven stage-wise scene motion，但依赖 LLM 自由分解，缺少可编辑 storyboard / blocking pose 接口。
+- [[StoryMotionnalysis/Human_Interaction/arXiv_2025/2025_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indoor_Scenes|UniHM]]：`continuous 6DoF waypoint + discrete local token` 是强支撑，说明全局空间摆放不应强行离散化，局部身体动作可以 token 化。
+- [[StoryMotionnalysis/Motion_Generation/arXiv_2026/2026_PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition|PRISM]] 和 [[StoryMotionnalysis/Motion_Generation/CVPR_2026/2026_ActionPlan_Future_Aware_Streaming_Motion_Synthesis_via_Frame_Level_Action_Planning|ActionPlan]]：证明 long / streaming / editing 正在变成 motion 主战场，但它们没有显式处理 storyboard、scene object anchor 和跨 shot 状态记忆。
 
 ## 2. Real Scenarios and Pain Points
 

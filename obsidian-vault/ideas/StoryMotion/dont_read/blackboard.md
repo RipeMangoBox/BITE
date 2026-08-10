@@ -319,7 +319,7 @@
 
   - ordered ID SHA、seed17、DDIM50、CFG1、eta0、cache、decoder及协议均有记录。
   - v7.38 正是从该 step30K 严格恢复 optimizer，再训练到 105K。完整证据见
-    obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md:461。
+    obsidian-vault/ideas/StoryMotion-valid-metric-ledger.md:461。
 
   但 105K 对 30K 是系统性提升：
 
@@ -387,7 +387,7 @@
 ---
 StoryMotion_Checkmate.md 用于记录 storymotion 迭代过程中遇到的核心问题、分析与解决路径，帮助我积累失败-解决经验，辅助后续研究解决相似问题。
 
-遇到的问题、验证思路、如何从结果分析，得出结论或细化结论的过程，脉络清晰写入obsidian-vault/ideas/StoryMotion/StoryMotion_Checkmate.md，总分结构，先用箭头图画出脉络。
+遇到的问题、验证思路、如何从结果分析，得出结论或细化结论的过程，脉络清晰写入obsidian-vault/ideas/StoryMotion_Checkmate.md，总分结构，先用箭头图画出脉络。
 
 
 第一层机制证据已经很明确：v8.1A 与 v7.36 的
@@ -438,7 +438,7 @@ D4 已经给出决定性结果：这是“Stage1 manifold
   1。whitening 逆变换谱，D4 raw→decoded 放大率，owning decoder 分别是什么？
   2。fresh screen 意思是只改变模型初始参数/优化器（有啥可随机化）/RNG （是啥），其余均不变，相同环境和条件 retrain 吗？目的是测试 setting 是否能得出稳定的结论吗？为什么还有 25%/50% fresh scree 一说？A10是原本的 v8.1A的别称吗？目前的描述容易分不清楚 stage1/2。C3/D4 是什么实验？全部写入versions table
   3。5090 问题是 hdd 同时有 io 密集和计算密集（除了数据读取）时候，计算密集会被拖累吗？你是如何解决的？在 系统盘构建 cache ，还是将数据cp 到系统盘？还是没处理？如果涉及数据的迁移，更新 agents 规定每个服务器 storymotion 后续的数据读取。
-  4。遇到的问题、验证思路、如何从结果分析，得出结论或细化结论的过程，脉络清晰写入obsidian-vault/ideas/StoryMotion/StoryMotion_Checkmate.md，总分结构，先用箭头图画出脉络。
+  4。遇到的问题、验证思路、如何从结果分析，得出结论或细化结论的过程，脉络清晰写入obsidian-vault/ideas/StoryMotion_Checkmate.md，总分结构，先用箭头图画出脉络。
   5。5090 gpu0 已完成，分析，更新文档，然后重构优化。
 
 
@@ -479,7 +479,7 @@ D4 已经给出决定性结果：这是“Stage1 manifold
 ---0722 18：43
 1. `Direct-C 与 joint-C 在 shared trunk、Camera path、output head 上均为正向或结构性正交`结论如何得出的？
 2. obsidian-vault/ideas/StoryMotion/2026-07-17_storymotion-v8-2333-data-curation-plan.md和obsidian-vault/ideas/StoryMotion/sft-data-prepare.md重构为一个正式文档包含核心信息和进度；目前两份文档都没看见具体的分档标准以及分档结果
-3. 目前 stage2 在三模式下使用的是相同的 network，只是修改输入和 mask 吗？三个模式具体的数据流说明写入obsidian-vault/ideas/StoryMotion/StoryMotion-iclr-reliability.md。例如，joint 是对 concat 的 human-camera latent 去噪且输入接收的是 human 和 camera text；那 human/camera completion 时候，是对没有使用的 latent dim mask 吗？另一 branch 的 text embedding 如何占位？
+3. 目前 stage2 在三模式下使用的是相同的 network，只是修改输入和 mask 吗？三个模式具体的数据流说明写入obsidian-vault/ideas/StoryMotion-iclr-reliability.md。例如，joint 是对 concat 的 human-camera latent 去噪且输入接收的是 human 和 camera text；那 human/camera completion 时候，是对没有使用的 latent dim mask 吗？另一 branch 的 text embedding 如何占位？
 
 
 ---0722 19：40
@@ -526,7 +526,7 @@ D4 已经给出决定性结果：这是“Stage1 manifold
 1. 目前 direct-h/joint-h 的human质量均不高，我觉得最核心的是要先解决human 质量问题（但我没有单独的 human 单任务训练过，不清楚是三模式混合还是 human 能力上限不足）。需要基于 mainline 的 stage1 先单独训练 human
 
 完成：
-1. obsidian-vault/ideas/StoryMotion/StoryMotion-iclr-reliability.md 的优化重构，目前太脏，表述繁琐且多语言混合，统一为核心内容和清晰中文
+1. obsidian-vault/ideas/StoryMotion-iclr-reliability.md 的优化重构，目前太脏，表述繁琐且多语言混合，统一为核心内容和清晰中文
 2. 如果 stage1 有证据证明明显构成 stage2 的瓶颈，需要聚焦根因，是数据表示，还是训练监督问题。为什么模型会对 heading 敏感？需要优化 latent space，简化 stage2 学习难度。 pulp official 的 stage1 将 camera 的 distance 建模为相对于 human root 的 realtive，storymotion 因为 stage2 的 direct-c 从 H0，而 joint—c 从 H_t 预测 C，因此主动更换为 global distane 来避免不同模式对 human 在 raw camera14 data 上的因果依赖，从而在 stage1 的指标远胜 pulp。但也因此 stage2 的 camera 相比 pulp 更容易拍不到人。目前还没有尝试过 camera14 基于 relative distance + C3-25 的 yaw + rootxy 的累计 loss 的版本。
 
 
@@ -550,7 +550,7 @@ D4 已经给出决定性结果：这是“Stage1 manifold
 - E4 只有实现骨架、preflight 和 smoke，没有 optimizer run。
 - 三个 GPU 槽均已释放。
 - v9 当前结论见 obsidian-vault/ideas/StoryMotion/current.md。
-- 正式指标与 hashes 见 obsidian-vault/ideas/StoryMotion/StoryMotion-valid-metric-ledger.md:80。
+- 正式指标与 hashes 见 obsidian-vault/ideas/StoryMotion-valid-metric-ledger.md:80。
 
 ———
 
@@ -1139,7 +1139,7 @@ human-camera framing。
 （1，核心）stage2 backbone：ViMoGen-light clip 显著胜出；
 （2，核心）stage1：redesign stage1 pulp only 显著胜出，视觉质量相比 C3-25 · Stage1 没有恶化，且机制上增强了 H—C 独立可控。但 redesign stage1 和 C3-25 · Stage1 都在若干 sample 上最后一帧出现相机的明显跳动，导致 owing-camera projection 骤变。
 （3，非核心，但验证 redesign stage1 的优越性，增强 OOD 能力）stage1· HML root/local，Redesign Stage1 · Pulp-only能够 zero-shot 胜任HML 上若干in-domain 动作（已经达到预期），Redesign Stage1 · HML+Pulp则做得更好。但两者都会随着时间呈现整个人的不合理的旋转（可能是由于部分 data 字段使用 pulp mean 导致）。
-5. （重要，积累架构思考，写入obsidian-vault/ideas/StoryMotion/StoryMotion_Checkmate.md） 
+5. （重要，积累架构思考，写入obsidian-vault/ideas/StoryMotion_Checkmate.md）
 （1）redesign stage1 的动机、依据、实现规划、结果，在遇到哪些类似问题需要留意表征设计的解耦和联合问题。
 （2）为什么 ViMoGen 能够在 human motion gen 上显著胜出？其架构比其他 backbone 更适配胜任本任务的根因是什么？
 
@@ -1230,7 +1230,7 @@ Z_HC = F_HC(Z_H, Z_C)
 git 同步 bite—process 和 4090/5090，将 v11 C0-LAT和 C0--geo 为共同的 mainline.
 1. pulp 的视频相同尺寸，第三行其余空间可以空着；
 2. 保留C0-LAT和 C0--geo 为共同的 mainline 选择，清理文档，构建新 mainline 的三模式与 baseline 的对比。
-3. storymotion 核心目标：中稿 ICLR 2027。更新 `obsidian-vault/ideas/StoryMotion/StoryMotion-iclr-reliability.md`，分析为了中稿 iclr 还有哪些距离。
+3. storymotion 核心目标：中稿 ICLR 2027。更新 `obsidian-vault/ideas/StoryMotion-iclr-reliability.md`，分析为了中稿 iclr 还有哪些距离。
 
 另外，目前剩下的实验整理（非必要，以中稿为目标）：
 （1）目前 v11 的 stage1 偏复杂，如果说不出明确的设计依据，可能被审稿人 argue。之前 v10 设计了简化的 stage1 但 stage1/2 指标均退化且没找到明确的原因。
@@ -1318,17 +1318,17 @@ git 同步 bite—process 和 4090/5090，将 v11 C0-LAT和 C0--geo 为共同的
 
 ---0803 16：07
 1. 标题采用：
-paper A：StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
+StoryMotion：Preserving Human Motion Priors in Asymmetric Human–Camera Generation
 paper B：DIRECT: Dual-Frame Cinematographic Intent Transfer across Articulated Human Motions
 
-1. 目前聚焦 paper A，剩余的核心任务有 2个：pulp dataset 的 camera text 的处理，这也是 paper A 的一个贡献点。为了与 DIRECT 的贡献分离，storymotion 的数据处理只对 camera text 无歧义化，我忘了之前推荐过参考哪篇工作处理；（2）specialist 消融：独立 Human specialist 加独立 Camera specialist（stage1之前是否有在 16w 数据 train，pure 4053 eval 的可用公平可用的 stag？如果有，直接用于stage2 retrain；否则两个 stage 都 retrain）；Pulp-style symmetric joint generation；你的 protected-H + shared Camera（已完成，现有 mainline）。
+1. 目前聚焦 StoryMotion，剩余的核心任务有 2个：pulp dataset 的 camera text 的处理，这也是 StoryMotion 的一个贡献点。为了与 DIRECT 的贡献分离，storymotion 的数据处理只对 camera text 无歧义化，我忘了之前推荐过参考哪篇工作处理；（2）specialist 消融：独立 Human specialist 加独立 Camera specialist（stage1之前是否有在 16w 数据 train，pure 4053 eval 的可用公平可用的 stag？如果有，直接用于stage2 retrain；否则两个 stage 都 retrain）；Pulp-style symmetric joint generation；你的 protected-H + shared Camera（已完成，现有 mainline）。
 
 
 ---0803 18:57
 specialist：
 1. 后续实验没有说明，就默认 seed17；
-2. `paperA_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`是哪条 specialist？
-3. 你停止的实验是否更接近 `fully separate`表述？`paperA_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`是去掉 interaction16，因此 camera latent48 的 variant 吗？
+2. `sm_independent_conditional_camera64_stage1_210k_seed17_4090g1_20260803`是哪条 specialist？
+3. 你停止的实验是否更接近 `fully separate`表述？`sm_fully_separate_native_lat_h105k_c105k_seed17_4090g0_r2_20260803`是去掉 interaction16，因此 camera latent48 的 variant 吗？
 
 pulp camera data：
 1. trimotion 的阈值定义逻辑是什么？pulp 照搬阈值逻辑而非数值是否合理？目前临时 pulp 阈值是通过 trimotion 逻辑计算的吗？

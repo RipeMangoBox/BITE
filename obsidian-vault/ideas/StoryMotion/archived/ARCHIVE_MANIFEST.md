@@ -71,13 +71,13 @@ updated: 2026-08-10T15:00:00+08:00
 | pre-v9 formal ledger | `metrics/2026-07-24_StoryMotion-valid-metric-ledger_pre-human-first-orthogonalization.md` | immutable pre-v9 numeric owner | StoryMotion active ledger starts from the v9 owner |
 | ordinary non-full generation rows | `metrics/2026-08-10_StoryMotion-valid-metric-ledger_pre-v9-and-nonfull.md` | provenance index only | first-512/N512 and intermediate generation screens no longer participate in active ranking; allowed special diagnostics remain explicitly labeled |
 
-## 2026-08-03 Paper A root-surface cleanup
+## 2026-08-03 StoryMotion root-surface cleanup
 
 | original root note | archived path | evidence status | reason |
 | --- | --- | --- | --- |
-| 2026-07-17 v8.2333 data curation | `data/` | retained historical contract | 未授权训练；不再占用Paper A live surface |
+| 2026-07-17 v8.2333 data curation | `data/` | retained historical contract | 未授权训练；不再占用StoryMotion live surface |
 | 2026-07-18 generatability ladder | `diagnostics/` | closed diagnostic | 结论已被current／ledger吸收 |
-| 2026-07-25 dual-expert design | `superseded-design/` | superseded | joint-parallel与DC3D不属于当前Paper A |
+| 2026-07-25 dual-expert design | `superseded-design/` | superseded | joint-parallel与DC3D不属于当前StoryMotion |
 | 2026-07-27 Stage1 H-anchor control | `invalidated/` | invalid for Stage2 | HumanML3D rot6D伪观测边界已关闭 |
 | 2026-07-28 v9 Camera diagnosis | `diagnostics/` | retained provenance | v11已替代其live执行状态 |
 | 2026-07-29 runtime plan | `operations/` | retained implementation history | 长期执行合同已由代码仓库文档接管 |
@@ -88,7 +88,7 @@ updated: 2026-08-10T15:00:00+08:00
 | 2026-08-03 condensed paper boundary | `paper-scope/2026-08-03_paper-boundary-condensed-superseded.md` | superseded condensed | 精简替代页保留；不得取代完整图文owner |
 | StoryMotion Checkmate | `diagnostics/` | stale-mainline snapshot | 仍以C3为current，不再是长期owner |
 | blackboard | `progress/` | working-note archive | 只保留历史问题与接力记录 |
-| pre-refactor ICLR reliability | `paper-scope/` | retained full snapshot | 拆分前附录不再混入Paper A live closure |
+| pre-refactor ICLR reliability | `paper-scope/` | retained full snapshot | 拆分前附录不再混入StoryMotion live closure |
 
 ## Interpretation Rule
 

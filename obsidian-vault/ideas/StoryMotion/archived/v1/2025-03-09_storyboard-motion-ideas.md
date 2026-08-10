@@ -97,7 +97,7 @@ Drawing：[[Storyboard|Storyboard]]
   - 稀疏的 keyframe / storyboard，经过合适的 diffusion / Transformer in-betweening，可以恢复出高质量连续时序；  
   - 2D 线索（图像 / 视频 / pose）可以可靠地约束 3D 动作生成。
 - **ResearchWY 当前收录下的直接证据链**
-  - [[paperAnalysis/Motion_Generation/SIGGRAPH_2024/2024_CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models|CondMDI]] 是目前最直接支持“关键帧 + 可选文本 → 补间”的代表工作；
+  - [[StoryMotionnalysis/Motion_Generation/SIGGRAPH_2024/2024_CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models|CondMDI]] 是目前最直接支持“关键帧 + 可选文本 → 补间”的代表工作；
   - 但现有 keyframe / in-betweening 文献的主目标仍偏向**平滑过渡、约束满足、自然度**，而不是“在关键帧之间生成更丰富的中间语义动作”；
   - 因此这个方向真正值得保留的增量，不是重复证明 keyframe+text 可行，而是把 **storyboard 级结构控制、rich in-betweening、上游制作资产接入** 统一成一个更自然的生成接口。
 
@@ -192,7 +192,7 @@ Drawing：[[Storyboard|Storyboard]]
 - **A**：把“分镜”定义成 **multi-shot / camera-discontinuous constraints**：关键帧来自不同 shot（相机跨度大、观测不连续），但输出必须是一段**单一连续**的 3D motion。
   - 相比 **inbetweening**：不再假设关键帧都在同一坐标系/同一观测视角里“可直接插值”。
   - 相比 **T2M**：不是纯文本自由生成，而是要同时满足分镜硬约束（关键姿态/轨迹/片段）。
-  - 对应参考：从 storyboard 的 2D 约束桥接到 3D 控制并生成连续片段：[[paperAnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]。
+  - 对应参考：从 storyboard 的 2D 约束桥接到 3D 控制并生成连续片段：[[StoryMotionnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]。
 
 **Q3：输入/输出接口怎么拆最清晰（MVP 优先）？**
 - **A（MVP, Minimum viable product，不引入场景）**：
@@ -204,15 +204,15 @@ Drawing：[[Storyboard|Storyboard]]
 
 **Q4：如果加 scene-aware，该怎么加而不让链路爆炸？**
 - **A**：把“场景”当作一个可插拔条件分支或后处理目标，而不是从零做一个端到端的大系统：
-  - **scene-aware inbetweening 模块**：给定（稀疏/噪声）关键帧 + 场景几何，补全中间并显著降低碰撞/足滑/抖动：[[paperAnalysis/Human_Interaction/ICCV_2025/2025_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions|SceneMI]]。
-  - **两阶段（导航→交互）模块**：先生成走到目标物体附近的轨迹，再生成交互动作（坐下等）：[[paperAnalysis/Motion_Generation/ECCV_2024/2024_TesMo_Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control|TeSMo]]。
+  - **scene-aware inbetweening 模块**：给定（稀疏/噪声）关键帧 + 场景几何，补全中间并显著降低碰撞/足滑/抖动：[[StoryMotionnalysis/Human_Interaction/ICCV_2025/2025_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions|SceneMI]]。
+  - **两阶段（导航→交互）模块**：先生成走到目标物体附近的轨迹，再生成交互动作（坐下等）：[[StoryMotionnalysis/Motion_Generation/ECCV_2024/2024_TesMo_Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control|TeSMo]]。
 
 **Q5：数据怎么拿？我缺“带相机的分镜-motion”怎么办？**
 - **A**：不必强依赖真实“分镜+相机+3D motion”成对数据，优先用“可控伪分镜”构造训练对：
   - **路线 A（推荐，合成分镜）**：用任意 mocap/文本数据（HumanML3D/KIT/AMASS 等）抽 K 个关键时刻/短片段，然后**每个 shot 独立采样相机**渲染出 2D 约束（keypose / stickman / 轨迹草图），天然得到 camera-discontinuous storyboard。
-    - 2D 约束 → 3D 控制的桥接思路可直接对齐：[[Sketch2Anim]]、[[paperAnalysis/Motion_Generation/CVPR_2025/2025_StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman|StickMotion]]。
+    - 2D 约束 → 3D 控制的桥接思路可直接对齐：[[Sketch2Anim]]、[[StoryMotionnalysis/Motion_Generation/CVPR_2025/2025_StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman|StickMotion]]。
   - **路线 B（带场景、多视角渲染）**：直接使用可渲染 multi-view 的 HSI 数据/基座：
-    - MoCap 级、100 场景、15 小时，并提供 multi-view/ego-view 渲染：[[paperAnalysis/Human_Interaction/CVPR_2024/2024_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling|TRUMANS]]。
+    - MoCap 级、100 场景、15 小时，并提供 multi-view/ego-view 渲染：[[StoryMotionnalysis/Human_Interaction/CVPR_2024/2024_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling|TRUMANS]]。
     - SceneMI 也以 TRUMANS 为核心训练/评测基座：[[SceneMI]]。
 
 **Q6：一条“最小可行链路（MVP）”长什么样？**
@@ -221,26 +221,26 @@ Drawing：[[Storyboard|Storyboard]]
   - **生成器（先不加场景）**：用 keyframe/inpainting 风格的扩散作为骨架，先把“遵守稀疏约束补全整段”跑通；
   - **再叠加**：shot/段落脚本（多段文本）→ 长序列组合能力 → scene-aware 分支（可选）。
 
-### knowledge base：推荐 backbone / 模块（paperAnalysis 本地连接）
+### knowledge base：推荐 backbone / 模块（StoryMotionnalysis 本地连接）
 
 - **Storyboard/草图 → 3D 生成（核心接口）**
-  - [[paperAnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]：2D↔3D 约束对齐 + Trajectory-ControlNet + Keypose Adapter。
-  - [[paperAnalysis/Motion_Generation/CVPR_2025/2025_StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman|StickMotion]]：stickman-as-condition，适合作为“分镜关键姿态/草图”的低门槛输入代理。
+  - [[StoryMotionnalysis/Motion_Generation/TOG_2025/2025_Sketch2Anim_Towards_Transferring_Sketch_Storyboards_into_3D_Animation|Sketch2Anim]]：2D↔3D 约束对齐 + Trajectory-ControlNet + Keypose Adapter。
+  - [[StoryMotionnalysis/Motion_Generation/CVPR_2025/2025_StickMotion_Generating_3D_Human_Motions_by_Drawing_a_Stickman|StickMotion]]：stickman-as-condition，适合作为“分镜关键姿态/草图”的低门槛输入代理。
 
 - **Keyframe / in-betweening backbone（MVP 生成器优先）**
-  - [[paperAnalysis/Motion_Generation/SIGGRAPH_2024/2024_CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models|CondMDI]]：mask 条件扩散，支持任意稀疏/局部关键帧约束（很适合承载 storyboard 约束）。
-  - [[paperAnalysis/Motion_Generation/ICCV_2025/2025_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes|Less Is More (sMDM)]]：关键帧中心建模（高效且更像动画工作流）。
+  - [[StoryMotionnalysis/Motion_Generation/SIGGRAPH_2024/2024_CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models|CondMDI]]：mask 条件扩散，支持任意稀疏/局部关键帧约束（很适合承载 storyboard 约束）。
+  - [[StoryMotionnalysis/Motion_Generation/ICCV_2025/2025_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes|Less Is More (sMDM)]]：关键帧中心建模（高效且更像动画工作流）。
 
 - **长序列/脚本驱动 backbone（把“分镜段落/shot”变成可执行长动作）**
-  - [[paperAnalysis/Motion_Generation/CVPR_2024/2024_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodings|FlowMDM]]：多段文本 → 一次性长动作组合（对“分镜段落脚本”很友好）。
-  - [[paperAnalysis/Motion_Generation/ECCV_2024/2024_Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation|Motion Mamba]]：长序列效率与质量兼顾（作为长时 backbone 候选）。
-  - [[paperAnalysis/Motion_Generation/TPAMI_2023/2023_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model|MotionDiffuse]]：time-varied prompts 的长动作控制思路（可迁移到“脚本分段条件”）。
+  - [[StoryMotionnalysis/Motion_Generation/CVPR_2024/2024_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodings|FlowMDM]]：多段文本 → 一次性长动作组合（对“分镜段落脚本”很友好）。
+  - [[StoryMotionnalysis/Motion_Generation/ECCV_2024/2024_Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation|Motion Mamba]]：长序列效率与质量兼顾（作为长时 backbone 候选）。
+  - [[StoryMotionnalysis/Motion_Generation/TPAMI_2023/2023_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model|MotionDiffuse]]：time-varied prompts 的长动作控制思路（可迁移到“脚本分段条件”）。
 
 - **Scene-aware / HSI 模块（可插拔增强）**
-  - [[paperAnalysis/Human_Interaction/ICCV_2025/2025_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions|SceneMI]]：scene-aware inbetweening（关键帧 + 场景 → 中间补全，显著降碰撞/足滑/抖动）。
-  - [[paperAnalysis/Motion_Generation/ECCV_2024/2024_TesMo_Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control|TeSMo]]：导航→交互两阶段，适合作为“scene-aware 版本”的结构模板。
-  - [[paperAnalysis/Human_Interaction/CVPR_2024/2024_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling|TRUMANS]]：HSI 数据与 episode-wise 生成范式（也提供 multi-view/ego-view 渲染）。
-  - [[paperAnalysis/Human_Interaction/ICCV_2025/2025_SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning|SIMS]]：RAG+LLM 把主题变脚本/关键帧，再由低层控制执行（适合你“动作脚本”输入形态）。
+  - [[StoryMotionnalysis/Human_Interaction/ICCV_2025/2025_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions|SceneMI]]：scene-aware inbetweening（关键帧 + 场景 → 中间补全，显著降碰撞/足滑/抖动）。
+  - [[StoryMotionnalysis/Motion_Generation/ECCV_2024/2024_TesMo_Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control|TeSMo]]：导航→交互两阶段，适合作为“scene-aware 版本”的结构模板。
+  - [[StoryMotionnalysis/Human_Interaction/CVPR_2024/2024_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling|TRUMANS]]：HSI 数据与 episode-wise 生成范式（也提供 multi-view/ego-view 渲染）。
+  - [[StoryMotionnalysis/Human_Interaction/ICCV_2025/2025_SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning|SIMS]]：RAG+LLM 把主题变脚本/关键帧，再由低层控制执行（适合你“动作脚本”输入形态）。
 
 - **相机/镜头侧的可借鉴表示（如果未来把 camera 当显式条件）**
-  - [[paperAnalysis/Image_Video_Generation/CVPR_2025/2025_TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human_centric_Video_Generation|TokenMotion]]：把 camera trajectory 与 human motion 都 token 化，并做可学习融合（更偏 video，但对“相机条件怎么进模型”有启发）。
+  - [[StoryMotionnalysis/Image_Video_Generation/CVPR_2025/2025_TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human_centric_Video_Generation|TokenMotion]]：把 camera trajectory 与 human motion 都 token 化，并做可学习融合（更偏 video，但对“相机条件怎么进模型”有启发）。

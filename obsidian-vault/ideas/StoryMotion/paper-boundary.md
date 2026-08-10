@@ -1,7 +1,7 @@
 ---
 title: "StoryMotion / DIRECT 单仓库双论文边界"
 hypothesis: |
-  Paper A StoryMotion研究如何在保持冻结Human prior及其输出路径不变的前提下，以
+  StoryMotion研究如何在保持冻结Human prior及其输出路径不变的前提下，以
   非对称接口增加observed-H与generated-H Camera generation。Paper B DIRECT研究
   transferable dual-frame cinematographic programs。两篇论文共享StoryMotion代码仓库，
   但各自拥有独立的问题、训练边、artifact解释与claim ledger。
@@ -41,14 +41,14 @@ updated: 2026-08-04T14:51:40+08:00
 # StoryMotion / DIRECT 单仓库双论文边界
 
 > [!important] 当前决策
-> 将当前工作拆成两个独立研究问题：Paper A为 **StoryMotion: Preserving Human Motion
+> 将当前工作拆成两个独立研究问题：StoryMotion为 **StoryMotion: Preserving Human Motion
 > Priors in Asymmetric Human–Camera Generation**；Paper B为 **DIRECT: Dual-Frame
 > Cinematographic Intent Transfer across Articulated Human Motions**。两者目前只使用
-> StoryMotion代码仓库；`DIRECT`是论文／方法身份，不是新仓库。DIRECT可以使用Paper A
-> 作为冻结backbone，但不能把Paper A的能力保持式非对称框架重新计算为自身贡献。
+> StoryMotion代码仓库；`DIRECT`是论文／方法身份，不是新仓库。DIRECT可以使用StoryMotion
+> 作为冻结backbone，但不能把StoryMotion的能力保持式非对称框架重新计算为自身贡献。
 
 > [!warning] 成熟度边界
-> Paper A已有完整C0-LAT mainline endpoint，C0-GEO保留为audited alternate；剩余核心任务是
+> StoryMotion已有完整C0-LAT mainline endpoint，C0-GEO保留为audited alternate；剩余核心任务是
 > C0-LAT-based ablation收口与Pulp Camera文本修正。Camera data因5090断链暂时暂停；
 > 当前先冻结protected-H／relation-interface最小机制检查与Matched Symmetric factorization
 > control的参数、exposure及成本合同，不启动旧Independent／Fully-Separate specialist长训。
@@ -65,15 +65,15 @@ updated: 2026-08-04T14:51:40+08:00
 
 - 唯一代码仓库保持为`linkedCodebases/StoryMotion/`；当前不创建`DIRECT`仓库、镜像仓库或
   第二套公共代码根。
-- 论文文档物理分目录：Paper A位于`obsidian-vault/ideas/StoryMotion/`，Paper B位于
+- 论文文档物理分目录：StoryMotion位于`obsidian-vault/ideas/StoryMotion/`，Paper B位于
   `obsidian-vault/ideas/DIRECT/`；文档分目录不改变代码仓库所有权。
-- 新实验在同一`runs/`布局中按论文身份分流：Paper A新run使用`paperA_`前缀，DIRECT新run
+- 新实验在同一`runs/`布局中按论文身份分流：StoryMotion新run使用`sm_`前缀，DIRECT新run
   使用`direct_`前缀。已有run ID、checkpoint名和`Actor–Director`诊断名均保持不可变。
 - Stage1、decoder、evaluator、run harness与正式metric ledger可以共享；研究问题、positive
   定义、训练授权、结果解释、论文表格与claim不得共享默认值。
-- 跨论文复用必须显式写成“冻结的Paper A backbone／shared infrastructure”。同一artifact
+- 跨论文复用必须显式写成“冻结的StoryMotion backbone／shared infrastructure”。同一artifact
   若进入两篇论文，必须分别说明它在各自因果问题中的角色，不能把同一贡献计算两次。
-- Paper A状态由[[StoryMotion/current|StoryMotion current]]路由，收口计划由
+- StoryMotion状态由[[StoryMotion/current|StoryMotion current]]路由，收口计划由
   [[StoryMotion-iclr-reliability]]拥有；Paper B状态由[[DIRECT/current|DIRECT current]]
   路由，研究合同由[[DIRECT/2026-08-01_storymotion-multipair-data-training-plan]]拥有。
 
@@ -81,12 +81,12 @@ updated: 2026-08-04T14:51:40+08:00
 
 | 工作 | 核心研究问题 | 主要证据 | 不进入该工作的内容 |
 | --- | --- | --- | --- |
-| Paper A：StoryMotion | 能否保持强Human prior及其输出路径不变，同时增加observed-H与generated-H Camera generation，并让两条Camera route共享同一个关系感知模型？ | Human逐输出保持、Stage1／Stage2接口、两条Camera route与Pulp正式指标；Camera坐标／文本修正作为次要贡献 | Rect、HML跨配对、Camera program solver、DIRECT数据贡献、ViGen应用突破 |
+| StoryMotion | 能否保持强Human prior及其输出路径不变，同时增加observed-H与generated-H Camera generation，并让两条Camera route共享同一个关系感知模型？ | Human逐输出保持、Stage1／Stage2接口、两条Camera route与Pulp正式指标；Camera坐标／文本修正作为次要贡献 | Rect、HML跨配对、Camera program solver、DIRECT数据贡献、ViGen应用突破 |
 | Paper B：DIRECT | 如何从factual H-C pair恢复dual-frame cinematographic program，并针对不同完整Human重新执行？ | program ownership、source reconstruction、compatibility、target-H re-execution、multi-pair训练、视觉／用户／下游utility | 重新把StoryMotion三模式与能力保持式框架当作新贡献 |
 
 这不是把一个大系统机械切成上下两半。两篇工作的**因果单位不同**：
 
-- Paper A改变的是模型架构与条件生成接口，事实训练单元仍是Pulp的一对一配对；
+- StoryMotion改变的是模型架构与条件生成接口，事实训练单元仍是Pulp的一对一配对；
 - Paper B改变的是监督关系本身，从factual pair扩展为program-conditioned多对多边，
   并要求新的合法性、求解与验证合同。
 
@@ -96,9 +96,9 @@ DIRECT中的`dual-frame`明确指actor／event-relative intent frame与world exe
 
 ## 2. 为什么合并反而削弱两篇工作
 
-### 2.1 Paper A的主语应是能力保持式扩展
+### 2.1 StoryMotion的主语应是能力保持式扩展
 
-Paper A不是“一个新模型同时学会三个任务”，而是一个受保护的非对称扩展：
+StoryMotion不是“一个新模型同时学会三个任务”，而是一个受保护的非对称扩展：
 
 1. 预训练Human branch拥有$p_H(H\mid T_H)$，在Camera扩展中冻结；
 2. 新增的$p_C(C\mid H,T_C)$同时服务observed-H与generated-H；
@@ -126,14 +126,14 @@ Camera模型执行两种Human来源。** “三接口”是系统结果，不单
 ### 2.3 两篇工作的数据与监督边界图
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 930" width="100%" role="img" aria-labelledby="two-paper-data-title" font-family="Inter, Arial, 'Noto Sans CJK SC', sans-serif">
-  <title id="two-paper-data-title">StoryMotion Paper A and DIRECT Paper B data boundary</title>
+  <title id="two-paper-data-title">StoryMotion and DIRECT Paper B data boundary</title>
   <rect x="0" y="0" width="1200" height="930" fill="#ffffff"/>
   <defs><marker id="arrow-data" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#4b5563"/></marker></defs>
   <text x="600" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#111827">两篇工作的数据与监督边界</text>
   <rect x="430" y="48" width="340" height="54" rx="8" fill="#f3f4f6" stroke="#4b5563" stroke-width="2"/>
   <text x="600" y="80" text-anchor="middle" font-size="17" fill="#111827">Pulp factual: (T_H, H, T_C, C)</text>
   <rect x="28" y="135" width="535" height="700" rx="12" fill="#f8fbff" stroke="#4f7dbd" stroke-width="2"/>
-  <text x="295" y="166" text-anchor="middle" font-size="19" font-weight="700" fill="#244b7a">Paper A · capability-preserving StoryMotion</text>
+  <text x="295" y="166" text-anchor="middle" font-size="19" font-weight="700" fill="#244b7a">StoryMotion · capability-preserving StoryMotion</text>
   <rect x="145" y="190" width="300" height="48" rx="7" fill="#e8f1ff" stroke="#4f7dbd" stroke-width="2"/>
   <text x="295" y="219" text-anchor="middle" font-size="15" fill="#10243e">official split + parent-source audit</text>
   <rect x="58" y="270" width="220" height="60" rx="7" fill="#e8f1ff" stroke="#4f7dbd" stroke-width="2"/>
@@ -193,9 +193,9 @@ Camera模型执行两种Human来源。** “三接口”是系统结果，不单
 
 这张图冻结五个边界：
 
-- Paper A只消费Pulp factual一对一监督；projection与framing由同一对$H,C$计算，
+- StoryMotion只消费Pulp factual一对一监督；projection与framing由同一对$H,C$计算，
   不是额外数据源；
-- Paper A增加Camera坐标／文本修正：由实际extrinsics变化生成无歧义$T_C^{geo}$，保留
+- StoryMotion增加Camera坐标／文本修正：由实际extrinsics变化生成无歧义$T_C^{geo}$，保留
   原$T_C^{raw}$与来源。它修复factual监督，不产生跨Human新边；
 - Paper B可以复用Pulp作为donor、target-H pool与factual anchor，但必须把新监督归因于
   program extraction、compatibility和target-H re-execution；
@@ -301,7 +301,7 @@ Camera模型执行两种Human来源。** “三接口”是系统结果，不单
 当前operational contract仍唯一由StoryMotion仓库的`docs/experiment-contract.md`持有；本节
 只解释两篇论文共用的系统边界图。
 
-## 4. Paper A：StoryMotion的能力保持式非对称扩展
+## 4. StoryMotion的能力保持式非对称扩展
 
 ### 4.1 一句话定位
 
@@ -314,7 +314,7 @@ Camera模型执行两种Human来源。** “三接口”是系统结果，不单
 非对称接口增加observed-H与generated-H两种Camera generation，并由同一个关系感知
 Camera模型执行。重点不是“三接口本身”，也不是同步joint denoising。
 
-MotionRemix／MotionCutMix式组合只属于Paper A的secondary utility extension：它服务于构造组合式
+MotionRemix／MotionCutMix式组合只属于StoryMotion的secondary utility extension：它服务于构造组合式
 H–C pairs、打破一对一pair correlation，不把上／下半身Human增广或任意free editing升格为主贡献。
 
 ### 4.2 建议的主贡献
@@ -328,7 +328,7 @@ H–C pairs、打破一对一pair correlation，不把上／下半身Human增广
    Human。Direct-H的高质量表述为被保留的基础能力，不计作Camera扩展带来的提升。
 3. **Pulp Camera坐标／文本修正。** 固定Camera convention，并根据实际Camera参数变化新增
    无歧义描述；原caption、来源与修订版本全部保留。约16万条数据必须先经过自动几何一致性
-   检查，再抽样人工核验。该项是Paper A的次要数据贡献，目前仍是待闭环方案。
+   检查，再抽样人工核验。该项是StoryMotion的次要数据贡献，目前仍是待闭环方案。
 4. **三接口实证。** 在统一split、decoder、sample count与正式指标下报告Direct-H、
    Direct-C、sequential Human→Camera、C0-LAT mainline及C0-GEO objective alternate；两endpoint不得
    按字段拼成虚构的单模型。组合式H–C utility只有通过独立data／Stage1 support gate后才可作为次要扩展。
@@ -336,7 +336,7 @@ H–C pairs、打破一对一pair correlation，不把上／下半身Human增广
 Stage1可以作为**系统级架构贡献**，但不应在缺少matched component ablation时声称
 `interaction16`、conditioner与三阶段schedule中的每一个部件都被单独证明必要。
 
-### 4.3 Paper A主动放弃的claim
+### 4.3 StoryMotion主动放弃的claim
 
 - 不把冻结Human branch的Direct-H质量写成统一学习带来的新提升；
 - 不声称双向Human–Camera协同或同步joint denoising；
@@ -355,7 +355,7 @@ StoryMotion的formal joint inference确实是sequential：先生成Human，再�
 
 ### 5.2 当前允许主张的区别
 
-普通串行baseline是两个独立系统在推理时拼接。Paper A当前不主张latent直连必然优于
+普通串行baseline是两个独立系统在推理时拼接。StoryMotion当前不主张latent直连必然优于
 显式Human API，也不主张统一训练带来参数或正迁移优势。其可审计结构事实是：
 
 - 一个明确的Stage1共享表示与owning decoder合同；
@@ -383,13 +383,13 @@ checkpoint、sampler与评测协议下，把sequential的Human接口替换为
 
 | 系统类别 | 主要输入 | 主要输出 | 核心评价对象 |
 | --- | --- | --- | --- |
-| StoryMotion Paper A | Human／Camera文字，可选observed Human motion | 显式3D Human motion与6-DoF Camera motion | 结构化motion质量、语义、几何、构图与三接口统一性 |
+| StoryMotion | Human／Camera文字，可选observed Human motion | 显式3D Human motion与6-DoF Camera motion | 结构化motion质量、语义、几何、构图与三接口统一性 |
 | Uni3C／ActCam类ViGen control | 参考图像／视频加已给定或已构造的Camera、pose、depth等控制 | 像素视频 | 视频保真度、身份保持、Camera／pose控制精度 |
 | Auteur | Human trajectory anchors Camera trajectory for downstream ViGen | StoryMotion works on Human motion generation and capability-preserving Human–Camera generation | 上游结构化motion generation vs 下游ViGen Camera trajectory anchoring |
 | Pulp Motion／TSA | Human与Camera运动或其联合分布 | 结构化Human–Camera motion | 多模态一致性、联合运动与构图 |
 
 Uni3C通过对齐点云与SMPL-X控制冻结ViGen，ActCam通过camera-aligned depth／pose做
-zero-shot联合控制；它们已经证明ViGen可以消费强3D Camera／Human条件。因此Paper A的
+zero-shot联合控制；它们已经证明ViGen可以消费强3D Camera／Human条件。因此StoryMotion的
 安全差异不是“ViGen做不到控制”，而是：
 
 > ViGen control主要研究**如何遵循给定的控制信号生成视频**；StoryMotion研究
@@ -397,15 +397,15 @@ zero-shot联合控制；它们已经证明ViGen可以消费强3D Camera／Human�
 
 Auteur uses Human trajectory to anchor Camera trajectory for downstream ViGen；StoryMotion works on
 Human motion generation and capability-preserving Human–Camera generation。Auteur比Uni3C／ActCam更接近
-DIRECT问题；Pulp Motion与TSA则是Paper A更直接的结构化
+DIRECT问题；Pulp Motion与TSA则是StoryMotion更直接的结构化
 Human–Camera generation基线，必须进入相关工作与主表。
 
-### 6.2 Paper A的防守边界
+### 6.2 StoryMotion的防守边界
 
 - 可以说显式motion资产可被不同renderer消费；
 - 没有matched downstream实验前，不能说StoryMotion改善ViGen；
 - 不用像素视频指标与3D motion指标做伪横向SOTA；
-- demo负责说明输出可渲染，不负责承担Paper A的全部新颖性；
+- demo负责说明输出可渲染，不负责承担StoryMotion的全部新颖性；
 - 真正的下游utility与可用性证据留给DIRECT。
 
 ## 7. Paper B：DIRECT
@@ -429,7 +429,7 @@ Human–Camera generation基线，必须进入相关工作与主表。
 6. matched renderer／ViGen utility、自然度盲评或创作工作流。
 
 当前RV的source reconstruction为`0/25`，所以DIRECT仍处于方法发现期。这个失败不会
-反向否定Paper A；它只说明第二篇尚未获得合法multi-pair positive。
+反向否定StoryMotion；它只说明第二篇尚未获得合法multi-pair positive。
 
 ### 7.3 CVPR还是SIGGRAPH
 
@@ -443,7 +443,7 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 
 ## 8. 两篇论文的防串线合同
 
-| 研究元素 | Paper A：StoryMotion | Paper B：DIRECT |
+| 研究元素 | StoryMotion | Paper B：DIRECT |
 | --- | --- | --- |
 | Pulp factual一对一数据 | 主训练与正式benchmark | factual anchor／donor来源 |
 | Pulp Camera坐标／文本修正 | 次要数据贡献：无歧义描述、原文provenance与自动质检 | 作为可靠factual／program输入，不重复计贡献 |
@@ -451,7 +451,7 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 | protected-H、共享Camera与三接口 | 主方法与系统证据 | 已知父系统，不重复计贡献 |
 | RV／Rect／multi-pair | 不进入 | 主方法与数据证据 |
 | HumanML3D | 不进入主线 | 跨域Human pool，可独立失败 |
-| Human text注入Camera | 不作为Paper A新增贡献 | Director条件设计候选 |
+| Human text注入Camera | 不作为StoryMotion新增贡献 | Director条件设计候选 |
 | Camera program solver | 不进入 | 必须先通过source reconstruction |
 | ViGen／renderer utility | 仅可选demo与边界说明 | 正式可用性证据 |
 | 盲评／用户研究 | 基础视觉可信度 | 自然度、可控性与创作价值主证据 |
@@ -459,12 +459,12 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 第二篇必须：
 
 - 明确引用第一篇并冻结其checkpoint／decoder身份；
-- 以`Paper A backbone + factual data`作为baseline；
+- 以`StoryMotion backbone + factual data`作为baseline；
 - 把收益归因于新数据／program／Director机制，而不是再次展示三模式表；
 - 使用新的任务、训练边和评价单位，避免形成salami slicing；
 - 若最终只剩Human text adapter小改进而multi-pair／program失败，不足以独立成篇。
 
-## 9. Paper A仍需补强什么
+## 9. StoryMotion仍需补强什么
 
 “学术工作而非强产品”不妨碍ICLR，但不等于可以只交当前best checkpoint。最低补强包应是：
 
@@ -477,10 +477,10 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 
 ## 10. 当前执行裁决
 
-### Paper A：立即收口
+### StoryMotion：立即收口
 
 - 冻结C0-LAT为后续唯一operational mainline与默认ablation parent；C0-GEO保留audited alternate；
-- 停止把DIRECT、Rect和ViGen utility当作Paper A hard blocker；
+- 停止把DIRECT、Rect和ViGen utility当作StoryMotion hard blocker；
 - 5090断链期间暂停Pulp Camera数据处理，先冻结C0-LAT-based ablation合同；恢复后再继续文本修正；
 - H199与最小机制检查只按正文实际claim选择，不进入默认critical path；
 - 标题、摘要与contribution围绕capability-preserving asymmetric extension；
@@ -495,7 +495,7 @@ Venue不应现在仅按期望选择。先看最终最强证据属于“通用视
 - 训练、artifact、指标、文档与claim均使用独立paper identity。
 
 > [!success] 最终边界
-> Paper A回答“如何在精确保留Human prior的条件下增加两种Camera generation route”，
+> StoryMotion回答“如何在精确保留Human prior的条件下增加两种Camera generation route”，
 > 并以Pulp Camera坐标／文本修正提高基础监督可靠性；DIRECT回答“如何从factual H-C pair
 > 恢复dual-frame cinematographic program，并针对不同完整Human重新执行”。前者以能力
 > 保持、共享Camera接口与matched证据成立，后者以program合法性、multi-pair学习与可用性成立。

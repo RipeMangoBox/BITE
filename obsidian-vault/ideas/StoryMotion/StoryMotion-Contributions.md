@@ -20,7 +20,7 @@ modality-wise performance。StoryMotion 的目标不是再次证明“联合比�
 
 与Auteur的核心边界必须逐字保持清楚：Auteur uses Human trajectory to anchor Camera trajectory
 for downstream ViGen；StoryMotion works on Human motion generation and capability-preserving
-Human–Camera generation。StoryMotion不把Camera planning或ViGen controller当作Paper A主问题。
+Human–Camera generation。StoryMotion不把Camera planning或ViGen controller当作StoryMotion主问题。
 
 True-P2 matched symmetric formal使这个动机需要更精确：不能再写成“Camera supervision经验上必然
 损害Human指标”。允许Camera loss更新Human后，P2的Direct-H与sequential Human geometry反而改善，

@@ -75,18 +75,18 @@ updated: 2026-08-10T12:45:00+08:00
 > [[StoryMotion-valid-metric-ledger#4A. v9+ Stage2 audited detail tables]]。
 
 > [!important] C1REL Stage2 formal与caption边界
-> GPU0运行`paperA_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`：复用已审计
+> GPU0运行`sm_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`：复用已审计
 > C1REL Stage1及owning decoder／新建C1REL cache与train-only stats，fresh训练Human
 > teacher `105K`，冻结后再训练GT-H-only LAT Camera `105K`；该run已到达总step `210K`，并完成
 > Direct-H、Direct-C与sequential pure4,053 formal。`rawt0`只属于immutable run identity；原始
 > Pulp captions是authoritative text，不存在当前recaption依赖。GPU1运行
-> `paperA_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`：保留native
+> `sm_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804`：保留native
 > C1REL-C48，只删除I16，latent为H128＋C48＝176D；其matched Stage2也已完成同一原始
 > caption、exposure与sequential formal protocol。完整证据与剩余 queue 见
 > [[StoryMotion-iclr-reliability#8.1 Evidence closure matrix]]。
 
 > [!note] C1REL seed23 repeat boundary
-> `paperA_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` 的三模式 artifact/hash、样本顺序、
+> `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` 的三模式 artifact/hash、样本顺序、
 > non-causal 与 checkpoint／decoder identity 已闭合；Direct-H=`17.455219 / 102.077736`，
 > Direct-C Camera=`61.610401 / 20.361712`，sequential Camera=`60.909504 / 18.602613`。
 > seed17↔seed23 的逐样本 geometry 95% CI 全部跨零；aggregate TMR/CLaTr 没有逐样本 semantic
@@ -94,7 +94,7 @@ updated: 2026-08-10T12:45:00+08:00
 
 > [!important] 当前长训与评测边界
 > PulpMotion native Stage2
-> `paperA_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809`
+> `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809`
 > 已完成210K训练、105K／210K full-state checkpoint与4,053 native-joint formal audit；它与StoryMotion
 > 的train/eval ID集exact匹配为`162,760/4,053`，不是StoryMotion的更小训练子集。结果有效但很弱，
 > 且representation／decoder／mode不同，只作system-boundary negative result。true-P2 fresh symmetric
@@ -105,7 +105,7 @@ updated: 2026-08-10T12:45:00+08:00
 > no-I16 seed23已完成`210K`训练；其Direct-H、Direct-C与sequential pure4,053 formal eval
 > 已按同一ordered cohort和non-causal contract部署，结果尚未完成审计，因此本页不预写结论。
 > 第二张4090卡部署Human-text条件归因矩阵
-> `paperA_ht_condition_attribution_pure4053_20260810_r2`：HT-FILM／HX／DR各自只改变Camera侧
+> `sm_ht_condition_attribution_pure4053_20260810_r2`：HT-FILM／HX／DR各自只改变Camera侧
 > Human-text为absent或fixed-point-free shuffled，覆盖Direct-C与sequential完整4,053；Camera text、
 > Human context、sample IDs、noise与checkpoint固定，且不构造optimizer。该矩阵只判断matching-text
 > 改善能否归因于正确Human语义，不参与C0-LAT promotion；结果尚未审计。
@@ -277,7 +277,7 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   `seed17`。改变seed必须预先写明理由，历史seed23 provenance不改名。
 - NoInt-HREL Stage2保持搁置；C1REL与`C1REL-w/o-Interaction16` Stage2 sequential formal
   均已完成并使用原始Pulp captions。full-C1REL seed23 raw-T0 repeat audit已闭合；新部署的
-  `paperA_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` 是 no-I16 seed23 replication，
+  `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` 是 no-I16 seed23 replication，
   已完成`210K`训练并进入三模式pure4,053 formal eval，尚无已审计结果。PulpMotion Stage2已formal闭合为有效弱system-boundary result；true-P2
   fresh Matched Symmetric已完成训练endpoint及三接口formal，保留mixed-Pareto与P1初始化不匹配边界。
   exact HREL-vs-C1REL Stage2已闭合并保留mixed-Pareto边界，

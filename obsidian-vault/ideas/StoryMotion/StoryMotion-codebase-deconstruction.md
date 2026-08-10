@@ -44,14 +44,15 @@ C1REL representation/control、invariants、experiment contract 及其最小依�
 
 所有 manifest 文件在同步后均与 4090 HEAD 的 SHA256 一致；manifest 记录的是源码
 快照而不是运行结果。仓库固定提交为
-31e9df5b225208184f29a5b16d0c3c24561394fc，因此代码链接可固定到同一提交，例如：
+31e9df5b225208184f29a5b16d0c3c24561394fc，因此未改名代码链接可固定到同一提交。三组
+`sm_` source namespace位于本地受审计commit `0cf5f91`，在GitHub push前不伪造公开链接：
 
 - [v9 Pulp-only Stage1 owner](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage1_human_anchor_residual_pulp_only_r3/train.py)
 - [Stage1 representation model](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage1_human_anchor_residual/model.py)
 - [C0 fixed-H model](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_v11_fixed_h_camera/model.py)
 - [C0 fixed-H training loop](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_v11_fixed_h_camera/train.py)
 - [protected-H shared evaluator](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_protected_h_vimogen/evaluate.py)
-- [C1REL geometry](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage1_paperA_representation_controls/geometry.py)
+- C1REL geometry：`experiments/stage1_sm_representation_controls/geometry.py`（local commit `0cf5f91`；pending push）
 - [experiment contract](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/docs/experiment-contract.md)
 
 ## 2. 研究问题：三个接口必须同时成立
@@ -364,7 +365,7 @@ HT fresh control
 
 C1REL representation/control
   geometry.py + build_c1rel_stats.py -> model.py + run.py
-    -> stage2_paperA_c1rel/make_contract.py -> preflight.py
+    -> stage2_sm_c1rel/make_contract.py -> preflight.py
       -> frozen-H Camera diagnostic -> formal evaluator
 ~~~
 
@@ -439,7 +440,7 @@ human-preserving sequential generation，同时给出可验证的有限 composit
 
 ## 13. 进一步阅读
 
-- 当前 Paper A 状态：[[current]]
+- 当前 StoryMotion 状态：[[current]]
 - 版本与关闭决定：[[version_family]]
 - ICLR reliability / QA：[[StoryMotion-iclr-reliability]]
 - 正式 metric ledger：[[StoryMotion-valid-metric-ledger]]
@@ -452,8 +453,10 @@ human-preserving sequential generation，同时给出可验证的有限 composit
 
 The following is the exact file-level manifest copied for this deconstruction note. Every file
 is relative to linkedCodebases/StoryMotion/; every SHA256 was measured against 4090 HEAD
-31e9df5b225208184f29a5b16d0c3c24561394fc. synced to 4090 HEAD means the local mirror hash
-equals the remote hash. It does not mean a run artifact or checkpoint was copied.
+31e9df5b225208184f29a5b16d0c3c24561394fc. `synced to 4090 HEAD` means the local mirror content
+hash equals the audited 4090 source hash；它不表示复制了run artifact或checkpoint。表内
+`stage1_sm_*`／`stage2_sm_*`路径按rename commit `0cf5f91`解析；rename未改变这些文件的
+content hash，且尚待GitHub push。
 
 | relative source path | SHA256 | status |
 | --- | --- | --- |
@@ -467,16 +470,16 @@ equals the remote hash. It does not mean a run artifact or checkpoint was copied
 | experiments/stage1_human_anchor_residual/train.py | 9eb537195d39756cd2e5c7364d80e96e83c713ea8e2ed7685872e30a91694f1b | synced to 4090 HEAD |
 | experiments/stage1_human_anchor_residual_packedio/packed_data.py | 4c0ad561f1506947291d72b3e3b62c0043dce0c0394194ae32da0c4acf945e69 | synced to 4090 HEAD |
 | experiments/stage1_independent_conditional_camera/geometry.py | 16e100dee1437e7acecc2bd6c33cc021818e74c6aad02c2c97031151871d16aa | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/__init__.py | f9d196fd06b5593c044b431c7d239e7e0b2036b19a9d48612436998af33833c7 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/build_c1rel_stats.py | bb0151368dc6f2969ac55fcd666a236396a763c8ea553acf1517fa2cbfdff66e | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/compare_formal.py | c577b1d81d00200cdc24964994c15e7c1a62c53f49a43bf2dbbdfbc273c83e95 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/evaluate_formal.py | cd4a4054129813182a95debc10a4d7958cf7f1d405177336e1d46b6173530218 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/geometry.py | dc9dad6ef14b1e11571a21012911ef8d93a3b16bc83fa53cd478aa21151955d2 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/model.py | aa4b5e51736c495964f17d42dd6761a8e3f36e5398e79cc500d04117fe320152 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/run.py | 141fb9229b0b95cc5e8fbd42000a255244628e6587cc31092ea6313dc708eb05 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/test_compare_formal.py | b5843e4a550eb1ba850aa95173095f597e7c758dbc03213b67e17215fe7fe272 | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/test_evaluate_formal.py | 443e152164b55d4c99a71169aa6487329a2b8a34819c5776905b0d79b417853a | synced to 4090 HEAD |
-| experiments/stage1_paperA_representation_controls/test_model.py | 037c4d47e574aa0223cd0c10710403a0cd9f08a8e0f36b2feb97e794ac93775a | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/__init__.py | f9d196fd06b5593c044b431c7d239e7e0b2036b19a9d48612436998af33833c7 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/build_c1rel_stats.py | bb0151368dc6f2969ac55fcd666a236396a763c8ea553acf1517fa2cbfdff66e | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/compare_formal.py | c577b1d81d00200cdc24964994c15e7c1a62c53f49a43bf2dbbdfbc273c83e95 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/evaluate_formal.py | cd4a4054129813182a95debc10a4d7958cf7f1d405177336e1d46b6173530218 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/geometry.py | dc9dad6ef14b1e11571a21012911ef8d93a3b16bc83fa53cd478aa21151955d2 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/model.py | aa4b5e51736c495964f17d42dd6761a8e3f36e5398e79cc500d04117fe320152 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/run.py | 141fb9229b0b95cc5e8fbd42000a255244628e6587cc31092ea6313dc708eb05 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/test_compare_formal.py | b5843e4a550eb1ba850aa95173095f597e7c758dbc03213b67e17215fe7fe272 | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/test_evaluate_formal.py | 443e152164b55d4c99a71169aa6487329a2b8a34819c5776905b0d79b417853a | synced to 4090 HEAD |
+| experiments/stage1_sm_representation_controls/test_model.py | 037c4d47e574aa0223cd0c10710403a0cd9f08a8e0f36b2feb97e794ac93775a | synced to 4090 HEAD |
 | experiments/stage2_v11_fixed_h_camera/__init__.py | be371d026026afe391d808b2bb4f8751c6e44e74610e736ec5d5167e0996bbf3 | synced to 4090 HEAD |
 | experiments/stage2_v11_fixed_h_camera/audit_confirmation.py | a1ea4e3086dafeec6366cd0cbd39e8cd31981cd15cb34d12d504c518f677ad07 | synced to 4090 HEAD |
 | experiments/stage2_v11_fixed_h_camera/audit_pure4053.py | 858bcdb4148d0efcf96beefd5a54b93bf33d8f3f1bf06b730a48b5a32e7f121d | synced to 4090 HEAD |
@@ -533,10 +536,10 @@ equals the remote hash. It does not mean a run artifact or checkpoint was copied
 | experiments/stage2_v11_human_text_camera_fresh/runtime.py | 40e14a4e150f1847b03befaf6c31e2c3e70be63a0aa859831a207e0e8374c9d2 | synced to 4090 HEAD |
 | experiments/stage2_v11_human_text_camera_fresh/test_fresh_human_text_camera.py | a8bab0a55c7bda691e1f4da96995538c0f63e064814af6d7b1c552c16a57b0d4 | synced to 4090 HEAD |
 | experiments/stage2_v11_human_text_camera_fresh/train.py | 85401970eec23bd06c16356e72b024385e6654fc9b74c2b7e275f5b6005caea0 | synced to 4090 HEAD |
-| experiments/stage2_paperA_c1rel/__init__.py | c40f754c415c942be778978f615388c0c31689bb797ebb28e7c4138e70e98f85 | synced to 4090 HEAD |
-| experiments/stage2_paperA_c1rel/make_contract.py | 40b49111f16feaac2d929a59014c4a17757bbd58483ba32330cf1252796f96dd | synced to 4090 HEAD |
-| experiments/stage2_paperA_c1rel/preflight.py | 36f83828ecff97babd0a90fd0ef3f073ee454ec0d6ad70441fc039ad71ebb6f5 | synced to 4090 HEAD |
-| experiments/stage2_paperA_c1rel/test_contract.py | 0c932e334f834ecafbd9da7cef8d395325565534b553115cbff964694b1babb4 | synced to 4090 HEAD |
+| experiments/stage2_sm_c1rel/__init__.py | c40f754c415c942be778978f615388c0c31689bb797ebb28e7c4138e70e98f85 | synced to 4090 HEAD |
+| experiments/stage2_sm_c1rel/make_contract.py | 40b49111f16feaac2d929a59014c4a17757bbd58483ba32330cf1252796f96dd | synced to 4090 HEAD |
+| experiments/stage2_sm_c1rel/preflight.py | 36f83828ecff97babd0a90fd0ef3f073ee454ec0d6ad70441fc039ad71ebb6f5 | synced to 4090 HEAD |
+| experiments/stage2_sm_c1rel/test_contract.py | 0c932e334f834ecafbd9da7cef8d395325565534b553115cbff964694b1babb4 | synced to 4090 HEAD |
 | storymotion/experiment_invariants.py | 3690778d743918dbf487bfa44f5b1b50c9fcf9623a1ca03d0cc46675923325d3 | synced to 4090 HEAD |
 | storymotion/per_sample_quality.py | 7e356764c9bab74a7ae6afc51f65dc91e868536861dcd67a8c7a9c4fd4a18026 | synced to 4090 HEAD |
 | storymotion/tokenizers/base.py | 72cef8f3e0463de0986780072e58bd4db4126e01a8b7c60d3a0e77f729761ecb | synced to 4090 HEAD |

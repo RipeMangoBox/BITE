@@ -18,7 +18,7 @@ source_notes:
   - "[[DIRECT/2026-07-31_storymotion-v11-actor-director-counterfactual-control]]"
   - "[[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]"
   - "[[StoryMotion/paper-boundary]]"
-  - "[[StoryMotion/StoryMotion-valid-metric-ledger]]"
+  - "[[StoryMotion-valid-metric-ledger]]"
 created: 2026-08-03T14:30:39+08:00
 updated: 2026-08-03T15:35:18+08:00
 ---
@@ -41,7 +41,7 @@ updated: 2026-08-03T15:35:18+08:00
 - 不得把HumanML3D Human与原Pulp world Camera直接组成positive。
 - generated-H route没有合法re-execution target时，只能做推理分布测试。
 - v11 Actor／Director反事实screen与Human-text Camera结果是前置诊断，不自动构成DIRECT
-  方法闭环，也不改变StoryMotion Paper A mainline。
+  方法闭环，也不改变StoryMotion mainline。
 
 ## 2. Canonical owners
 
@@ -53,9 +53,9 @@ updated: 2026-08-03T15:35:18+08:00
   [[DIRECT/2026-08-01_storymotion-pulp-hml-stage1-data-mixing]]。
 - 两篇论文边界与单代码仓库合同：
   [[StoryMotion/paper-boundary]]。
-- 已审计共享系统数字：[[StoryMotion/StoryMotion-valid-metric-ledger]]；不得在DIRECT下复制
+- 已审计共享系统数字：[[StoryMotion-valid-metric-ledger]]；不得在DIRECT下复制
   第二份既有结果表。
-- StoryMotion Paper A当前状态：[[StoryMotion/current|StoryMotion current]]。
+- StoryMotion当前状态：[[StoryMotion/current|StoryMotion current]]。
 
 ## 3. 当前行动
 

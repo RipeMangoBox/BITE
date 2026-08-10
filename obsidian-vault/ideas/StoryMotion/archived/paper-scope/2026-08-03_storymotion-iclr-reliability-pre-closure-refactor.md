@@ -1,9 +1,9 @@
 ---
 title: "StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation — Reliability Plan"
 hypothesis: |
-  Paper A StoryMotion主张收口为capability-preserving asymmetric extension：
+  StoryMotion主张收口为capability-preserving asymmetric extension：
   冻结Human prior及其输出路径，以一个共享Camera模型增加observed-H与generated-H
-  Camera generation。Pulp Camera坐标／文本修正是次要数据贡献；Paper A仍需关闭
+  Camera generation。Pulp Camera坐标／文本修正是次要数据贡献；StoryMotion仍需关闭
   matched cascade、文本有效性、统计／感知、公开baseline与复现缺口。
 status: archived_pre_closure_refactor
 archived: 2026-08-03
@@ -40,17 +40,17 @@ supersedes: "[[2026-06-16_storymotion-v3-formal]]"
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation — Reliability Plan
 
-> [!important] Paper A唯一live范围
-> 本页只授权Paper A的能力保持式非对称扩展、共享Camera接口、matched specialist
+> [!important] StoryMotion唯一live范围
+> 本页只授权StoryMotion的能力保持式非对称扩展、共享Camera接口、matched specialist
 > cascade、Pulp Camera坐标／文本修正、公开baseline、sealed audit与复现成本。
 > DIRECT、RV、Rect、HumanML3D跨配对、Camera program solver、Human-text Director与
 > ViGen utility均不属于本页；其唯一live owner是
 > [[DIRECT/2026-08-01_storymotion-multipair-data-training-plan]]。两篇工作只共享StoryMotion仓库，
 > 不创建DIRECT仓库。
 
-> [!warning] 拆分前总判断（只读历史，不作Paper A门槛或训练授权）
+> [!warning] 拆分前总判断（只读历史，不作StoryMotion门槛或训练授权）
 > 拆分前的Actor–Director、Rect、Human selection、editing与旧reviewer诊断仅保留在
-> Appendix A–I供provenance追溯；它们不属于本页的live queue、Paper A claim或训练门槛。
+> Appendix A–I供provenance追溯；它们不属于本页的live queue、StoryMotion claim或训练门槛。
 
 正式数字与 hashes 只见 [[StoryMotion-valid-metric-ledger]]；本页只拥有论文
 claim-evidence gap、优先级、停止条件与 acceptance strategy。
@@ -61,13 +61,13 @@ claim-evidence gap、优先级、停止条件与 acceptance strategy。
   <title id="iclr-data-title">StoryMotion ICLR data supervision and evaluation flow</title>
   <rect x="0" y="0" width="1200" height="1080" fill="#ffffff"/>
   <defs><marker id="arrow-iclr" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#4b5563"/></marker></defs>
-  <text x="600" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#111827">ICLR Paper A · data, supervision and evaluation</text>
+  <text x="600" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#111827">ICLR StoryMotion · data, supervision and evaluation</text>
   <rect x="420" y="48" width="360" height="54" rx="8" fill="#f3f4f6" stroke="#4b5563" stroke-width="2"/>
   <text x="600" y="80" text-anchor="middle" font-size="16" fill="#111827">Pulp factual: (T_H, H199, T_C^raw, C14)</text>
   <rect x="440" y="132" width="320" height="50" rx="8" fill="#f3f4f6" stroke="#4b5563" stroke-width="2"/>
   <text x="600" y="162" text-anchor="middle" font-size="15" fill="#111827">official split + parent-source audit</text>
   <rect x="820" y="50" width="340" height="86" rx="8" fill="#fde7e7" stroke="#a33b3b" stroke-width="2"/>
-  <text x="990" y="73" text-anchor="middle" font-size="13" fill="#4a1717"><tspan x="990">OUT OF PAPER A DATA</tspan><tspan x="990" dy="19">RV · Rect · HumanML3D · program solver</tspan><tspan x="990" dy="19">· ViGen utility</tspan></text>
+  <text x="990" y="73" text-anchor="middle" font-size="13" fill="#4a1717"><tspan x="990">OUT OF STORYMOTION DATA</tspan><tspan x="990" dy="19">RV · Rect · HumanML3D · program solver</tspan><tspan x="990" dy="19">· ViGen utility</tspan></text>
   <path d="M600 102 L600 132" fill="none" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow-iclr)"/>
   <rect x="28" y="218" width="724" height="526" rx="12" fill="#f8fbff" stroke="#4f7dbd" stroke-width="2"/>
   <text x="390" y="250" text-anchor="middle" font-size="20" font-weight="700" fill="#244b7a">Pulp train · v9 non-causal Stage1 owner</text>
@@ -118,23 +118,23 @@ claim-evidence gap、优先级、停止条件与 acceptance strategy。
   <path d="M205 896 L205 914 L600 914 L600 928 M600 896 L600 928 M995 896 L995 914 L600 914 M600 976 L600 996 M981 540 L1150 540 L1150 1017 L810 1017" fill="none" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow-iclr)"/>
 </svg>
 
-图中只有Pulp factual pair进入Paper A训练。Direct-H、Direct-C与sequential共享同一
+图中只有Pulp factual pair进入StoryMotion训练。Direct-H、Direct-C与sequential共享同一
 Stage1 owner和Stage2 branch实现；sequential是Human完成后固定再生成Camera，不是
 joint-parallel训练。`RV`、`Rect`、HumanML3D与Camera program重求解的完整数据图由
 [[StoryMotion/paper-boundary#2.3 两篇工作的数据与监督边界图]]拥有，
-这些数据不再构成ICLR Paper A的训练输入或接收门槛。
+这些数据不再构成ICLR StoryMotion的训练输入或接收门槛。
 
 Camera文本修正仍位于同一factual edge内：固定extrinsic convention，从实际Camera参数
 变化生成$T_C^{geo}$，同时保留$T_C^{raw}$、来源和修订版本。它不产生新的Human–Camera
 配对，也不包含DIRECT的dual-frame program或event ownership。
 
-## 0.1 当前Paper A的claim–evidence合同
+## 0.1 当前StoryMotion的claim–evidence合同
 
 $$
 p(H,C\mid T_H,T_C)=p_H(H\mid T_H)\,p_C(C\mid H,T_C).
 $$
 
-Paper A包含两个条件分布和三个推理接口。Direct-H复用冻结Human prior；Direct-C给定
+StoryMotion包含两个条件分布和三个推理接口。Direct-H复用冻结Human prior；Direct-C给定
 observed Human；Composition先生成并固定Human，再调用同一Camera模型。Direct-H质量是
 被保留的基础能力，不计作Camera扩展带来的新增益。
 
@@ -192,7 +192,7 @@ audit，不预注册新的Stage1或Stage2长训。Pulp Camera坐标／文本修�
 > “separate”误解为去掉$H$。B只增加冻结的`H128 → D_H → H199 → E_H → H128`
 > 串行接口并复用现有endpoint，新增optimizer steps为`0`。若重训H/C separate Stage1，
 > representation、decoder、参数、训练exposure与GPU小时都会同时变化，只能列为未授权的
-> Cascade-Native system comparison，不能作为Paper A matched baseline。
+> Cascade-Native system comparison，不能作为StoryMotion matched baseline。
 
 > [!important] 已确认的实现事实
 > 正式seed23 contract与revision `31b4d88d919e9340588a48f860f4d1b995087870`表明：

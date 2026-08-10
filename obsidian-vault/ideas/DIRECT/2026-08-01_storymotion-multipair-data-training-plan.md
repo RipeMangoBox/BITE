@@ -44,8 +44,8 @@ updated: 2026-08-03T15:13:03+08:00
 > `DIRECT`是Paper B的论文／方法身份，不是新仓库。实现、配置、run与artifact继续位于
 > `linkedCodebases/StoryMotion/`及其现有`runs/`布局；不创建DIRECT仓库。新DIRECT run
 > 使用`direct_`前缀，已有`storymotion_*`、`v11_*`与`Actor–Director`诊断ID不改名。
-> 共享Stage1／decoder／evaluator必须明确写为冻结的StoryMotion／Paper A基础设施，不能
-> 把Paper A的能力保持式非对称框架重复计为DIRECT贡献。
+> 共享Stage1／decoder／evaluator必须明确写为冻结的StoryMotion／StoryMotion基础设施，不能
+> 把StoryMotion的能力保持式非对称框架重复计为DIRECT贡献。
 
 > [!important] 当前结论
 > 两个高优先级轴都已闭合：`RV-25`因source reconstruction `0/25`不授权Rect；三种Human-text Camera设计完成fresh `105K`与pure4,053 formal后形成geometry／semantic Pareto，没有单一全胜者。caption同义扩写、Stage1 observation替换、B-series、co-design和editing继续后置。

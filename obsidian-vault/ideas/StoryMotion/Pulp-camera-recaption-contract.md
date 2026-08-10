@@ -13,8 +13,8 @@ tags:
 aliases:
   - Pulp-Camera-Recaption-Contract
 source_notes:
-  - "[[StoryMotion/StoryMotion-iclr-reliability]]"
-  - "[[StoryMotion/StoryMotion_Gradio_Render]]"
+  - "[[StoryMotion-iclr-reliability]]"
+  - "[[StoryMotion_Gradio_Render]]"
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/dont_read/0805-0137]]"
   - "[[StoryMotion/dont_read/0805-2009]]"
@@ -28,7 +28,7 @@ updated: 2026-08-05T23:55:00+08:00
 > [!important] 当前状态
 > 本页评估并收敛`0805-0137`中的Web GPT建议，拥有Pulp Camera recaptioning的算法、
 > calibration、语言化与QC合同。全量候选阈值及其artifact只见
-> [[StoryMotion/StoryMotion-iclr-reliability#1.1 Pulp Camera full-train threshold audit]]。
+> [[StoryMotion-iclr-reliability#1.1 Pulp Camera full-train threshold audit]]。
 > 版本注册现已统一：旧512/Euler/逐采样step阈值及其short／long链称为 **v1**；从exact
 > `162,760`条train、`4,733,272`个stride-4 step的rotvec rate signal直接重建H0／H1，再经过
 > event budget与区间关系校准的链称为 **v2**。历史run／artifact ID中的`v1p0`不改名；它们是
@@ -589,26 +589,26 @@ signal、sample offsets、histogram与后续event所需字段。P2以后只消�
 
 ### 9.1 v2-pre历史执行artifact（ID保留`v1p0`）
 
-- rotvec conversion：`paperA_pulp_camera_rotvec_shard_conversion_train162760_stride4_v1p0_seed17_4090cpu_20260805`；
+- rotvec conversion：`sm_pulp_camera_rotvec_shard_conversion_train162760_stride4_v1p0_seed17_4090cpu_20260805`；
   contract SHA256=`a99cfc727dc9e7eada3cbf59bbe1a16869e8bdb39ffdc175b193cd5df49282fa`，
   equivalence SHA256=`1dd01e89e20d1b0c1708a1c11cdd4b3a22879518795e7e3e3acfd9c68fb311a0`。
-- provisional H1 event plan：`paperA_pulp_camera_eventplan_n100000_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
+- provisional H1 event plan：`sm_pulp_camera_eventplan_n100000_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
   contract SHA256=`f7038bddb805a41e4e4270f898261c2dc46e3bb9759446af8051813426444c2c`，
   共100,000条、842,488个axis events、650,709个required events与19,427条static样本。
-- GPU1三逻辑worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_tri_20260805`；
+- GPU1三逻辑worker run：`sm_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_tri_20260805`；
   contract SHA256=`65fad244ab4a75d6f38692fcf5fd68d65b0a4bd73a933fd33ac44ae752012b10`。
   三模型同时加载的OOM日志保留；修订后只运行worker0／1，worker2队列在产生record前停止。
-- GPU1 remainder source：`paperA_pulp_camera_eventplan_gpu1_remainder_n16666_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
+- GPU1 remainder source：`sm_pulp_camera_eventplan_gpu1_remainder_n16666_rotvec_h1_v1p0_seed17_4090cpu_20260805`；
   只选择parent `source_index mod 3 = 2`并从零连续reindex，contract SHA256=
   `8b980cef485cdd670be423169fe56ce2aa63327a52e57bd0cdba9758baf859d0`。
-- GPU1 remainder双worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_gpu1_remainder_n16666_seed17_4090g1_dual_20260805`；
+- GPU1 remainder双worker run：`sm_pulp_qwen3_4b_recaption_v1p0_h1_gpu1_remainder_n16666_seed17_4090g1_dual_20260805`；
   contract SHA256=`6185f622176b4aaacd115b478ab966df51f30f9ff3bf325f734e22eca5aeace1`，
   绑定StoryMotion revision `99145173d02aa1f9184eebf9576cc1023236db41`，仅在前两个GPU1
   worker成功完成并释放显存后启动两个worker。
-- GPU0双worker run：`paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g0_dual_20260805`；
+- GPU0双worker run：`sm_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g0_dual_20260805`；
   contract SHA256=`676b0b76199ee1c29a6ed9fac210697a3cab7cab7b636bae761ef950cbdd09f4`。
 - 更改部署合同前的GPU1双worker run保留28条已生成records，不删除、不拼入新run：
-  `paperA_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_dual_20260805`，contract
+  `sm_pulp_qwen3_4b_recaption_v1p0_h1_n50000_seed17_4090g1_dual_20260805`，contract
   SHA256=`9c44a2b9f587a0cfc7eeffa70ec9566046c00eb545795176338e066990ac3e3e`。
 
 ### 9.2 first-20K v2-pre quality audit与停止裁决
@@ -652,19 +652,19 @@ grouping与budget calibration，再过6个原语×3条paired review，才可讨�
 
 审计artifact：
 
-- cohort：`paperA_pulp_camera_recaption_v1p0_first20k_qc_cohort_seed17_4090cpu_20260805`；
+- cohort：`sm_pulp_camera_recaption_v1p0_first20k_qc_cohort_seed17_4090cpu_20260805`；
   contract SHA256=`a3a4a78eb53ca0c4d9b367f9b039f09bf70259e6d5c0443d503e302374ea133b`；
-- comparison：`paperA_pulp_camera_recaption_v1p0_vs_legacy_first20k_qc_seed17_4090cpu_20260805`；
+- comparison：`sm_pulp_camera_recaption_v1p0_vs_legacy_first20k_qc_seed17_4090cpu_20260805`；
   contract／summary SHA256=`03aecfba2aa8a58fb5dfbb3c47861f44fe6985a4a38608e78ab8546b91514f2d`／
   `3b325cf10a421b7ac1a159232cccef9cb141585cb7182a09a99c45bcac3b8e03`；
-- review：`paperA_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805`；
+- review：`sm_pulp_camera_recaption_v1p0_vs_legacy_primitive6x3_review_seed17_4090cpu4_20260805`；
   build contract／manifest SHA256=`c8b9ac20bd564a2b80a347a28869243dc4d8d5220a383b402ca0fa761a5ca1dd`／
   `401d2c05fcead399f66419922a10f7fc379ccb3070aaf31feb049a0ed1ffce1f`；
 - implementation：StoryMotion revision `fa6361c1`；24项相关unittest通过。
 
 ### 9.3 v2结构修复与full-train screen状态
 
-实现位于`experiments/paperA_camera_recaption/`，但需区分可复用组件与尚未成立的v2主链：
+实现位于`experiments/sm_camera_recaption/`，但需区分可复用组件与尚未成立的v2主链：
 
 - `event_plan_v2.py`只读immutable v2-pre H1 event records；它可用于历史fixed-top3风险screen，
   不能生成H0，也不再是v2 geometry planner；
@@ -675,14 +675,14 @@ grouping与budget calibration，再过6个原语×3条paired review，才可讨�
   各自segment candidate nodes，第二遍报告`K_axis／K_salient`、length bins、预算3／4／5／6覆盖、
   cross-axis overlap／containment、opposite-direction gap，并与历史100K H1按sample核对；
 - 新screen不调用LLM、不选择H0／H1、不生成canonical text。run ID为
-  `paperA_pulp_camera_event_distribution_h0h1_fulltrain_v2screen_seed17_4090cpu_20260805`；exact
+  `sm_pulp_camera_event_distribution_h0h1_fulltrain_v2screen_seed17_4090cpu_20260805`；exact
   `162,760` samples／`4,733,272` steps已完成。contract／summary／sample-stats SHA256分别为
   `179eb954b28e8f681df5f9bed1112a82d0b73a75f9c3672ee0de85ff29a4e83f`／
   `b87ffa83a5f8d14ad5cfed7a424a4b8445eb93bfe4d957ab4282045dd23e1c10`／
   `61a66bf0c9d3a3c13d8d1e1c5daa290666c1d108978b932b151406667096ab5b`；该结果仍是screen，
   不在metric ledger登记；
 - 当前StoryMotion revision=`28c1c737f7166f1c4e523769b62a358422ac3fb0`；相关v1／v2定向单测
-  33项通过。远端分支仍为`paper-a-camera-video-review-20260804`。
+  33项通过。远端分支仍为`storymotion-camera-video-review-20260804`。
 
 当前没有经calibration选择的v2 event-plan artifact或v2 Qwen输出；“几何基础代码可运行”不得写成
 “v2实现完成”，更不得写成“数据标注完成”。
@@ -719,7 +719,7 @@ candidate-specific VLM review IDs由下一节的full-train child artifact拥有�
 ### 9.4 Semantic grouping full-train sweep（已由hierarchy child screen取代）
 
 CPU-only run
-`paperA_pulp_camera_semantic_grouping_sweep_h0h1_fulltrain_v2screen_seed17_4090cpu_20260805`
+`sm_pulp_camera_semantic_grouping_sweep_h0h1_fulltrain_v2screen_seed17_4090cpu_20260805`
 完成exact `162,760` samples／`4,733,272` steps，未调用VLM。contract／summary／sample-stats
 SHA256分别为：
 
@@ -757,7 +757,7 @@ S0逐项复现parent H0／H1 salience nodes、`K_axis`与`K_salient` histogram�
 ### 9.5 Semantic hierarchy full-train child screen
 
 CPU-only run
-`paperA_pulp_camera_semantic_hierarchy_h0h1_fulltrain_v3screen_seed17_4090cpu_20260805`
+`sm_pulp_camera_semantic_hierarchy_h0h1_fulltrain_v3screen_seed17_4090cpu_20260805`
 在StoryMotion revision `28c1c737f7166f1c4e523769b62a358422ac3fb0`完成exact `162,760`
 samples／`4,733,272` steps，耗时`303.60 s`，未调用LLM／VLM。run ID中的`v3screen`仅表示第三代
 统计实现，不新增canonical数据semantic version；目标数据仍是本页定义的v2。contract／summary／
