@@ -187,7 +187,8 @@ not part of this mapping.
 
 - 4090 source experiment namespaces: renamed and tested. The symmetric package
   is on `agent/symmetric-route-controls-20260810` at `47b29fa`; the other three
-  namespaces are on `agent/sm-namespace-migration-20260810` at `0cf5f91`.
+  namespaces are on `agent/sm-namespace-migration-20260810` at `0cf5f91`；both
+  branches are pushed to `RipeMangoBox/StoryMotion`.
 - 4090 historical run/eval/vis/artifact folders: held after inventory showed the
   scope is about 145 directories, not a small manual rename. No destructive or
   hash-breaking bulk move is authorized by this note.

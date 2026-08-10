@@ -45,14 +45,14 @@ C1REL representation/control、invariants、experiment contract 及其最小依�
 所有 manifest 文件在同步后均与 4090 HEAD 的 SHA256 一致；manifest 记录的是源码
 快照而不是运行结果。仓库固定提交为
 31e9df5b225208184f29a5b16d0c3c24561394fc，因此未改名代码链接可固定到同一提交。三组
-`sm_` source namespace位于本地受审计commit `0cf5f91`，在GitHub push前不伪造公开链接：
+`sm_` source namespace位于受审计commit `0cf5f91`，已推送到GitHub：
 
 - [v9 Pulp-only Stage1 owner](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage1_human_anchor_residual_pulp_only_r3/train.py)
 - [Stage1 representation model](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage1_human_anchor_residual/model.py)
 - [C0 fixed-H model](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_v11_fixed_h_camera/model.py)
 - [C0 fixed-H training loop](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_v11_fixed_h_camera/train.py)
 - [protected-H shared evaluator](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/experiments/stage2_protected_h_vimogen/evaluate.py)
-- C1REL geometry：`experiments/stage1_sm_representation_controls/geometry.py`（local commit `0cf5f91`；pending push）
+- [C1REL geometry](https://github.com/RipeMangoBox/StoryMotion/blob/0cf5f9165e688f16b56a0d53b48ff15a0a1e8f0b/experiments/stage1_sm_representation_controls/geometry.py)
 - [experiment contract](https://github.com/RipeMangoBox/StoryMotion/blob/31e9df5b225208184f29a5b16d0c3c24561394fc/docs/experiment-contract.md)
 
 ## 2. 研究问题：三个接口必须同时成立
@@ -456,7 +456,7 @@ is relative to linkedCodebases/StoryMotion/; every SHA256 was measured against 4
 31e9df5b225208184f29a5b16d0c3c24561394fc. `synced to 4090 HEAD` means the local mirror content
 hash equals the audited 4090 source hash；它不表示复制了run artifact或checkpoint。表内
 `stage1_sm_*`／`stage2_sm_*`路径按rename commit `0cf5f91`解析；rename未改变这些文件的
-content hash，且尚待GitHub push。
+content hash；rename branch已推送，尚待review／merge。
 
 | relative source path | SHA256 | status |
 | --- | --- | --- |
