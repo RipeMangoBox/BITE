@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-10T21:26:13+08:00
+updated: 2026-08-11T11:14:45+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -39,7 +39,7 @@ updated: 2026-08-10T21:26:13+08:00
 - Active v11 modes are Direct-H, Direct-C and sequential Human→Camera. `joint_parallel=false`; evolving-H solver is closed.
 - Direct-H is Human-text-only. Direct-C is observed Human latent plus Camera text. Sequential first samples final Human, then samples Camera with that frozen Human.
 - v11 C0-LAT is the operational Camera-only latent-flow mainline at Camera optimizer `105K`; C0-GEO shares exact v9 Stage1/Human owner and adds decoded Camera/framing geometry objective as an audited alternate.
-- HREL, C1REL and true-P2 are v9+ full-cohort system/ablation evidence. A row may compare systems, but different representation, decoder, objective, initialization or mode prevents a single-variable causal claim.
+- HREL, C1REL, true-P2 and the observed-Human G-on/G-off route controls are v9+ full-cohort system/ablation evidence. A row may compare systems, but different representation, decoder, objective, initialization, runtime or mode prevents a single-variable causal claim.
 - Formal data boundary is complete materializable train/eval IDs `162,760/4,053`; PulpMotion's “matched available-data cohort” is the same ID set, not a smaller StoryMotion subset.
 - Loss/TensorBoard values, training progress and deployment logs remain in run artifacts; this page owns decoded metric results and audit boundaries only.
 
@@ -66,7 +66,7 @@ HumanML3D `N=1,460` root/local reconstruction is a cross-domain special diagnost
 
 ## 4. Active Stage2 full-cohort evidence
 
-The active Stage2 headline is v11 C0-LAT at Camera optimizer `105K`; C0-GEO, HT-FILM/HX/DR, HREL, C1REL, C1REL-noI16, seed23 repeat, Pulp native and True-P2 remain auditable controls. Complete pure4053 fields, hashes and exception boundaries are retained under [[#4A. v9+ Stage2 audited detail tables]].
+The active Stage2 headline is v11 C0-LAT at Camera optimizer `105K`; C0-GEO, HT-FILM/HX/DR, HREL, C1REL, C1REL-noI16, seed23 repeat, Pulp native, True-P2 and the observed-Human G-on/G-off route controls remain auditable controls. Complete pure4053 fields, hashes and exception boundaries are retained under [[#4A. v9+ Stage2 audited detail tables]].
 
 ### 4.1 C0-LAT competition snapshot (pure4053 formal)
 
@@ -81,6 +81,8 @@ This compact reviewer-facing snapshot uses only complete pure4,053 formal rows a
 | C1REL / `sm_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | pure4,053; C1REL owner; three-interface formal | 104.331841 / 17.276762 | 18.183035 / 61.985516 | 1.709340 / 1.785491 / 35.901068 | 17.322052 / 61.360668 | — | 2.990472 / 3.093771 / 71.352258 | representation control; no semantic paired-unit significance claim |
 | C1REL-noI16 / `sm_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | pure4,053; Interaction16 removed; three-interface formal | 92.033676 / 17.619104 | 65.427673 / 43.920853 | 1.665444 / 1.777655 / 41.145027 | 89.051743 / 41.235523 | — | 2.646307 / 2.745572 / 67.081549 | matched component ablation; not a universal necessity claim |
 | True-P2 / `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | pure4,053; symmetric-joint diagnostic; three active modes | 97.553619 / 18.013281 | 131.628693 / 37.851692 | 2.025185 / 2.145800 / 49.877689 | 104.280891 / 40.078587 | 0.499214 | 2.476393 / 2.583847 / 64.814241 | fresh symmetric joint; diagnostic-only, not causal rank |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | pure4,053; source row1; 4090 runtime; three active modes | 102.445770 / 17.845230 | 33.146400 / 54.313377 | 2.388501 / 2.498247 / 56.352396 | 23.822430 / 58.139671 | 0.741294 | 2.918527 / 3.029785 / 70.852242 | route-control diagnostic; mixed Pareto, not a promoted system |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | pure4,053; source row1; 5090 runtime; three active modes | 96.372887 / 18.613176 | 29.300417 / 55.365463 | 2.501148 / 2.616128 / 58.310559 | 25.601322 / 57.573360 | 0.743736 | 2.980856 / 3.099442 / 70.781130 | detached route control; host/runtime is an explicit covariate |
 | PulpMotion native / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | pure4,053; native-joint only | — | — | — | — | — | — | native-joint TMR/FDTMR=`15.332323 / 375.383148`; CLaTr/FDCLaTr=`14.281564 / 275.958374`; no direct StoryMotion ranking |
 
 The table is a protocol-aware snapshot, not a single leaderboard: representation, owning decoder, objective, initialization, and native-joint versus asymmetric mode differences remain explicit. Exact fields, artifact identities, hashes, and uncertainty boundaries are retained in the detailed Stage2 sections below.
@@ -997,11 +999,295 @@ P1/P2 audit records 仅有 geometry，故 distributional／semantic 与 decoded-
 
 P1 HREL使用不同的Human teacher／Stage2 checkpoint初始化，因此以上paired CI只说明在同一评测器
 与采样协议下的field-wise差异，**不是**严格的factorization因果效应。与P2 exact初始化相同的
-C0-LAT才是训练干预reference；在它通过同一`128/1` evaluator/noise合同并形成paired audit前，
-不得把本节压缩为“protected asymmetry全面优于symmetric joint”。当前只能描述为mixed Pareto：
-相对P1 secondary reference，P2的Human与sequential Camera paired geometry更低；Direct-C Camera
-geometry更高，Direct-C／sequential Camera semantic与framing cohort aggregate回退。这个结果
-说明symmetric joint尚未形成更可用的Camera interface，但不识别唯一退化机制。
+C0-LAT现已通过同一`128/1` evaluator/noise合同并完成paired audit，见§3.21：结论仍是mixed
+Pareto，P2的Human与sequential Camera geometry更低，但Direct-C Camera geometry更高，且两种
+Camera接口的semantic／framing cohort aggregate回退。§3.21的source-row replay同时证明C0
+sequential依赖训练未覆盖且会改变全部样本Camera输出的row1；因此它关闭了初始化／evaluator执行
+缺口，却仍不允许“protected asymmetry全面优于symmetric joint”或source-row-free严格因果措辞。
+
+
+### Audited detail — original §3.20 C1REL-noI16 seed23 full-cohort repeat
+
+| display ID | canonical sm_ run alias | setting | goal |
+| --- | --- | --- | --- |
+| C1REL-noI16-seed23 | `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | fresh training seed23；C1REL-C48 owner with Interaction16 removed；raw Pulp Camera captions；three active asymmetric modes | independently repeat the Interaction16 component arm |
+| full-C1REL-seed23 reference | `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | sealed full-C1REL seed23 result from §3.17 | same-seed component reference |
+
+每行是一个named arm/reference。noI16 seed23完成Human `105K`＋Camera `105K`，final
+global step=`210K`；checkpoint tensor audit确认Camera input/output为`48D`、source embedding为
+`[2,512]`、Human为`128D`且`is_causal=false`。正式评测只含Direct-H、Direct-C与sequential，
+`joint_parallel=false`；pure-test `N=4,053`，ordered-ID SHA-256=
+`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`，
+eval/decode batch=`128/1`，shifted-sigma explicit Euler50、eta=0、CFG=1、固定evaluation seed17。
+训练seed仍为23；固定evaluation seed用于与既有reference共享noise，不改写run identity。
+
+noI16 seed23 checkpoint SHA-256=
+`6f1ac203689c9df4af956eb5b78fe97a1669688c4d87a86908cc8198d20c5f3b`，Human teacher
+SHA-256=`8603339b3e4526d003c2b1aa740e969664ee9d0a79f29eeaa94ea7a184f1497d`，owning
+decoder SHA-256=`b8b572d5562f0946896ac9fc6af866d9ea636c9460e461628b81bb2d2329be0b`，
+training contract SHA-256=`66eaa2ae328de6870f0e84e6925c904ac673a1b21e94468d2c03ca1e2b015442`。
+sealed audit canonical alias为
+`sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810_formal_pure4053_r1/sealed_audit_noi16_seed23.json`
+（exact immutable path见[[StoryMotion-folder-rename-map]]），SHA-256=
+`67485dc4ddb30669a3e4272745bb2d33bdbd940556715ff2599489f43e567840`。
+
+#### Formal artifact identity
+
+| version / run | mode | evaluation contract SHA-256 | fixed samples SHA-256 | records SHA-256 | results SHA-256 | manifest SHA-256 |
+| --- | --- | --- | --- | --- | --- | --- |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-H | `fbdb923e1f85944aad89ca273e3b07f2335fd471d708015acf56852d32c1d089` | `dc2c522cf745e1439a8731989e8092e6492cec58bffa86e89344c411e58848f4` | `2b02d782980d6dab68082466d4b95d06865e7b4af0835a310b2a67f3a806abe3` | `cf1b7ae0125586775bdf052cc909f7763dca85873660a74db859aa970d6aa716` | `89f4338d1461bcdf2d66ede731a1a8c95baa52136a2a0fb35b38e03bbf126b66` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-C observed-H | `2613be6b0cb5c3446128c7d9e7a2e1e1a7114cb3d82421a4eef7e9128e6a0339` | `61da766498135baa21e8ca03a6b775d6a923612e2c9ad5b560fb95b88fb5cb6c` | `8f4fae7e02281c51afe4bfaee703891105a187e3d3de99723726b4339898a2b5` | `49b9924a9b5c09b70042a76a1894f0db8684f5ebe76419858a89486d0a11bed9` | `0680f0ff5afbd9f1a8312539f05ec54b103ed9e800db08feade6b951f056e596` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | sequential Human→Camera | `9ea1f830a9560d48de0679019808aab92f6d96b1e89a974607b8ec3505727a24` | `a389de5b9fa5ba2624d76f7ae7f4a98990a4c9899af071cf80598b90146cc0eb` | `d060ff384e63db19cce6976994f4665ff72ae3a7d14bdd37e1436e5575b151e9` | `52c456c4b4cd3b2159c3cd2a63d880ac3b21e45776194d39e29eafeb0669651c` | `909ab0b5be4eed2cd9892bccff635d19617fee70cab935d08991a560df137033` |
+
+#### Aggregate metrics and paired geometry
+
+| version / run | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | observed-H TMR ↑ / FDTMR ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| --- | --- | --- | --- | --- | ---: | --- |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-H | `17.800165 / 93.129906` | — | — | — | — |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-C observed-H | — | `43.644409 / 66.523109` | `15.575075 / 9.833646` | `0.541792` | `8.256357 / 0.440641` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | sequential Human→Camera | `17.800165 / 93.129906` | `40.343426 / 92.991791` | — | `0.492550` | `8.533516 / 0.438627` |
+
+| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| --- | --- | --- | --- | --- | ---: |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-H | `0.850149 / 0.229023` | `0.764463 / 1.274428` | — | — |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | Direct-C observed-H | — | — | `1.664651 / 1.775128` | `41.231200` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | sequential Human→Camera | `0.850149 / 0.229023` | `0.764463 / 1.274428` | `2.627770 / 2.727306` | `66.708058` |
+
+Direct-H与sequential共享同一Human输出；teacher regression max-abs=`4.1008e-05`。上述semantic／
+framing字段是cohort aggregate，没有逐样本semantic bootstrap单位。
+
+#### Same-seed component comparison and repeat boundary
+
+相对§3.17的sealed full-C1REL seed23，删除Interaction16后，Direct-C的CLaTr／FDCLaTr差值为
+`-17.965992 / +46.161398`，sequential为`-20.566078 / +74.389177`；caption F1分别变化
+`-0.230566 / -0.273797`，r-FPD分别变化`+6.929227 / +7.862639`。四个预声明方向
+（两模式CLaTr下降、FDCLaTr上升）全部通过，但这些仍是aggregate direction gate，不是semantic显著性检验。
+
+下表差值均为`noI16 seed23 − full-C1REL seed23`；每个cell为
+`mean delta [95% CI]`，使用exact ordered sample执行10,000次paired bootstrap。
+
+| version / comparison | mode | metric group（均↓） | mean delta [95% CI] |
+| --- | --- | --- | --- |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` − full-C1REL-seed23 / `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-H | Human global MPJPE；root ADE；root-aligned MPJPE；root FDE | `-0.001234 [-0.012370, +0.009972]`; `-0.000211 [-0.011291, +0.010428]`; `-0.002311 [-0.004270, -0.000336]`; `-0.004430 [-0.027025, +0.017701]` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` − full-C1REL-seed23 / `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Direct-C observed-H | Camera ADE；Camera FDE；Camera rotation | `-0.015999 [-0.064162, +0.033819]`; `+0.024299 [-0.025927, +0.074107]`; `+5.741240 [+4.555008, +6.938256]` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` − full-C1REL-seed23 / `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | sequential Human | Human global MPJPE；root ADE；root-aligned MPJPE；root FDE | `-0.001234 [-0.012323, +0.009520]`; `-0.000211 [-0.011255, +0.010696]`; `-0.002311 [-0.004272, -0.000339]`; `-0.004430 [-0.026642, +0.017403]` |
+| C1REL-noI16-seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` − full-C1REL-seed23 / `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | sequential Camera | Camera ADE；Camera FDE；Camera rotation | `-0.360764 [-0.410682, -0.312155]`; `-0.361588 [-0.411744, -0.312594]`; `-4.793408 [-6.088850, -3.485564]` |
+
+裁决是**semantic／framing collapse复现，但geometry为mixed Pareto**：Direct-C rotation显著更高，
+sequential三项Camera geometry反而显著更低；Human除小幅root-aligned项外没有稳定差异。因此结果支持
+Interaction16在两seed的matched component protocol中具有可重复的Camera semantic／framing贡献，
+不支持“所有字段都退化”或普遍必要性。full-C1REL与noI16会按声明的组件干预一起改变Stage1
+representation owner、owning decoder、Camera width和参数量；该比较不是Stage2-only单变量消融。
+
+noI16 seed23相对seed17的全部paired geometry CI跨零，但seed17 evaluation contract绑定的旧training-contract
+SHA=`32f39697f55d3bdc71cd8ecec54be771805547d2d19a6ce42da2e55f83478dd9`在同一路径已变为
+`6edca8b2d99ffa4807a0c9186291f13d43d8bd39ffc618dc361cf6abd3b4daf8`，run root中没有旧bytes；故该
+cross-seed结果只作provenance-limited secondary repeat，不称fully hash-matched。这个例外不影响上述
+same-seed noI16 seed23 vs sealed full-C1REL seed23 primary gate。另有三个保留的执行例外：训练合同预测
+decode batch=`64`而正式执行为`1`；run-local `meta.json`遗留C64架构标签而contract／checkpoint tensor
+均为Camera48；训练seed23使用固定evaluation seed17。所有原bytes均不回写。
+
+
+### Audited detail — original §3.21 exact-initialization C0-LAT reference and source-row diagnostic
+
+| display ID | canonical sm_ run alias | setting | evidence role |
+| --- | --- | --- | --- |
+| exact-init C0-LAT reference | `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | exact legacy C0-LAT Camera `105K` EMA and canonical frozen Human teacher; True-P2 data/evaluator/sampler boundary | full-cohort formal-protocol reference; diagnostic-only and promotion-ineligible |
+| source-row replay | `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810/diagnostic_source_row01` | fixed sequential samples/noise; only Camera `source_id` changes from untrained row1 to trained row0 | full-cohort sensitivity diagnostic; not a formal fourth mode |
+
+三种正式模式均使用pure-test `N=4,053`、ordered-ID SHA-256=
+`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`、
+eval/decode batch=`128/1`、shifted-sigma explicit Euler50、eta=0、CFG=1和相同逐分支确定性
+noise。`is_causal=false`、`joint_parallel=false`，不存在evolving-H或第四种formal mode。
+checkpoint SHA-256=`b7759ea686ddc8bd9abc2db2b3a6f74421bf3f6033274863d715f58b0d66b96a`，
+canonical Human teacher SHA-256=`3efd59481f8052b401889fce6559e31f96cb88f51dfb6c466464cf05ec6c2c50`，
+owning decoder SHA-256=`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`。
+正式实现绑定clean commit `989693955ecbfc3c4cfe6f7c326d981e5f3366d4`；legacy C0 identity contract
+SHA-256=`1d05bef03cf10b839bb75018cd6ca0efff8d0a4696f6cafcbbafb028fb69e326`，
+True-P2 contract SHA-256=`b57ef7103a23aca806a61f9ea50d4ff585a117e46b32278000e8e0950a59aa51`
+在这里仅拥有data／evaluator／sampler boundary，不改写C0训练语义。
+
+#### Formal artifact identity
+
+| version / run | mode | evaluation contract SHA-256 | fixed samples SHA-256 | records SHA-256 | results SHA-256 | manifest SHA-256 |
+| --- | --- | --- | --- | --- | --- | --- |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | `93e2062cbe715136887024d9b7078dabdb4b6832a4199d6498e4cf495b11ee9b` | `ec467d6931fb9fc3391e0b0bfda8f6fc2e431a1f3d4f9b2c029d82aa9a26636e` | `8b8123ff1770b19c1b5efde4135193a88d702e5c5614e4b6f4ade796f3eb5e1d` | `b932d966031af331de497989654ec837aa88deae3dcf1d02fb80e9d81ecfbf2a` | `dd63e5ce90b8941faae513b6518152a3e49e25f5834e40c45067d60ba5a856d5` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H, source row0 | `701a089024c30a5e00c990aec891a53d98bc186140d7108ab3e5e41346ed5ad4` | `7e295949a939db06ea5ed0d6d9bf1091f9f085121e4457799500009b8c89a0fe` | `6a3150c2d8d54dda1777977f1bf72a40406408904e447c632969a4da43d90125` | `bf85dd04c423c33262bbe8fea61b22f14d0f3bdfa4c1ad3cff31cf936c56c6a6` | `c37b057cf1ce7c7a134a5cc22e4e4152235c03a564b59f6905b4dba00028a1da` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human→Camera, source row1 | `1ff617dc0b1c328dfd913a9d87b15391121466668e245e8020864579d88fb6d3` | `d1e7059f360861cfc6dd09b6fc0a81c25909440176467a2d6f57ea0374400f3c` | `6375b261fc4d972de02cc62f869a3f70a17ebeb26a465d14f4c8c55ed4b0b808` | `fe6670ff41644c86084a680210ca821493b9854dac4aa16897534f1ce5165fe1` | `f575f14cb432d0d8b67b294d9c6baa943c4d53e592ae6efbb1109d62b9f9f674` |
+
+#### Formal metrics
+
+| version / run | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| --- | --- | --- | --- | ---: | --- |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | `17.354467 / 100.254402` | — | — | — |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H, source row0 | observed-H `15.659584 / 7.944044` | `56.586727 / 22.163630` | `0.731021` | `0.799310 / 0.100393` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human→Camera, source row1 | `17.354467 / 100.254402` | `55.393429 / 29.761435` | `0.685826` | `0.507365 / 0.078331` |
+
+| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| --- | --- | --- | --- | --- | ---: |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | `0.848565 / 0.230946` | `0.762336 / 1.278247` | — | — |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H, source row0 | — | — | `1.404148 / 1.487332` | `30.184385` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human→Camera, source row1 | `0.848565 / 0.230946` | `0.762336 / 1.278247` | `2.896272 / 2.993438` | `70.880520` |
+
+Direct-H与sequential Human逐元素exact，max-abs=`0`。
+
+#### True-P2 minus exact-init C0-LAT paired audit
+
+下表为`True-P2 − exact-init C0-LAT`的`mean delta [95% percentile CI]`；均使用同一4,053个
+ordered IDs、10,000次matched-index bootstrap、seed=`260812`。列内metric均为↓。
+
+| version / comparison | mode | metric group | mean delta [95% CI] |
+| --- | --- | --- | --- |
+| True-P2 / `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | Human global MPJPE; root ADE; root-aligned MPJPE; root FDE | `-0.020787 [-0.031666, -0.010184]`; `-0.015894 [-0.026625, -0.005393]`; `-0.008937 [-0.010747, -0.007137]`; `-0.026080 [-0.048386, -0.004738]` |
+| True-P2 / `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H | Camera ADE; Camera FDE; Camera rotation | `+0.621037 [+0.567702, +0.674284]`; `+0.658468 [+0.601490, +0.715619]`; `+19.693304 [+18.281702, +21.124427]` |
+| True-P2 / `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human | Human global MPJPE; root ADE; root-aligned MPJPE; root FDE | `-0.020787 [-0.031421, -0.010356]`; `-0.015894 [-0.026467, -0.005252]`; `-0.008937 [-0.010755, -0.007113]`; `-0.026080 [-0.048255, -0.003953]` |
+| True-P2 / `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` − exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Camera | Camera ADE; Camera FDE; Camera rotation | `-0.419879 [-0.464221, -0.376540]`; `-0.409590 [-0.455058, -0.364457]`; `-6.066279 [-7.409024, -4.671518]` |
+
+全部14项geometry CI不跨零，但方向构成mixed Pareto。P2相对C0的aggregate差值为：Direct-H
+`TMR +0.658814 / FDTMR -2.700783`；Direct-C
+`CLaTr -18.735035 / FDCLaTr +109.465063 / caption F1 -0.279733 / r-FPD +2.388920 / Out +0.124709`；
+sequential `CLaTr -15.314842 / FDCLaTr +74.519457 / caption F1 -0.186612 / r-FPD +1.516708 / Out +0.079490`。
+semantic／framing字段仍是cohort aggregate，没有逐样本paired CI。因此严格初始化reference支持的结论是：
+P2改善Human及sequential Camera geometry，同时显著损害Direct-C geometry与两种Camera接口的
+semantic／framing；不存在单一winner。
+
+#### Source-row sensitivity and corrective boundary
+
+C0-LAT训练只使用Camera source row0（observed/GT）；formal Direct-C也使用row0，而formal sequential
+使用训练未触达的row1（generated/teacher-final）。checkpoint的`camera.source_embedding.weight`
+shape=`[2,512]`：row0 L2=`0.376517`、SHA-256=`defff3ad66d7a3a0a05c0279d7e951a100d9bea0796cacadcaab907c48fa34b1`；
+row1为exact zero、SHA-256=`e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad`；
+row0−row1 L2=`0.376517`、max-abs=`0.045465`。
+
+固定formal sequential的Human、Camera text、ordered IDs与noise，只将row1重放为row0后，Human在全部样本
+逐元素exact；4,053/4,053样本的Camera latent及decoded Camera均发生非零变化。每样本Camera-latent L2
+mean/median/P90/P99/max=`3.059385 / 2.153666 / 5.005076 / 24.109246 / 87.388237`；
+decoded-Camera L2=`1.017175 / 0.507861 / 1.586884 / 14.615968 / 67.628067`。
+diagnostic contract／records／summary／manifest SHA-256依次为
+`7a07c35c877fd8a598f08b25c73b1df86a10147273073dc53684cfd11c4a8138`、
+`cbe5a58db3eae7b54d0cc8e6cedaef5368cf54548c570c73d6c6016c7094da30`、
+`f056193bc8dc2dc6015f24468b012db50e6e9cf5606030eaeb69e52a95af6977`、
+`1d55ebccff752c7f891872dfef6e00ddb2b4041319045bcb02f3a48f39189477`；诊断实现commit=
+`7ae3b08c0a5552f18cbbf4a8b395b026f9c3db99`。
+
+sealed audit为
+`sm_c0_lat_true_p2_reference_seed17_4090g1_20260810/sealed_audit_c0_reference_source_row01.json`
+（exact immutable path见[[StoryMotion-folder-rename-map]]），SHA-256=
+`1d823b05b996a910253c5fecbb3db3d2be4ca82ca14ad441e83d6bb848253215`。
+裁决：exact-init三模式formal与P2 paired closure已经完成，但source-row diagnostic证明sequential
+依赖一个训练未覆盖的row1；它不允许把现有sequential artifact解释为source-row-free的factorization
+因果证据。需要先预声明并实现source-row语义修正，再决定是否进行corrective training；本诊断不选择
+tie/remove embedding、补充generated-H训练或任何具体重训方案，也未授权或启动新长训。
+
+### Audited detail — original §3.22 observed=true symmetric route controls pure4,053 formal
+
+| display ID | canonical sm_ run alias | training route | role |
+| --- | --- | --- | --- |
+| observed=true, G=on | `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | `observed_human=true`；Camera loss reaches Human；Human loss continues；source row1 | coupled route control |
+| observed=true, G=off | `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | `observed_human=true`；Camera loss detached from Human；Human loss continues；source row1 | detached route control |
+| historical True-P2 | `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` | `observed_human=false`；G=on；U=on；source row1 | route reference from §3.19 |
+| exact-init C0-LAT | `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | frozen Human；Direct-C row0、sequential untrained row1 | operational reference from §3.21 |
+
+两条新臂均完成Camera／joint optimizer `105K`。endpoint audit确认model与EMA同时包含完整Human／
+Camera state，optimizer、scheduler、RNG、sampler、embedded contract、implementation boundary与
+checkpoint reload均闭合。预声明的step `20/100/1K/5K/21K/42K/63K/84K/105K`九次gradient
+audit全部通过：G=on的Camera→Human梯度finite nonzero，G=off对应梯度exact zero，其余Human／Camera
+梯度finite。两臂正式评测均为Direct-H、Direct-C与sequential，`joint_parallel=false`、
+`is_causal=false`、shifted-sigma Euler50、CFG=1、eval/decode batch=`128/1`，ordered pure-test
+`N=4,053`及ID SHA-256=
+`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`。
+
+公共owning decoder SHA-256=
+`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`，canonical Human teacher
+SHA-256=`3efd59481f8052b401889fce6559e31f96cb88f51dfb6c466464cf05ec6c2c50`。
+G=on checkpoint／training contract／endpoint audit SHA-256依次为
+`d2921293dd0e6115d59490e0cc311188a3ee2e4605426031ed9a29e32a8638c0`、
+`3ac108c3b2aeb7937409ee69b871115f5d17797aa66a8b251a1b0e094bdcb591`、
+`c2c8c6f1f3fc826c8416c0cc132e248bd3d9f5b3dc9c45ce4611c46022bea2a0`；G=off对应为
+`3535ac9e45ab920db4275524c1239edf2eed0586824f4928c410e1817eff7069`、
+`81b7987752ed7663f54e80fde08a32ba203bde15d0a1ecb6e1e41f9b953a6f44`、
+`b33b7fd5066e808e2cf7f1d3fee914106d5e8499f81e7d43274fff18d70f021f`。
+
+#### Formal artifact identity
+
+| version / run | mode | evaluation contract SHA-256 | fixed samples SHA-256 | records SHA-256 | results SHA-256 | manifest SHA-256 |
+| --- | --- | --- | --- | --- | --- | --- |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-H | `ce6a48f3fa37dedf269eeb1a5108681fa4dc6445479c315228b42776b185813e` | `92cd859ef0418bdef50b945d4023217b0dcc6a067d6f27f43968282dd7d20f99` | `5832829a90e91588cd52b5800a4bc8d15bad6e7aa031e058375fee1e5c1b3741` | `d8d47d1c3585497f159020385c6fdfd0bd5deb977c285aaadc4a382ce87192da` | `b6b410e6372f640e5a57f1de3e4f6c3a13a0754f2a72d27cd1cc6125cf6fad3f` |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-C observed-H | `c04df3185bbb5278a0733b4714d1a07faba09da826f3db71b59c8b05725dbdc1` | `7beb46ebb500e8abf52ff88350eab1552d457e3ee311ec91f8cc470dc0fe8c94` | `340a1554085e7c6adf635aca3acf404aba1459cee5d623bf22f33ae1e27fc6d8` | `05d8b8655c555a245360a734c5f77e68a3a679156f5217e8d9cfa3009a8d27d6` | `170fc5bfd64055c9a9f1b58d7e52165d4dfd8f92383918a16c5127537f255799` |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | sequential Human→Camera | `e62e01ca85a7cad5db8d526f2f0f57063ab6d4f3e267ec244014f1a6939c787f` | `dc9fd3b78bef3eaaad9c3bf258151334ed4d7abce9c18b8c019534140c036491` | `3d301ff6147c5b45f27736af3db2e2c66932e6f1871a1c2b2d075b3b4f5873f1` | `754a20cf484028b604a5312e2ee179fdebae8377aa451ef473a30628b38fb1b9` | `0c986dcfda01e4db52c8428aa3ca0360d5382c5950598bf10fd152c6f163dcb6` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-H | `2140f745e3495cb7d4283d616da01689cbdc8f2079c7ed544ffa3c84975ba67d` | `6a7cf0de0a43389d0bfda5ea52f5f90fe19b25b4adee455cefecfdf875db0efe` | `52fbd91cdd9a5a85a0065620d45418de0d800e422bda10f4d0c36543075bd6b0` | `55ed8c86a4bad1306d51c2486a86a0b6458db62a6cc30781a7fc593f88bab7df` | `ed19c64ce66a884239b9172556e4eda7dfebfb2cf13428e42dfa0ae4d308c376` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-C observed-H | `831bb0e31e717180ed567e6bacec1ab180014e13c9a30f1aa199d1e979610b3a` | `2a486bfdeced682484337661c605b594d8ed1bb9a1fc3a926799b1f2b887c071` | `4679ed6369e15f5677067cb063027762a62d810a6dab1902c5bbde75028212eb` | `e8769db9c908ee9701eba5eb33df892723ccededc332172ce1abfe7a086c7326` | `312fa3775f7f7fb61814f36aca882468c00218a9bf3df679a3ef195b8cfe5820` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | sequential Human→Camera | `e5169097434a543d10fb71c04ca4624e92f501a5213c874084beaa7e894a2e51` | `94e6f3624ba9776ae8292b044c2210170422a8a3ebd59a118af748faa2035e93` | `659849e09ddf844d0aa00235bcf5c91c092357f26dbe7846b138a532e1283869` | `2cf7b98913929de85da6e1ff0d9942fb3a7a8ea9f69216491ced0d7c24d03da9` | `d1b5e4b053d0c80b8edc9cabe5d287c08b76d9188db3d53ea6f6e2b46258885f` |
+
+G=on／G=off sealed eval audit SHA-256分别为
+`c38c506dd88ebb06903f43166c62f7f7186ccb6ca61a2b8f50b684b83d2326dc`／
+`4d2bd81853f9591a1eecfd5fccf2994a37909b0c2be1d9d8f5d49dcc93994805`。
+G=off正式bytes以只读comparison input保存在G=on eval root下的
+`comparison_inputs/detached_5090/pure4053/`；seal重新核验每个manifest与artifact hash，比较读取这些
+5090原始bytes，不是在4090重跑detached evaluator。5090 runtime metadata仍由artifact保留，不能因staging
+而消除cross-host covariate。
+
+#### Aggregate metrics
+
+| version / run | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| --- | --- | --- | --- | ---: | --- |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-H | `17.845230 / 102.445770` | — | — | — |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-C observed-H | — | `54.313377 / 33.146400` | `0.713573` | `1.812493 / 0.167663` |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | sequential Human→Camera | `17.845230 / 102.445770` | `58.139671 / 23.822430` | `0.741294` | `1.014779 / 0.116215` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-H | `18.613176 / 96.372887` | — | — | — |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-C observed-H | — | `55.365463 / 29.300417` | `0.733114` | `1.886545 / 0.171948` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | sequential Human→Camera | `18.613176 / 96.372887` | `57.573360 / 25.601322` | `0.743736` | `0.989905 / 0.115524` |
+
+| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| --- | --- | --- | --- | --- | ---: |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-H | `0.828285 / 0.223819` | `0.746462 / 1.254861` | — | — |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | Direct-C observed-H | — | — | `2.388501 / 2.498247` | `56.352396` |
+| observed=true, G=on / `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` | sequential Human→Camera | `0.828285 / 0.223819` | `0.746462 / 1.254861` | `2.918527 / 3.029785` | `70.852242` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-H | `0.829283 / 0.221986` | `0.747588 / 1.249277` | — | — |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-C observed-H | — | — | `2.501148 / 2.616128` | `58.310559` |
+| observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | sequential Human→Camera | `0.829283 / 0.221986` | `0.747588 / 1.249277` | `2.980856 / 3.099442` | `70.781130` |
+
+#### Paired route-control audit and causal boundary
+
+下表为`left − right`的mean delta与95% percentile CI；lower-is-better geometry按同一4,053个
+ordered IDs做10,000次matched-index bootstrap。semantic／framing只有cohort aggregate，不附造
+paired CI。
+
+| version / comparison | mode | metric group | mean delta [95% CI] |
+| --- | --- | --- | --- |
+| G=on − G=off | Direct-H | Human global MPJPE；root ADE；root-aligned MPJPE；root FDE | `-0.000998 [-0.016342, 0.013772]`；`-0.001126 [-0.016764, 0.014216]`；`+0.001832 [-0.000618, 0.004252]`；`+0.005584 [-0.023057, 0.033504]` |
+| G=on − G=off | Direct-C | Camera ADE；FDE；rotation | `-0.112647 [-0.166972, -0.058112]`；`-0.117881 [-0.176609, -0.060989]`；`-1.958163 [-3.447080, -0.528759]` |
+| G=on − G=off | sequential Camera | Camera ADE；FDE；rotation | `-0.062329 [-0.119977, -0.005823]`；`-0.069657 [-0.127882, -0.010750]`；`+0.071113 [-1.523275, 1.675527]` |
+| G=on − historical True-P2 | Direct-C | Camera ADE；FDE；rotation | `+0.363317 [+0.320545, +0.406139]`；`+0.352447 [+0.305621, +0.398184]`；`+6.474707 [+5.281071, +7.661443]` |
+| G=on − historical True-P2 | sequential Camera | Camera ADE；FDE；rotation | `+0.442134 [+0.402287, +0.482851]`；`+0.445938 [+0.404240, +0.488569]`；`+6.038001 [+4.905851, +7.160045]` |
+| G=on − exact-init C0-LAT | Direct-H | Human global MPJPE；root ADE；root-aligned MPJPE；root FDE | `-0.020280 [-0.029381, -0.011242]`；`-0.015874 [-0.024598, -0.007182]`；`-0.007128 [-0.008950, -0.005288]`；`-0.023386 [-0.041084, -0.005427]` |
+| G=on − exact-init C0-LAT | Direct-C | Camera ADE；FDE；rotation | `+0.984354 [+0.925758, +1.043899]`；`+1.010915 [+0.950138, +1.072369]`；`+26.168011 [+24.692029, +27.630983]` |
+| G=on − exact-init C0-LAT | sequential Camera | Camera ADE；FDE；rotation | `+0.022255 [-0.027944, 0.071142]`；`+0.036347 [-0.014966, 0.088674]`；`-0.028278 [-1.468793, 1.447926]` |
+
+相对G=off，G=on不改变任何有显著CI的Human geometry，却显著改善Direct-C三项与sequential
+ADE/FDE；sequential rotation CI跨零。对应aggregate为mixed Pareto：Direct-C的
+`CLaTr/FDCLaTr/F1=-1.052086/+3.845984/-0.019541`，但`r-FPD/Out=-0.074052/-0.004285`；
+sequential为`+0.566311/-1.778893/-0.002442`，但`r-FPD/Out=+0.024874/+0.000691`。
+因此G-on只获得“在该matched observed route下Camera geometry更强”的局部支持，不能写成整体支配。
+
+相对historical `observed_human=false`，G=on在Direct-C／sequential的aggregate Camera语义与framing
+大幅修复：CLaTr分别`+16.461685/+18.061085`、FDCLaTr `-98.482292/-80.458462`、caption F1
+`+0.262285/+0.242080`、r-FPD `-1.375736/-1.009295`、Out `-0.057439/-0.041606`；代价是上述
+六项Camera geometry均显著回退。它支持“训练route错位是历史semantic／framing collapse的重要根因”，
+但仍是trade-off，不是全面修复。
+
+相对exact-init C0-LAT，G=on显著改善Human geometry，Direct-C Camera geometry和semantic／framing
+均回退；sequential Camera geometry CI全跨零，CLaTr／FDCLaTr／caption F1改善，但r-FPD／Out回退。
+再结合§3.21的untrained source-row1，本组只关闭root-cause execution，不关闭source-row-free的
+protected-asymmetry superiority claim。
+
+sealed paired comparison artifact SHA-256=
+`7c0c5f77545f46052f5e26812c02ed9fe003baaa26fe562992e9c211a9eab490`；comparison audit script
+SHA-256=`ae0c821a67e0d2e5a9cd35cd6fb07d25d130336561602207a8b1c4dc967a81cf`；exact audit helper
+bytes只读保存在对应train/eval run的`audit_code/`。
+4090运行时为Python `3.10.14`、Torch `2.3.1+cu121`、CUDA `12.1`、cuDNN `8902`、driver
+`580.119.02`；5090为Python `3.10.20`、Torch `2.8.0+cu128`、CUDA `12.8`、cuDNN `91002`、
+driver `580.95.05`。因此G=on−G=off保留host/runtime covariate，不能升格为无条件单变量估计。
 
 
 ## 4B. v9+ Stage1 audited detail tables
@@ -1192,6 +1478,92 @@ cross-arm comparison／manifest SHA256为
 `dd89f88bb4fb08dc4cb0bb2dd8d2b126025e33117c983d6e7a20557c9700d254`；formal evaluator与
 comparison evaluator SHA256为`e6c8fb08f830b24dd2d36bedd4a3942065e807029149d073a67e14fb5e625eb0`／
 `c577b1d81d00200cdc24964994c15e7c1a62c53f49a43bf2dbbdfbc273c83e95`。
+
+### Audited detail — original §6.9 fully independent Human／Camera Stage1 native-system audit
+
+| display ID | canonical sm_ run alias | owner boundary | role |
+| --- | --- | --- | --- |
+| independent-H | `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` | Human199→H128；独立encoder、decoder、optimizer、checkpoint与branch-specific normalizer fields | secondary native Human Stage1 system |
+| independent-C | `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811` | world-C2W14→C64；独立encoder、decoder、optimizer、checkpoint与branch-specific normalizer fields；learned path不读Human | secondary native Camera Stage1 system |
+
+两条fresh non-causal Stage1 run使用exact Pulp train/eval ordered cohorts=`162,760/4,053`、seed17和
+train-only statistics；各自完成`210K` optimizer steps并原子保存／reload验证`105K`与`210K`
+full-state checkpoint。两branch没有共享learned parameter、optimizer、checkpoint或decoder；Camera
+cache只在materialization时用factual paired Human把HREL distance还原为absolute C2W center，训练consumer
+与learned Camera model不再读取Human。train/eval cache index SHA-256分别为
+`af8825ee56c0268c7b5dcd89a4034c29a46ad66f8737c2e53a040e0aff94fea6`／
+`f586ce46bd307ee5e2a737c5e933614d0e39f039c5b27e8008e7f8ad11381abf`。共同的只读
+`normalizer_stats.pt`容器分别保存train-only Human199与C2W14 mean/std；两consumer只加载各自字段，
+没有跨branch normalization。该artifact SHA-256=
+`073e52ad4a7ca7794463bc750f102ffc3dd16316ff776e0d7cf058997545e71a`。
+
+#### Formal artifact identity
+
+| version / run | endpoint | checkpoint / model-state SHA-256 | evaluation contract SHA-256 | fixed samples SHA-256 | records / results SHA-256 | manifest / endpoint seal SHA-256 |
+| --- | ---: | --- | --- | --- | --- | --- |
+| independent-H / `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` | 105K | `9689eef98b7df83a228fd91968164b3d84f5a36be9ce44126f52a975be1cca84` / `e881627b8633149827796473eb6e0d227dc897daaea35bb312e20021a2a981f4` | `744592b436c2fdde73f919153212cb891f820270a3ccce58821a5ec01527255b` | `ffad8d5e822ce3f8fa083d522192feb91f578d899e002d6c8c921d707f3af8ff` | `712df2ec210e40f343540397fce585911bbfadcd334d2f5d81ea6d6e8f09a61e` / `2b84a7736f4f7b6c7f6879d5e5db23f6e1f8238e93082427666a5ca309f6fef2` | `31d560f4cdaac6fa6b89ffa769dc9cbbf0a930764f4734dd66c7dc402c1bad7c` / `460e359afa802cda743e35b8dbe9c0eb777e11bc1e4b39867610d1ecb29d55ae` |
+| independent-H / `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` | 210K | `9b46896520431bb22f866c159700e0557439cab17464567fe3a5b592c96d24e9` / `fb84e4eac399f289ba5a2d195777b1145dc2877ee8f021ec9ff27fd2faed0277` | `09259c7b7cb042cb3eba47f2637e136965265131a2a0f127881e8d330d8ed582` | `61e852c0476feec6ef4454aced02cde50b3499c2f0ec96a4ac389448249e1b02` | `c321698d85d7eb8083de34d841ec511abc99d6fca2e7c9051b26d8f591fc7da2` / `11a9455c5aab8889df7100449b0d6cfcb8ec914465cc67112f1232ed48d99398` | `54b53ec182b48fc62f9d8d643a0b639804d86253d315daf6c9156a70c59a9083` / `0e22f5c003b63b8d74a00b4aea59aa520430d9e04770f8ac61bbb581986c9bcf` |
+| independent-C / `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811` | 105K | `3d190b130d082362d8c5471807c3c9380c49b8f65a0e5b38525954859ebe61ee` / `81b88fe9d00ede260e53cc7851ab04c159fbb9ff6ca11998cab167013abc3367` | `d5bf36f28980018ecfd7156122d06a2ec98332a4bbbf34b6fa2e27c28cdf10cf` | `cf1fc2be15223012f65b71071d57253f6bb5197b2e54633aa7c2c353ac52d7a0` | `e303c5421c1b9c1d5e62b3ca49ea9dac4bb857758db87011415d46adc89c4fae` / `a61531792f44ad1965de5e20cff2243c1260e319c3d280af919860a49a781bc4` | `6caf42bd67e19f2580151bf584738d8edbd33d9f998f1db1343c9d5547901e44` / `1eb331be18323a0f68787b1e0723462738e5392b10f506c982ce6f2a9f01cc3a` |
+| independent-C / `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811` | 210K | `979681044340fd41ee4c6edd063ee8d4d6e102188cd52fbc6112c6219b8715e8` / `f1f22bef06056815f2026b6d4d08c21dee8a9ea917340651ee08d230951e1abd` | `30a9c0206c91787b662951bfd34bde88a4369bbe8c0f9e45a83ebf79660b42b0` | `10a2556e9af940af7514c961dea6745309dd437ddb1b1bcc96dcf2dd0c0d4874` | `f95c46a301654d9b65a74b480dee0090da47c4c724b0e6caa58ca3a84bcc1147` / `1e5f82452b5c2e432d5d17bfcb4727e0e518c8c98690d19c67116c98e6f800ac` | `b8e9600662fc443f36c016a1ef0a9bffc5373795180fb9f25da2617712dbdb76` / `53a79262e0130078781afd83810e1158e6d7f062edd291c13c37f59a2421644e` |
+
+Human training contract／manifest／log／endpoint summary SHA-256为
+`ea085bf62e5bf31178aff9379e667a6d9604010e917a8a70b8c5446447e76fcc`／
+`a52f9624640c5d4759ab1b1581dcecc13871386cbb92908d8abdabc9be018ffc`／
+`ce12bf0ec9b36897189a0700c53ea78edfcdf3d7efb043effd2a142012ed37e7`／
+`be0ca643fe8fbbf909749b09b529a15b9f2149c3c70958e98381b15ea7660c1d`；Camera对应为
+`9510fe1a9d1a495c0c87a61e33026ab2a840e9db8d3e3477be941e8779fb5df8`／
+`b4b1b882c7e49c327e0886294fc7406fd085b055619aca10fc16262d57bc25c5`／
+`c7c153f93cf9d53cece7afc80452e26558a2f51a043206c733ef966c2d5a4a6a`／
+`084960716e2ec01e23152b2c200c010bda6e6a5934ba791dced6e365c1f65c6f`。
+
+#### Human and Camera reconstruction
+
+| version / run | endpoint | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | wrapped yaw mean / final ↓ deg | velocity / acceleration / jerk error ↓ m | latent active channels / effective rank |
+| --- | ---: | --- | --- | --- | --- | --- |
+| independent-H / `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` | 105K | `0.622276 / 0.192610` | `0.529873 / 1.060024` | `72.463502 / 89.867299` | `0.044848 / 0.033377 / 0.051026` | `128/128 / 42.929` |
+| independent-H / `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` | 210K | `0.167870 / 0.057315` | `0.145091 / 0.345824` | `16.059308 / 28.526968` | `0.017880 / 0.019987 / 0.032172` | `128/128 / 43.114` |
+
+| version / run | endpoint | Camera ADE / FDE ↓ m | rotation ↓ deg | FOV-H / FOV-W ↓ deg | velocity / acceleration / jerk error ↓ m | projective UV / center / scale / Out ↓ | latent active channels / effective rank |
+| --- | ---: | --- | ---: | --- | --- | --- | --- |
+| independent-C / `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811` | 105K | `0.021462 / 0.106367` | `0.311567` | `0.061200 / 0.101091` | `0.015458 / 0.023026 / 0.038907` | `0.036435 / 0.024218 / 0.006623 / 0.008246` | `64/64 / 15.426` |
+| independent-C / `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811` | 210K | `0.017597 / 0.084248` | `0.261007` | `0.054026 / 0.083821` | `0.012773 / 0.019168 / 0.032525` | `0.029197 / 0.020189 / 0.005448 / 0.006644` | `64/64 / 14.431` |
+
+Human `210K−105K`的十项误差95% CI全部低于零；代表性差值为global MPJPE
+`-0.454406 [-0.480980, -0.429073]`、root-aligned MPJPE
+`-0.135295 [-0.137954, -0.132586]`、root ADE
+`-0.384781 [-0.410850, -0.358752]`、root FDE
+`-0.714200 [-0.763931, -0.664825]`、wrapped-yaw mean
+`-56.404195 [-57.368950, -55.408399]`。Camera `210K−105K`的十三项error CI同样全部低于零；
+代表性差值为ADE `-0.003864 [-0.004091, -0.003646]`、FDE
+`-0.022119 [-0.023566, -0.020738]`、rotation
+`-0.050560 [-0.053767, -0.047486]`、projective UV
+`-0.007238 [-0.010473, -0.004463]`。均使用4,053个matched IDs、10,000次bootstrap。
+
+Human 210K decoded physical mean／median／P90为：bone CV
+`0.024896/0.018748/0.049165`、joint speed `0.035763/0.022525/0.079537`、
+acceleration `0.027898/0.017351/0.061306`、jerk `0.042581/0.026549/0.091710`、
+root speed `0.030591/0.017947/0.069521`、contact heuristic
+`0.494966/0.436508/0.992331`、skate `0.038348/0.023838/0.079905`。这些是未校准的
+physical diagnostics，不提供单调优越性结论。
+
+#### Native-system boundary
+
+210K明确优于各自105K，且所有latent channel active、无collapse；但它不替代StoryMotion v9 owner。
+independent-H 210K仍弱于v9 joint owner的Human aggregate（global/root-aligned MPJPE=
+`0.120708/0.042136`，root ADE/FDE=`0.100757/0.248722`，wrapped-yaw mean=`10.434°`）。
+independent-C相对v9 joint/GT-H owner在ADE、rotation与projective部分字段更低，但FDE更高；且它使用
+world-C2W14→C64的不同representation、decoder、normalization、参数量与interface，不能写成单变量优势。
+
+cross audit artifact为
+`sm_independent_dual_encdec_105k_210k_pure4053_audit_20260811/sealed_audit.json`，SHA-256=
+`9acc6b0f95610d60f77fd16fe678902093aa26bd1e6fb0097d30804ff5f1c020`；audit script SHA-256=
+`9a4d2aa13d549dc2b2684d51383a1b707fe9bef2bd5cfb0e4f01ca3dc0373760`；exact helper bytes只读保存在
+该audit root的`audit_code/`。implementation／evaluator
+revisions为`88c6a17f25e789af0716c07336bc3b512f505bc5`／
+`9ef42f84897c36773a018bd369eb8aeb4ce74919`，evaluator SHA-256=
+`e865f1e1f3568e0a5e6ad09e6cbc9d9fd93456efc74670c9558961ac082060f2`。
+本证据分类固定为secondary native-system Stage1 comparison；`stage2_authorized=false`，不自动授权
+独立双Stage2 cascade，也不进入protected-asymmetry核心消融。
 
 
 ## 4C. Special full-cohort diagnostic detail
@@ -1438,6 +1810,18 @@ Native boundary summary: [[#Audited detail — original §3.18 PulpMotion native
 
 Symmetric-control summary: [[#Audited detail — original §3.19 True-P2 matched symmetric Stage2 pure4,053 formal]].
 
+### 3.20 C1REL-noI16 seed23 full-cohort repeat
+
+Repeatability summary: [[#Audited detail — original §3.20 C1REL-noI16 seed23 full-cohort repeat]].
+
+### 3.21 exact-initialization C0-LAT reference and source-row diagnostic
+
+Exact-initialization and source-row boundary: [[#Audited detail — original §3.21 exact-initialization C0-LAT reference and source-row diagnostic]].
+
+### 3.22 observed=true symmetric route controls pure4,053 formal
+
+Route-control closure: [[#Audited detail — original §3.22 observed=true symmetric route controls pure4,053 formal]].
+
 ### 5.6 compatibility route — v9／v10 Human teacher owner非等价审计
 
 Canonical fixed-cohort owner-identity diagnostic: [[#5.6 v9／v10 Human teacher owner非等价审计]]. It is not a generation ranking row.
@@ -1453,6 +1837,10 @@ Current Stage1 detail: [[#Audited detail — original §6.4 Pulp pure4,053 compl
 ### 6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit
 
 Current Stage1 detail: [[#Audited detail — original §6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit]].
+
+### 6.9 fully independent Human／Camera Stage1 native-system audit
+
+Secondary native-system detail: [[#Audited detail — original §6.9 fully independent Human／Camera Stage1 native-system audit]].
 
 ### 6A compatibility route — Pulp Camera recaption first-20K quality audit
 

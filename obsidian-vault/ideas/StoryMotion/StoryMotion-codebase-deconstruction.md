@@ -9,7 +9,7 @@ tags:
   - contracts
   - status/maintained
 created: "2026-08-10T15:00:00+08:00"
-updated: "2026-08-10T21:26:13+08:00"
+updated: "2026-08-11T11:14:45+08:00"
 status: maintained
 source_host: "3090-local"
 source_root: "linkedCodebases/StoryMotion"
@@ -24,6 +24,8 @@ source_files: 31
 > frozen-Human Stage2；没有 `experiments/`、runs、checkpoint、cache、dataset、log、render、
 > rescue 或旧版本备份。历史实验身份和正式数字分别只在 [[version_family]] 与
 > [[StoryMotion-valid-metric-ledger]] 追溯。
+> 4090／5090随后完成的observed-Human route controls与fully independent H/C Stage1使用各自
+> immutable实验worktree；它们不会被回灌成3090 release core中的第二套实现。
 
 本页是实现地图，不复制指标表。指标定义与 I/O 见
 [[StoryMotion-metric-computation-io]]，当前论文决策见 [[current]]，ICLR 证据缺口见
@@ -146,7 +148,9 @@ program 的零样本拼接。
 
 这也解释了为什么“从 Stage1 起独立 Encodec-H / Encodec-C”不是一个干净的核心 ablation：
 它会同时更改 representation、decoder support、参数量、normalization 与 Stage2 interface。
-若论文不主张 latent-interface superiority，就不应仅因 GPU 空闲启动该整套替代系统。
+该系统后来经用户单独授权完成fresh 105K／210K、pure4,053与latent audit，只形成secondary
+native-system Stage1 boundary；它不进入protected-asymmetry核心消融，未授权Stage2 cascade，也不改变
+本地唯一owner。正式证据见ledger §6.9。
 
 ### 4.3 三阶段优化
 
@@ -225,17 +229,18 @@ Camera Transformer 预测
 $v_\theta(c_\sigma,t_C,z_H,\sigma)$，用 valid-mask 后的均方 flow loss 训练。C0 的
 `camera_step` 只使用 observed/GT Human；C0-GEO decoded auxiliary 不在当前发布树中。
 
-### 6.4 一个正在闭环的 source-ID 风险
+### 6.4 已审计但尚未修正的 source-ID 风险
 
 当前 [training step](../../../linkedCodebases/StoryMotion/storymotion/training/steps.py) 的 C0
 训练只给 observed-H source row；[routing.py](../../../linkedCodebases/StoryMotion/storymotion/stage2/routing.py)
 却在 sequential 模式选择 generated-H source row。因为两行 embedding 都从零开始，未见过的
 generated row 是否仍是正确 inference tag，取决于训练后 observed row 与零行的分离程度。
 
-这不是理由去做新长训；最小闭环是同 checkpoint、ordered IDs、noise 与 evaluator 下，将
-sequential 的 source row 0/1 做 paired replay，并报告两行 embedding norm 与逐样本 delta。
-在该诊断完成前，不能把 row1 行为默认为“已训练的 generated-H adaptation”。正式结果仍沿用
-immutable canonical evaluator，不用 diagnostic 覆盖 ledger。
+该paired replay已经完成：row0为nonzero而row1为exact zero；固定checkpoint、ordered IDs、
+noise、Human与Camera text后切换row1→row0，全部formal样本的Camera latent及decoded output均改变，
+Human exact。因此formal artifact继续有效，但row1不能被描述为“已训练的generated-H adaptation”，也
+不能支持source-row-free严格factorization因果措辞。诊断未选择tie/remove embedding或corrective
+retrain；任何修正都需另行预声明。正式identity与数值只见ledger §3.21。
 
 ## 7. 三种正式推理接口
 
@@ -293,7 +298,7 @@ EMA、RNG、code/host/device 与 artifact manifest。配置错、进度停滞或
 | C0-GEO、C1REL、HREL、no-I16 | 已完成的 objective/representation controls，不属于 operational release implementation |
 | HT-FILM/HT-HX/HT-DR、framing、inpainting、multipair | 已关闭或 diagnostic mechanism axes |
 | matched symmetric、joint-parallel/evolving-H | factorization control 或失败轴；当前路由 fail closed |
-| H199 cascade / fully independent Encodec-H/C | 会改写整套 representation 与 decoder；论文已删除 latent-interface superiority claim |
+| H199 cascade / fully independent Encodec-H/C | 不属于release core；独立H/C Stage1后来作为secondary native-system完成formal audit，但仍改变整套representation/decoder且Stage2未授权；论文不主张latent-interface superiority |
 | baseline implementations | baseline 应保持 native owner/repository，不能混进 StoryMotion implementation |
 | runs/checkpoints/caches/logs/renders | artifact 层，不是发布源码；由 immutable run path 与 ledger 追溯 |
 
