@@ -15,7 +15,7 @@ source_notes:
   - "[[StoryMotion-valid-metric-ledger]]"
   - "[[StoryMotion-iclr-reliability]]"
 created: 2026-07-09T12:20:00+0800
-updated: 2026-08-10T18:00:00+0800
+updated: 2026-08-11T14:19:10+0800
 ---
 
 # StoryMotion Metric Computation IO
@@ -113,6 +113,16 @@ Camera raw poses are converted to the official CLaTr coordinate convention, repr
 | Out | `test/proj/outscreen` | valid-frame fraction with zero selected joints inside normalized screen bounds | lower |
 
 `Out` is a generated-system zero-visible rate. It is not the Stage1 raw joint-out occupancy and not the paired Stage1 Out error; these fields must never be mixed.
+
+Paired Camera geometry has different evidential meaning across the two Camera interfaces. In
+Direct-C, generated Camera and dataset Camera share the observed factual Human, so Camera ADE／FDE／
+rotation are paired target-deviation diagnostics under a common Human condition. In sequential,
+the Camera consumes generated $\hat H$ while the dataset Camera was paired with $H^*$；$C^*$ is not
+the unique correct Camera for $\hat H$. Sequential Camera ADE／FDE／rotation must therefore be labeled
+`dataset-target deviation` and kept diagnostic. They mix Human generation error, Camera error and
+the one-to-many Camera solution set；they cannot be the sole or primary correctness claim. Sequential
+interpretation prioritizes Camera-text alignment, Human-relative framing／projection, visibility／Out,
+smoothness and the sealed visual audit once available.
 
 ## 5. Current Stage1 objective IO
 

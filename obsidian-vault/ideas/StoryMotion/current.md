@@ -9,8 +9,9 @@ hypothesis: |
   now formal but mixed-Pareto: HREL is stronger on Camera geometry while C1REL
   has higher Camera semantic aggregates; Human geometry has no clear winner.
   Observed-Human G-on/G-off route controls and the fully independent Human/
-  Camera Stage1 native-system diagnostic are also formally closed; neither
-  changes the C0-LAT mainline.
+  Camera Stage1 native-system diagnostic are also formally closed. Its
+  separately authorized Stage2 remains a secondary system-boundary run;
+  neither changes the C0-LAT mainline.
   Original Pulp captions are authoritative and recaption is not a current
   evidence gate.
 tags:
@@ -31,7 +32,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-11T11:14:45+08:00
+updated: 2026-08-11T14:19:10+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -130,8 +131,9 @@ updated: 2026-08-11T11:14:45+08:00
 > 完全独立Human／Camera Stage1 native-system也已完成两条fresh `210K`、105K／210K full-state、
 > pure4,053与paired bootstrap。两branch独立性、train-only normalizer/cache及latent non-collapse均通过；
 > 210K在各自全部预声明error字段上显著优于105K，但Human仍弱于v9 owner，Camera与v9为不同
-> representation／decoder下的mixed comparison。它只保secondary system boundary，Stage2仍未授权；
-> 正式结果只见ledger §6.9。
+> representation／decoder下的mixed comparison。它只保secondary system boundary；后续独立双EncDec
+> Stage2已获单独授权并进入cache／preflight执行，但尚无endpoint或formal generation结论。Stage1正式结果
+> 只见ledger §6.9。
 > no-I16 seed23的`210K`训练、Direct-H、Direct-C、sequential pure4,053与sealed audit均已闭合；
 > 完整数值只见ledger §3.20，本页只保留上述mixed-geometry与非Stage2-only边界。
 > 已部署的Human-text条件归因矩阵
@@ -254,7 +256,7 @@ joint parallel gate v11。历史合同中的 `diagnostic_only=true` 与
 
 StoryMotion 的目标是中稿 ICLR 2027。当前中心主张收口为：
 
-> 以non-causal asymmetric unified framework支持Human generation、observed-Human
+> 在一个non-causal capability-preserving asymmetric design中支持Human generation、observed-Human
 > Camera generation与sequential Human-then-Camera generation；在Camera扩展中保持
 > Human owner及其输出路径不变，并由同一Camera模型执行observed-H与generated-H。
 
@@ -299,8 +301,12 @@ ViGen；StoryMotion works on Human motion generation and capability-preserving H
    observed=true G-on／G-off pair的endpoint、三模式与matched comparison均已sealed；4090 GPU1的
    exact-initialization C0-LAT及`source_id` row0／row1 diagnostic也已sealed。现有C0 sequential的
    未训练row1与4090／5090 runtime covariate必须如实保留。
-   完全独立Human／Camera Stage1的105K／210K pure4,053 audit亦已闭合，只作secondary native-system
-   boundary；不授权其Stage2，也不进入核心单变量矩阵。
+   完全独立Human／Camera Stage1的105K／210K pure4,053 audit亦已闭合。核验表明每臂210K是
+   optimizer steps、各26.88M exposure，不是v9双倍样本；用户据此另行授权独立H128+C64 cache／
+   normalizer／decoder的Human105K+Camera105K LAT Stage2。该链仍只作secondary native-system
+   boundary，不进入核心单变量矩阵；endpoint与formal结果产生前不写generation结论。
+   `0810-2137`建议中，current C0-LAT的Camera-text correct／shuffle／absent ownership audit、
+   sealed visual blind audit与latency／参数／显存profile仍是明确缺口。
    基础盲评只用于可信度。最终还需冻结论文代码、配置、三接口evaluator、checkpoint／decoder身份、
    参数量、GPU小时、推理成本与最小复现实验包。
 3. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
@@ -339,9 +345,10 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
 - 历史`pulp_camera_recaption_v1p0_rotvec_h1_eventplan_20260805`现登记为v2-pre并保持immutable；
   recaption不属于当前formal evidence gate，也不恢复旧100K队列；任何未来数据修订都必须另建
   版本化合同与人工复审。
-- H199与双Stage2 cascade保持从投稿核心队列删除。后来单独授权的完全独立H/C Stage1 native-system
-  diagnostic已经完成105K／210K formal audit，但它同时改变表示、decoder、参数量、normalization与
-  Stage2接口，只作secondary system boundary；`stage2_authorized=false`，不得自动启动cascade。
+- H199与历史双Stage2 cascade保持从投稿核心队列删除。完全独立H/C Stage1 native-system diagnostic
+  已完成105K／210K formal audit；用户在exposure复核后另行授权适配后的独立双EncDec Stage2，当前只作
+  secondary system boundary并处于cache／preflight执行。它同时改变表示、decoder、参数量、normalization
+  与Stage2接口，在endpoint与formal evaluation闭合前不得产生generation结论或回流核心单变量矩阵。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
   C1REL是新建的matched representation arm，不是历史v10/C1队列恢复。

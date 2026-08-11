@@ -1237,6 +1237,9 @@ G=off正式bytes以只读comparison input保存在G=on eval root下的
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-H | `18.613176 / 96.372887` | — | — | — |
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-C observed-H | — | `55.365463 / 29.300417` | `0.733114` | `1.886545 / 0.171948` |
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | sequential Human→Camera | `18.613176 / 96.372887` | `57.573360 / 25.601322` | `0.743736` | `0.989905 / 0.115524` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | `17.354467 / 100.254402` | — | — | — |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H | — | `56.586727 / 22.163630` | `0.731021` | `0.799310 / 0.100393` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human→Camera | `17.354467 / 100.254402` | `55.393429 / 29.761435` | `0.685826` | `0.507365 / 0.078331` |
 
 | version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
 | --- | --- | --- | --- | --- | ---: |
@@ -1246,6 +1249,9 @@ G=off正式bytes以只读comparison input保存在G=on eval root下的
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-H | `0.829283 / 0.221986` | `0.747588 / 1.249277` | — | — |
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | Direct-C observed-H | — | — | `2.501148 / 2.616128` | `58.310559` |
 | observed=true, G=off / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | sequential Human→Camera | `0.829283 / 0.221986` | `0.747588 / 1.249277` | `2.980856 / 3.099442` | `70.781130` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-H | `0.848565 / 0.230946` | `0.762336 / 1.278247` | — | — |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | Direct-C observed-H | — | — | `1.404148 / 1.487332` | `30.184385` |
+| exact-init C0-LAT / `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810` | sequential Human→Camera | `0.848565 / 0.230946` | `0.762336 / 1.278247` | `2.896272 / 2.993438` | `70.880520` |
 
 #### Paired route-control audit and causal boundary
 
