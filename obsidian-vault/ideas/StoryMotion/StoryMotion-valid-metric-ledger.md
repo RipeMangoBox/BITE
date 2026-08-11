@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-11T11:14:45+08:00
+updated: 2026-08-12T01:45:27+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1002,8 +1002,9 @@ P1 HREL使用不同的Human teacher／Stage2 checkpoint初始化，因此以上p
 C0-LAT现已通过同一`128/1` evaluator/noise合同并完成paired audit，见§3.21：结论仍是mixed
 Pareto，P2的Human与sequential Camera geometry更低，但Direct-C Camera geometry更高，且两种
 Camera接口的semantic／framing cohort aggregate回退。§3.21的source-row replay同时证明C0
-sequential依赖训练未覆盖且会改变全部样本Camera输出的row1；因此它关闭了初始化／evaluator执行
-缺口，却仍不允许“protected asymmetry全面优于symmetric joint”或source-row-free严格因果措辞。
+sequential依赖训练未覆盖且会改变全部样本Camera输出的row1；因此historical P2−C0 sequential
+对照需披露这一C1-derived实现covariate。它不对应StoryMotion的双来源能力主张；不能写“protected
+asymmetry逐字段全面优于symmetric joint”的原因是metric本身为mixed Pareto，而不是row1造成核心claim缺口。
 
 
 ### Audited detail — original §3.20 C1REL-noI16 seed23 full-cohort repeat
@@ -1149,9 +1150,11 @@ ordered IDs、10,000次matched-index bootstrap、seed=`260812`。列内metric均
 sequential `CLaTr -15.314842 / FDCLaTr +74.519457 / caption F1 -0.186612 / r-FPD +1.516708 / Out +0.079490`。
 semantic／framing字段仍是cohort aggregate，没有逐样本paired CI。因此严格初始化reference支持的结论是：
 P2改善Human及sequential Camera geometry，同时显著损害Direct-C geometry与两种Camera接口的
-semantic／framing；不存在单一winner。
+semantic／framing；不存在逐字段全局支配。但这不表示两者“总体相当”：按投稿预先采用的
+Camera／系统质量优先级，C0-LAT在Direct-C geometry及Direct-C／sequential semantic／framing上
+明确占优；True-P2的优势限于Human geometry与sequential Camera geometry。
 
-#### Source-row sensitivity and corrective boundary
+#### Historical source-row sensitivity and implementation-cleanup boundary
 
 C0-LAT训练只使用Camera source row0（observed/GT）；formal Direct-C也使用row0，而formal sequential
 使用训练未触达的row1（generated/teacher-final）。checkpoint的`camera.source_embedding.weight`
@@ -1174,10 +1177,13 @@ sealed audit为
 `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810/sealed_audit_c0_reference_source_row01.json`
 （exact immutable path见[[StoryMotion-folder-rename-map]]），SHA-256=
 `1d823b05b996a910253c5fecbb3db3d2be4ca82ca14ad441e83d6bb848253215`。
-裁决：exact-init三模式formal与P2 paired closure已经完成，但source-row diagnostic证明sequential
-依赖一个训练未覆盖的row1；它不允许把现有sequential artifact解释为source-row-free的factorization
-因果证据。需要先预声明并实现source-row语义修正，再决定是否进行corrective training；本诊断不选择
-tie/remove embedding、补充generated-H训练或任何具体重训方案，也未授权或启动新长训。
+裁决：两行source embedding来自共享C0／C1四臂实现；C1的GT-H与teacher-final-H mixture需要区分
+conditioning route，但StoryMotion从未提出“双来源匹配”能力，C0的核心条件分布也只要求Camera读取
+给定Human latent与Camera text。因而本诊断证明的是historical C0多带了一个output-sensitive、训练未覆盖的
+实现变量，不是StoryMotion核心claim失败，也不把既有三模式formal artifact作废。2026-08-12作者另行
+授权只移除C0 source identity并fresh训练Camera Stage2 `105K`；exact v9 Stage1、owning decoder／cache／
+stats与frozen Human teacher保持不变。该run只作实现清理，在endpoint／full-state与同evaluator三模式
+formal audit前不替换operational C0-LAT；本节不提前登记任何新metric。
 
 ### Audited detail — original §3.22 observed=true symmetric route controls pure4,053 formal
 
@@ -1284,8 +1290,9 @@ sequential为`+0.566311/-1.778893/-0.002442`，但`r-FPD/Out=+0.024874/+0.000691
 
 相对exact-init C0-LAT，G=on显著改善Human geometry，Direct-C Camera geometry和semantic／framing
 均回退；sequential Camera geometry CI全跨零，CLaTr／FDCLaTr／caption F1改善，但r-FPD／Out回退。
-再结合§3.21的untrained source-row1，本组只关闭root-cause execution，不关闭source-row-free的
-protected-asymmetry superiority claim。
+本组关闭observed-route与gradient root-cause execution；§3.21的untrained source-row1只作为
+historical C0 sequential实现provenance，StoryMotion不提出source matching claim。结果仍不支持
+protected-asymmetry逐字段全面优越。
 
 sealed paired comparison artifact SHA-256=
 `7c0c5f77545f46052f5e26812c02ed9fe003baaa26fe562992e9c211a9eab490`；comparison audit script

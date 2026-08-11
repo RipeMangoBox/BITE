@@ -9,7 +9,7 @@ tags:
   - contracts
   - status/maintained
 created: "2026-08-10T15:00:00+08:00"
-updated: "2026-08-11T11:14:45+08:00"
+updated: "2026-08-12T01:45:27+08:00"
 status: maintained
 source_host: "3090-local"
 source_root: "linkedCodebases/StoryMotion"
@@ -229,7 +229,7 @@ Camera Transformer 预测
 $v_\theta(c_\sigma,t_C,z_H,\sigma)$，用 valid-mask 后的均方 flow loss 训练。C0 的
 `camera_step` 只使用 observed/GT Human；C0-GEO decoded auxiliary 不在当前发布树中。
 
-### 6.4 已审计但尚未修正的 source-ID 风险
+### 6.4 historical source-ID：C1路由适配，不是StoryMotion能力主张
 
 当前 [training step](../../../linkedCodebases/StoryMotion/storymotion/training/steps.py) 的 C0
 训练只给 observed-H source row；[routing.py](../../../linkedCodebases/StoryMotion/storymotion/stage2/routing.py)
@@ -239,8 +239,11 @@ generated row 是否仍是正确 inference tag，取决于训练后 observed row
 该paired replay已经完成：row0为nonzero而row1为exact zero；固定checkpoint、ordered IDs、
 noise、Human与Camera text后切换row1→row0，全部formal样本的Camera latent及decoded output均改变，
 Human exact。因此formal artifact继续有效，但row1不能被描述为“已训练的generated-H adaptation”，也
-不能支持source-row-free严格factorization因果措辞。诊断未选择tie/remove embedding或corrective
-retrain；任何修正都需另行预声明。正式identity与数值只见ledger §3.21。
+不能被描述成StoryMotion需要具备的“双来源匹配”能力。两行embedding源于共享C0／C1四臂实现：C1的
+GT-H／teacher-final-H mixture需要route tag，C0并没有这一研究主张。诊断因此定位了historical C0的
+冗余且output-sensitive实现变量，而不是核心factorization claim的缺口。2026-08-12授权的最小修正只在
+C0 Camera Stage2删除source identity并fresh训练`105K`；v9 Stage1、decoder／cache／stats及Human teacher
+全部复用和冻结。正式identity与数值只见ledger §3.21。
 
 ## 7. 三种正式推理接口
 

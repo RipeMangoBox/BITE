@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-11T14:19:10+08:00
+updated: 2026-08-12T01:45:27+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -77,11 +77,14 @@ operational mainline；C0-GEO保留为audited alternate。该选择不是显著�
 > `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809` 已按正确合同通过
 > contract/generic audit、GPU preflight与step20双边finite nonzero-gradient gate，并完成`105K`
 > symmetric-joint endpoint及pure4,053三接口formal。结果是mixed Pareto：Direct-H与sequential
-> geometry改善，但Direct-C Camera以及sequential semantic／framing明显退化。P1 HREL只提供同
+> geometry改善，但Direct-C Camera以及sequential semantic／framing明显退化。这里的mixed只表示
+> 不存在逐字段全局支配；按投稿优先的Camera／系统质量字段，C0-LAT明确强于historical True-P2，
+> 不能写成两者总体相当。P1 HREL只提供同
 > evaluator/protocol secondary comparison；因其Human初始化与P2不同，不是严格factorization估计。
 > exact-init C0-LAT同一evaluator/noise reference、P2−C0 paired audit及source-row diagnostic现已sealed：
-> metric仍是mixed Pareto，且C0 sequential依赖训练未覆盖的row1，故只关闭reference执行缺口，不关闭
-> source-row-free因果解释。正式数字只见ledger §§3.19、3.21。
+> metric仍是mixed Pareto。C0 sequential使用的未训练row1源自C1 GT-H／teacher-final-H route adaptation；
+> StoryMotion没有双来源匹配claim，因此它只约束historical P2−C0 sequential的实现级归因，不构成核心
+> factorization或三接口能力缺口。正式数字只见ledger §§3.19、3.21。
 
 此前的Independent Conditional Camera64与Fully-Separate-Native来自`0803-1647`，不回答本轮
 表示问题。前者在审计前已完成`210K`，只保留off-plan HREL-Camera64 diagnostic；后者在约Human
@@ -200,7 +203,8 @@ P2−C0 paired audit与`source_id` row0／row1 diagnostic均已sealed，不产�
 G=off显著改善Direct-C三项Camera geometry与sequential ADE/FDE，Human geometry CI全跨零；
 semantic／framing为mixed Pareto。相对historical `observed_human=false`，observed route大幅修复
 两种Camera接口的semantic／framing collapse，但六项Camera geometry显著回退。该结论必须保留
-source-row与4090／5090 runtime covariate；当前没有授权corrective retrain。本文将detached臂作为本轮P1 matched arm；它不同于历史的P1 HREL
+historical C0 source-row与4090／5090 runtime covariate。source row只来自C1 route adaptation，不是
+StoryMotion能力主张；2026-08-12已另行授权no-source C0-LAT Camera Stage2实现清理臂。本文将detached臂作为本轮P1 matched arm；它不同于历史的P1 HREL
 `sm_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809`，后者仍只是evaluator-matched secondary control。
 
 ### 2.3b 完全独立Human／Camera Stage1 native-system diagnostic
@@ -254,7 +258,7 @@ does not duplicate the metric ledger.
 | C1REL-w/o-Interaction16 matched Stage2 | `sm_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806` | formal complete | Supports a seed17 matched Camera-generation component effect; no universal necessity claim |
 | HREL vs C1REL matched Stage2 | `sm_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | formal complete; mixed Pareto | HREL geometry stronger, C1REL semantic aggregate higher, Human geometry unresolved; no single-winner claim |
 | PulpMotion native Stage2 comparison | `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | formal complete; valid weak native-joint result | Train/eval IDs exactly match StoryMotion at `162,760/4,053`, but representation, decoder and formal mode differ. Keep as a system boundary; no single-variable three-mode superiority claim |
-| Protected asymmetry vs symmetric joint | Old `sm_p2_1_matched_symmetric_joint_h105k_c105k_seed17_4090g0_20260808` is invalid; exact-init reference `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810`; historical fresh `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809`; controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | all four valid endpoints and paired audits formal complete | P2−C0 and both route contrasts are mixed Pareto. Observed route repairs historical semantic/framing collapse but regresses Camera geometry; G-on improves local Camera geometry over G-off without significant Human-geometry change. Preserve untrained C0 row1 and cross-host runtime; no global superiority or source-row-free causal claim |
+| Protected asymmetry vs symmetric joint | Old `sm_p2_1_matched_symmetric_joint_h105k_c105k_seed17_4090g0_20260808` is invalid; exact-init reference `sm_c0_lat_true_p2_reference_seed17_4090g1_20260810`; historical fresh `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809`; controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | all four valid endpoints and paired audits formal complete | P2−C0 and both route contrasts are mixed Pareto. Observed route repairs historical semantic/framing collapse but regresses Camera geometry; G-on improves local Camera geometry over G-off without significant Human-geometry change. Preserve cross-host runtime and the historical C0 row1 implementation covariate for the sequential contrast; no global superiority claim |
 | C1REL seed robustness | `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | formal complete; diagnostic-only raw-caption repeat | Three interfaces and hashes are sealed; all paired geometry seed23−seed17 CIs cross zero. Semantic aggregates have no paired bootstrap unit, so robustness wording remains field-specific |
 | C1REL-noI16 seed robustness | `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | formal complete；diagnostic-only；ledger §3.20 | The same-seed component direction repeats, while geometry remains mixed and the seed17 training-contract byte exception makes the direct cross-seed comparison provenance-limited. Support a two-seed matched component effect, not universal necessity or a Stage2-only claim |
 | Fully independent Human／Camera native-system diagnostic | Stage1 `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811`; `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811`; Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1 105K／210K formal complete；adapted Stage2 separately authorized，live execution state只见run manifest／logs | Stage1 owning-decoder audits, full-state reloads, exact IDs and latent gates pass; 210K improves every preregistered error field over 105K. Keep as a secondary native-system boundary; no protected-asymmetry, latent-interface, cascade or generation claim before Stage2 formal closure |
@@ -270,7 +274,7 @@ does not duplicate the metric ledger.
 | --- | --- | --- | --- |
 | HREL vs C1REL representation | Stage1 与 matched Stage2 均已 formal；结论为 mixed Pareto（ledger §§3.16、6.8） | 保留 HREL 为 representation owner；不得写单边 superiority | 只支持审计到的表示差异与 mixed-Pareto 边界 |
 | Interaction16 component | HREL/C1REL 两条 Stage1 deletion 与 C1REL matched Stage2 已 formal（ledger §§3.15、6.8） | 将结论限定为 seed17 matched Camera-generation component effect | 不宣称 Interaction16 在所有 seed、数据或实现下普遍必要 |
-| Protected asymmetric factorization | 旧P2-1 invalid；fresh P2、exact-init C0-LAT及observed=true G-on/G-off pair的三接口、paired audit与source-row diagnostic均已完成（ledger §§3.19、3.21、3.22） | 披露cross-host runtime；在另行预声明修正前保留C0未训练row1边界 | 只支持observed route repair、G-on局部Camera geometry effect与field-wise mixed Pareto；不支持全局asymmetric superiority或source-row-free严格因果结论 |
+| Protected asymmetric factorization | 旧P2-1 invalid；fresh P2、exact-init C0-LAT及observed=true G-on/G-off pair的三接口、paired audit与source-row diagnostic均已完成（ledger §§3.19、3.21、3.22） | 披露cross-host runtime；historical C0 row1只作为P2−C0 sequential实现covariate，不升格为能力缺口 | 支持C0-LAT优先字段优势、observed route repair、G-on局部Camera geometry effect与field-wise mixed Pareto；不支持全局asymmetric superiority |
 | Fully independent H/C Stage1 | 两条105K／210K full-state、owning-decoder pure4,053及latent audit均已sealed（ledger §6.9）；独立双EncDec Stage2后续另行授权并在执行 | 保持secondary native-system分类；等Stage2 endpoint与formal audit，不回流核心单变量矩阵 | 可报告独立Stage1 feasibility与210K成熟度；当前不支持latent-interface、cascade或generation superiority claim |
 | Native PulpMotion Stage2 boundary | Stage1 r9 与 Stage2 `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` 均已 formal；Stage2 是有效弱 native-joint result（ledger §3.18） | 保留 representation／decoder／mode 差异和 system-boundary 标签；不以 protocol-sanity control 选模 | 可报告同 cohort 外部系统边界，不能写成 StoryMotion 三模式的单变量 superiority |
 | C1REL seed robustness | `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` 三接口 pure `N=4,053` 与 hash 已 formal | 保留 raw-caption、diagnostic-only 与 semantic aggregate 无 paired unit 的边界 | 支持 paired geometry 未见 seed 差异；不扩写成所有指标的统计稳健性 |
@@ -323,9 +327,10 @@ does not duplicate the metric ledger.
 - protected asymmetric factorization整体优于matched symmetric joint的命题已被否定为过强措辞。
   historical P2、exact-init C0与observed=true G-on／G-off pair均已formal：observed route大幅修复历史
   semantic／framing collapse但牺牲Camera geometry；G-on相对G-off改善局部Camera geometry且Human
-  geometry CI跨零，semantic／framing仍mixed。source-row diagnostic证明C0 sequential的未训练row1
-  会改变全部样本，G-on／G-off又跨4090／5090 runtime，故不得称source-row-free、host-free的严格
-  factorization estimate。当前不启动corrective retrain；任何row语义修正或U-control必须另行预声明。
+  geometry CI跨零，semantic／framing仍mixed。G-on／G-off跨4090／5090 runtime，故不得称host-free的
+  严格factorization estimate。source-row diagnostic只说明historical C0带有C1 route adapter并影响
+  sequential输出；StoryMotion不主张来源匹配。已授权的no-source Camera Stage2是实现清理，不是claim gate；
+  任何U-control仍须另行预声明。
 - 是否优于公开baseline、是否有主观优势；由同协议主表、sealed audit与盲评决定。
 
 ### 4.3 已移出投稿核心的轴
@@ -397,8 +402,8 @@ superiority 仍保留为条件性 claim。
 4. Protected-asymmetry只认fresh P2合同；旧symmetric artifact不产生metric row。历史fresh P2 formal已闭合，
    observed=true G-on／G-off matched pair与4090 GPU1 exact-initialization C0-LAT、P2−C0 paired audit及
    `source_id` row0／row1 diagnostic均已sealed。P1 HREL仍只是evaluator-matched secondary control；
-   C0未训练row1的全样本敏感性阻止source-row-free因果措辞，4090／5090 Python／Torch／CUDA差异
-   必须作为runtime covariate披露。
+   C0未训练row1的全样本敏感性只作为historical P2−C0 sequential实现covariate披露，不对应双来源
+   claim；4090／5090 Python／Torch／CUDA差异必须作为runtime covariate披露。
 5. Native PulpMotion Stage2 已形成 matched available-data cohort 的 formal system-boundary negative
    result；保留 representation／decoder／mode 差异，不与 Pulp Stage1 reconstruction 混比。
 6. Fully independent H/C Stage1已形成secondary native-system formal；适配后的独立双EncDec Stage2已另行授权，
@@ -427,7 +432,7 @@ sequential Human→Camera。旧 `joint_parallel` artifact 保留为 provenance�
 | P1 | HREL-vs-C1REL matched comparison `sm_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | formal complete; mixed Pareto | Keep geometry/semantic conclusions separated; no single-winner representation claim; ledger §3.16 |
 | closed | C1REL seed23 repeat `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | formal complete; ledger §3.17 | Report the paired-geometry all-CI-cross-zero result with the raw-caption and unpaired-semantic boundaries |
 | P1 | Stage2 geometry/physical extraction | complete from existing sequential artifacts | No new training; retain no-reference diagnostic boundary |
-| closed | Historical fresh P2, exact-init C0 and observed=true controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | all valid pure4,053 endpoints and paired audits complete; mixed Pareto; source-row diagnostic sealed | Retain source-row and cross-host runtime boundaries; report route repair and G-on local geometry effect only; old invalid run remains excluded; ledger §§3.19–3.22 |
+| closed | Historical fresh P2, exact-init C0 and observed=true controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | all valid pure4,053 endpoints and paired audits complete; mixed Pareto; source-row diagnostic sealed | Retain the historical C0 row1 covariate only for the sequential contrast and retain cross-host runtime; report route repair and G-on local geometry effect; old invalid run remains excluded; ledger §§3.19–3.22 |
 | P2 | Native PulpMotion Stage2 `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | formal complete；有效弱 native-joint result | 只作 matched available-data cohort 的 system-boundary comparison；不伪装为 StoryMotion 三模式单变量对照 |
 | active secondary | Fully independent H/C Stage1 `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` / `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811`; Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1 105K／210K full-state pure4,053 formal complete；Stage2已授权，live state只见run manifest／logs | Keep as native-system system boundary; no Stage2 conclusion before endpoint and formal audit; Stage1 ledger §6.9 |
 | Conditional | C1REL cfg sensitivity | not required for current claim | Only run under a frozen, predeclared evaluator contract; never use post-hoc selection |
@@ -437,8 +442,9 @@ sequential Human→Camera。旧 `joint_parallel` artifact 保留为 provenance�
 > [!warning] Overall risk verdict
 > 模拟严格 ICLR reviewer 的当前 verdict 仍为 **Borderline / Weak Reject**。研究问题与工程证据链有价值，
 > symmetric route-control执行缺口现已关闭，但结果没有形成全局winner：observed route修复historical
-> semantic／framing collapse却牺牲Camera geometry，G-on只给出局部geometry effect；未训练source row1的
-> 全样本敏感性与cross-host runtime继续要求降级严格因果措辞，sealed final visual blind audit也尚未完成。
+> semantic／framing collapse却牺牲Camera geometry，G-on只给出局部geometry effect；cross-host runtime
+> 继续约束该梯度对照的严格因果措辞，sealed final visual blind audit也尚未完成。historical C0 row1是
+> C1 route adapter遗留的实现变量，不是StoryMotion claim或单独的拒稿风险。
 > C1REL seed23已闭合为field-bounded repeat；
 > PulpMotion native Stage2 也已闭合，但结果很弱且只能作
 > system-boundary comparison。exact
@@ -457,7 +463,7 @@ Pulp captions，recaption 不是当前证据门槛。`diagnostic_only` 与 `prom
 | --- | --- | --- | --- | --- |
 | C1REL / `sm_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` | 完成 | `N=4,053` pure_test；Direct-H、Direct-C、sequential | 可支持当前 C1REL 三接口与 sequential artifact claim；Camera semantic aggregate高于HREL，但不可单独支持整体优于HREL/PulpMotion | ledger §3.15 已有 semantic、geometry、physical 与 hash；保持mixed-Pareto wording |
 | C1REL-noI16 / seed17 `sm_c1rel_nointeraction16_rawt0_lat_h105k_c105k_seed17_4090g1_20260806`; seed23 `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | 两seed formal完成；seed23 ledger §3.20 | `N=4,053` pure_test；Direct-H、Direct-C、sequential | 支持两seed matched component protocol下的semantic／framing方向复现；geometry mixed，且不是Stage2-only消融 | 保持原始Pulp caption、semantic无paired unit及seed17 contract-byte例外；不外推普遍必要性 |
-| Matched Symmetric Joint / historical `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809`; controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | historical、exact-init C0及observed=true pair全部pure4,053 formal；旧P2-1 invalid provenance-only | observed route修复historical semantic／framing collapse但Camera geometry回退；G-on相对G-off改善Camera geometry、Human CI跨零，aggregate mixed | 不能支持global asymmetric superiority；保留C0未训练row1与cross-host runtime covariate | ledger §§3.19、3.21、3.22；任何row修正、U-control或corrective retrain须另行预声明；永久排除旧P2-1 |
+| Matched Symmetric Joint / historical `sm_p2_matched_symmetric_joint_fresh_h105k_joint105k_seed17_4090g1_20260809`; controls `sm_p2_obstrue_coupled_cont105k_seed17_4090g0_20260810` / `sm_p2_obstrue_detach_cont105k_seed17_5090g3_20260810` | historical、exact-init C0及observed=true pair全部pure4,053 formal；旧P2-1 invalid provenance-only | observed route修复historical semantic／framing collapse但Camera geometry回退；G-on相对G-off改善Camera geometry、Human CI跨零，aggregate mixed | 不能支持global asymmetric superiority；保留historical C0 row1与cross-host runtime作为具体对照covariate，不把row1写成StoryMotion能力 | ledger §§3.19、3.21、3.22；no-source C0只作实现清理，任何U-control须另行预声明；永久排除旧P2-1 |
 | Independent H/C native system / Stage1 `sm_independent_encdec_h199_h128_210k_seed17_4090g1_20260811` + `sm_independent_encdec_c2w14_c64_210k_seed17_4090g1_20260811`; Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1 105K／210K full-state与pure4,053 formal完成；Stage2已授权，optimizer-free适配代码与测试完成，formal结果未产生 | Stage1 210K latent gate通过；Stage2固定独立cache／normalizer／decoder、Human105K+Camera105K、单一trained source row和三接口 | secondary native-system only；不进入核心消融，Stage2完成前不产生generation结论 | ledger §6.9仅拥有现有Stage1数字；Stage2结果须在endpoint与pure4,053 audit后另行入账 |
 | HREL matched Stage2 / `sm_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | formal完成；mixed Pareto | `N=4,053` pure_test；Direct-H、Direct-C、sequential；exact ordered HREL−C1REL geometry bootstrap | HREL Camera geometry更强，C1REL Camera semantic aggregate更高，Human geometry无明确差异；semantic/framing paired blocked | ledger §3.16 已有完整 semantic、geometry、physical、exception 与 hash；不写成单边 superiority |
 | PulpMotion Stage2 matched available-data cohort / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | formal完成；有效弱 native-joint result | 210K／105K full-state checkpoint、4,053 IDs、contract、output与audit hashes闭合；同协议官方checkpoint sanity通过 | 不能把native joint task slices写成StoryMotion Direct-H／Direct-C／sequential，也不能分解checkpoint与decoder贡献 | 以ledger §3.18的system-boundary标签报告；不做事后CFG或checkpoint选择 |
@@ -489,7 +495,7 @@ generation。StoryMotion可防守的新颖性因此是受约束的capability-pre
 | M1 | Cross-paper / `Pulp Motion`, `Towards Storytelling Animations`, `Auteur` | Novelty may be only “another human-camera joint model” | The KB shows prior work already covers framing-aware auxiliary sampling, synchronous entity interaction, and actor-relative cinematographic control | Add a changed-slot table: ownership/factorization, latent target, solver mode, representation, data, and claim. If not added, narrow novelty to the audited asymmetric capability-preservation result and mark confidence limited |
 | M2 | C1REL / `sm_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804` vs native Pulp Stage2 / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | Is C1REL better than PulpMotion? | Train/eval IDs now match exactly, but representation, owning decoder and generation mode differ; Pulp emits one native joint path, while StoryMotion reports three interfaces | Report the Pulp row as a system boundary and remove any single-variable superiority wording; same cohort alone does not make the methods matched |
 | M3 | HREL reference / `stage1_hanchor_pulp_only_matched_r3_636k_seed17_4090g0_20260726` vs C1REL / `sm_c1rel_stage1_636k_seed17_4090g1_r2_20260803` | Does the new representation actually improve the reference? | Exact matched Stage2 is now formal: HREL geometry is stronger, C1REL Camera semantic aggregate is higher, Human geometry CI crosses zero; semantic/framing paired unit is unavailable | Withdraw single-winner wording; report mixed Pareto and keep HREL as representation owner |
-| M4 | Matched Symmetric Joint / historical P2；exact-init C0；observed=true G-on/G-off controls | Is protected asymmetry causally better than symmetric joint, and does observed route or Camera→Human gradient explain the reversal? | All controls are formal. Observed route repairs historical semantic/framing collapse but worsens Camera geometry; G-on improves local Camera geometry over G-off without significant Human-geometry change. C0 sequential uses an untrained source row1, and G contrast is cross-host | Report route repair and G-on local effect with runtime/source-row covariates; withdraw global superiority and source-row-free causal wording until a separately preregistered correction closes the implementation gap |
+| M4 | Matched Symmetric Joint / historical P2；exact-init C0；observed=true G-on/G-off controls | Is protected asymmetry causally better than symmetric joint, and does observed route or Camera→Human gradient explain the reversal? | All controls are formal. Historical True-P2 has local Human／sequential-geometry wins but is clearly worse on the prioritized Direct-C geometry and Direct-C／sequential semantic-framing fields. Observed route repairs the historical semantic/framing collapse but worsens Camera geometry; G-on improves local Camera geometry over G-off without significant Human-geometry change. The G contrast is cross-host; historical C0 sequential also carries a C1-derived row1 implementation covariate | State C0-LAT's priority-weighted advantage without claiming all-field dominance; report route repair and G-on local effect with runtime covariates; disclose row1 only for the historical sequential contrast, not as a StoryMotion capability or core-claim gap |
 | M5 | C1REL seed17/23 / `sm_c1rel_rawt0_lat_h105k_c105k_seed17_4090g0_20260804`; `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | Is the result robust or seed-selected? | The three-interface seed23 repeat is sealed and every paired-geometry CI crosses zero; semantic/framing aggregates lack a paired unit and the repeat is raw-caption diagnostic-only | State robustness only for the audited paired-geometry fields; do not convert absence of a detected seed difference into universal equivalence |
 | M6 | Sealed final blind audit / `sm_sealed_final_blind_audit_run_id_pending` | Are visual examples cherry-picked and are failure rates credible? | Existing blind artifacts are legacy/diagnostic; no sealed current final study exists | Freeze evaluator and sampling first, then blind random/best/worst slices and failure taxonomy. Until then make no visual superiority or failure-rate claim |
 
@@ -511,7 +517,7 @@ generation。StoryMotion可防守的新颖性因此是受约束的capability-pre
 | Is the sequential result a real formal result? | Both C1REL component runs have pure-test `N=4,053`, `mode=sequential`, `is_causal=false`, status evaluated and exact hashes in ledger §3.15; the full-C1REL seed23 repeat is sealed in §3.17 | Promotion flags remain immutable provenance; seed23 is raw-caption diagnostic-only | “The artifacts are formal4053 evidence; promotion is a separate author decision. We retain the historical flags and do not use them to rewrite provenance.” |
 | Does Interaction16 matter beyond reconstruction? | Seed17 (§3.15) and sealed seed23 (§3.20) same-seed component comparisons both show the preregistered Camera semantic/framing degradation direction when Interaction16 is removed | Geometry is mixed; semantic fields lack a per-sample paired unit; the component intervention changes Stage1 owner, decoder and Camera width; seed17 cross-seed reference lacks immutable old contract bytes | “The two-seed result supports an Interaction16 Camera-generation component effect under the matched protocol, not a universal component-necessity theorem or a Stage2-only ablation.” |
 | Does C1REL beat HREL? | Exact ordered pure4,053 HREL-vs-C1REL Stage2 comparison is formal in ledger §3.16: HREL has stronger Camera geometry, C1REL higher Camera semantic aggregates, Human geometry CI crosses zero | Semantic/framing records lack a per-sample paired unit, so semantic significance is blocked; conclusion is mixed Pareto | “We withdraw a single-winner claim: HREL remains the representation owner, C1REL is retained as a tested control, and the comparison is reported as mixed Pareto.” |
-| Does protected asymmetry beat a symmetric joint model? | Fresh P2, exact-init C0-LAT and observed=true G-on/G-off controls all completed pure4,053 and paired audit. Observed route repairs historical semantic/framing collapse but worsens Camera geometry; G-on improves local Camera geometry over G-off while Human geometry CI crosses zero | Exact C0 sequential uses an untrained source row1; G-on/G-off also spans 4090/5090 runtimes | “The evidence rejects a one-number winner. We report route repair and the local G effect with source-row/runtime covariates; we do not claim a source-row-free factorization effect or authorize corrective retraining post hoc.” |
+| Does protected asymmetry beat a symmetric joint model? | Fresh P2, exact-init C0-LAT and observed=true G-on/G-off controls all completed pure4,053 and paired audit. C0-LAT clearly wins the prioritized Direct-C geometry and Direct-C／sequential semantic-framing fields, while P2 wins Human and sequential Camera geometry; observed route repairs the historical semantic/framing collapse but worsens Camera geometry; G-on improves local Camera geometry over G-off while Human geometry CI crosses zero | G-on/G-off spans 4090/5090 runtimes; exact C0 sequential carries a C1-derived untrained row1, relevant only to that historical sequential contrast | “C0-LAT has a clear priority-weighted advantage over historical P2, but not all-field dominance. We report route repair and the local G effect with the runtime boundary, disclose historical row1 as implementation provenance, and make no dual-source matching claim.” |
 | Where are the Direct-H baselines? | MoMask-Pulp native and MotionLab-MFT both have human-text-only pure4,053 formal artifacts; MoMask also has a byte-exact replay, while MotionLab-MFT is explicitly a Pulp-latent adaptation | MoLingo-derived v7.45 is only a provisional screen because its result requests promotion audit and its recorded training-source SHA is unrecoverable; MotionStreamer has no Stage2 generator | “We report MoMask as a native-system peer and MotionLab-MFT as an adapted operator peer. We disclose the MoLingo screen outside formal ranking and do not turn MotionStreamer reconstruction into generation evidence.” |
 | Where are the Direct-C baselines? | Corrected Director-C／E.T. has a native pure4,053 formal endpoint; CCD-Pulp has a fixed 60K endpoint, sealed IDs, contract and complete records | Director consumes GT pelvis trajectory and emits native 9D C2W; CCD uses a v7.14 latent/decoder and has no independent audit artifact. Neither has matched decoded Cam-ADE/FDE/rotation | “We report their semantic/distribution rows with condition/decoder and assurance boundaries, mark CCD accordingly, and leave unmatched geometry blank rather than borrowing StoryMotion values.” |
 | Is C1REL better than PulpMotion? | Native Pulp Stage2 is now formal on the exact same `162,760/4,053` ID sets, and its weak result passed evaluator-path sanity | Pulp uses a different representation, owning decoder and native-joint mode, so this remains a system comparison rather than a single-variable ablation | “We report the matched-cohort Pulp result transparently but do not claim that cohort matching isolates architecture; mode and decoder boundaries remain explicit.” |
@@ -534,8 +540,8 @@ generation。StoryMotion可防守的新颖性因此是受约束的capability-pre
    result and downgrade any single-winner wording.
 4. **Factorization/robustness repair:** historical P2、exact-init C0-LAT与observed=true G-on／G-off controls
    均已formal；报告observed route的semantic／framing repair、G-on的局部Camera geometry effect及其
-   mixed-Pareto结论，并同时披露output-sensitive untrained source row与cross-host runtime。不要在另行
-   预声明前选择corrective training design。
+   mixed-Pareto结论，并在historical P2−C0 sequential对照中披露C1-derived、output-sensitive row1，
+   同时披露cross-host runtime。row1不是StoryMotion能力主张；no-source C0只作已预声明的实现清理。
    The full-C1REL and noI16 seed23 repeats are both sealed；the latter supports a two-seed matched component
    direction with mixed geometry and provenance limits, not universal necessity.
 5. **Visual repair:** latent-interface superiority and its H199/cascade experiment queue have been
@@ -553,7 +559,7 @@ Re-review should be requested only after every applicable item below is true:
 - [x] C1REL seed23 three-interface formal result is sealed with field-specific uncertainty boundaries;
 - [x] C1REL-noI16 seed23 three-interface result and same-seed component audit are sealed with mixed-geometry and provenance boundaries;
 - [x] exact-initialization C0-LAT three-mode reference, P2−C0 paired audit and source-row diagnostic are sealed in ledger §3.21;
-- [x] G-on/G-off controls are endpoint/eval audited；source-row与cross-host gap采用honest downgrade，未事后授权correction；
+- [x] G-on/G-off controls are endpoint/eval audited；cross-host gap采用honest downgrade；historical source-row只作实现provenance；
 - [ ] sealed visual blind audit and failure taxonomy are complete;
 - [x] latent-interface superiority is deleted；independent Human／Camera Stage1已作为secondary
   native-system formal闭合；其Stage2虽已另行授权，但仍是non-core system boundary；
@@ -569,7 +575,7 @@ Re-review should be requested only after every applicable item below is true:
 | prompt item | state | canonical outcome or remaining work |
 | --- | --- | --- |
 | Q1、Q2 | closed | §8.2已加入closest-paradigm design-space table；正文边界固定为sequential composition，不写synchronous joint sampling |
-| Q5 | closed with downgrade | exact-init C0、historical symmetric及observed=true G-on/G-off均已formal；结果否定global asymmetric superiority，只支持route repair与G-on局部Camera geometry effect |
+| Q5 | closed with bounded claim | exact-init C0、historical True-P2及observed=true G-on/G-off均已formal；C0-LAT在投稿优先Camera／系统质量字段明确占优，但不构成逐字段全局支配；梯度对照只支持route repair与G-on局部Camera geometry effect，不支持“Camera gradient必然损害Human” |
 | Q6 | in execution, secondary | 独立H/C Stage1已formal；exposure audit证明不是v9双倍样本。独立cache／normalizer／decoder的LAT Stage2已授权，完成前无generation结论 |
 | Q8、Q13、Q16、Q18、Q20 | wording closed | 使用human-owned relation-aware而非disentangled；Pulp保持matched-cohort system boundary；LAT为简洁性operational选择；三接口对应两个条件分布；editing退出核心贡献 |
 | Q10 | interpretation closed | metric I/O已规定sequential Camera ADE/FDE/rotation只作`dataset-target deviation` diagnostic，不是生成Human下唯一正确Camera target |
@@ -588,11 +594,12 @@ Re-review should be requested only after every applicable item below is true:
 | priority | version / run | evidence state | close condition | claim gated |
 | --- | --- | --- | --- | --- |
 | closed | PulpMotion Stage2 matched available-data cohort / `sm_pulpmotion_repro162760_stage2_original_matched210k_seed17_5090g3_r2_20260809` | formal complete；valid weak native-joint result；ledger §3.18 | —；永久保留representation／decoder／mode差异 | 仅支持external system-boundary reporting，不支持单变量 superiority |
-| closed Q1 | True Matched Symmetric historical；exact-init C0；observed=true G-on/G-off controls | 全部有效endpoint、pure4,053、paired audit及source-row diagnostic完成；mixed Pareto；ledger §§3.19–3.22；旧run invalid | —；保留cross-host runtime与source-row边界；corrective方案须另行预声明 | route repair与G-on局部Camera geometry effect；不支持source-row-free全局因果结论 |
+| closed Q1 | True Matched Symmetric historical；exact-init C0；observed=true G-on/G-off controls | 全部有效endpoint、pure4,053、paired audit及source-row diagnostic完成；C0-LAT具priority-weighted Camera／system advantage但无all-field dominance；ledger §§3.19–3.22；旧run invalid | —；保留cross-host runtime；historical C0 row1只约束P2−C0 sequential实现归因，no-source清理臂不构成投稿门槛 | C0-LAT优先字段优势、route repair与G-on局部Camera geometry effect；不支持global superiority或“Camera gradient必然损害Human” |
 | closed | C1REL seed23 / `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` | 三接口 pure `N=4,053` 与 hash formal闭合；ledger §3.17 | —；保留raw-caption、diagnostic-only与unpaired-semantic边界 | 只支持audited paired-geometry field robustness |
 | closed | C1REL-noI16 seed23 / `sm_c1rel_noi16_lat_h105k_c105k_seed23_4090g0_20260810` | 三接口pure `N=4,053`、hash与same-seed component audit闭合；ledger §3.20 | —；保留mixed geometry、non-Stage2-only与seed17 contract-byte例外 | 只支持两seed matched component方向，不支持普遍必要性 |
 | closed | Matched HREL Stage2 / `sm_p1_hrel_matched_lat_h105k_c105k_seed17_4090g1_20260809` | ledger §3.16 formal closed；mixed Pareto | — | HREL vs C1REL representation choice |
 | Q2 | Sealed visual audit / `sm_sealed_final_blind_audit_run_id_pending` | incomplete | Freeze evaluator/cohort and complete random/best/worst blind study plus failure taxonomy | visual credibility and selection-leakage rebuttal |
+| active implementation cleanup / non-core | C0-LAT no-source / `sm_c0_lat_nosource_c105k_seed17_4090g0_20260812` | exact v9 dependencies and source-free Camera architecture contract sealed；generic audit与production GPU preflight passed；fresh Camera Stage2 `105K` launched | Endpoint、full-state reload及同evaluator pure4,053 Direct-H／Direct-C／sequential audit；完成前不替换mainline | implementation hygiene only；StoryMotion无双来源匹配claim，本run不是投稿门槛 |
 | active secondary / non-core | Independent Human／Camera native system / Stage1 pair；Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1 formal closed；Stage2 optimizer-free cache/preflight passed with dual owning cache／normalizer／decoder and one trained source row；no endpoint result yet | Complete Human105K+Camera105K full-state endpoints, then pure4,053 Direct-H／Direct-C／sequential audit before ledger entry | native-system behavior only；no protected-asymmetry or latent-interface claim |
 | Q3 | C0-LAT Camera-text ownership / no current run | archived v4/v6.4 interventions are architecture-mismatched；current Human-text attribution is non-substitutable | Freeze Human/noise and compare correct／shuffled／absent Camera text under Direct-C and sequential；audit semantic response, target/non-target Camera changes and Human invariance | `Camera-text-owned`、`independent Camera control` and controllability wording |
 | Q4 | C0-LAT resource profile / no sealed artifact | missing | Record Human pass、Direct-C Camera pass、sequential total latency、parameter count、peak memory and length scaling under one runtime contract | offline/two-pass cost disclosure；no real-time or online claim |

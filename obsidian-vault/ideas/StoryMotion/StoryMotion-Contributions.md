@@ -1,6 +1,6 @@
 # StoryMotion Contributions Review
 
-## 2026-08-11 frozen correction
+## 2026-08-12 frozen correction
 
 下文保留了早期review推导，但当前投稿措辞以本节和
 [[StoryMotion-iclr-reliability#8.7 `0810-2137` reviewer建议执行审计]]为准：
@@ -10,13 +10,18 @@
 2. HREL称为`human-owned, relation-aware representation with an explicit interaction channel`，
    不称`disentangled`，也不把Camera48误写成严格Camera-native component。
 3. 三个接口来自两个条件分布；sequential是two-pass composition，不是synchronous joint sampling。
-4. observed=true symmetric controls形成mixed Pareto，否定“protected asymmetry全面优于symmetric”与
-   旧版“stronger Pareto frontier”措辞。Human preservation是架构／合同保证，不是冻结后的经验发现。
+   StoryMotion不主张识别或匹配observed／generated两种Human来源；historical `source_id`是共享
+   C0／C1实现中的route adapter，不是方法能力或投稿贡献。
+4. historical True-P2与observed=true symmetric controls必须分开解释：C0-LAT在投稿优先的
+   Direct-C geometry及Camera semantic／framing字段明确占优，但True-P2有Human／sequential geometry
+   局部优势，因此不能写逐字段全局支配；G-on／G-off只否定“Camera gradient必然损害Human”。Human
+   preservation是架构／合同保证，不是冻结后的经验发现。
 5. 在current C0-LAT Camera-text ownership与sealed blind audit闭合前，不写`independent Camera
    control`、visual superiority、SOTA或通用controllability。
 
 当前可冻结的贡献上限是：提出受约束的Human→Camera顺序分解；实现Human owner不被Camera输入／
-supervision改写、同一Camera branch覆盖observed-H与generated-H的系统；在三个互补evaluation
+supervision改写、同一Camera条件函数可分别接收observed-H与generated-H，而不要求辨识Human来源；
+在三个互补evaluation
 interfaces上报告field-wise quality／coherence trade-offs及边界。独立H/C native cascade只作
 secondary system comparison，不用于宣称latent interface优越。
 
