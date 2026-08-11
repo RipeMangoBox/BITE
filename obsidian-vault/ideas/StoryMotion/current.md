@@ -132,8 +132,8 @@ updated: 2026-08-11T14:19:10+08:00
 > pure4,053与paired bootstrap。两branch独立性、train-only normalizer/cache及latent non-collapse均通过；
 > 210K在各自全部预声明error字段上显著优于105K，但Human仍弱于v9 owner，Camera与v9为不同
 > representation／decoder下的mixed comparison。它只保secondary system boundary；后续独立双EncDec
-> Stage2已获单独授权并进入cache／preflight执行，但尚无endpoint或formal generation结论。Stage1正式结果
-> 只见ledger §6.9。
+> Stage2已获单独授权；live execution state只由其run manifest／logs拥有，当前尚无endpoint或formal
+> generation结论。Stage1正式结果只见ledger §6.9。
 > no-I16 seed23的`210K`训练、Direct-H、Direct-C、sequential pure4,053与sealed audit均已闭合；
 > 完整数值只见ledger §3.20，本页只保留上述mixed-geometry与非Stage2-only边界。
 > 已部署的Human-text条件归因矩阵
@@ -347,7 +347,7 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   版本化合同与人工复审。
 - H199与历史双Stage2 cascade保持从投稿核心队列删除。完全独立H/C Stage1 native-system diagnostic
   已完成105K／210K formal audit；用户在exposure复核后另行授权适配后的独立双EncDec Stage2，当前只作
-  secondary system boundary并处于cache／preflight执行。它同时改变表示、decoder、参数量、normalization
+  secondary system boundary；live execution state只见run manifest／logs。它同时改变表示、decoder、参数量、normalization
   与Stage2接口，在endpoint与formal evaluation闭合前不得产生generation结论或回流核心单变量矩阵。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
