@@ -18,7 +18,7 @@ source_notes:
   - "[[2026-07-29_storymotion-v10-human-relative-camera-training-contract]]"
   - "[[2026-07-29_storymotion-v11-v9-owner-stage2-three-mode-rescue-contract]]"
 created: 2026-07-28T12:03:02+08:00
-updated: 2026-08-04T14:51:40+08:00
+updated: 2026-08-13T02:03:00+08:00
 ---
 
 # StoryMotion Experiment SHA Registry
@@ -403,6 +403,22 @@ visual roots统一为`/data/public/ripemangobox/Motion/StoryMotion/runs/vis/stag
 | Browser smoke（duration + equal-width assertion） | 10c0391bad3ca1ca109cb5868d6e26f68905ddff8a1165666c49cce83a16a053 |
 
 最初Pulp composite沿用旧native renderer的`12 FPS`，而StoryMotion六路均为`30 FPS`；相同`valid_frames`因此被错误播放得更长。active manifest保持每条容器帧数等于`valid_frames`，仅以time scale `12 / 30 = 0.4`归一到`30 FPS`，不改变模型样本或裁剪帧。Gradio全量validation读取`1510`个required files，missing为`0`；browser smoke通过用户路径`17868 → 4090:7865`确认新tab、8个sample options、14行metric、七个唯一video、样本切换、媒体HTTP响应与同步播放。选中76帧样本的七路container duration均为`2.533333 s`，page／console errors均为空。服务部署于4090的`127.0.0.1:17865`与`0.0.0.0:7865`。
+
+### 5.2 C0-LAT no-source fixed-8 visual supplement
+
+两套补片均取相同pure4,053 ordered fixed-8 IDs，以同一renderer生成GT／Direct-C／formal
+sequential三列，`30 FPS`、`is_causal=false`、`joint_parallel=false`。每套均含8个可解码MP4、
+8张midpoint PNG、contact sheet与逐文件SHA manifest；本节只登记visual identity，不新增metric或
+system-selection结论。
+
+| version / run | immutable role | SHA256 |
+| --- | --- | --- |
+| v11 / sm_c0_lat_nosource_c105k_seed17_4090g0_20260812 | embedded fixed source / visual manifest / contact sheet | 5ae6a2b5afa5f4464692a95cf82fc5e97e6839122ead3cd64102953265ad0f51 / ea8ce2fefb640ad05b126c91b97944a55e522446794625272358eccf09a6936a / 9f7e783b1454c6a60131f3dac9a84474f6ac7570ce42c0f242a0aab86374b1dc |
+| v11 / v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 | embedded fixed source / visual manifest / contact sheet | d1bec3b1782e0d4d67c09eeb5608ddf61bfc8e5c083f62df94561a3b36c52aa2 / ed36775980ff125582d83afb55a0466b0bfe2711bd2922dd95331e8db71a8f9e / 7e6f91af5a9d52e0224b1d2688071c7de3759e20d0761922c6b31bd7552ce51a |
+
+共同ordered IDs SHA为`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`；
+owning decoder SHA为`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`；
+renderer SHA为`b52cc9c051eba975fa8216ef3ae2ed17246389f410259eec064fe3d4a9619072`。
 
 ## 6. Migration completeness index
 
