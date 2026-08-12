@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-13T00:55:00+08:00
+updated: 2026-08-13T02:12:50+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1537,6 +1537,72 @@ evaluator commit／SHA-256=`c3dcdff`／
 EMA bytes、training contract、Stage1／decoder／teacher／stats／cache identity检查；较早的partial
 audit `ebb92a99fc122b760adafa47cbeafc134b3aabb004fbcac89440cbe085dc895e`被R2明确supersede，
 不作为canonical seal。
+
+### Audited detail — §3.26 matched Camera-text dropout pure4,053 formal
+
+两条no-source C0-LAT arm在同一5090 SSD worktree从零完成Camera `105K`，每臂
+`13.44M` exposures；exact parent、v9 Stage1／owning decoder、frozen Human teacher、cache／
+train-only stats、seed17、batch order、noise、runtime与evaluation protocol均匹配，唯一训练差异是
+Camera-text dropout=`0.10`或`0.00`。由于训练前没有绑定独立validation split／cache，全部
+`162,760`个可物化train IDs又已用于训练，两臂在首次pure-test access前共同冻结neutral scale
+`1.0`与single-open pure4,053合同。这里的证据类别严格是**matched Camera-text-dropout training
+ablation**；`cfg_guidance_enabled=false`，不产生CFG scale或controllability promotion证据。
+
+formal评测覆盖同一ordered pure `N=4,053`，ID SHA-256=
+`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`；Direct-H、
+Direct-C与sequential均使用Euler50，`joint_parallel=false`、`is_causal=false`。Direct-H的fixed
+samples与四项paired Human geometry在两臂间tensor-exact。
+
+| version / run | mode | Human TMR ↑ / FDTMR ↓ | Camera CLaTr ↑ / FDCLaTr ↓ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| --- | --- | --- | --- | ---: | --- |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | Direct-H | `17.608446 / 99.390511` | — | — | — |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | Direct-C observed-H | — | `55.066975 / 22.295156` | `0.710181` | `0.875055 / 0.110521` |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | sequential Human→Camera | `17.608446 / 99.390511` | `52.678387 / 38.197651` | `0.642800` | `0.505727 / 0.078213` |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | Direct-H | `17.608446 / 99.390511` | — | — | — |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | Direct-C observed-H | — | `57.242012 / 19.488703` | `0.733595` | `0.862023 / 0.105909` |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | sequential Human→Camera | `17.608446 / 99.390511` | `54.940334 / 31.276964` | `0.685531` | `0.495212 / 0.077305` |
+
+| version / run | mode | Human global / root-aligned MPJPE ↓ m | Human root ADE / FDE ↓ m | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| --- | --- | --- | --- | --- | ---: |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | Direct-H | `0.842760 / 0.228751` | `0.758772 / 1.283039` | — | — |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | Direct-C observed-H | — | — | `1.423981 / 1.516389` | `29.851310` |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | sequential Human→Camera | `0.842760 / 0.228751` | `0.758772 / 1.283039` | `2.905080 / 3.004177` | `71.022073` |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | Direct-H | `0.842760 / 0.228751` | `0.758772 / 1.283039` | — | — |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | Direct-C observed-H | — | — | `1.401442 / 1.487820` | `29.332004` |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | sequential Human→Camera | `0.842760 / 0.228751` | `0.758772 / 1.283039` | `2.905820 / 3.004678` | `70.530631` |
+
+#### Matched dropout comparison and decision boundary
+
+下表为`drop0.10 − drop0.00`的mean delta与95% percentile CI；lower-is-better Camera geometry
+按4,053个ordered matched samples做10,000次bootstrap。aggregate semantic／framing没有逐样本
+paired unit，只报告完整差值，不附造CI。
+
+| comparison | mode | Camera ADE∆ / FDE∆ / rotation∆ | aggregate CLaTr∆ / FDCLaTr∆ / caption F1∆ / r-FPD∆ / Out∆ |
+| --- | --- | --- | --- |
+| drop0.10 − drop0.00 / matched no-source pair | Direct-C observed-H | `+0.022539 [-0.014427, +0.062036]` / `+0.028569 [-0.009663, +0.068672]` / `+0.519307 [-0.362747, +1.430821]` | `-2.175037 / +2.806454 / -0.023414 / +0.013033 / +0.004612` |
+| drop0.10 − drop0.00 / matched no-source pair | sequential Human→Camera | `-0.000740 [-0.030354, +0.028779]` / `-0.000501 [-0.030967, +0.029494]` / `+0.491442 [-0.448575, +1.466452]` | `-2.261948 / +6.920687 / -0.042731 / +0.010515 / +0.000908` |
+
+六项Camera geometry CI全部跨零；dropout `0.10`在Direct-C与sequential的CLaTr、FDCLaTr、caption
+F1、r-FPD与Out这十个方向性aggregate字段上全部回退。故本次matched treatment被拒绝，保留
+no-drop实现；不把dropout arm放入主表、不替换operational C0-LAT，也不声称统计显著的geometry退化。
+该formal没有执行caption intervention，因而既不是Camera-text ownership证据，也不能关闭C3；CFG
+guidance／controllability promotion永久不具资格。
+
+#### Formal artifact identity
+
+| version / run | training contract / Camera EMA SHA-256 | pure4053 / eval / fixed / records / results / manifest SHA-256 |
+| --- | --- | --- |
+| v11 C0-LAT no-source drop0.10 / `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812` | `dc9e3d9bd32b7a4f8d7836a0d57c8ffb153a73e36858930cd6c0dd00332ba3ac` / `0e2290d1972af311a7a09cc110a93d5a166857eff8482199001ee1c852ecafea` | `6396debcd81237dec755c04ca972353c0854ab45f8dd52c0f642e501ef4adc35` / `a723322f68dba1718565990a35cd2c0818b0f156297d78e776d0d1259e061295` / `f73b01e232b643c5525197bc6b9e1a355e8394f707f77c6adfe1c84e24fbb261` / `bf3663099a3d382910fa744d21889d8ca8e8c5b0e190082f8fecb56f55eb8b50` / `7401fd7b7e7edf8266bb473d222c0fdfc404827725cbdd26a76832bee36bbcf7` / `e098a3e9cdae891140e6393410cea321032274ee4a8e0f3f5a2a55c8c79402ef` |
+| v11 C0-LAT no-source drop0.00 / `sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812` | `492ac6c5f1954abbafcef6ee3037e9bf28770b215c2e450e4da8d17396cd44a2` / `2f9092a789394a826fd3535fad1fd40c7bc3f29df95b1d109999476e32ac3c5d` | `3c427f033be286ba58713849695317dde2bbd6de6099bb4ff2ec8ef85ab2b744` / `e41ff9c43a1725afcd1bb222c186284bc8cdf55ab6d362d1b01368e0ce4fea10` / `3c3c18279bd58a9ecc8227e6e40404b9dfcc3701f958a974285fef9b1b3648c6` / `2fc2ae7484e8b0bb52d3429a792307b5c431a7c9f8140cb1234d9ebceced07c8` / `82115745294830dc9a44f3d9e3c10c1e9fee6723a5cb400df61f6b536a3326e3` / `781ead0399893651b0d2ee0ce43f6b667634bf093f9f51d4fbce4f8f72428c5d` |
+
+两臂共享decoder／teacher／stats／train-cache SHA-256=
+`51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df`／
+`3efd59481f8052b401889fce6559e31f96cb88f51dfb6c466464cf05ec6c2c50`／
+`117d51a1d2ed1ae57541723b85c732118172634c57b2665f00b246c36e218558`／
+`04add8e553af334e4724f08c7076a0be24f171470b938920120ef64fc7b01576`。paired audit
+SHA-256=`9b63b9e952f8efb3e46da233f9e8d48ee747d259b1a537618f25687fd3caf923`；
+audit commit=`6f3a8277fe7d307e960debcd02a28ef0e6330cbc`，script SHA-256=
+`776664efe97e54d18c737a8a8dee9439a8ab4e7a3a441c8fefcf0e353974314c`。
 
 
 ## 4B. v9+ Stage1 audited detail tables

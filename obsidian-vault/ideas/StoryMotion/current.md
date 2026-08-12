@@ -14,6 +14,9 @@ hypothesis: |
   secondary system boundary; neither changes the C0-LAT mainline.
   The optional Human-text attribution matrix is sealed: non-empty conditioning
   matters, but sample-matched Human semantics are not evidenced over shuffling.
+  The matched Camera-text dropout pair is also sealed: dropout 0.10 regresses
+  all reported semantic/framing aggregates while all six Camera-geometry
+  intervals cross zero, so the treatment is rejected and no CFG claim is made.
   The source-free C0-LAT implementation cleanup is formally closed and
   quality-mixed; it removes a non-claim implementation variable without
   automatically replacing the operational metric mainline.
@@ -38,7 +41,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T00:55:00+08:00
+updated: 2026-08-13T02:12:50+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -169,6 +172,12 @@ updated: 2026-08-13T00:55:00+08:00
 > 因此只支持“非空Human-text通道被使用”，不支持“样本匹配Human语义被使用”；aggregate没有
 > paired CI，不能声称统计等价。该optional diagnostic不promote HT分支、不改变C0-LAT mainline，
 > 也不替代C0-LAT Camera-text ownership缺口。正式数字与R2 seal只见ledger §3.25。
+> matched no-source Camera-text dropout pair也已在首次pure-test access前固定neutral scale `1.0`，
+> 完成两臂pure4,053三接口与paired seal。dropout `0.10`相对no-drop在Direct-C／sequential的
+> CLaTr、FDCLaTr、caption F1、r-FPD、Out十个方向性aggregate字段全部回退，六项Camera geometry
+> CI全部跨零；故拒绝该treatment并保留no-drop。该结果不支持CFG、controllability或Camera-text
+> ownership，后者仍由correct／shuffle／contradictory intervention单独闭合。正式数字与hash只见
+> ledger §3.26。
 > step与ETA只见各自`runs/`，本页不重复。
 
 > [!warning] ICLR QA status
@@ -179,7 +188,8 @@ updated: 2026-08-13T00:55:00+08:00
 > diagnostic-only，不能当作最终 caption-matched evidence；C1REL-noI16 seed23也已sealed，支持两seed
 > component方向复现但不支持普遍必要性。exact HREL-vs-C1REL Stage2缺口已经关闭，
 > 但结论是mixed Pareto。独立H/C Stage1＋Stage2已formal闭合为secondary mixed system boundary，
-> 不提供核心单变量证据；剩余投稿QA是C0-LAT Camera-text ownership、sealed blind audit／visual
+> 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合；剩余投稿QA是
+> C0-LAT Camera-text ownership、simple-composition baseline、sealed blind audit／visual
 > failure taxonomy、sealed resource profile与release package。
 
 > [!note] Caption boundary
@@ -388,6 +398,9 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
   decoder、参数量、normalization与Stage2接口，不产生独立representation／latent-interface／cascade
   superiority结论，也不回流核心单变量矩阵。
 - multi-seed matched repeat已经闭合，不再等待Rect或ViGen utility。
+- matched no-source Camera-text dropout `0.10`／`0.00`已完成105K endpoints、neutral-scale
+  pure4,053与paired seal；dropout treatment被拒绝，no-drop保留。该轴不提供CFG／controllability或
+  Camera-text ownership证据，也不授权事后scale sweep；完整数字只见ledger §3.26。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
   C1REL是新建的matched representation arm，不是历史v10/C1队列恢复。
 - 组合式H–C utility只作为secondary extension：先完成data／Stage1 support／Human-retention gates，
