@@ -23,7 +23,9 @@
 supervision改写、同一Camera条件函数可分别接收observed-H与generated-H，而不要求辨识Human来源；
 在三个互补evaluation
 interfaces上报告field-wise quality／coherence trade-offs及边界。独立H/C native cascade只作
-secondary system comparison，不用于宣称latent interface优越。
+secondary system comparison；其完整Stage1＋Stage2 formal结果为Camera semantic／caption改善、
+Human semantic／projective framing与多数Camera geometry回退的mixed boundary，不用于宣称
+独立representation、cascade、latent interface或protected-asymmetry优越。
 
 我的总体判断是：第 1、2 条方向正确，但当前表述仍过于接近 PulpMotion；第 3 条可以成为独立贡献，
 但必须经过严格的“数据质量—模型控制能力”双重验证；第 4 条只能作为结果性贡献，且在本地可用数据

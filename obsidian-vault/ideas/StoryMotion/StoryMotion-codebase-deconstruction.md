@@ -24,7 +24,7 @@ source_files: 31
 > frozen-Human Stage2；没有 `experiments/`、runs、checkpoint、cache、dataset、log、render、
 > rescue 或旧版本备份。历史实验身份和正式数字分别只在 [[version_family]] 与
 > [[StoryMotion-valid-metric-ledger]] 追溯。
-> 4090／5090随后完成的observed-Human route controls与fully independent H/C Stage1使用各自
+> 4090／5090随后完成的observed-Human route controls与fully independent H/C Stage1＋Stage2使用各自
 > immutable实验worktree；它们不会被回灌成3090 release core中的第二套实现。
 
 本页是实现地图，不复制指标表。指标定义与 I/O 见
@@ -86,6 +86,12 @@ flowchart LR
 > 在公开前仍需把 contract materialization、checkpoint/EMA/RNG resume、正式 evaluator 和
 > dataset bridge 作为无版本 CLI 接回这套 library。当前源码可用于理解和单步验证，不能仅凭
 > `python` 命令宣称端到端复现 formal ledger。
+
+2026-08-12的private WebGPT R2 handoff另外保存了两个完整tracked snapshot：
+v9／C0-LAT／C1REL／HREL／symmetric／official evaluator与no-source audit所在的主实现树，
+以及independent native H/C分支。这是内部审稿与evidence handoff，不把上述
+`linkedCodebases/StoryMotion/`单版本树伪装成已完成的公开复现包，也不创建第二个
+StoryMotion或DIRECT仓库。
 
 ## 3. 张量与数据合同
 
@@ -149,8 +155,11 @@ program 的零样本拼接。
 这也解释了为什么“从 Stage1 起独立 Encodec-H / Encodec-C”不是一个干净的核心 ablation：
 它会同时更改 representation、decoder support、参数量、normalization 与 Stage2 interface。
 该系统后来经用户单独授权完成fresh 105K／210K、pure4,053与latent audit，只形成secondary
-native-system Stage1 boundary；它不进入protected-asymmetry核心消融，未授权Stage2 cascade，也不改变
-本地唯一owner。正式证据见ledger §6.9。
+native-system Stage1 boundary；在exposure复核后又另行授权并完成了适配cache／normalizer／decoder的
+独立双EncDec Stage2 Human105K＋Camera105K、三模式pure4,053与paired seal。结果是Camera
+semantic／caption改善但Human semantic、projective framing及多数Camera geometry回退的mixed
+system comparison，仍不进入protected-asymmetry核心消融，不是历史cascade恢复，也不改变
+本地唯一owner。正式证据分别见ledger §§3.24、6.9。
 
 ### 4.3 三阶段优化
 
@@ -243,7 +252,10 @@ Human exact。因此formal artifact继续有效，但row1不能被描述为“�
 GT-H／teacher-final-H mixture需要route tag，C0并没有这一研究主张。诊断因此定位了historical C0的
 冗余且output-sensitive实现变量，而不是核心factorization claim的缺口。2026-08-12授权的最小修正只在
 C0 Camera Stage2删除source identity并fresh训练`105K`；v9 Stage1、decoder／cache／stats及Human teacher
-全部复用和冻结。正式identity与数值只见ledger §3.21。
+全部复用和冻结。该no-source run已完成endpoint与pure4,053三模式seal：相对
+exact-init C0的paired geometry CI全跨零，相对operational C0只有sequential ADE／FDE小幅改善，
+semantic／framing aggregate为mixed。所以source identity可从C0中清理，但本结果不自动替换
+operational metric mainline。historical source-row identity见ledger §3.21，no-source formal见§3.23。
 
 ## 7. 三种正式推理接口
 
@@ -301,7 +313,7 @@ EMA、RNG、code/host/device 与 artifact manifest。配置错、进度停滞或
 | C0-GEO、C1REL、HREL、no-I16 | 已完成的 objective/representation controls，不属于 operational release implementation |
 | HT-FILM/HT-HX/HT-DR、framing、inpainting、multipair | 已关闭或 diagnostic mechanism axes |
 | matched symmetric、joint-parallel/evolving-H | factorization control 或失败轴；当前路由 fail closed |
-| H199 cascade / fully independent Encodec-H/C | 不属于release core；独立H/C Stage1后来作为secondary native-system完成formal audit，但仍改变整套representation/decoder且Stage2未授权；论文不主张latent-interface superiority |
+| H199 cascade / fully independent Encodec-H/C | 不属于release core；独立H/C Stage1＋Stage2后来作为secondary native-system完成formal audit，但改变整套representation／decoder／normalizer／cache／interface且结果mixed；论文不主张latent-interface、cascade或独立representation superiority |
 | baseline implementations | baseline 应保持 native owner/repository，不能混进 StoryMotion implementation |
 | runs/checkpoints/caches/logs/renders | artifact 层，不是发布源码；由 immutable run path 与 ledger 追溯 |
 
