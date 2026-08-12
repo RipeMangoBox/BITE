@@ -34,10 +34,11 @@ source_notes:
   - "[[Storymotion-exp-sha]]"
   - "[[StoryMotion-metric-computation-io]]"
   - "[[StoryMotion-iclr-reliability]]"
+  - "[[StoryMotion-iclr-ready]]"
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-12T16:12:00+08:00
+updated: 2026-08-12T20:55:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -227,6 +228,7 @@ updated: 2026-08-12T16:12:00+08:00
 - 当前论文：StoryMotion。
 - 当前方法owner：v11 C0-LAT operational mainline；C0-GEO audited alternate。
 - 当前实验owner：[[StoryMotion-iclr-reliability]]。
+- 当前paper-ready claim／table／figure／limitation owner：[[StoryMotion-iclr-ready]]。
 - 正式数字owner：[[StoryMotion-valid-metric-ledger]]。
 - DIRECT状态与队列：[[DIRECT/current|DIRECT current]]；不在本页复述。
 - 代码仍只有`linkedCodebases/StoryMotion/`；文档按StoryMotion／DIRECT分目录。
