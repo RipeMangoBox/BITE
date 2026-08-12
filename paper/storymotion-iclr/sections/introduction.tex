@@ -1,0 +1,29 @@
+\section{Introduction}
+
+Human--Camera generation requires both modality quality and cross-modal coherence. Symmetric
+joint modeling couples these goals, but it also makes the Human generator mutable under Camera
+inputs and supervision. We study a narrower question: can Camera generation be added to a
+strong Human generator while keeping the finalized Human pathway unchanged?
+
+\storymotion{} uses a directed factorization. A frozen Human generator first owns Human motion
+generation. One Camera conditional function then operates on either observed Human motion or a
+Human sample generated in a first pass. Generated-Human Human--Camera generation is therefore
+an explicit two-pass composition, not synchronous joint sampling.
+
+Our bounded contributions are:
+\begin{itemize}
+  \item A capability-preserving asymmetric design in which Camera training cannot rewrite the
+  finalized Human generator, together with three complementary evaluation interfaces.
+  \item A human-owned, relation-aware representation with an explicit interaction channel and a
+  protected dual-stream generator. We do not claim semantic disentanglement or universal
+  component necessity.
+  \item A field-wise evaluation and artifact protocol that separates Human generation,
+  observed-Human Camera generation, and generated-Human two-pass generation, including explicit
+  uncertainty and metric-semantics boundaries.
+  \item \evidencepending: an audited Camera-text response and matched Camera CFG study. This
+  contribution will be removed if its preregistered gates fail.
+\end{itemize}
+
+We do not claim the first Human--Camera generator, a model-agnostic framework, arbitrary
+editing, online generation, real-time performance, or global superiority over symmetric joint
+modeling.

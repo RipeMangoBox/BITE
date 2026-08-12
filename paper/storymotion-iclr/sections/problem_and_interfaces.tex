@@ -1,0 +1,24 @@
+\section{Problem Definition and Evaluation Interfaces}
+
+Let $T_H$ and $T_C$ denote Human and Camera descriptions, respectively. \storymotion{} uses
+two conditional distributions:
+\begin{align}
+  \hat H &\sim p_H(H\mid T_H), \\
+  \hat C &\sim p_C(C\mid H,T_C).
+\end{align}
+Their directed composition defines
+\begin{equation}
+  p(H,C\mid T_H,T_C)=p_H(H\mid T_H)p_C(C\mid H,T_C).
+\end{equation}
+
+We evaluate three interfaces:
+\begin{enumerate}
+  \item \textbf{Human generation:} $T_H\rightarrow H$.
+  \item \textbf{Observed-H Camera generation:} $H_{\mathrm{obs}}+T_C\rightarrow C$.
+  \item \textbf{Generated-H Human--Camera generation:} first sample $\hat H$ and keep it fixed,
+  then sample $\hat C\sim p_C(C\mid\hat H,T_C)$.
+\end{enumerate}
+
+The third interface contains Human generation error and a generated-Human condition shift. Its
+Camera deviation from the factual dataset Camera is a dataset-target diagnostic, not distance
+to a unique valid Camera trajectory.

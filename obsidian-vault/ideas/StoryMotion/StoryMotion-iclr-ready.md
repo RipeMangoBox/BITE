@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/tasks/0812-1919]]"
 created: 2026-08-12T20:50:00+08:00
-updated: 2026-08-12T20:50:00+08:00
+updated: 2026-08-12T21:10:00+08:00
 ---
 
 # StoryMotion ICLR 2027 Paper-Ready Claim and Presentation Owner
@@ -260,7 +260,9 @@ Caption skeleton：
 8. **Limitations**：OOD shift、metric semantics、caption、scope、offline cost、baseline covariates；
 9. **Reproducibility and Conclusion**：contracts、artifact routing、failure-aware conclusion。
 
-正式论文草稿尚未建立；本结构用于后续 `.tex` 搭建，不把 vault 变成另一份运行日志。
+中性、可编译的论文骨架已建立在 `paper/storymotion-iclr/`。当前仓库没有官方 ICLR style，故骨架只用
+标准 `article` 验证章节与claim-safe文案；加入官方模板后只替换class/style与conference metadata。
+`references.bib` 当前为空，禁止编造citation；正式表格仍须从ledger完整row单向填充。
 
 ## 10. Abstract 与 contributions 骨架
 
@@ -300,6 +302,7 @@ Caption skeleton：
 - [x] 主表／ablation 表 schema 要求每行非空 `version / run` 且禁止跨 endpoint 拼字段；
 - [x] 主图 caption 不使用 joint-parallel、disentangled、SOTA 或 visual-superiority 表述；
 - [x] limitation 与 failure taxonomy 已建立；
+- [x] 中性 LaTeX scaffold 已按八个章节建立并通过两次 `pdflatex` 编译；
 - [ ] Phase-C A1/A2 formal 后更新 Stage1 provenance claim；
 - [ ] Camera-text intervention、matched CFG 与 simple-composition formal 后冻结 C3 与主表 rows；
 - [ ] sealed resource profile 后填写 latency／memory；

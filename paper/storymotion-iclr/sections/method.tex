@@ -1,0 +1,30 @@
+\section{Method}
+
+\subsection{Human-owned relation-aware representation}
+
+Stage~1 represents Human motion, an explicit Human--Camera interaction channel, and Camera
+motion with Human-owned, interaction, and Camera latent channels. The Human decoder consumes
+only the Human-owned channel; Camera and framing decoding additionally consume the interaction
+and Camera channels. This is a structural information-flow statement, not a semantic
+disentanglement claim.
+
+\subsection{Protected asymmetric generation}
+
+Stage~2 freezes the finalized Human generator. The Camera flow consumes Camera text together
+with fixed observed or generated Human context. Camera optimization excludes Human parameters,
+and every StoryMotion tokenizer and generator boundary is non-causal.
+
+\subsection{Two-pass inference}
+
+Human generation and Camera generation use separate passes. The Camera pass begins only after
+the Human sample is complete and fixed. Joint-parallel and evolving-Human solvers are outside
+the reported method.
+
+\subsection{Training and artifact contract}
+
+Each result binds a Stage~1 checkpoint and owning decoder, train-only normalization statistics,
+train/eval caches and ordered sample identities, seed, batch sizes, sampler, code revision,
+hardware, and checkpoint state. A comparison row may not combine fields from different
+endpoints.
+
+% TODO: replace prose-level architecture references with a frozen Figure 1/2 asset.
