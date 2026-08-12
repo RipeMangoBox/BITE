@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/tasks/0812-1919]]"
 created: 2026-08-12T20:50:00+08:00
-updated: 2026-08-12T21:10:00+08:00
+updated: 2026-08-13T00:40:00+08:00
 ---
 
 # StoryMotion ICLR 2027 Paper-Ready Claim and Presentation Owner
@@ -114,7 +114,7 @@ C3 的关闭条件只见
 | causal axis | changed slot | evidence state | 可进入正文的结论 | 不允许的外推 |
 | --- | --- | --- | --- | --- |
 | Camera expansion preserves Human | Camera pathway is added after freezing Human | supported | Camera training cannot rewrite the finalized Human pathway；Direct-H exact replay | symmetric learning necessarily damages Human quality |
-| Phase-C protection provenance | Camera→Human gradient与Phase-C Human update | evidence pending | 等 A1/A2 formal 后区分“Camera supervision 是否需要进入 Human representation”和“Phase C 是否需继续更新 Human” | 用 finalized Stage2 freeze 倒推早期 Stage1 一直受保护 |
+| Phase-C protection provenance | Camera→Human gradient与Phase-C Human update | audited, mixed；no promotion | 关闭 Camera→Human gradient 而保留 Human update 只产生很小的 mixed effect；进一步冻结 Human 显著损伤 Human reconstruction、同时形成 Camera／framing Pareto | 声称 Stage1 全程冻结 Human、Camera gradient 普遍有害，或把未预注册 margin 的近零结果改写成 non-inferiority |
 | Camera-text ownership | correct vs shuffled／contradictory Camera text | evidence pending | 只在 frozen Human/noise、同 IDs 与 target-attribute response 闭合后写 bounded response | 用 Human-text attribution 或旧架构 intervention 替代 current C0-LAT evidence |
 | Camera CFG | Camera-text dropout `0.10` vs matched no-drop | evidence pending | validation-frozen scale 若提高 text response 且守住质量 gate，可写 controllability improvement | test-set 选 scale、事后扫 dropout rate、把 CFG 归功于旧 checkpoint |
 | Simple Human→Camera composition | integrated StoryMotion vs audited off-the-shelf pair | evidence pending | 只能在接口、数据、decoder 和 runtime 差异完整披露后写 system trade-off | 把不同 native system 当作单变量 architecture ablation |
@@ -129,6 +129,8 @@ C3 的关闭条件只见
 [[StoryMotion-valid-metric-ledger#Audited detail — original §3.20 C1REL-noI16 seed23 full-cohort repeat]]、
 [[StoryMotion-valid-metric-ledger#Audited detail — original §3.23 C0-LAT no-source implementation cleanup pure4,053 formal]]和
 [[StoryMotion-valid-metric-ledger#Audited detail — original §3.24 fully independent dual-EncDec Stage2 pure4,053 formal]]。
+Phase-C 的 A0/A1/A2 训练与 paired causal audit 只见
+[[StoryMotion-valid-metric-ledger#Audited detail — §6.5 Phase-C gradient／update protection controls]]。
 
 ## 5. Evaluation hierarchy 与主表 recipe
 
@@ -157,11 +159,10 @@ artifact。禁止跨候选拼接最优字段。
 
 1. operational C0-LAT；
 2. C0-GEO audited objective alternate；
-3. C3-25 former-mainline system baseline；
-4. mode-compatible external Human／Camera baselines；
-5. PulpMotion matched available-data native system boundary；
-6. audited simple-composition baseline（pending）；
-7. Camera CFG candidate 或 matched no-drop control（pending，二者只在完成后选择完整 system row）。
+3. mode-compatible external Human／Camera baselines；
+4. PulpMotion matched available-data native system boundary；
+5. audited simple-composition baseline（pending）；
+6. Camera CFG candidate 或 matched no-drop control（pending，二者只在完成后选择完整 system row）。
 
 所有数值从[[StoryMotion-valid-metric-ledger#4. Active Stage2 full-cohort evidence]]单向填充；本页不缓存数值。
 
@@ -169,7 +170,8 @@ artifact。禁止跨候选拼接最优字段。
 
 | version / run | changed slot | matched fields | Human retention | Camera response／quality | causal conclusion |
 | --- | --- | --- | --- | --- | --- |
-| 待审计 row | Phase-C G/U、symmetric route、I16、Camera dropout | seed／init／data／exposure／runtime | exact replay or paired audit | field-wise result | supported／mixed／rejected |
+| A0/A1/A2 Phase-C Stage1 / exact run IDs见ledger §6.5 | Camera→Human `G`；Phase-C Human update `U` | exact Phase-B parent、seed17、data/order、216K×128 exposure、4090 runtime | A1 near-zero mixed；A2 all principal Human errors regress | A1 tiny mixed；A2 Camera geometry improves but projective framing regresses | Stage1仍需Human-loss update；不选择protected owner，不授权downstream |
+| 待审计 row | symmetric route、I16、Camera dropout | seed／init／data／exposure／runtime | exact replay or paired audit | field-wise result | supported／mixed／rejected |
 
 跨 host 或跨 representation 的 row 必须在 `matched fields` 中写明差异，不进入单变量结论。
 C1REL／no-I16 的受限 component evidence 进入本表；P2 route、no-source cleanup、independent H/C
@@ -202,8 +204,9 @@ Caption skeleton：
 
 必须进入正文 limitations：
 
-1. **Stage1 provenance。** Finalized Stage2 的 Human freeze 不等价于 Stage1 全程隔离；Phase-C A1/A2
-   在 formal 前保持 `evidence pending`。
+1. **Stage1 provenance。** Finalized Stage2 的 Human freeze 不等价于 Stage1 全程隔离。Phase-C formal
+   显示关闭 Camera→Human gradient 的效果很小且mixed，但继续用Human loss更新Human branch仍有明确作用；
+   未封存numeric non-inferiority margin，因此A1/A2都不替换现有Stage1 owner。
 2. **Generated-H shift。** Camera 在 generated Human 上承受 Human generation error 与 condition shift；
    当前 sequential rotation 偏大，不能由 Direct-C 结果代替。
 3. **Camera text。** 原始 Camera caption 的质量、坐标语义、primitive 粒度与组合控制能力有限；current
@@ -236,6 +239,7 @@ Caption skeleton：
 | --- | --- | --- | --- |
 | Why is this not PulpMotion? | PulpMotion performs symmetric joint modeling；StoryMotion asks how to preserve a frozen Human generator while adding observed-H and generated-H Camera composition. | reliability nearest-work gap | Introduction＋Related Work |
 | Is generated-H generation just composition? | Yes；the novelty claim is the capability-preserving asymmetric design and audited interface, not a new synchronous primitive. | method contract＋three-interface artifacts | Method＋Evaluation Protocol |
+| Was the Human pathway frozen throughout Stage1? | No；the guarantee begins after the finalized Stage1 owner. A matched Phase-C audit shows that removing Human-loss updates harms Human reconstruction, while removing Camera→Human gradients alone has small mixed effects. | metric ledger §6.5 | Method Training Boundary＋Ablation＋Limitations |
 | Why not compose two off-the-shelf models? | This remains an evidence gate；report only after a compatibility-audited system comparison. | simple-composition plan | Main Table 1／Ablation |
 | Does Camera text actually control Camera? | Current mainline ownership is pending；do not substitute Human-text attribution or old architectures. | Camera-text intervention plan | Camera-text Analysis |
 | Is asymmetry universally better than symmetry? | No；formal controls are mixed Pareto. StoryMotion is prioritized on bounded Camera/system fields and offers an exact Human ownership invariant. | symmetric ledger sections | Ablation＋Limitations |
@@ -285,9 +289,9 @@ Caption skeleton：
 1. **Supported.** A capability-preserving asymmetric Human–Camera design in which Camera
    training cannot rewrite the finalized Human generator, together with three complementary
    paper-facing evaluation interfaces.
-2. **Supported, bounded.** A human-owned relation-aware representation and protected dual-stream
-   generator that implement directed Human→Camera information flow; no semantic-disentanglement
-   or universal component-necessity claim is made.
+2. **Supported, bounded.** A human-owned relation-aware representation and Stage2-protected
+   dual-stream generator that implement directed Human→Camera information flow; no claim of
+   Stage1-wide freezing, semantic disentanglement, or universal component necessity is made.
 3. **Evidence pending.** An audited Camera-text response and matched Camera CFG study. If its
    preregistered gates fail, this bullet is removed rather than replaced by an unsupported
    controllability statement.
@@ -303,7 +307,7 @@ Caption skeleton：
 - [x] 主图 caption 不使用 joint-parallel、disentangled、SOTA 或 visual-superiority 表述；
 - [x] limitation 与 failure taxonomy 已建立；
 - [x] 中性 LaTeX scaffold 已按八个章节建立并通过两次 `pdflatex` 编译；
-- [ ] Phase-C A1/A2 formal 后更新 Stage1 provenance claim；
+- [x] Phase-C A1/A2 pure4,053 formal、paired bootstrap 与 Stage1 provenance claim 已闭合；
 - [ ] Camera-text intervention、matched CFG 与 simple-composition formal 后冻结 C3 与主表 rows；
 - [ ] sealed resource profile 后填写 latency／memory；
 - [ ] sealed visual audit 后冻结 Figure 4/5 与 failure-rate wording；

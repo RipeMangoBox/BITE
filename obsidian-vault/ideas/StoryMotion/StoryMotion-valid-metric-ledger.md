@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-12T01:45:27+08:00
+updated: 2026-08-13T00:55:00+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1645,6 +1645,107 @@ provenance，但回答的是representation round-trip误差，而不是text-cond
 | C1REL-noI16 / `sm_c1rel_nointeraction16_stage1_636k_seed17_4090g1_20260804` | matched joint paired reconstruction | 4,053 | 0.030311 / 0.017568 / 0.069343 | 0.019653 / 0.011535 / 0.043463 | 0.027627 / 0.016403 / 0.060805 | 0.485326 / 0.424242 / 0.996774 | 0.039549 / 0.023427 / 0.082139 |
 | v10 HREL-C old-3-loss Phase-B / `v10_hrelcam_stage1_phasea210k_phaseb_camera48_210k_seed17_4090g0_20260729` | frozen-Human + Camera-only paired reconstruction | 4,053 | 0.030211 / 0.017454 / 0.069245 | 0.019525 / 0.011400 / 0.043384 | 0.027378 / 0.016122 / 0.060866 | 0.496643 / 0.443182 / 1.000000 | 0.039378 / 0.023089 / 0.082767 |
 | Redesign HML+Pulp / `stage1_hanchor_hmlrootlocal_pulpfull_packedio_r3_636k_eval_r4_true4053_seed17_5090g2_20260727` | joint paired reconstruction | 4,053 | 0.030462 / 0.017899 / 0.069392 | 0.021257 / 0.012494 / 0.046893 | 0.029491 / 0.017673 / 0.063758 | 0.480031 / 0.415730 / 0.986771 | 0.061342 / 0.042012 / 0.127044 |
+
+
+#### Audited detail — §6.5 Phase-C gradient／update protection controls
+
+本节登记同一 v9 Phase-B `420K` parent 上的 Phase-C `216K` matched causal audit。A0 是现有
+Pulp-only v9 owner 的原始 Phase-C；A1 只关闭 Camera loss 到 Human encoder 的梯度，仍用 Human
+loss 更新 Human encoder／decoder；A2 在相同 `G=off` 边界进一步关闭 Phase-C Human 更新。三臂
+使用相同 non-causal `H128+I16+C48` 拓扑、parent checkpoint SHA-256
+`0bc677c173eae3330757de62418059ed1176d7359221fe648c10eef3d6f048d8`、seed17、重建后的同一
+batch order、`162,760/4,053` train／eval IDs 和 `216,000 × 128 = 27,648,000` Phase-C exposures。
+
+| version / run | Camera→Human `G` | Phase-C Human update `U` | endpoint update boundary | endpoint checkpoint SHA-256 | training contract SHA-256 |
+| --- | --- | --- | --- | --- | --- |
+| A0 current owner / `stage1_hanchor_pulp_only_matched_r3_636k_seed17_4090g0_20260726` | on | on | `216,000 / 216,000` | `51233f6a032c779e66b6eed4bb22b7f61c41d9b4a5a0a1ffc7dade7d3d86d4df` | `96552a68699bb6c9dd694a19e8a4147d6ddf2f2c997c53aed93532e461f6cc28` |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | off | on | `216,000 / 216,000` | `626acf50e65a552a0e34442d5c223182ff21d556d300501f7d8424b55c339193` | `6bdefebf8c781a1d00a40fb1cd61806a42d23424eb51b1e60d29a7f29c7292b5` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | off | off | `151,200 parameter updates / 64,800 intentional no-update anchor boundaries` | `94407e46ee7eac7681a925cd31e83f6510bea602f5df953939826b7a7782e569` | `157a71f244a7e7cb9580d616aa8440b5cfe554e8186ab03f8455923c3ee59563` |
+
+A1／A2 midpoint与endpoint均 atomic-save、reload-verified；endpoint全状态含 model、optimizer、RNG、sampler、
+scheduler、contract／code／host／device provenance。A1／A2 training revision为`0e0b15c2`。preflight 分别验证
+Camera loss 对 Human encoder／decoder exact-zero gradient、A1 Human loss 对两者非零 gradient，以及 A2
+frozen Human parameter hash 不变。
+
+##### Formal artifact identity
+
+三臂 formal 均使用相同 evaluator SHA-256
+`66f64cc8add76ea941a972d8a197cab380a85dadd1913fcedb0e0da312458b3a`、pure-test `N=4,053`、ordered-ID
+SHA-256 `a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`、batch `128`、
+true-length decode batch `1` 和 exact owning decoder。A0 artifact identity已在§6.1–§6.4登记；下表只新增
+A1／A2 bytes，避免重复登记 A0 数字。
+
+| version / run | evaluation contract SHA-256 | fixed samples SHA-256 | result SHA-256 | records SHA-256 | eval manifest SHA-256 |
+| --- | --- | --- | --- | --- | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | `58c23ecbee64a3b14329f493336b2568667c14f1d899a998a6fcfabe50ccb769` | `b4bb1255c2ed5219b67c5bdd61a6dcce61bf06a428ff8c6f95e05d37e6c12680` | `2ee476643efc31e781c76838c15bfd990bd8827f84322d00eb2227beabd22615` | `5c8681fec7a6cb025f647af1aca0277b635a1c6690a32e2c1fb9bdccc6c28ca2` | `89b79850ea05872d09a95a9d84d96d74f8594a0f01da5115ec1d276b146a16cc` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | `bb63c60d9f39d0f43f1774dc8b5a82118a1b8bed09ab9a41c93b433231fd3452` | `d84fd3718c3a958a5ad5c2ab1f0c6c0c4c675ecbb975dba6e0e9b7e43f7ab219` | `da06172b8e28d873e56072de1af7b7900d050e1a77137dea92ce5ebdec8ec43a` | `dd6c996a62de99265b218d9ee7b0c91ec061715961862db4aae625996cee3a51` | `d665ac6a2d3bfc65a67b10cb7d80911dd5a4db8ad065b54718fe4c78f01aee07` |
+
+##### Formal reconstruction aggregates
+
+以下是 deterministic Stage1 reconstruction，不是 text-conditioned generation。Human root-aligned MPJPE
+移除 root translation，但仍保留 heading error。
+
+| version / run | N | global / root-aligned MPJPE ↓ m | root ADE / FDE ↓ m | yaw mean / final / unwrapped final ↓ deg |
+| --- | ---: | --- | --- | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | 4,053 | `0.120762 / 0.042260` | `0.100764 / 0.248305` | `10.4740 / 18.9520 / 20.9692` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | 4,053 | `0.133869 / 0.044779` | `0.112616 / 0.279547` | `11.8966 / 21.2175 / 23.6222` |
+
+| version / run | joint Cam ADE / FDE ↓ m | GT-H Cam ADE / FDE ↓ m | rotation ↓ deg | FOV-H / FOV-W ↓ deg |
+| --- | --- | --- | ---: | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | `0.037729 / 0.043980` | `0.026170 / 0.033787` | 0.575230 | `0.203853 / 0.262149` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | `0.035537 / 0.041679` | `0.024328 / 0.031843` | 0.556322 | `0.192442 / 0.247522` |
+
+| version / run | joint UV / center L2 ↓ | log-scale / out-ratio abs ↓ | visible recon / reference ↔ | zero-visible recon / reference ↓ |
+| --- | --- | --- | --- | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | `0.161031 / 0.096820` | `0.029860 / 0.039690` | `0.483917 / 0.497732` | `0.024163 / 0.007547` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | `0.164988 / 0.100944` | `0.030390 / 0.041214` | `0.481314 / 0.497732` | `0.026834 / 0.007547` |
+
+两条 result artifact 均另含相同 `1-64/65-128/129-192/193+` bins，样本数分别为
+`1,805/1,411/456/381`；length `min/median/p90/max=9/71/188/251`。完整逐 bin 字段由上表
+`results.json` hash 唯一拥有。
+
+##### Decoded-Human physical／kinematic diagnostics
+
+每个 cell 为 `mean / median / p90`；仍是 reconstruction heuristic，不是 calibrated physical-validity。
+
+| version / run | bone CV ↓ | joint speed | joint acceleration | joint jerk |
+| --- | --- | --- | --- | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | `0.026013 / 0.020494 / 0.050116` | `0.035670 / 0.022322 / 0.079735` | `0.028279 / 0.017334 / 0.062094` | `0.043176 / 0.026409 / 0.094687` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | `0.021380 / 0.016591 / 0.041141` | `0.035518 / 0.022162 / 0.079693` | `0.027760 / 0.016814 / 0.061350` | `0.042220 / 0.025519 / 0.093351` |
+
+| version / run | root speed | root acceleration | root jerk | contact | foot skate ↓ |
+| --- | --- | --- | --- | --- | --- |
+| A1 G-off, U-on / `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812` | `0.030291 / 0.017516 / 0.069141` | `0.019718 / 0.011582 / 0.043867` | `0.027752 / 0.016471 / 0.061080` | `0.484014 / 0.420455 / 0.999598` | `0.039462 / 0.023296 / 0.081835` |
+| A2 G-off, U-off / `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812` | `0.030211 / 0.017454 / 0.069245` | `0.019525 / 0.011400 / 0.043384` | `0.027378 / 0.016122 / 0.060866` | `0.496643 / 0.443182 / 1.000000` | `0.039378 / 0.023089 / 0.082767` |
+
+##### Paired causal audit and decision boundary
+
+10,000-draw sample-paired bootstrap使用seed17。comparison／manifest SHA-256分别为
+`a8893f4e6511576da4dd238a051969c22512511dc2625c75a31850c6414000c1`／
+`d97cd613abb67e4f621fd77a748041b6edab2113257ce7120a792e6f2c51932a`；comparator SHA-256为
+`edc8652452350a5f99413619edcb8347941a83d379ccdb5a1d480cdf31a184c0`，revision=`5901ace7`。
+每个 cell 是 `arm − reference [95% CI]`，误差项正值表示回退。
+
+| comparison | global / root-aligned MPJPE Δ m | root ADE / FDE Δ m | yaw mean / final / unwrapped final Δ deg |
+| --- | --- | --- | --- |
+| A1−A0：在 `U=on` 时关闭 `G` | `+0.000054 [-0.001067, +0.001026]` / `+0.000124 [-0.000030, +0.000278]` | `+0.000007 [-0.001088, +0.000962]` / `-0.000417 [-0.003704, +0.002525]` | `+0.0401 [-0.0066, +0.0873]` / `+0.2009 [+0.0938, +0.3072]` / `+0.2118 [+0.1046, +0.3184]` |
+| A2−A1：在 `G=off` 时关闭 `U` | `+0.013106 [+0.008677, +0.018214]` / `+0.002519 [+0.001552, +0.003460]` | `+0.011853 [+0.007513, +0.016892]` / `+0.031242 [+0.019684, +0.044226]` | `+1.4226 [+1.1778, +1.6658]` / `+2.2656 [+1.7820, +2.7673]` / `+2.6531 [+2.0845, +3.2424]` |
+
+| comparison | joint Cam ADE / FDE Δ m | GT-H Cam ADE / FDE Δ m | rotation Δ deg | projective center / out / zero-visible Δ |
+| --- | --- | --- | --- | --- |
+| A1−A0：在 `U=on` 时关闭 `G` | `+0.000076 [+0.000035, +0.000118]` / `+0.000139 [+0.000073, +0.000210]` | `+0.000025 [-0.000029, +0.000080]` / `+0.000119 [+0.000037, +0.000204]` | `-0.000661 [-0.001056, -0.000298]` | `+0.000629 [+0.000130, +0.001119]` / `+0.000139 [-0.000103, +0.000364]` / `+0.000242 [-0.000165, +0.000650]` |
+| A2−A1：在 `G=off` 时关闭 `U` | `-0.002193 [-0.002430, -0.001973]` / `-0.002301 [-0.002602, -0.002021]` | `-0.001843 [-0.002048, -0.001642]` / `-0.001944 [-0.002232, -0.001663]` | `-0.018908 [-0.020836, -0.016988]` | `+0.004124 [+0.001671, +0.006760]` / `+0.001524 [+0.000652, +0.002459]` / `+0.002671 [+0.001168, +0.004222]` |
+
+审计裁决：A1−A0 的大多数 Human 项跨零，但两个 final-yaw 字段、微小 Camera／projective 字段形成
+mixed effect；它不支持“Camera gradient 普遍有害”，也不能在结果后把近零均值改写成预注册
+non-inferiority。A2−A1 的全部 Human geometry／yaw CI 均在零上，同时 Camera trajectory／rotation
+改善而 projective center、out-ratio、visible fraction与zero-visible回退，证明关闭 Phase-C Human更新
+不是免费的 protection，而是明确的 Human–Camera Pareto trade-off。
+
+计划要求 endpoint 前封存 numeric non-inferiority margin，但没有找到已封存的数值 margin；comparison
+因此 fail closed 为`stage2_authorized=false`、`stage1_owner_replacement_authorized=false`。不选择 protected
+arm、不建新 cache／stats／Stage2；保留现有 A0 Stage1 owner。paper 只能写 finalized Stage1 后的 frozen-Human
+保证，并把“Stage1 Phase-C 仍需要 Human-loss更新；Camera→Human gradient的效果很小且mixed”作为审计边界。
 
 
 #### Audited detail — original §6.8 NoInt-HREL／C1REL／C1REL-noI16 matched Stage1 audit

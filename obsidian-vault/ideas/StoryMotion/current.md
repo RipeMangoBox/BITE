@@ -38,7 +38,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-12T20:55:00+08:00
+updated: 2026-08-13T00:55:00+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -75,6 +75,15 @@ updated: 2026-08-12T20:55:00+08:00
 > [[StoryMotion-valid-metric-ledger#4A. v9+ Stage2 audited detail tables]]。
 > HREL与C0-LAT的当前mainline身份不变。正式数值见
 > [[StoryMotion-valid-metric-ledger#3. Active full-cohort Stage1 owner]]。
+
+> [!important] Phase-C protection gate已闭合
+> A0／A1／A2 已在同一 Phase-B parent、non-causal topology、seed17、数据顺序与 Phase-C
+> exposure 下完成 pure4,053 reconstruction 和 sample-paired bootstrap。关闭 Camera→Human
+> gradient 而继续 Human-loss update 的结果很小且mixed；进一步冻结 Phase-C Human update
+> 明确损伤 Human reconstruction，并形成 Camera geometry／projective framing Pareto。由于 endpoint
+> 前没有封存 numeric non-inferiority margin，本次审计 fail closed：A1／A2 均不替换 A0、不建
+> downstream cache／Stage2。论文保护保证从 finalized Stage1 之后开始，正式数字与hash只见
+> [[StoryMotion-valid-metric-ledger#Audited detail — §6.5 Phase-C gradient／update protection controls]]。
 
 > [!important] HREL matched Stage2 formal已闭合
 > HREL matched Stage2三接口均以pure `N=4,053`完成并通过artifact/hash、ordered-ID、
