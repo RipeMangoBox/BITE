@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-13T02:12:50+08:00
+updated: 2026-08-13T11:14:41+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1604,6 +1604,107 @@ SHA-256=`9b63b9e952f8efb3e46da233f9e8d48ee747d259b1a537618f25687fd3caf923`；
 audit commit=`6f3a8277fe7d307e960debcd02a28ef0e6330cbc`，script SHA-256=
 `776664efe97e54d18c737a8a8dee9439a8ab4e7a3a441c8fefcf0e353974314c`。
 
+
+### Audited detail — §3.27 C0-LAT Camera-text shuffled／absent pure4,053 formal cells
+
+operational C0-LAT 的 shuffled 与 absent Camera-text cell 均完成同一 ordered pure
+`N=4,053`、Direct-H／Direct-C／sequential、Euler50、`joint_parallel=false`、
+`is_causal=false` 的无优化器正式评测。两条 manifest 当前列出的 artifact SHA-256 与文件
+bytes 全部一致，`records.jsonl` 都是 4,053 行；两条 intervention 的
+`official_input_sha256` 均为
+`6d75cbf5d22b4a9f0a39d79fa8cfb900708a4095725b7ff62e7bf11ca4d2b80f`，
+Direct-H official metrics 与 paired geometry 在二者之间 exact 相同。
+
+shuffled mapping 在 Camera primary-primitive group 内按长度稳定排序后做无固定点置换；
+`fixed_points=0`、median length difference=`0`、max difference=`19`、same-primitive
+fraction=`0.9995065384`，mapping SHA-256=
+`da14776982ccdae550a3162a0d105c2e0854ed3cea1397f6f01da251fb2e7f76`。
+absent 使用每行一个**全零 token value 的有效 sentinel**满足既有 Transformer 的“至少一个
+valid token”输入合同；它不含 caption 内容，但仍是旧模型未训练过的 OOD 辅助条件，不能作为
+robust control 的核心证据。
+
+| version / run | condition | mode | FDCLaTr ↓ / CLaTr ↑ | caption F1 ↑ | r-FPD ↓ / Out ↓ |
+| --- | --- | --- | --- | ---: | --- |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | factual correct；既有 mainline context | Direct-C observed-H | `21.171 / 56.933` | `0.7372` | `0.8465 / 0.1052` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | factual correct；既有 mainline context | sequential Human→Camera | `28.754 / 55.579` | `0.6935` | `0.5082 / 0.0773` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_shuffled_pure4053_r3_20260813` | fixed-point-free shuffled | Direct-C observed-H | `24.453793 / 49.253841` | `0.643830` | `0.891448 / 0.108472` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_shuffled_pure4053_r3_20260813` | fixed-point-free shuffled | sequential Human→Camera | `29.204689 / 47.279198` | `0.608636` | `0.521557 / 0.078834` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_absent_pure4053_r4_20260813` | absent zero-sentinel；OOD auxiliary | Direct-C observed-H | `69.925789 / 28.938532` | `0.334154` | `1.106651 / 0.122369` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_absent_pure4053_r4_20260813` | absent zero-sentinel；OOD auxiliary | sequential Human→Camera | `80.906418 / 24.219442` | `0.260614` | `0.645198 / 0.087206` |
+
+| version / run | condition | mode | Camera center ADE / FDE ↓ m | Camera rotation ↓ deg |
+| --- | --- | --- | --- | ---: |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | factual correct；既有 mainline context | Direct-C observed-H | `1.412472 / 1.498528` | `29.922` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730` | factual correct；既有 mainline context | sequential Human→Camera | `2.942785 / 3.042185` | `71.435` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_shuffled_pure4053_r3_20260813` | fixed-point-free shuffled | Direct-C observed-H | `1.416470 / 1.513431` | `30.003232` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_shuffled_pure4053_r3_20260813` | fixed-point-free shuffled | sequential Human→Camera | `2.941684 / 3.043639` | `71.075657` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_absent_pure4053_r4_20260813` | absent zero-sentinel；OOD auxiliary | Direct-C observed-H | `1.472309 / 1.584119` | `31.011330` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_absent_pure4053_r4_20260813` | absent zero-sentinel；OOD auxiliary | sequential Human→Camera | `2.965736 / 3.069133` | `72.080682` |
+
+相对既有 factual mainline context，shuffled 与 absent 在两种 Camera 接口的 CLaTr、FDCLaTr、
+caption F1、r-FPD、Out 五个方向性 aggregate 字段均回退，且 absent 回退更大；Camera geometry
+则只作无 CI 的 descriptive context。**本节点仍不能关闭 Camera-text ownership claim**：尚无以本轮
+sealed evaluator 重跑的 factual-correct sibling，contradictory／target-attribute response 与 paired
+non-target audit 也未完成。故这些 row 只登记为有效 intervention cells，不把历史 correct row 与新
+cell 冒充单变量 matched comparison，不授权 `independent Camera control` 或 strong controllability。
+
+#### Formal artifact identity
+
+| version / run | pure4053 / eval / fixed / records / results / manifest SHA-256 |
+| --- | --- |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_shuffled_pure4053_r3_20260813` | `eb9fc4a6174981c6e70c6ca9d9f2f0c5280485bfec03996cf2a7b4b3dbf6c444` / `5225f0cbf8ac25f529a9532ca6cdf886e0e758eda159ac4194e266d470d9ae8e` / `17c59ecc7c22436da43b9da6474903b297013cd3c27db01a8fe6f932809a96a0` / `281016b6ba4a6a3581a1080e480514ecf1f3f3ff4ea39b94daaa3f0751f58743` / `cebe588d2b986d2c4f4f2a04d6f55a9f788783fc454002da5b8f21cea9b44dbd` / `4a154c38abc34b5b66d5c107aa488776661f5b6161a5855a840eb4576d59a1db` |
+| v11 / `v11_c0_lat_fixedh_35to105k_seed17_5090g2_r2_20260730 :: camera_text_absent_pure4053_r4_20260813` | `0e8dbf7604575f9af00b12b28d530f1de8ea35b9a2c4f9f22e534190c07b3007` / `73c7d590a2986763dc0d2a73d362185840b50ac0bd65880a92871e2bc0033247` / `cdaab048ff1f039758cd4f594164a848d003eca4b819f4babc771d6895409199` / `b124ffd193819345252e2082ee6a44c30e13d4682ff38f4ba17263c69f252086` / `f3a6df5f630c67742ff0eb9fc04ab8ac0fe88540b11d5ee53fc8e4ca67b29459` / `5f036d8e9488c9a31cda1ea2d455bf29a13c2ceb15cc151243215309919eb6e7` |
+
+两条 cell 共享 training contract／Camera EMA／implementation composite SHA-256=
+`1d05bef03cf10b839bb75018cd6ca0efff8d0a4696f6cafcbbafb028fb69e326`／
+`b7759ea686ddc8bd9abc2db2b3a6f74421bf3f6033274863d715f58b0d66b96a`／
+`33eef1048cc19335fc25e6b8025eadc40fc5a12af88b95d62ed581bf00d83552`。
+shuffled／absent sealed evaluator SHA-256 分别为
+`08471e13887ae3d4eb52423ad1f29b2dae72f1f8000c5208f3161f4c3e7b950c`／
+`0e7be3e7670f76ac77eb63844cecdc3f37325d0f07cf76aa0db4f6bf813152dd`；
+absent 的差异只实现 zero-sentinel intervention，并在其 boundary 中显式保留 OOD 边界。
+
+### Audited detail — §3.28 C0-LAT sampler-step grid r4 partial formal snapshot
+
+预注册 grid 固定 operational C0-LAT、同一 pure4,053 ordered IDs、seed17/base noise、v9 owner、
+Euler sampler 与 `H,C∈{25,50,100}`，grid contract SHA-256=
+`2e1cd238ba9ca12f450da2fa8bf9ff6a6557d469baa4974b6d4b834b2d59c46d`。
+当前 6/9 个 r4 cell 已完成：5090 GPU3 的四个 assignment cells 全部完成，GPU2 在完成
+`H25/C25`与`H25/C100`后，于`H50/C50` prepare 因 contract 中 mode 顺序与 evaluator
+顺序不一致而 fail closed；`H50/C50`、`H100/C25`、`H100/C100`均没有有效 r4 result。
+
+下列 6 个 cell 均有 4,053 行 records、`pure4053_evaluated` manifest、匹配的 artifact bytes，
+所以是有效的 full-cohort **cell-level** evidence；但 grid contract 明确要求 complete grid，故当前
+snapshot 不具 Pareto selection、default replacement 或 test-selected step claim 资格。
+
+| version / run | H steps | C steps | sequential FDCLaTr ↓ / CLaTr ↑ | caption F1 ↑ | r-FPD ↓ / Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg |
+| --- | ---: | ---: | --- | ---: | --- | --- | ---: |
+| v11 / `sm_c0_lat_sampler_grid_h025_c025_pure4053_r4_20260813` | 25 | 25 | `29.709513 / 56.980156` | `0.714445` | `0.433114 / 0.068090` | `2.906867 / 3.004755` | `70.828164` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r4_20260813` | 25 | 50 | `30.215458 / 55.802074` | `0.701340` | `0.457624 / 0.070155` | `2.910336 / 3.008426` | `70.902485` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c100_pure4053_r4_20260813` | 25 | 100 | `30.461082 / 55.242229` | `0.692788` | `0.481676 / 0.072019` | `2.912267 / 3.010622` | `70.922579` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r4_20260813` | 50 | 25 | `27.973045 / 56.745441` | `0.710081` | `0.482184 / 0.074892` | `2.939494 / 3.038257` | `71.403069` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r4_20260813` | 50 | 100 | `29.342546 / 55.020927` | `0.688143` | `0.532597 / 0.079081` | `2.944360 / 3.044037` | `71.402452` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r4_20260813` | 100 | 50 | `28.427786 / 55.392792` | `0.694107` | `0.560943 / 0.082401` | `2.953038 / 3.052828` | `71.414991` |
+
+| version / run | sliced interface | primary semantic / distribution | paired geometry context |
+| --- | --- | --- | --- |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r4_20260813` | Human generation, H25 | TMR `18.021236` / FDTMR `121.479698` | global / root-aligned MPJPE `0.832756 / 0.229566` m |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r4_20260813` | Human generation, H100 | TMR `17.197746` / FDTMR `92.361870` | global / root-aligned MPJPE `0.848286 / 0.228860` m |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r4_20260813` | Observed-H Camera, C25 | CLaTr `58.008045` / FDCLaTr `18.757345`；caption F1 `0.751211` | center ADE / FDE `1.403524 / 1.489013` m；rotation `29.808927` deg |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r4_20260813` | Observed-H Camera, C100 | CLaTr `56.392288` / FDCLaTr `22.926144`；caption F1 `0.728462` | center ADE / FDE `1.418537 / 1.504831` m；rotation `30.025345` deg |
+
+#### Partial-cell artifact identity
+
+每行字段顺序为 pure4053 / eval / fixed / records / results / manifest SHA-256。
+
+| version / run | artifact SHA-256 sequence |
+| --- | --- |
+| v11 / `sm_c0_lat_sampler_grid_h025_c025_pure4053_r4_20260813` | `ea31a868fad0a2d60357a53bd4d06f4432d29b0d55419b03f41501aa430ffa6f` / `7333e695b1d4d09d418e8ea97fa49932eef213c921b9c673e28b97ed803c63c5` / `1ce70a9cfc6dca893ed6f2b5c3a70ea140bd081830691d1ebd2b97eae806613e` / `1fdd22cbf9e4b092e7c4cd84f6f0cd12dba28c55d4102d034969bd32985b7695` / `d0dbe2a0e361fc4b4b75db43a594c76bd4023c95d247d41bbc4a69f95479caa8` / `6b8bdc1ca8648e20ee3a7b6fe7bb28248562aef1d3870c87006c4b98391d4398` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r4_20260813` | `c95068e081cf9ffb7066b613bcaae382c0399764d0d58876860b22fbb581851d` / `c22a844314ee9d491a8d7fa89890c2329f18048e0d13ac8107668bae18c28e7e` / `8c393dd841e24dc57cbc0e7b3bd088443938497a3e00ead47f9babe59d5b53e8` / `85c2e89d38812c4f3eae1e27808fc3b9687fef334e7876f9aabb8fe01069c0a9` / `e1a97e4f8564a1762ed930809d792d1b8cd2ed6f4f488aa69b9c7ebfba0d8e8b` / `e5a0251a2b5cbcac6b95b09414abfa20a8f267cda7337fc8c55ab8730156a24a` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c100_pure4053_r4_20260813` | `15e9b6e09bd609155685b53a07557d86d1be1fc974425060d8cf8f67e6245792` / `109365971a4674cc29dd655844a62aab3e509cf1839db17134ec0473d5be9f53` / `d7c7ae32d81f1a7927d0c1a11e0caf6f420b16853943e9ca4f32c0d91f453f37` / `981544c48e89c5fad895fb2690423a67dbbda26b2b19b93c4142ab33adce0456` / `15682a3e6f7c6066e2127fb2138d43bb39d2e14168599733d0b43a00113c688b` / `8f18e4bef0bd634d0ae52d9fc77587d5fe907d675a3bb6f4fe642c943a88c3d2` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r4_20260813` | `69a6e77040b48e010eb5f16b20b0fd3f4637b8746cb8fe8a62ee80e083079b04` / `c624ac0e58d6fb53173767db3e7a8431fde4bf11153583d131c4b3c2d53ad5d8` / `1fa0848f0d5c7800524073575fd87baff7183c4bca5746b48854f2582f49024c` / `4d32e835d3492cf70424a22c3ce752c40e7e6638dc4e020cb5463f95512f058a` / `d572f13b9f3837735c563b495ed437a6dc11ed49555312ff10e50d7bf8ef2c27` / `76cb343539e31f35e2152c53a5b8196cd1994b48b66d24dc79ff96d897fbff62` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r4_20260813` | `42512cd48d87a6b344b4c1ce52210b8d71d36acf9d9d3cf919730db95c9b2231` / `e75853d671e2aec810728a698173e3daaa367359158685778badb5bfe35ee11a` / `72fc5021cc2079158538633efa875285e4f645a8edcce4afa5a761a42b3c71a3` / `8d6602b9a38a3a3fe14633fef84da84655fdc3646882d31bc56aac925515cb77` / `21b85084c41c36b94a88614da4558f0f59f7522ed28523bb44cd89ff3f275973` / `23f318dcf1563ea2721ce3f15ddd881cd192d79bb38785bac54c58f3b9e5928c` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r4_20260813` | `d2fd1316e8dc8650b322f26e6dbc882fc431be905f79e9b79803e1184ae34285` / `64bb69e2f3def5f50c29615d43f0983bed424f865489c5d39f05899f9691aa98` / `f9f45a3d9828bd9287d9f73a868a39bcc640a227c9b3f03219a4356e2aa9d8db` / `766ef7eef486404593c3db2ffce746f22e1a09808f1d10304a7128b8e5dfdef4` / `d1660065b0224c15b00e9e95673b4cfd862547a1b990b64837aa78ed84201387` / `071a078cc60ef5b0dce7b6839a834fe3f7f45ce91adacebe271d2723088552a0` |
 
 ## 4B. v9+ Stage1 audited detail tables
 

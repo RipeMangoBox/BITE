@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T02:12:50+08:00
+updated: 2026-08-13T11:14:41+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -322,11 +322,17 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-13（Stage1 Phase-C protection causal audit闭合）：** A1 `sm_stage1_phasec_g0_u1_seed17_4090g0_20260812`与A2 `sm_stage1_phasec_g0_u0_seed17_4090g1_20260812`从exact v9 Phase-B parent完成matched Phase-C，并与历史A0以相同non-causal topology、seed17、数据顺序、exposure、pure4,053 evaluator及10,000次sample-paired bootstrap审计。A1关闭Camera→Human gradient而保留Human-loss update，只产生很小且mixed的变化；A2进一步关闭Phase-C Human update后，Human reconstruction显著回退，同时Camera geometry改善而projective framing回退。endpoint前没有封存numeric non-inferiority margin，因此不事后发明阈值：A1／A2均不promote、不授权cache／Stage2，A0继续作为Stage1 owner；论文保护边界限定在finalized Stage1之后。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §6.5 Phase-C gradient／update protection controls]]。
 - **2026-08-13（C0-LAT matched Camera CFG training endpoints闭合）：** `sm_c0_lat_nosource_camtextdrop010_c105k_seed17_5090g2_r2_20260812`与`sm_c0_lat_nosource_nodrop_c105k_seed17_5090g3_r2_20260812`在同一5090 SSD worktree完成fresh Camera `105K`，每臂`13.44M` exposures；exact no-source parent、v9 Stage1／decoder、frozen Human teacher、cache／train-only stats、seed17、batch order、corruption与runtime均匹配，唯一训练差异是Camera-text dropout mask。两份contract audit、variant／production preflight、CFG单测以及105K full-state／raw／EMA文件hash均通过。endpoint时两臂的`pure_test_opened=false`且eval roots为空，因此该节点只登记T2 milestone。后续验收确认训练前未绑定独立validation split／cache，全部可物化train IDs又已用于训练，故在首次pure-test access前共同冻结neutral `Camera CFG=1.0`与single-open pure4,053合同；该formal只具matched dropout-treatment解释资格，不具CFG guidance／controllability promotion资格。
 - **2026-08-13（matched Camera-text dropout formal闭合）：** 上述两臂以共同冻结的neutral scale `1.0`完成同一ordered pure4,053 Direct-H／Direct-C／sequential评测及10,000次sample-paired bootstrap；Direct-H fixed samples与四项Human geometry tensor-exact。dropout `0.10`相对no-drop在两种Camera接口的CLaTr、FDCLaTr、caption F1、r-FPD与Out十个方向性aggregate字段全部回退，六项Camera geometry CI全部跨零；因此拒绝dropout treatment、保留no-drop，不promote任一新系统。由于没有独立validation、未执行caption intervention且`cfg_guidance_enabled=false`，本事件不支持CFG、controllability或Camera-text ownership；正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.26 matched Camera-text dropout pure4,053 formal]]。
+- **2026-08-13（current C0-LAT Camera-text intervention partial formal）：** shuffled r3与absent zero-sentinel r4分别完成ordered pure4,053三接口，现有manifest、4,053行records及全部artifact bytes验收通过；两臂Direct-H exact。两种Camera接口在shuffled／absent下均相对既有factual mainline context出现五个方向性semantic／framing aggregate回退，absent更大，但本轮没有同sealed evaluator的factual-correct sibling，也未执行contradictory／target-attribute paired audit。故只登记两个有效intervention cells，Camera-text ownership与controllability claim继续pending；absent永久只作OOD auxiliary。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.27 C0-LAT Camera-text shuffled／absent pure4,053 formal cells]]。
+- **2026-08-13（C0-LAT sampler-step grid r4 partial formal）：** 5090 SSD worktree的预注册3×3 grid完成6个pure4,053 cell并逐项通过record／manifest／artifact-hash验收；GPU2在`H50/C50` prepare遇到mode顺序合同不一致后fail closed，`H50/C50`、`H100/C25`、`H100/C100`无有效结果。`complete_grid_required=true`，因此六个cell只保留为有效partial evidence，不选择Pareto、不替换50/50 default。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.28 C0-LAT sampler-step grid r4 partial formal snapshot]]。
+- **2026-08-13（resource／fixed-8 post-queue未形成结果）：** 4090 secondary resource r2在首个case因batch缺`human_text_tokens`失败，5090 primary r2因上游grid队列失败未启动；均无`resource_profile.json`。4090 shuffled与5090 `H50/C25` fixed-8 render仅复制source后因错误Pulp stats root停止，其余排队render未完成；所有partial visual roots无manifest／视频，不能进入visual registry。合同、日志与partial roots保留bug provenance，不产生metric或visual evidence。
 
 ## Bug 与 invalidation provenance
 
 | issue | 影响 | 当前处理 |
 | --- | --- | --- |
+| sampler-grid r4 default cell的contract mode顺序为Direct-C／Direct-H／sequential，而evaluator按Direct-H／Direct-C／sequential比较list | GPU2在6/9总体进度处于`H50/C50` prepare fail closed；其后两个GPU2 cells未执行 | 六个已sealed cells按partial formal保留，完整grid不得选择；修复须新版本/evaluator seal并避免改写r4 artifact |
+| resource-profile r2 runner读取batch中不存在的`human_text_tokens` | 4090首case即失败，5090又因上游queue未启动；两个r2均无result | 保留preregistered合同与失败日志；修复后使用新run ID／result root，不在r2空目录补写 |
+| 2026-08-13 fixed-8 queues传入缺official stats YAML的Pulp root | shuffled与`H50/C25`只复制source，其他render未执行；无manifest／视频 | partial roots禁止登记visual evidence；重新部署前先以read-only stats preflight验证实际dataset root |
 | v7.5–v7.13 使用旧 raw human199/camera9 与错误 decode contract | local Stage1/Stage2 ranking 不可靠 | 只保 provenance；v7.14 corrected contract 起算 |
 | explicit-framing formal／visual 首轮边界错误 | 首次 evaluator loader 读错 checkpoint hash key，第二次沿用 N64 batch/noise 而非 parent formal batch32/noise，均未形成正式结果；首次成功 render 又声明四栏但 base renderer 实际只画三栏 | 三个 roots 全部保留为 failed provenance；formal 只接受重新预注册且 matched 的完整4,053结果，visual 只接受抽帧确认四栏且 manifest 绑定 base-renderer SHA 的 fresh root |
 | Human-text fixed8首条render命令使用失效的Pulp fast-root | pure4,053 eval与audit不受影响；render在首个cell前因缺失`smpl_rifke`失败，只留下空`arrays/` | 空目录经确认后移除；r2改用实际Pulp dataset root，完成80-cell manifest并通过逐文件SHA审计 |

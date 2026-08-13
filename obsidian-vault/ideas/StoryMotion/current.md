@@ -17,6 +17,11 @@ hypothesis: |
   The matched Camera-text dropout pair is also sealed: dropout 0.10 regresses
   all reported semantic/framing aggregates while all six Camera-geometry
   intervals cross zero, so the treatment is rejected and no CFG claim is made.
+  Current-mainline shuffled and absent Camera-text cells are individually
+  formal, but ownership remains open because a same-evaluator factual sibling,
+  contradictory target-response audit, and paired non-target audit are missing.
+  The sampler-step grid is 6/9 complete and is not selection-eligible; the
+  sealed resource profile and queued fixed-8 renders produced no valid result.
   The source-free C0-LAT implementation cleanup is formally closed and
   quality-mixed; it removes a non-claim implementation variable without
   automatically replacing the operational metric mainline.
@@ -41,7 +46,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T02:12:50+08:00
+updated: 2026-08-13T11:14:41+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -180,6 +185,16 @@ updated: 2026-08-13T02:12:50+08:00
 > ledger §3.26。
 > step与ETA只见各自`runs/`，本页不重复。
 
+> [!warning] 2026-08-13 空卡验收：I2／I5／R1／visual仍未关闭
+> C0-LAT shuffled r3 与 absent zero-sentinel r4 均完成 pure4,053 三接口并通过当前
+> manifest／artifact-hash／record-count 验收；两臂是有效 intervention cells，但没有同 sealed
+> evaluator 的 factual-correct sibling，且 contradictory／target-attribute paired audit未执行，故
+> Camera-text ownership与controllability仍不成立。5090 sampler grid r4 只有6/9 cells有效，
+> `H50/C50`因mode顺序合同不一致fail closed，后续两个GPU2 cells未执行；complete-grid gate禁止
+> 选择step。4090 resource r2在首个case因缺少`human_text_tokens`失败，5090 resource r2未启动；
+> fixed-8 queues又因错误Pulp stats root停止，只有source复制、没有manifest或视频。正式 cell 数字与
+> hash只见ledger §§3.27–3.28，失败细节与关闭条件只见任务页。
+
 > [!warning] ICLR QA status
 > symmetric route-control执行缺口已经关闭，但结论是field-wise mixed Pareto；historical source-row
 > 只属于C1 route adaptation遗留的实现清理，不是StoryMotion claim或投稿阻塞项。sealed blind audit
@@ -188,9 +203,11 @@ updated: 2026-08-13T02:12:50+08:00
 > diagnostic-only，不能当作最终 caption-matched evidence；C1REL-noI16 seed23也已sealed，支持两seed
 > component方向复现但不支持普遍必要性。exact HREL-vs-C1REL Stage2缺口已经关闭，
 > 但结论是mixed Pareto。独立H/C Stage1＋Stage2已formal闭合为secondary mixed system boundary，
-> 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合；剩余投稿QA是
-> C0-LAT Camera-text ownership、simple-composition baseline、sealed blind audit／visual
-> failure taxonomy、sealed resource profile与release package。
+> 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合。当前mainline
+> shuffled／absent cell虽有效，但缺matched correct、contradictory／target-attribute audit，仍未关闭
+> Camera-text ownership；sampler-step grid也只完成6/9。剩余投稿QA是这两个formal闭环、
+> simple-composition baseline、sealed blind audit／visual failure taxonomy、sealed resource profile与
+> release package。
 
 > [!note] Caption boundary
 > 当前StoryMotion正式证据冻结使用原始Pulp captions；历史recaption/v2-pre artifacts只保留为

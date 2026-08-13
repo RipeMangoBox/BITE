@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-12T16:12:00+08:00
+updated: 2026-08-13T11:14:41+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -472,7 +472,7 @@ sequential Human→Camera。旧 `joint_parallel` artifact 保留为 provenance�
 
 > [!note] Heuristic acceptance calibration
 > 在未看到最终paper prose与visual study的前提下，当前接收概率只作启发式估计：约`30–40%`。
-> 若只关闭真正claim-critical的C0-LAT Camera-text correct／shuffle／absent ownership、sealed blind
+> 若只关闭真正claim-critical的C0-LAT Camera-text matched correct／shuffle／contradictory ownership、sealed blind
 > random／best／worst＋failure taxonomy，并把三项最近工作changed-slot与bounded claim写入正文，估计可到
 > `45–55%`；resource profile与release polish主要改善clarity／reproducibility。最大不确定性仍是
 > **novelty framing能否让reviewer相信这是一个值得单独研究的受约束问题**，其次才是视觉可信度。
@@ -608,12 +608,12 @@ Re-review should be requested only after every applicable item below is true:
 | Q6 | closed, secondary | 独立H/C Stage1＋Stage2均已formal；exposure audit证明不是v9双倍样本。完整链改善Camera semantic／caption但回退Human semantic、projective framing与多数Camera geometry，只支持mixed native-system feasibility，不支持核心superiority claim |
 | Q8、Q13、Q16、Q18、Q20 | wording closed | 使用human-owned relation-aware而非disentangled；Pulp保持matched-cohort system boundary；LAT为简洁性operational选择；三接口对应两个条件分布；editing退出核心贡献 |
 | Q10 | interpretation closed | metric I/O已规定sequential Camera ADE/FDE/rotation只作`dataset-target deviation` diagnostic，不是生成Human下唯一正确Camera target |
-| Q11 | current-mainline evidence missing | archived v4/v6.4有旧架构Camera-text zero/shuffle证据，但不能替代C0-LAT。Human-text attribution也不是Camera-text ownership。须对固定Human执行correct/shuffled/absent Camera-text formal intervention；闭合前禁止`independent Camera control`或`Camera-text-owned`措辞 |
+| Q11 | partial formal；claim open | current C0-LAT shuffled与absent zero-sentinel均已完成pure4,053三接口并通过artifact seal（ledger §3.27），但没有同sealed evaluator的factual-correct sibling，也没有contradictory／target-attribute paired audit；absent仅为OOD auxiliary。闭合前禁止`independent Camera control`、`Camera-text-owned`或strong controllability措辞 |
 | Q12 | answered; robustness follow-up open | 两条旧C1 LAT/GEO Camera训练确为每step GT-H64 + frozen-teacher-final-H64，loss按两route等权平均；这不是Direct-C evaluator混合，而是Camera训练condition mixture。C0-LAT仍只用factual GT-H positive；generated-H条件保持OOD interpretation |
 | Q14 | open | sealed final blind audit、随机／最好／最差、failure taxonomy与盲化比较仍未完成；不写visual superiority |
 | Q15 | field-bounded only | C1REL与noI16 seed23已闭合窄字段复现；HREL／C0主线没有完整多seed robust claim |
 | Q17、Q22 | claim narrowed | “framework”只表示本实现的架构组织；不主张可扩展任意Human backbone。最强主张是受约束的capability-preserving asymmetric design与三个互补evaluation interfaces，不写SOTA、全局对称优势或任意编辑 |
-| Q19 | open | 已冻结offline、non-causal、sequential two-pass边界；Human pass／Camera pass latency、总参数、峰值显存和长度缩放尚未形成sealed resource profile |
+| Q19 | open；r2无结果 | 已冻结offline、non-causal、sequential two-pass边界；4090 secondary在首个case因缺`human_text_tokens`失败，5090 primary因上游grid队列失败未启动，均无`resource_profile.json`。Human／Camera pass latency、总参数、峰值显存和长度缩放仍未形成sealed profile |
 
 ## 9. Durable submission queue
 
@@ -631,6 +631,6 @@ Re-review should be requested only after every applicable item below is true:
 | closed implementation cleanup / non-core | C0-LAT no-source / `sm_c0_lat_nosource_c105k_seed17_4090g0_20260812` | endpoint/full-state/gradient、三模式pure4,053与seal已闭合；ledger §3.23 | —；保留aggregate mixed与wrapper／batch covariates，不自动替换operational metric mainline | implementation hygiene only；StoryMotion无双来源匹配claim，本run不是投稿门槛 |
 | closed secondary / non-core | Independent Human／Camera native system / Stage1 pair；Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1与Stage2 endpoint、三模式pure4,053及paired seal均已formal；ledger §§3.24、6.9 | —；永久保留representation／decoder／normalizer／cache／runtime差异与mixed outcome | 完整native-chain feasibility与system trade-off only；no protected-asymmetry、latent-interface、cascade或independent-representation superiority claim |
 | closed optional / non-core | Human-text condition attribution / `sm_ht_condition_attribution_pure4053_20260810_r2` | 12/12 intervention arms、matching references、N=4,053 IDs与model/decoder/cache identity已R2-sealed；ledger §3.25 | —；保留aggregate无paired CI、不得写统计等价 | 非空Human-text通道使用only；不支持样本匹配Human语义，不promote HT或改变C0-LAT |
-| Q3 | C0-LAT Camera-text ownership / no current run | archived v4/v6.4 interventions are architecture-mismatched；current Human-text attribution is non-substitutable | Freeze Human/noise and compare correct／shuffled／absent Camera text under Direct-C and sequential；audit semantic response, target/non-target Camera changes and Human invariance | `Camera-text-owned`、`independent Camera control` and controllability wording |
-| Q4 | C0-LAT resource profile / no sealed artifact | missing | Record Human pass、Direct-C Camera pass、sequential total latency、parameter count、peak memory and length scaling under one runtime contract | offline/two-pass cost disclosure；no real-time or online claim |
+| Q3 | C0-LAT Camera-text ownership / partial formal | shuffled／absent pure4,053 cells有效且Direct-H在二者间exact；ledger §3.27。缺同-evaluator factual correct、contradictory／target-attribute paired audit；absent只作OOD auxiliary | 以新matched factual sibling和预封存contradictory subset补齐Direct-C／sequential，审计target/non-target Camera变化与Human invariance | `Camera-text-owned`、`independent Camera control` and controllability wording |
+| Q4 | C0-LAT resource profile / no sealed artifact | 4090 r2首case失败；5090 r2未启动；两者都没有result | 修复batch text-input合同后用新run/result root记录Human pass、Direct-C Camera pass、sequential total latency、parameter count、peak memory和长度缩放 | offline/two-pass cost disclosure；no real-time or online claim |
 | future / conditional | Composite H–C utility data and Stage1 support audit / no run authorized | not started; no long train authorized | Construct retargeted/re-solved many-to-many pairs, recompute Camera14/projection/framing/I16/C48, filter, seal composition-disjoint eval, then pass frozen-Stage1 support and Human-retention gates before any pair-side finetune or Stage2 | secondary utility only; no free-editing claim |

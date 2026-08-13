@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/tasks/0812-1919]]"
 created: 2026-08-12T20:50:00+08:00
-updated: 2026-08-13T02:12:50+08:00
+updated: 2026-08-13T11:14:41+08:00
 ---
 
 # StoryMotion ICLR 2027 Paper-Ready Claim and Presentation Owner
@@ -95,14 +95,16 @@ sampling，也不是第三个独立 generator。
 | --- | --- | --- | --- |
 | C1 · capability preservation | StoryMotion adds a Camera pathway while keeping the frozen Human generator and its output path unchanged by Camera inputs and supervision. | supported | 这是架构、合同和 exact replay 共同支持的边界；不改写成“symmetric training 必然损伤 Human” |
 | C2 · asymmetric composition | One Camera conditional function supports observed-H Camera generation and generated-H two-pass Human–Camera generation in a single audited system. | supported, bounded | Generated-H 是 OOD condition shift；只主张接口与完整 artifact，不把 sequential 包装成同步 joint primitive |
-| C3 · Camera-text response | Camera text provides an auditable, localized response in Camera behavior. | evidence pending；dropout treatment rejected | matched dropout `0.10`已正式回退且不具CFG资格；只有correct／shuffle／contradictory intervention闭合后才可写bounded response，否则降级为“Camera text is an input condition” |
+| C3 · Camera-text response | Camera text provides an auditable, localized response in Camera behavior. | partial formal；claim pending；dropout treatment rejected | shuffled／absent full-cohort cells有效且方向上显示广泛回退，但缺同-evaluator factual correct、contradictory与target-attribute paired audit；这些补齐前只写“Camera text is an input condition” |
 
 C1/C2 的正式结果入口只见
 [[StoryMotion-valid-metric-ledger#4.1 C0-LAT competition snapshot (pure4053 formal)]]与
 [[StoryMotion-valid-metric-ledger#Audited detail — original §3.11 v11 four-arm `105K` pure4,053 formal audit]]。
 C3 的关闭条件只见
 [[StoryMotion-iclr-reliability#8.7 `0810-2137` reviewer建议执行审计]]与
-[[StoryMotion/tasks/0812-1919#4. P0-B：Camera-text ownership 与 Camera CFG]]。
+[[StoryMotion/tasks/0812-1919#4. P0-B：Camera-text ownership 与 Camera CFG]]；已完成但不足以
+关闭claim的两条 intervention cell 只见
+[[StoryMotion-valid-metric-ledger#Audited detail — §3.27 C0-LAT Camera-text shuffled／absent pure4,053 formal cells]]。
 
 > [!warning] Representation claim boundary
 > H128、I16、C48 及 owning decoders 构成明确的 human-owned relation-aware design，但现有 matched
@@ -115,7 +117,7 @@ C3 的关闭条件只见
 | --- | --- | --- | --- | --- |
 | Camera expansion preserves Human | Camera pathway is added after freezing Human | supported | Camera training cannot rewrite the finalized Human pathway；Direct-H exact replay | symmetric learning necessarily damages Human quality |
 | Phase-C protection provenance | Camera→Human gradient与Phase-C Human update | audited, mixed；no promotion | 关闭 Camera→Human gradient 而保留 Human update 只产生很小的 mixed effect；进一步冻结 Human 显著损伤 Human reconstruction、同时形成 Camera／framing Pareto | 声称 Stage1 全程冻结 Human、Camera gradient 普遍有害，或把未预注册 margin 的近零结果改写成 non-inferiority |
-| Camera-text ownership | correct vs shuffled／contradictory Camera text | evidence pending | 只在 frozen Human/noise、同 IDs 与 target-attribute response 闭合后写 bounded response | 用 Human-text attribution 或旧架构 intervention 替代 current C0-LAT evidence |
+| Camera-text ownership | correct vs shuffled／contradictory Camera text | partial formal；claim pending | shuffled／absent cells已formal，但只有 frozen Human/noise、同 IDs 的 factual sibling 与 contradictory／target-attribute paired response 闭合后才写 bounded response | 把历史 factual row与新cell冒充matched pair，或用absent／Human-text attribution／旧架构 intervention替代current-mainline ownership evidence |
 | Camera-text dropout / CFG | Camera-text dropout `0.10` vs matched no-drop | pure4,053 formal audited；dropout rejected；CFG promotion ineligible | dropout在十个方向性semantic／framing aggregates全部回退，六项geometry CI跨零；保留no-drop | 把neutral scale `1.0`称为CFG、用本结果声称controllability、test-set选scale或事后扫dropout rate |
 | Simple Human→Camera composition | integrated StoryMotion vs audited off-the-shelf pair | evidence pending | 只能在接口、数据、decoder 和 runtime 差异完整披露后写 system trade-off | 把不同 native system 当作单变量 architecture ablation |
 | Asymmetric vs symmetric route | historical P2、exact-init C0、observed-H G-on/G-off | supported, mixed Pareto | C0-LAT 在投稿优先字段形成优势；route repair 与 G-on 只有局部 effect | all-field asymmetric superiority；Camera gradient necessarily harms Human |
@@ -184,7 +186,7 @@ C1REL／no-I16 的受限 component evidence 进入本表；P2 route、no-source 
 | Figure 1 · Problem and interfaces | frozen Human owner、observed-H Camera、generated-H two-pass composition | ready to draw | method contract | 不画 joint-parallel 或 evolving-H |
 | Figure 2 · Human-owned asymmetric architecture | H128、I16、C48、owning decoders、Stage2 protected routes | ready to draw | architecture／contract owner | I16是explicit interaction channel，不写disentangled |
 | Figure 3 · Quality–coherence evidence | 三接口 field-wise Pareto 与 Human exact replay | schema ready；row selection pending | metric ledger | 不用单一平均分掩盖 mixed Pareto |
-| Figure 4 · Camera-text response | correct／shuffle／contradictory 与 rejected dropout pair | intervention pending；dropout pair audited | audited dropout artifacts＋future intervention | absent只作训练支持／OOD辅助项；不画CFG scale curve，不用dropout回退替代ownership证据 |
+| Figure 4 · Camera-text response | correct／shuffle／contradictory 与 rejected dropout pair | shuffled／absent cells audited；matched figure仍pending | ledger §3.27 cells＋audited dropout artifacts＋future matched correct／contradictory | partial render roots无manifest；absent只作OOD辅助项；不画CFG scale curve，不用dropout或历史correct替代ownership证据 |
 | Figure 5 · Random and failure cases | random、best/worst、failure strata 的匿名对比 | evidence pending | sealed visual registry | blind audit前不写visual superiority或failure rate |
 | Supplementary video | fixed-view Human、GT-H Camera projection、generated-H pair projection、side-by-side | registry pending | runs/vis manifests | 每个片段保留run、mode、ID、text、noise、renderer与source hash |
 
@@ -292,9 +294,10 @@ Caption skeleton：
 2. **Supported, bounded.** A human-owned relation-aware representation and Stage2-protected
    dual-stream generator that implement directed Human→Camera information flow; no claim of
    Stage1-wide freezing, semantic disentanglement, or universal component necessity is made.
-3. **Evidence pending.** An audited Camera-text response study. The matched Camera-text dropout
-   intervention is already rejected and supplies no CFG or controllability claim; if the remaining
-   correct/shuffled/contradictory gate fails, this bullet is removed.
+3. **Evidence pending.** An audited Camera-text response study. Shuffled and absent full-cohort
+   cells are valid but do not form a matched ownership comparison without a same-evaluator factual
+   sibling and contradictory target-response audit. The matched Camera-text dropout intervention is
+   rejected and supplies no CFG or controllability claim; if the remaining gate fails, this bullet is removed.
 4. **Supported as evaluation practice, not SOTA.** A field-wise evaluation and artifact protocol
    separating Human generation, observed-H Camera generation, and generated-H two-pass
    generation, with explicit uncertainty and metric-semantics boundaries.
@@ -309,8 +312,9 @@ Caption skeleton：
 - [x] 中性 LaTeX scaffold 已按八个章节建立并通过两次 `pdflatex` 编译；
 - [x] Phase-C A1/A2 pure4,053 formal、paired bootstrap 与 Stage1 provenance claim 已闭合；
 - [x] matched Camera-text dropout pure4,053 formal已闭合为negative ablation且不进入主表；
-- [ ] Camera-text intervention与simple-composition formal 后冻结 C3 与主表 rows；
-- [ ] sealed resource profile 后填写 latency／memory；
+- [ ] Camera-text intervention与simple-composition formal 后冻结 C3 与主表 rows；当前I2只有shuffled／absent有效cells，claim未关闭；
+- [ ] 完成3×3 sampler-step grid；当前r4为6/9，禁止选择Pareto cell；
+- [ ] sealed resource profile 后填写 latency／memory；当前primary未启动、secondary首case失败，无可填写数字；
 - [ ] sealed visual audit 后冻结 Figure 4/5 与 failure-rate wording；
 - [ ] 最终 abstract result sentence 只从 metric ledger 的完整 audited row 填入；
 - [ ] 最终 reviewer audit 确认没有第二份 metric ledger、DIRECT claim crosswire 或 test-set selection。
