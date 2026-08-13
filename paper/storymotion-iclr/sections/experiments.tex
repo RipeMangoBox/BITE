@@ -19,7 +19,7 @@ decoder, mode, and assurance boundary.
     \toprule
     Version / run & Role & Human & Observed-H Camera & Generated-H pair \\
     \midrule
-    \multicolumn{5}{c}{\textit{Pending audited row selection from the canonical metric ledger}} \\
+    \multicolumn{5}{c}{\textit{Populate complete audited rows from the canonical metric ledger at table export}} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -32,18 +32,24 @@ remain field-wise.
 
 \subsection{Camera-text response and CFG}
 
-\evidencepending. Freeze Human motion, sample identity, length, initial noise, sampler, and
-decoder while comparing correct, fixed-point-free shuffled, contradictory, and absent Camera
-text. Select one CFG scale on validation data before opening pure test.
+Freeze Human motion, sample identity, length, initial noise, sampler, and decoder while comparing
+correct, fixed-point-free shuffled, contradictory, and absent Camera text. The matched family
+supports active Camera-text conditioning, but its predeclared four-pair attribute response is
+mixed; absent text is an out-of-distribution auxiliary. A matched dropout treatment regresses the
+audited aggregate fields, and no valid pre-test validation split existed for CFG selection, so we
+make no CFG, independent-control, or strong-controllability claim.
 
 \subsection{Simple Human-to-Camera composition}
 
-\evidencepending. First audit representation and coordinate compatibility. Label every pair as
-native or adapted, record whether Camera text is consumed, and distinguish zero-retraining
-composition from a separately authorized adapter.
+Audit representation and coordinate compatibility before composing models. We evaluate
+MotionLab-to-C0 and MoMask-to-C0 by decoding each Human output to Pulp Human199 and re-encoding it
+with the exact StoryMotion Human encoder before the same Camera model consumes Camera text. Both
+pairs are zero-retraining system comparisons and regress semantic, framing, and Human evidence;
+no adapter is required or authorized.
 
 \subsection{Qualitative and resource evidence}
 
+Fixed-sample Camera-text, sampler, and composition media are hash- and decode-audited diagnostics.
 No visual-superiority or failure-rate statement is allowed before a sealed random/best/worst
 blind audit. Report Human-pass, Camera-pass, and total two-pass latency, parameters, peak memory,
 throughput, and length scaling under one frozen runtime contract.

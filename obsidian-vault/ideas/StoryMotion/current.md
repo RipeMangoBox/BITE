@@ -17,9 +17,12 @@ hypothesis: |
   The matched Camera-text dropout pair is also sealed: dropout 0.10 regresses
   all reported semantic/framing aggregates while all six Camera-geometry
   intervals cross zero, so the treatment is rejected and no CFG claim is made.
-  Current-mainline shuffled and absent Camera-text cells are individually
-  formal, but ownership remains open because a same-evaluator factual sibling,
-  contradictory target-response audit, and paired non-target audit are missing.
+  The current-mainline four-condition Camera-text family is formal: matched
+  shuffling supports active Camera-text conditioning, while the predeclared
+  four-pair attribute response is mixed and permits only a bounded claim.
+  MotionLab→C0 and MoMask→C0 zero-retrain compositions are also formal; both
+  are feasible but strongly regress semantic/framing/Human evidence and remain
+  system-level baselines rather than single-variable architecture controls.
   The sampler-step grid is now 9/9 audited without post-hoc selection, and the
   4090 plus 5090-SSD resource profiles are sealed as runtime-only evidence.
   The sampler diagonal fixed-8 family is media-hash and decode audited, but it
@@ -48,7 +51,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T14:13:06+08:00
+updated: 2026-08-13T16:34:25+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -178,24 +181,28 @@ updated: 2026-08-13T14:13:06+08:00
 > 30个方向性aggregate cell全部改善，但matching与fixed-point-free shuffled几乎重合且方向混合。
 > 因此只支持“非空Human-text通道被使用”，不支持“样本匹配Human语义被使用”；aggregate没有
 > paired CI，不能声称统计等价。该optional diagnostic不promote HT分支、不改变C0-LAT mainline，
-> 也不替代C0-LAT Camera-text ownership缺口。正式数字与R2 seal只见ledger §3.25。
+> 也不作为C0-LAT Camera-text ownership证据；后者已由独立four-condition family闭合。正式数字与
+> R2 seal只见ledger §3.25。
 > matched no-source Camera-text dropout pair也已在首次pure-test access前固定neutral scale `1.0`，
 > 完成两臂pure4,053三接口与paired seal。dropout `0.10`相对no-drop在Direct-C／sequential的
 > CLaTr、FDCLaTr、caption F1、r-FPD、Out十个方向性aggregate字段全部回退，六项Camera geometry
 > CI全部跨零；故拒绝该treatment并保留no-drop。该结果不支持CFG、controllability或Camera-text
-> ownership，后者仍由correct／shuffle／contradictory intervention单独闭合。正式数字与hash只见
+> ownership；后者已由correct／shuffle／contradictory intervention独立闭合。正式数字与hash只见
 > ledger §3.26。
 > step与ETA只见各自`runs/`，本页不重复。
 
-> [!important] 2026-08-13 I5／R1已闭合；I2／I3／visual继续按gate执行
+> [!important] 2026-08-13 I2／I3／I5／R1已闭合；blind visual继续按gate执行
 > 5090 SSD上的sampler r8已完成预注册3×3 grid的9/9 pure4,053 cells，并由独立auditor绑定
 > contracts、records、results、manifests与fixed samples；由于直接使用pure test cohort，不做
 > post-hoc Pareto selection，默认仍为H50/C50。4090 r4与5090 SSD r5 resource profiles均完成
 > 27/27 cases和三次重复，参数、latency、throughput、显存与设备identity已sealed，只支持offline
 > runtime disclosure。旧r4 partial grid、resource r2失败与5090 HDD未执行profile继续保留immutable
-> provenance。sampler diagonal fixed-8 family已通过24个视频完整解码与逐媒体hash审计，但只作
-> diagnostic confirmation，不替代blind visual audit。I2 matched四条件formal、I3 composition和完整
-> blind registry仍未通过最终审计，因此本页不提前登记其结论。正式数字与hash只见ledger §§3.29–3.30。
+> provenance。I2 correct／shuffle／contradictory／absent四条件各完成pure4,053，paired comparison
+> 与fixed-diagnostic媒体审计均通过；结论只支持active Camera-text conditioning，预封存attribute
+> response方向混合，不支持strong control。I3 MotionLab→C0与MoMask→C0两条
+> zero-retrain pair亦完成pure4,053、10k paired comparison及各8视频审计；两者可执行但
+> semantic／framing／Human证据大幅回退，只作system-level baseline。完整blind registry仍未闭合。
+> 正式数字与hash只见ledger §§3.27、3.29–3.31。
 
 > [!warning] ICLR QA status
 > symmetric route-control执行缺口已经关闭，但结论是field-wise mixed Pareto；historical source-row
@@ -205,11 +212,10 @@ updated: 2026-08-13T14:13:06+08:00
 > diagnostic-only，不能当作最终 caption-matched evidence；C1REL-noI16 seed23也已sealed，支持两seed
 > component方向复现但不支持普遍必要性。exact HREL-vs-C1REL Stage2缺口已经关闭，
 > 但结论是mixed Pareto。独立H/C Stage1＋Stage2已formal闭合为secondary mixed system boundary，
-> 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合。当前mainline
-> shuffled／absent cell虽有效，但缺matched correct、contradictory／target-attribute audit，仍未关闭
-> Camera-text ownership。sampler-step grid与sealed resource profile已经闭合；剩余投稿QA是
-> Camera-text matched formal、simple-composition baseline、sealed blind audit／visual failure taxonomy与
-> release package。
+> 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合。current-mainline
+> Camera-text matched family与两条simple-composition baseline也已formal，分别关闭为bounded response
+> 与system-level negative trade-off。sampler-step grid与sealed resource profile已经闭合；剩余投稿QA
+> 只包括sealed blind audit／visual failure taxonomy与release package。
 
 > [!note] Caption boundary
 > 当前StoryMotion正式证据冻结使用原始Pulp captions；历史recaption/v2-pre artifacts只保留为
@@ -369,9 +375,10 @@ ViGen；StoryMotion works on Human motion generation and capability-preserving H
    paired seal也已闭合；结果是Camera semantic／caption改善但Human semantic、projective framing与
    多数Camera geometry回退的mixed system comparison（ledger §3.24）。它仍只作secondary
    native-system boundary，不进入核心单变量矩阵。
-   `0810-2137`建议中，current C0-LAT的Camera-text correct／shuffle／contradictory ownership audit与
-   sealed visual blind audit仍是明确缺口；latency／参数／显存profile与sampler diagonal fixed-8
-   diagnostic已闭合，但不替代前两项。
+   `0810-2137`建议中的current C0-LAT Camera-text correct／shuffle／contradictory ownership audit已
+   关闭为bounded response；MotionLab→C0与MoMask→C0 simple-composition也已关闭为system-level
+   negative trade-off。sealed visual blind audit仍是明确缺口；latency／参数／显存profile、sampler
+   diagonal与上述两轴fixed-8 diagnostic均已闭合，但不替代blind evidence。
    基础盲评只用于可信度。最终还需冻结论文代码、配置、三接口evaluator、checkpoint／decoder身份、
    参数量、GPU小时、推理成本与最小复现实验包。
 3. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
@@ -421,6 +428,10 @@ RV、Rect、HumanML3D、Director ownership与ViGen utility均由
 - matched no-source Camera-text dropout `0.10`／`0.00`已完成105K endpoints、neutral-scale
   pure4,053与paired seal；dropout treatment被拒绝，no-drop保留。该轴不提供CFG／controllability或
   Camera-text ownership证据，也不授权事后scale sweep；完整数字只见ledger §3.26。
+- current C0-LAT四条件Camera-text family已完成4×pure4,053、10k comparison、4对定向response与
+  32视频审计；只支持bounded active conditioning，不支持independent／strong control。MotionLab→C0
+  与MoMask→C0两条zero-retrain composition均完成formal／comparison／fixed-8，证明简单组合可行但
+  当前系统质量明显退化；完整数字只见ledger §§3.27、3.31。
 - v10 Camera Stage2、WORLD、swapped-host replay和Camera64 MAE长训均保持关闭；当前获授权的
   C1REL是新建的matched representation arm，不是历史v10/C1队列恢复。
 - 组合式H–C utility只作为secondary extension：先完成data／Stage1 support／Human-retention gates，

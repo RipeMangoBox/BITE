@@ -16,8 +16,9 @@
    Direct-C geometry及Camera semantic／framing字段明确占优，但True-P2有Human／sequential geometry
    局部优势，因此不能写逐字段全局支配；G-on／G-off只否定“Camera gradient必然损害Human”。Human
    preservation是架构／合同保证，不是冻结后的经验发现。
-5. 在current C0-LAT Camera-text ownership与sealed blind audit闭合前，不写`independent Camera
-   control`、visual superiority、SOTA或通用controllability。
+5. current C0-LAT Camera-text ownership已关闭为bounded active conditioning；预封存attribute response
+   mixed，故永久不写`independent Camera control`、strong／robust compositional control。sealed blind
+   audit闭合前也不写visual superiority、failure rate或SOTA。
 
 当前可冻结的贡献上限是：提出受约束的Human→Camera顺序分解；实现Human owner不被Camera输入／
 supervision改写、同一Camera条件函数可分别接收observed-H与generated-H，而不要求辨识Human来源；
@@ -25,7 +26,9 @@ supervision改写、同一Camera条件函数可分别接收observed-H与generate
 interfaces上报告field-wise quality／coherence trade-offs及边界。独立H/C native cascade只作
 secondary system comparison；其完整Stage1＋Stage2 formal结果为Camera semantic／caption改善、
 Human semantic／projective framing与多数Camera geometry回退的mixed boundary，不用于宣称
-独立representation、cascade、latent interface或protected-asymmetry优越。
+独立representation、cascade、latent interface或protected-asymmetry优越。MotionLab→C0与
+MoMask→C0两条zero-retrain composition也已formal闭合：两者可执行但semantic／framing／Human
+证据明显退化，只作system-level baseline，不是单变量architecture proof。
 
 我的总体判断是：第 1、2 条方向正确，但当前表述仍过于接近 PulpMotion；第 3 条可以成为独立贡献，
 但必须经过严格的“数据质量—模型控制能力”双重验证；第 4 条只能作为结果性贡献，且在本地可用数据

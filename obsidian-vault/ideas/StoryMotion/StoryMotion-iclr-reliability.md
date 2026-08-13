@@ -8,6 +8,8 @@ hypothesis: |
   exact HREL-vs-C1REL Stage2 comparison已完成formal评测；observed-Human route controls与
   fully independent H/C native-system Stage1＋Stage2 chain也已闭合，结论均保持field-bounded。
   Optional Human-text attribution已sealed：通道存在性有证据，样本匹配语义没有证据。
+  Current C0-LAT four-condition Camera-text family已关闭为bounded active conditioning，
+  MotionLab→C0与MoMask→C0 zero-retrain composition已关闭为system-level negative trade-off。
   Sampler 3×3 grid与4090／5090-SSD runtime profiles也已formal闭合，均不授权test-selected
   endpoint或跨主机algorithmic speedup claim。
 tags:
@@ -25,7 +27,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-13T14:13:06+08:00
+updated: 2026-08-13T16:34:25+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -296,6 +298,8 @@ does not duplicate the metric ledger.
 | C1REL seed robustness | `sm_c1rel_lat_h105k_c105k_seed23_4090g0_20260809` 三接口 pure `N=4,053` 与 hash 已 formal | 保留 raw-caption、diagnostic-only 与 semantic aggregate 无 paired unit 的边界 | 支持 paired geometry 未见 seed 差异；不扩写成所有指标的统计稳健性 |
 | C1REL-noI16 repeat | seed23 `210K`与三接口pure4,053 artifact/hash、same-seed component comparison及field-wise audit已sealed（ledger §3.20） | 保留mixed geometry、semantic aggregate无paired unit、non-Stage2-only与seed17旧contract bytes缺失边界 | 支持两seed matched protocol下的Interaction16 Camera semantic／framing component effect；不宣称普遍必要 |
 | Optional Human-text attribution | HT-FILM/HX/DR matching＋absent/shuffled × Direct-C/sequential共12条intervention arm已完成full4,053 R2 seal（ledger §3.25） | —；保留aggregate无paired CI且不声称matching与shuffled统计等价 | 支持非空Human-text通道被使用；不支持样本匹配Human语义，不改变C0-LAT mainline |
+| Current C0-LAT Camera-text ownership | correct／shuffle／contradictory／absent full-cohort family、paired comparison、预封存response与媒体decode均闭合（ledger §3.27） | 保留contradictory为窄fixed diagnostic、response方向混合、absent OOD边界 | 支持active Camera-text conditioning与mixed localized response；不支持independent／strong／robust compositional control |
+| Simple Human→Camera composition | MotionLab→C0与MoMask→C0均完成zero-retrain pure4,053、10k comparison与fixed-8媒体审计（ledger §3.31） | 永久标为system-level；披露representation／decoder／Human generator covariates | 简单组合可执行但semantic／framing／Human质量显著回退；不构成单变量architecture superiority |
 | Human preservation | seed17/23 Direct-H 共享冻结 Human owner；正式 artifact 与 replay 归 ledger | 公开包固化 checkpoint/output identity check | Camera 扩展不改变 Human owner 与输出路径 |
 | Perceptual / reproducibility closure | 当前 visual blind audit、failure taxonomy 与论文复现/成本包未闭合 | 冻结 evaluator/cohort，完成 random/best/worst blind slices、环境与成本记录 | 不作 visual superiority、failure-rate 或 production claim |
 
@@ -309,7 +313,7 @@ does not duplicate the metric ledger.
 | --- | --- | --- | --- |
 | Direct-H | MoMask-Pulp native；MotionLab-MFT v7.14 adaptation | 两者均为pure4,053 formal system/operator peers；MoMask保留native owner，MotionLab-MFT明确是representation-matched adaptation而非官方原样实现 | MoLingo-derived v7.45仅为provisional screen，缺audit与历史训练源码SHA；MotionStreamer只有causal TAE reconstruction，无Stage2 generator |
 | Direct-C | corrected Director-C／E.T. native；CCD-Pulp | Director是pure4,053 native formal；CCD的fixed endpoint、合同、IDs与records完整，但缺独立audit artifact；两者condition/decoder不同且均缺decoded Cam-ADE/FDE/rotation | 现有semantic/distribution可以报告；CCD标注较低assurance，几何只在接入相同callback后比较 |
-| sequential Human→Camera | 无mode-equivalent外部baseline；PulpMotion native joint `210K` | matched `162,760/4,053` cohort但representation、decoder与概率分解不同 | 只作native-joint system boundary，不把joint task slices改名为Direct-H／Direct-C／sequential |
+| sequential Human→Camera | MotionLab→C0、MoMask→C0 zero-retrain pairs；PulpMotion native joint `210K` | 两条pair以owning Human decoder→Pulp H199→exact v9 $E_h$接同一C0-LAT，pure4,053 formal；仍同时改变Human system／decoder，故只作system-level | Tier-A已闭合且明显回退；不需要Tier-B adapter，不把native joint或跨system pair改名为单变量ablation |
 
 - v9是首个可用Stage1 owner；其普通first-512 Stage2 screens已退出活动证据，不能伪装成
   pure4,053 matched row或参与排名。
@@ -594,9 +598,9 @@ Re-review should be requested only after every applicable item below is true:
 - [ ] sealed visual blind audit and failure taxonomy are complete;
 - [x] latent-interface superiority is deleted；independent Human／Camera Stage1＋Stage2已作为
   secondary mixed native-system boundary formal闭合；
-- [ ] every mixed metric table has non-empty version/run and points to the single ledger owner;
+- [x] every mixed metric table has non-empty version/run and points to the single ledger owner;
 - [x] original Pulp captions are stated as authoritative, with no active recaption gate;
-- [ ] no claim says C1REL > HREL/PulpMotion, protected asymmetry globally > symmetric joint, or calibrated physical validity without the corresponding evidence.
+- [x] no claim says C1REL > HREL/PulpMotion, protected asymmetry globally > symmetric joint, or calibrated physical validity without the corresponding evidence.
 
 ### 8.7 `0810-2137` reviewer建议执行审计
 
@@ -610,7 +614,7 @@ Re-review should be requested only after every applicable item below is true:
 | Q6 | closed, secondary | 独立H/C Stage1＋Stage2均已formal；exposure audit证明不是v9双倍样本。完整链改善Camera semantic／caption但回退Human semantic、projective framing与多数Camera geometry，只支持mixed native-system feasibility，不支持核心superiority claim |
 | Q8、Q13、Q16、Q18、Q20 | wording closed | 使用human-owned relation-aware而非disentangled；Pulp保持matched-cohort system boundary；LAT为简洁性operational选择；三接口对应两个条件分布；editing退出核心贡献 |
 | Q10 | interpretation closed | metric I/O已规定sequential Camera ADE/FDE/rotation只作`dataset-target deviation` diagnostic，不是生成Human下唯一正确Camera target |
-| Q11 | partial formal；claim open | current C0-LAT shuffled与absent zero-sentinel均已完成pure4,053三接口并通过artifact seal（ledger §3.27），但没有同sealed evaluator的factual-correct sibling，也没有contradictory／target-attribute paired audit；absent仅为OOD auxiliary。闭合前禁止`independent Camera control`、`Camera-text-owned`或strong controllability措辞 |
+| Q11 | closed with bounded response | current C0-LAT four-condition full-cohort family完成Human/context exact、paired geometry与预封存target-response audit（ledger §3.27）。correct→shuffle形成一致aggregate回退，支持active conditioning；但fixed proxy response方向混合，absent仅OOD auxiliary，故禁止`independent Camera control`或strong／robust controllability措辞 |
 | Q12 | answered; robustness follow-up open | 两条旧C1 LAT/GEO Camera训练确为每step GT-H64 + frozen-teacher-final-H64，loss按两route等权平均；这不是Direct-C evaluator混合，而是Camera训练condition mixture。C0-LAT仍只用factual GT-H positive；generated-H条件保持OOD interpretation |
 | Q14 | open；fixed diagnostic closed | sampler diagonal三组fixed-8已通过24个MP4完整解码、逐媒体hash及共同source／renderer／ffmpeg审计；但sealed final blind audit、随机／最好／最差、failure taxonomy与盲化比较仍未完成，不写visual superiority |
 | Q15 | field-bounded only | C1REL与noI16 seed23已闭合窄字段复现；HREL／C0主线没有完整多seed robust claim |
@@ -633,7 +637,8 @@ Re-review should be requested only after every applicable item below is true:
 | closed implementation cleanup / non-core | C0-LAT no-source / `sm_c0_lat_nosource_c105k_seed17_4090g0_20260812` | endpoint/full-state/gradient、三模式pure4,053与seal已闭合；ledger §3.23 | —；保留aggregate mixed与wrapper／batch covariates，不自动替换operational metric mainline | implementation hygiene only；StoryMotion无双来源匹配claim，本run不是投稿门槛 |
 | closed secondary / non-core | Independent Human／Camera native system / Stage1 pair；Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1与Stage2 endpoint、三模式pure4,053及paired seal均已formal；ledger §§3.24、6.9 | —；永久保留representation／decoder／normalizer／cache／runtime差异与mixed outcome | 完整native-chain feasibility与system trade-off only；no protected-asymmetry、latent-interface、cascade或independent-representation superiority claim |
 | closed optional / non-core | Human-text condition attribution / `sm_ht_condition_attribution_pure4053_20260810_r2` | 12/12 intervention arms、matching references、N=4,053 IDs与model/decoder/cache identity已R2-sealed；ledger §3.25 | —；保留aggregate无paired CI、不得写统计等价 | 非空Human-text通道使用only；不支持样本匹配Human语义，不promote HT或改变C0-LAT |
-| Q3 | C0-LAT Camera-text ownership / partial formal | shuffled／absent pure4,053 cells有效且Direct-H在二者间exact；ledger §3.27。缺同-evaluator factual correct、contradictory／target-attribute paired audit；absent只作OOD auxiliary | 以新matched factual sibling和预封存contradictory subset补齐Direct-C／sequential，审计target/non-target Camera变化与Human invariance | `Camera-text-owned`、`independent Camera control` and controllability wording |
+| closed Q3 | C0-LAT Camera-text ownership / `sm_camera_text_i2_complete_pure4053_r4_20260813` | four-condition full-cohort family、Human/context exact、paired comparison、fixed response与媒体decode闭合；ledger §3.27 | —；保留mixed localized response、non-target changes与absent OOD边界 | bounded active conditioning only；no independent／strong／robust compositional control |
+| closed Q5-composition | Tier-A MotionLab→C0、MoMask→C0 / exact run IDs见ledger §3.31 | 两条zero-retrain pair均完成full-cohort paired comparison与fixed-diagnostic媒体decode；simple composition可执行但semantic／framing／Human证据大幅回退 | —；永久保留system-level covariates，Tier-B adapter不需要且未授权 | 支持StoryMotion相对当前简单组合的完整系统边界；no single-variable architecture superiority |
 | closed P1 | C0-LAT sampler grid / `sm_c0_lat_sampler_grid_pure4053_r8_20260813` | 9/9 pure4,053 cells、generate-once Human caches及独立grid audit完成；ledger §3.29 | —；pure test cohort禁止post-hoc Pareto selection，default保持H50/C50 | sampler cost–quality disclosure only；no test-selected endpoint |
 | closed Q4 | C0-LAT resource profiles / `sm_c0_lat_resource_profile_seed17_4090g1_r4_20260813`；`sm_c0_lat_resource_profile_seed17_5090g2_r5_ssd_20260813` | 两机各27/27 cases、3 repeats、设备／artifact audit完成；5090 active roots验证为`/dev/sdb2` SSD；ledger §3.30 | —；保留旧r2失败与5090 HDD r4未执行provenance | offline/two-pass cost disclosure；no real-time、online或cross-host algorithmic speedup claim |
 | future / conditional | Composite H–C utility data and Stage1 support audit / no run authorized | not started; no long train authorized | Construct retargeted/re-solved many-to-many pairs, recompute Camera14/projection/framing/I16/C48, filter, seal composition-disjoint eval, then pass frozen-Stage1 support and Human-retention gates before any pair-side finetune or Stage2 | secondary utility only; no free-editing claim |
