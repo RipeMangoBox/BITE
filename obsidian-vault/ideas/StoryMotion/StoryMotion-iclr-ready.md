@@ -23,7 +23,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[StoryMotion/tasks/0812-1919]]"
 created: 2026-08-12T20:50:00+08:00
-updated: 2026-08-13T11:14:41+08:00
+updated: 2026-08-13T14:13:06+08:00
 ---
 
 # StoryMotion ICLR 2027 Paper-Ready Claim and Presentation Owner
@@ -185,10 +185,10 @@ C1REL／no-I16 的受限 component evidence 进入本表；P2 route、no-source 
 | --- | --- | --- | --- | --- |
 | Figure 1 · Problem and interfaces | frozen Human owner、observed-H Camera、generated-H two-pass composition | ready to draw | method contract | 不画 joint-parallel 或 evolving-H |
 | Figure 2 · Human-owned asymmetric architecture | H128、I16、C48、owning decoders、Stage2 protected routes | ready to draw | architecture／contract owner | I16是explicit interaction channel，不写disentangled |
-| Figure 3 · Quality–coherence evidence | 三接口 field-wise Pareto 与 Human exact replay | schema ready；row selection pending | metric ledger | 不用单一平均分掩盖 mixed Pareto |
+| Figure 3 · Quality–coherence evidence | 三接口 field-wise Pareto 与 Human exact replay | sampler diagonal fixed-8 audited；full panel pending | metric ledger＋r8 fixed-8 audit | fixed-8只作diagnostic confirmation；不用单一平均分掩盖mixed Pareto或声称visual superiority |
 | Figure 4 · Camera-text response | correct／shuffle／contradictory 与 rejected dropout pair | shuffled／absent cells audited；matched figure仍pending | ledger §3.27 cells＋audited dropout artifacts＋future matched correct／contradictory | partial render roots无manifest；absent只作OOD辅助项；不画CFG scale curve，不用dropout或历史correct替代ownership证据 |
 | Figure 5 · Random and failure cases | random、best/worst、failure strata 的匿名对比 | evidence pending | sealed visual registry | blind audit前不写visual superiority或failure rate |
-| Supplementary video | fixed-view Human、GT-H Camera projection、generated-H pair projection、side-by-side | registry pending | runs/vis manifests | 每个片段保留run、mode、ID、text、noise、renderer与source hash |
+| Supplementary video | fixed-view Human、GT-H Camera projection、generated-H pair projection、side-by-side | sampler diagonal fixed-8 audited；full registry pending | runs/vis manifests＋family audit | 每个片段保留run、mode、ID、text、noise、renderer与source hash；diagnostic cohort不混入blind cohort |
 
 Caption skeleton：
 
@@ -216,7 +216,9 @@ Caption skeleton：
 4. **Mixed symmetric evidence。** Asymmetric／symmetric controls是 field-wise mixed Pareto，不支持
    all-field dominance。
 5. **Dataset／backbone scope。** 当前只有一个数据域和一个 Human backbone，不写 model-agnostic。
-6. **Offline cost。** 方法为 non-causal、two-pass offline generation；资源 profile 封存前不写实时性。
+6. **Offline cost。** 方法为 non-causal、two-pass offline generation；4090／5090 sealed profile
+   已给出 Human、Observed-H Camera 与 Generated-H two-pass 的 latency、throughput、参数量和峰值显存，
+   只作 runtime disclosure，不写 online／streaming／real-time 或跨主机 algorithmic speedup。
 7. **Metric semantics。** Generated-H 下不存在唯一正确 Camera；相对 factual Camera 的 geometry 只是
    dataset-target deviation。
 8. **Baseline covariates。** Native systems可能同时改变 representation、decoder、normalizer、cache、mode
@@ -313,8 +315,8 @@ Caption skeleton：
 - [x] Phase-C A1/A2 pure4,053 formal、paired bootstrap 与 Stage1 provenance claim 已闭合；
 - [x] matched Camera-text dropout pure4,053 formal已闭合为negative ablation且不进入主表；
 - [ ] Camera-text intervention与simple-composition formal 后冻结 C3 与主表 rows；当前I2只有shuffled／absent有效cells，claim未关闭；
-- [ ] 完成3×3 sampler-step grid；当前r4为6/9，禁止选择Pareto cell；
-- [ ] sealed resource profile 后填写 latency／memory；当前primary未启动、secondary首case失败，无可填写数字；
+- [x] 3×3 sampler-step grid已由r8完成9/9 formal audit；pure-test不作post-hoc selection，默认仍为H50/C50；
+- [x] 4090 r4与5090 SSD r5 sealed resource profile已完成27/27 cases，cost字段只从ledger §3.30引用；
 - [ ] sealed visual audit 后冻结 Figure 4/5 与 failure-rate wording；
 - [ ] 最终 abstract result sentence 只从 metric ledger 的完整 audited row 填入；
 - [ ] 最终 reviewer audit 确认没有第二份 metric ledger、DIRECT claim crosswire 或 test-set selection。

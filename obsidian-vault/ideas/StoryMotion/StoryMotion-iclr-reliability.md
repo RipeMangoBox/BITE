@@ -8,6 +8,8 @@ hypothesis: |
   exact HREL-vs-C1REL Stage2 comparison已完成formal评测；observed-Human route controls与
   fully independent H/C native-system Stage1＋Stage2 chain也已闭合，结论均保持field-bounded。
   Optional Human-text attribution已sealed：通道存在性有证据，样本匹配语义没有证据。
+  Sampler 3×3 grid与4090／5090-SSD runtime profiles也已formal闭合，均不授权test-selected
+  endpoint或跨主机algorithmic speedup claim。
 tags:
   - StoryMotion
   - reliability
@@ -23,7 +25,7 @@ source_notes:
   - "[[StoryMotion/paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-06-18T00:00:00+08:00
-updated: 2026-08-13T11:14:41+08:00
+updated: 2026-08-13T14:13:06+08:00
 ---
 
 # StoryMotion ICLR Reliability and Closure Contract
@@ -610,10 +612,10 @@ Re-review should be requested only after every applicable item below is true:
 | Q10 | interpretation closed | metric I/O已规定sequential Camera ADE/FDE/rotation只作`dataset-target deviation` diagnostic，不是生成Human下唯一正确Camera target |
 | Q11 | partial formal；claim open | current C0-LAT shuffled与absent zero-sentinel均已完成pure4,053三接口并通过artifact seal（ledger §3.27），但没有同sealed evaluator的factual-correct sibling，也没有contradictory／target-attribute paired audit；absent仅为OOD auxiliary。闭合前禁止`independent Camera control`、`Camera-text-owned`或strong controllability措辞 |
 | Q12 | answered; robustness follow-up open | 两条旧C1 LAT/GEO Camera训练确为每step GT-H64 + frozen-teacher-final-H64，loss按两route等权平均；这不是Direct-C evaluator混合，而是Camera训练condition mixture。C0-LAT仍只用factual GT-H positive；generated-H条件保持OOD interpretation |
-| Q14 | open | sealed final blind audit、随机／最好／最差、failure taxonomy与盲化比较仍未完成；不写visual superiority |
+| Q14 | open；fixed diagnostic closed | sampler diagonal三组fixed-8已通过24个MP4完整解码、逐媒体hash及共同source／renderer／ffmpeg审计；但sealed final blind audit、随机／最好／最差、failure taxonomy与盲化比较仍未完成，不写visual superiority |
 | Q15 | field-bounded only | C1REL与noI16 seed23已闭合窄字段复现；HREL／C0主线没有完整多seed robust claim |
 | Q17、Q22 | claim narrowed | “framework”只表示本实现的架构组织；不主张可扩展任意Human backbone。最强主张是受约束的capability-preserving asymmetric design与三个互补evaluation interfaces，不写SOTA、全局对称优势或任意编辑 |
-| Q19 | open；r2无结果 | 已冻结offline、non-causal、sequential two-pass边界；4090 secondary在首个case因缺`human_text_tokens`失败，5090 primary因上游grid队列失败未启动，均无`resource_profile.json`。Human／Camera pass latency、总参数、峰值显存和长度缩放仍未形成sealed profile |
+| Q19 | closed；runtime-only | 4090 r4与5090 SSD r5均完成27/27 cases、3 measured repeats及独立audit；Human／Observed-H Camera／Generated-H two-pass latency、throughput、`156,362,176`参数与峰值显存已封存（ledger §3.30）。只支持offline portability disclosure；不写online／real-time或跨主机algorithmic speedup |
 
 ## 9. Durable submission queue
 
@@ -632,5 +634,6 @@ Re-review should be requested only after every applicable item below is true:
 | closed secondary / non-core | Independent Human／Camera native system / Stage1 pair；Stage2 `sm_independent_dual_encdec_lat_h105k_c105k_seed17_4090g1_20260811` | Stage1与Stage2 endpoint、三模式pure4,053及paired seal均已formal；ledger §§3.24、6.9 | —；永久保留representation／decoder／normalizer／cache／runtime差异与mixed outcome | 完整native-chain feasibility与system trade-off only；no protected-asymmetry、latent-interface、cascade或independent-representation superiority claim |
 | closed optional / non-core | Human-text condition attribution / `sm_ht_condition_attribution_pure4053_20260810_r2` | 12/12 intervention arms、matching references、N=4,053 IDs与model/decoder/cache identity已R2-sealed；ledger §3.25 | —；保留aggregate无paired CI、不得写统计等价 | 非空Human-text通道使用only；不支持样本匹配Human语义，不promote HT或改变C0-LAT |
 | Q3 | C0-LAT Camera-text ownership / partial formal | shuffled／absent pure4,053 cells有效且Direct-H在二者间exact；ledger §3.27。缺同-evaluator factual correct、contradictory／target-attribute paired audit；absent只作OOD auxiliary | 以新matched factual sibling和预封存contradictory subset补齐Direct-C／sequential，审计target/non-target Camera变化与Human invariance | `Camera-text-owned`、`independent Camera control` and controllability wording |
-| Q4 | C0-LAT resource profile / no sealed artifact | 4090 r2首case失败；5090 r2未启动；两者都没有result | 修复batch text-input合同后用新run/result root记录Human pass、Direct-C Camera pass、sequential total latency、parameter count、peak memory和长度缩放 | offline/two-pass cost disclosure；no real-time or online claim |
+| closed P1 | C0-LAT sampler grid / `sm_c0_lat_sampler_grid_pure4053_r8_20260813` | 9/9 pure4,053 cells、generate-once Human caches及独立grid audit完成；ledger §3.29 | —；pure test cohort禁止post-hoc Pareto selection，default保持H50/C50 | sampler cost–quality disclosure only；no test-selected endpoint |
+| closed Q4 | C0-LAT resource profiles / `sm_c0_lat_resource_profile_seed17_4090g1_r4_20260813`；`sm_c0_lat_resource_profile_seed17_5090g2_r5_ssd_20260813` | 两机各27/27 cases、3 repeats、设备／artifact audit完成；5090 active roots验证为`/dev/sdb2` SSD；ledger §3.30 | —；保留旧r2失败与5090 HDD r4未执行provenance | offline/two-pass cost disclosure；no real-time、online或cross-host algorithmic speedup claim |
 | future / conditional | Composite H–C utility data and Stage1 support audit / no run authorized | not started; no long train authorized | Construct retargeted/re-solved many-to-many pairs, recompute Camera14/projection/framing/I16/C48, filter, seal composition-disjoint eval, then pass frozen-Stage1 support and Human-retention gates before any pair-side finetune or Stage2 | secondary utility only; no free-editing claim |

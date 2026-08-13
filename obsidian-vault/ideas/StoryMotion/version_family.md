@@ -31,7 +31,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[2026-07-29_full_re]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T11:14:41+08:00
+updated: 2026-08-13T14:13:06+08:00
 ---
 
 # StoryMotion Repository Version Family
@@ -325,14 +325,20 @@ C5-B 的 `0.5×/1.0×` 是相对 **fresh two-seed multi-horizon base weight** �
 - **2026-08-13（current C0-LAT Camera-text intervention partial formal）：** shuffled r3与absent zero-sentinel r4分别完成ordered pure4,053三接口，现有manifest、4,053行records及全部artifact bytes验收通过；两臂Direct-H exact。两种Camera接口在shuffled／absent下均相对既有factual mainline context出现五个方向性semantic／framing aggregate回退，absent更大，但本轮没有同sealed evaluator的factual-correct sibling，也未执行contradictory／target-attribute paired audit。故只登记两个有效intervention cells，Camera-text ownership与controllability claim继续pending；absent永久只作OOD auxiliary。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.27 C0-LAT Camera-text shuffled／absent pure4,053 formal cells]]。
 - **2026-08-13（C0-LAT sampler-step grid r4 partial formal）：** 5090 SSD worktree的预注册3×3 grid完成6个pure4,053 cell并逐项通过record／manifest／artifact-hash验收；GPU2在`H50/C50` prepare遇到mode顺序合同不一致后fail closed，`H50/C50`、`H100/C25`、`H100/C100`无有效结果。`complete_grid_required=true`，因此六个cell只保留为有效partial evidence，不选择Pareto、不替换50/50 default。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.28 C0-LAT sampler-step grid r4 partial formal snapshot]]。
 - **2026-08-13（resource／fixed-8 post-queue未形成结果）：** 4090 secondary resource r2在首个case因batch缺`human_text_tokens`失败，5090 primary r2因上游grid队列失败未启动；均无`resource_profile.json`。4090 shuffled与5090 `H50/C25` fixed-8 render仅复制source后因错误Pulp stats root停止，其余排队render未完成；所有partial visual roots无manifest／视频，不能进入visual registry。合同、日志与partial roots保留bug provenance，不产生metric或visual evidence。
+- **2026-08-13（C0-LAT sampler-step grid r8 formal闭合）：** 新r8 family修复r4的mode-order preflight bug，并在5090 SSD worktree完成H/C∈{25,50,100}的9/9 pure4,053 cells。独立grid auditor绑定每个execution、evaluation contract、fixed samples、4,053-row records、results与manifest，grid audit状态为`complete_sampler_grid_audited`。该grid直接使用pure test cohort，故不作post-hoc Pareto selection，预注册default继续为H50/C50；r4六个partial cells及失败合同保持immutable provenance。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.29 C0-LAT sampler-step grid r8 complete formal]]。
+- **2026-08-13（C0-LAT双机resource profile formal闭合）：** 4090 r4与5090 r5-SSD各完成27/27 cases、1次warm-up、3次measured repeats，并由共同auditor验证device binding、参数、latency、throughput、峰值显存、长度／steps scaling及non-causal/no-joint/no-optimizer边界。5090 active code、contract与result roots均在`/dev/sdb2`、`ROTA=0` SSD；HDD r4未执行且未补写。结果只支持offline runtime／portability disclosure，不支持quality ranking、checkpoint selection、online／real-time或跨主机algorithmic speedup。正式数字与hash只见[[StoryMotion-valid-metric-ledger#Audited detail — §3.30 C0-LAT sealed resource profiles]]。
+- **2026-08-13（sampler diagonal fixed-8 visual confirmation闭合）：** r8 H25/C25、H50/C50、H100/C100在fresh r3 visual roots完成同一8 IDs的Direct-C／sequential三栏资产。family auditor重算并完整解码24个MP4，核验24个midpoint PNG、3个contact sheets、3份embedded source及共同ordered IDs、Camera weights、decoder、renderer、Pulp stats和ffmpeg identity；audit SHA-256=`c3c5e28f4e21afcc9d6c7a1f4caa6499a478f1ee61da370da92144fe8f810fea`。该事件只关闭fixed diagnostic confirmation，不关闭blind registry、failure taxonomy或visual superiority claim。
 
 ## Bug 与 invalidation provenance
 
 | issue | 影响 | 当前处理 |
 | --- | --- | --- |
-| sampler-grid r4 default cell的contract mode顺序为Direct-C／Direct-H／sequential，而evaluator按Direct-H／Direct-C／sequential比较list | GPU2在6/9总体进度处于`H50/C50` prepare fail closed；其后两个GPU2 cells未执行 | 六个已sealed cells按partial formal保留，完整grid不得选择；修复须新版本/evaluator seal并避免改写r4 artifact |
-| resource-profile r2 runner读取batch中不存在的`human_text_tokens` | 4090首case即失败，5090又因上游queue未启动；两个r2均无result | 保留preregistered合同与失败日志；修复后使用新run ID／result root，不在r2空目录补写 |
+| sampler-grid r4 default cell的contract mode顺序为Direct-C／Direct-H／sequential，而evaluator按Direct-H／Direct-C／sequential比较list | GPU2在6/9总体进度处于`H50/C50` prepare fail closed；其后两个GPU2 cells未执行 | 六个r4 cells按partial formal保留；新r8 evaluator／contracts修复并完成9/9独立审计，仍不从pure test grid选择endpoint |
+| resource-profile r2 runner读取batch中不存在的`human_text_tokens` | 4090首case即失败，5090又因上游queue未启动；两个r2均无result | 保留r2合同与失败日志；新4090 r4与5090 SSD r5使用fresh run/result roots完成27/27审计，未向r2或HDD r4补写 |
 | 2026-08-13 fixed-8 queues传入缺official stats YAML的Pulp root | shuffled与`H50/C25`只复制source，其他render未执行；无manifest／视频 | partial roots禁止登记visual evidence；重新部署前先以read-only stats preflight验证实际dataset root |
+| Camera-text r3 smoke调用不存在的`base.source_ids_for` | correct／shuffled smoke在result写入前失败；四个r3 result roots均未形成formal结果 | r3合同／日志保留；fresh r4 evaluator改为本地sealed source-ID helper并通过17项测试，只有r4 family audit通过后才可登记结果 |
+| I3 r1使用不存在的PYTHONPATH overlay；r2又缺physical GPU／UUID execution seal | r1在Human cache前因缺`rotary_embedding_torch`失败；r2在合同写入前主动停止 | r1/r2原样保留；r3绑定manifested dependency overlay、module hashes、physical GPU/CVD/process-device/UUID及独立formal auditor，不从旧root恢复 |
+| fixed renderer只预检Pulp stats而未预检`ffmpeg` identity | sampler首个fresh composed render在视频生成前因PATH无ffmpeg停止；未形成可登记visual evidence | renderer新增ffmpeg path/hash/version preflight与manifest字段；fresh r3 family已逐媒体hash并完整解码审计，失败root未回填；该资产仍是diagnostic而非blind evidence |
 | v7.5–v7.13 使用旧 raw human199/camera9 与错误 decode contract | local Stage1/Stage2 ranking 不可靠 | 只保 provenance；v7.14 corrected contract 起算 |
 | explicit-framing formal／visual 首轮边界错误 | 首次 evaluator loader 读错 checkpoint hash key，第二次沿用 N64 batch/noise 而非 parent formal batch32/noise，均未形成正式结果；首次成功 render 又声明四栏但 base renderer 实际只画三栏 | 三个 roots 全部保留为 failed provenance；formal 只接受重新预注册且 matched 的完整4,053结果，visual 只接受抽帧确认四栏且 manifest 绑定 base-renderer SHA 的 fresh root |
 | Human-text fixed8首条render命令使用失效的Pulp fast-root | pure4,053 eval与audit不受影响；render在首个cell前因缺失`smpl_rifke`失败，只留下空`arrays/` | 空目录经确认后移除；r2改用实际Pulp dataset root，完成80-cell manifest并通过逐文件SHA审计 |

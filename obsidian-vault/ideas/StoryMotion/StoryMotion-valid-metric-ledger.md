@@ -22,7 +22,7 @@ source_notes:
   - "[[StoryMotion-metric-computation-io]]"
   - "[[paper-boundary]]"
 created: 2026-07-12T12:15:00+08:00
-updated: 2026-08-13T11:14:41+08:00
+updated: 2026-08-13T14:04:22+08:00
 ---
 
 # StoryMotion Repository Valid Metric Ledger
@@ -1705,6 +1705,99 @@ snapshot 不具 Pareto selection、default replacement 或 test-selected step cl
 | v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r4_20260813` | `69a6e77040b48e010eb5f16b20b0fd3f4637b8746cb8fe8a62ee80e083079b04` / `c624ac0e58d6fb53173767db3e7a8431fde4bf11153583d131c4b3c2d53ad5d8` / `1fa0848f0d5c7800524073575fd87baff7183c4bca5746b48854f2582f49024c` / `4d32e835d3492cf70424a22c3ce752c40e7e6638dc4e020cb5463f95512f058a` / `d572f13b9f3837735c563b495ed437a6dc11ed49555312ff10e50d7bf8ef2c27` / `76cb343539e31f35e2152c53a5b8196cd1994b48b66d24dc79ff96d897fbff62` |
 | v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r4_20260813` | `42512cd48d87a6b344b4c1ce52210b8d71d36acf9d9d3cf919730db95c9b2231` / `e75853d671e2aec810728a698173e3daaa367359158685778badb5bfe35ee11a` / `72fc5021cc2079158538633efa875285e4f645a8edcce4afa5a761a42b3c71a3` / `8d6602b9a38a3a3fe14633fef84da84655fdc3646882d31bc56aac925515cb77` / `21b85084c41c36b94a88614da4558f0f59f7522ed28523bb44cd89ff3f275973` / `23f318dcf1563ea2721ce3f15ddd881cd192d79bb38785bac54c58f3b9e5928c` |
 | v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r4_20260813` | `d2fd1316e8dc8650b322f26e6dbc882fc431be905f79e9b79803e1184ae34285` / `64bb69e2f3def5f50c29615d43f0983bed424f865489c5d39f05899f9691aa98` / `f9f45a3d9828bd9287d9f73a868a39bcc640a227c9b3f03219a4356e2aa9d8db` / `766ef7eef486404593c3db2ffce746f22e1a09808f1d10304a7128b8e5dfdef4` / `d1660065b0224c15b00e9e95673b4cfd862547a1b990b64837aa78ed84201387` / `071a078cc60ef5b0dce7b6839a834fe3f7f45ce91adacebe271d2723088552a0` |
+
+### Audited detail — §3.29 C0-LAT sampler-step grid r8 complete formal
+
+r8 在 5090 SSD worktree 重新封存 evaluator 与完整 grid contract，修复 r4 的 mode-order
+preflight bug 后从新 run IDs 生成缺失 cells，并对全部 9 个 pure4,053 cells 做统一 fail-closed
+审计。grid audit 状态为 `complete_sampler_grid_audited`，completed=`9/9`；grid contract／
+evaluator／official input／ordered IDs SHA-256 分别为
+`dc7111c5fe1121e6d6f45a8d350e2975273203c732c8e4992c84e0c8d6fa9e38`／
+`fceb6eebb7e68107f2961a0bd9a4f424b60f3d35dfbcc53bccf91eb01c8747a4`／
+`6d75cbf5d22b4a9f0a39d79fa8cfb900708a4095725b7ff62e7bf11ca4d2b80f`／
+`a0d7627ee827e36a229d33f9975f8417ae78b504cd5a6db1edf62cb1a9266b93`。
+H25／H50／H100 generate-once cache SHA-256 为
+`7838950c6c1006bcc7f702a20ca528db2478c19bd692255de65576b0fe3bb340`／
+`4bd299cc990ad5cabfefa1670afa4d06e525840deb52caf59440bd53fd02642d`／
+`ef8e2675248fc08afd06ed4d48e16b3e8f0105a9fbe5ac76dd19774af02c8b6c`。
+独立 `grid_audit.json` SHA-256=
+`6afab01f9d6dc7dad45d5a96adae104fb2299b709846b1b41a82a1f6137eab21`，其中逐 cell
+绑定 execution、evaluation contract、fixed samples、records、results 与 manifest bytes。
+
+| version / run | H steps | C steps | sequential FDCLaTr ↓ / CLaTr ↑ | caption F1 ↑ | r-FPD ↓ / Out ↓ | Camera ADE / FDE ↓ m | rotation ↓ deg |
+| --- | ---: | ---: | --- | ---: | --- | --- | ---: |
+| v11 / `sm_c0_lat_sampler_grid_h025_c025_pure4053_r8_20260813` | 25 | 25 | `29.709513 / 56.980156` | `0.714445` | `0.433114 / 0.068090` | `2.906867 / 3.004755` | `70.828164` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r8_20260813` | 25 | 50 | `30.215458 / 55.802074` | `0.701340` | `0.457624 / 0.070155` | `2.910336 / 3.008426` | `70.902485` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c100_pure4053_r8_20260813` | 25 | 100 | `30.461082 / 55.242229` | `0.692788` | `0.481676 / 0.072019` | `2.912267 / 3.010622` | `70.922579` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r8_20260813` | 50 | 25 | `27.973045 / 56.745441` | `0.710081` | `0.482184 / 0.074892` | `2.939494 / 3.038257` | `71.403069` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c050_pure4053_r8_20260813` | 50 | 50 | `28.753626 / 55.578743` | `0.693518` | `0.508205 / 0.077265` | `2.942796 / 3.042190` | `71.434555` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r8_20260813` | 50 | 100 | `29.342546 / 55.020927` | `0.688143` | `0.532597 / 0.079081` | `2.944360 / 3.044037` | `71.402452` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c025_pure4053_r8_20260813` | 100 | 25 | `27.382189 / 56.573685` | `0.710935` | `0.529032 / 0.078979` | `2.949543 / 3.048751` | `71.385158` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r8_20260813` | 100 | 50 | `28.427786 / 55.392792` | `0.694107` | `0.560943 / 0.082401` | `2.953038 / 3.052828` | `71.414991` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c100_pure4053_r8_20260813` | 100 | 100 | `29.172857 / 54.798561` | `0.686605` | `0.588237 / 0.084718` | `2.955155 / 3.055220` | `71.427750` |
+
+| version / run | sliced interface | primary semantic / distribution | projective / paired geometry context |
+| --- | --- | --- | --- |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r8_20260813` | Human generation, H25 | TMR `18.021236` / FDTMR `121.479698` | global / root-aligned MPJPE `0.832756 / 0.229566` m |
+| v11 / `sm_c0_lat_sampler_grid_h050_c050_pure4053_r8_20260813` | Human generation, H50 | TMR `17.608446` / FDTMR `99.390511` | global / root-aligned MPJPE `0.842760 / 0.228751` m |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r8_20260813` | Human generation, H100 | TMR `17.197746` / FDTMR `92.361870` | global / root-aligned MPJPE `0.848286 / 0.228860` m |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r8_20260813` | Observed-H Camera, C25 | CLaTr `58.008045` / FDCLaTr `18.757345`；caption F1 `0.751211` | r-FPD / Out `0.793315 / 0.101726`；ADE / FDE `1.403524 / 1.489013` m；rotation `29.808927` deg |
+| v11 / `sm_c0_lat_sampler_grid_h050_c050_pure4053_r8_20260813` | Observed-H Camera, C50 | CLaTr `56.933498` / FDCLaTr `21.171379`；caption F1 `0.737150` | r-FPD / Out `0.846527 / 0.105178`；ADE / FDE `1.412472 / 1.498528` m；rotation `29.922050` deg |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r8_20260813` | Observed-H Camera, C100 | CLaTr `56.392288` / FDCLaTr `22.926144`；caption F1 `0.728462` | r-FPD / Out `0.895799 / 0.108041`；ADE / FDE `1.418537 / 1.504831` m；rotation `30.025345` deg |
+
+H/C step effects是 field-wise trade-off，且本次 grid 直接使用 pure test cohort，没有独立 validation
+selection gate；因此**不从 9 cells 事后选择新 Pareto endpoint**，预注册 default `H50/C50`保持不变。
+r4 的六个已审计 partial cells继续作为 immutable provenance，不与 r8 artifact 拼接。
+
+#### Complete-grid artifact identity
+
+每行列出 results / manifest SHA-256；同一 `grid_audit.json` 另行逐项绑定 evaluation contract、fixed
+samples 与 4,053-row records。
+
+| version / run | results / manifest SHA-256 |
+| --- | --- |
+| v11 / `sm_c0_lat_sampler_grid_h025_c025_pure4053_r8_20260813` | `abf5f7492b32c99360cf2beb22c01badadbc43bdc7ec0a02a52c78a14f2ca0e0` / `9b691bbe88e259c18456d311c1a1dc0bcdc72083bdeb7c4d6b59f9bbf7cf4bb9` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c050_pure4053_r8_20260813` | `bc6c0944ee5fe193122ba6753f031f2c0ea6e8a70c145d34e4ccc40514fc6af5` / `d9c464eed27a5487450cfa43133686331b016003c62ee947ceb0f9f2ed43f81e` |
+| v11 / `sm_c0_lat_sampler_grid_h025_c100_pure4053_r8_20260813` | `7f34291c8bbf2edd67c50c181c3f491c66113c79cf85e16de57337d57fde3e7c` / `262030515ed5b554c14e4d9f278246a54d102b92840e74361643e549a7a79ae2` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c025_pure4053_r8_20260813` | `eb038e67427efac0996ffd8d4d3030dcfd1a85cf34218bf7d5ae636cd699d0e6` / `fb8b7305d3528d9b7b43713009952c802d833ba568072ef60826350dd36e1a17` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c050_pure4053_r8_20260813` | `bfe088cbba25de98de0cd0d690df436e55fd04117c2e8830a35faf9503c78280` / `e67e25c95f0d6126591ae80a45e733f7f9c667126d0a9b83cb98652233dd1b0c` |
+| v11 / `sm_c0_lat_sampler_grid_h050_c100_pure4053_r8_20260813` | `43a8ce4d0e37debccddd7edf724cfe6f48b141ff5de268ae1a39603310fe7924` / `e52f0804f5b68f2ba0cc098fad92850df76588bd1bf125782625faaebc1deac4` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c025_pure4053_r8_20260813` | `2949b85b5026fcc6da1fcf31df40c1f3a0d407dcc442f8d7b286abbbcfd36ee0` / `8775c2affc95afb53c6a8e774af7f74f4ef694dccc4fc13fd64e4a486132370f` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c050_pure4053_r8_20260813` | `7a3042712def96e189370e7a9f0b37b297db5a7be7b42ee3633046e63cb6640f` / `2198bc00cdb5cdb6d5179552318f1ab97f032217a037a1b98edbab8fa2f913d9` |
+| v11 / `sm_c0_lat_sampler_grid_h100_c100_pure4053_r8_20260813` | `60cad6957e568cc9106009e77c470f7e52b810f17324eed154dcc5c6b968c56b` / `2150d364149951c9aa84078f62e42df532258b11a22ad4ada7479cc8814eb214` |
+
+### Audited detail — §3.30 C0-LAT sealed resource profiles
+
+两个 profile 均固定 operational C0-LAT、batch `8`、FP32/no autocast、warm-up `1`、measured repeats
+`3`、同一 8 IDs，并明确 `is_causal=false`、`joint_parallel=false`、无 optimizer。每个 profile
+覆盖 27/27 cases：Human、Observed-H Camera、Generated-H two-pass 的长度与 step scaling。模型参数为
+Human `71,870,080`、Camera `84,492,096`、合计 `156,362,176`。Human／two-pass peak allocated
+`657,943,552` bytes，Camera peak allocated `657,384,960` bytes，peak reserved 均为
+`683,671,552` bytes。
+
+| version / run | device / execution | mode @ latent75, steps | median / p95 latency s | throughput samples/s |
+| --- | --- | --- | --- | ---: |
+| v11 / `sm_c0_lat_resource_profile_seed17_5090g2_r5_ssd_20260813` | RTX 5090 GPU2 / UUID `GPU-198d0b4d-2402-fe11-0740-1ca7bc58e30b` | Human, H50 | `0.462508 / 0.465486` | `17.297002` |
+| v11 / `sm_c0_lat_resource_profile_seed17_5090g2_r5_ssd_20260813` | RTX 5090 GPU2 / same sealed execution | Observed-H Camera, C50 | `0.630685 / 0.632052` | `12.684617` |
+| v11 / `sm_c0_lat_resource_profile_seed17_5090g2_r5_ssd_20260813` | RTX 5090 GPU2 / same sealed execution | Generated-H two-pass, H50/C50 | `1.083987 / 1.084548` | `7.380160` |
+| v11 / `sm_c0_lat_resource_profile_seed17_4090g1_r4_20260813` | RTX 4090 GPU1 / UUID `GPU-6337e204-7f3e-9593-8f69-7d2d2621881b` | Human, H50 | `0.704838 / 0.724164` | `11.350120` |
+| v11 / `sm_c0_lat_resource_profile_seed17_4090g1_r4_20260813` | RTX 4090 GPU1 / same sealed execution | Observed-H Camera, C50 | `0.966873 / 0.982469` | `8.274098` |
+| v11 / `sm_c0_lat_resource_profile_seed17_4090g1_r4_20260813` | RTX 4090 GPU1 / same sealed execution | Generated-H two-pass, H50/C50 | `1.672631 / 1.676414` | `4.782884` |
+
+5090 active code、contract 与 result roots 均在 `/dev/sdb2`、mount `/`、`ROTA=0` 的 SSD；没有把
+5090 HDD worktree 的 unexecuted r4 profile补写成结果。5090 profile/result/audit SHA-256 为
+`2aa430d088289210e150a18f4268341c6b3e7f156903070f86ba085767d82211`／
+`bdd95780036b0ed8f7c3944abe6db564a86ea886523691d4794362d54561635f`／
+`6d4e0d0075f0df969184a6955c05025764a39cd053afbaa067b075a1ff5f7c6c`；4090 对应为
+`44f3db750319ba16f41ea8fa9d1b751b9e26903e3e7e770040cfe4efb34d4ddc`／
+`f9b95cc24e886229f1accf7a90e57134e820677e059d41429477d6c97a906694`／
+`5c9997fde19b766e244bf7482eaeb060b9e0a62d956e085207738da536083bb8`。
+共同 auditor SHA-256=
+`92f8924d1d11dd797cdfc8df6703471cdc59fd4f37e769ce792b95bbf79604c9`。
+
+这些数字只支持 sealed runtime／portability 描述：方法是 offline、non-causal、two-pass；不同 host
+之间不能改写成 algorithmic speedup，profile也不参与质量排序或 checkpoint selection。长度 16–75
+的 latency近似平坦来自当前 padded fixed-shape compute，不代表任意长度下的线性复杂度结论。
 
 ## 4B. v9+ Stage1 audited detail tables
 

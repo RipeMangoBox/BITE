@@ -20,8 +20,10 @@ hypothesis: |
   Current-mainline shuffled and absent Camera-text cells are individually
   formal, but ownership remains open because a same-evaluator factual sibling,
   contradictory target-response audit, and paired non-target audit are missing.
-  The sampler-step grid is 6/9 complete and is not selection-eligible; the
-  sealed resource profile and queued fixed-8 renders produced no valid result.
+  The sampler-step grid is now 9/9 audited without post-hoc selection, and the
+  4090 plus 5090-SSD resource profiles are sealed as runtime-only evidence.
+  The sampler diagonal fixed-8 family is media-hash and decode audited, but it
+  remains a diagnostic cohort rather than a blind audit.
   The source-free C0-LAT implementation cleanup is formally closed and
   quality-mixed; it removes a non-claim implementation variable without
   automatically replacing the operational metric mainline.
@@ -46,7 +48,7 @@ source_notes:
   - "[[paper-boundary]]"
   - "[[analysis/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing]]"
 created: 2026-07-12T14:30:00+08:00
-updated: 2026-08-13T11:14:41+08:00
+updated: 2026-08-13T14:13:06+08:00
 ---
 
 # StoryMotion: Preserving Human Motion Priors in Asymmetric Human–Camera Generation
@@ -185,15 +187,15 @@ updated: 2026-08-13T11:14:41+08:00
 > ledger §3.26。
 > step与ETA只见各自`runs/`，本页不重复。
 
-> [!warning] 2026-08-13 空卡验收：I2／I5／R1／visual仍未关闭
-> C0-LAT shuffled r3 与 absent zero-sentinel r4 均完成 pure4,053 三接口并通过当前
-> manifest／artifact-hash／record-count 验收；两臂是有效 intervention cells，但没有同 sealed
-> evaluator 的 factual-correct sibling，且 contradictory／target-attribute paired audit未执行，故
-> Camera-text ownership与controllability仍不成立。5090 sampler grid r4 只有6/9 cells有效，
-> `H50/C50`因mode顺序合同不一致fail closed，后续两个GPU2 cells未执行；complete-grid gate禁止
-> 选择step。4090 resource r2在首个case因缺少`human_text_tokens`失败，5090 resource r2未启动；
-> fixed-8 queues又因错误Pulp stats root停止，只有source复制、没有manifest或视频。正式 cell 数字与
-> hash只见ledger §§3.27–3.28，失败细节与关闭条件只见任务页。
+> [!important] 2026-08-13 I5／R1已闭合；I2／I3／visual继续按gate执行
+> 5090 SSD上的sampler r8已完成预注册3×3 grid的9/9 pure4,053 cells，并由独立auditor绑定
+> contracts、records、results、manifests与fixed samples；由于直接使用pure test cohort，不做
+> post-hoc Pareto selection，默认仍为H50/C50。4090 r4与5090 SSD r5 resource profiles均完成
+> 27/27 cases和三次重复，参数、latency、throughput、显存与设备identity已sealed，只支持offline
+> runtime disclosure。旧r4 partial grid、resource r2失败与5090 HDD未执行profile继续保留immutable
+> provenance。sampler diagonal fixed-8 family已通过24个视频完整解码与逐媒体hash审计，但只作
+> diagnostic confirmation，不替代blind visual audit。I2 matched四条件formal、I3 composition和完整
+> blind registry仍未通过最终审计，因此本页不提前登记其结论。正式数字与hash只见ledger §§3.29–3.30。
 
 > [!warning] ICLR QA status
 > symmetric route-control执行缺口已经关闭，但结论是field-wise mixed Pareto；historical source-row
@@ -205,8 +207,8 @@ updated: 2026-08-13T11:14:41+08:00
 > 但结论是mixed Pareto。独立H/C Stage1＋Stage2已formal闭合为secondary mixed system boundary，
 > 不提供核心单变量证据；matched Camera-text dropout已以negative ablation闭合。当前mainline
 > shuffled／absent cell虽有效，但缺matched correct、contradictory／target-attribute audit，仍未关闭
-> Camera-text ownership；sampler-step grid也只完成6/9。剩余投稿QA是这两个formal闭环、
-> simple-composition baseline、sealed blind audit／visual failure taxonomy、sealed resource profile与
+> Camera-text ownership。sampler-step grid与sealed resource profile已经闭合；剩余投稿QA是
+> Camera-text matched formal、simple-composition baseline、sealed blind audit／visual failure taxonomy与
 > release package。
 
 > [!note] Caption boundary
@@ -367,8 +369,9 @@ ViGen；StoryMotion works on Human motion generation and capability-preserving H
    paired seal也已闭合；结果是Camera semantic／caption改善但Human semantic、projective framing与
    多数Camera geometry回退的mixed system comparison（ledger §3.24）。它仍只作secondary
    native-system boundary，不进入核心单变量矩阵。
-   `0810-2137`建议中，current C0-LAT的Camera-text correct／shuffle／absent ownership audit、
-   sealed visual blind audit与latency／参数／显存profile仍是明确缺口。
+   `0810-2137`建议中，current C0-LAT的Camera-text correct／shuffle／contradictory ownership audit与
+   sealed visual blind audit仍是明确缺口；latency／参数／显存profile与sampler diagonal fixed-8
+   diagnostic已闭合，但不替代前两项。
    基础盲评只用于可信度。最终还需冻结论文代码、配置、三接口evaluator、checkpoint／decoder身份、
    参数量、GPU小时、推理成本与最小复现实验包。
 3. **措辞边界。** sequential不写成同步joint；显式3D motion generation不写成ViGen
